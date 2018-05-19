@@ -1,6 +1,7 @@
 Hey guys,
 
-here we are. After some time and thoughts i give my Telegram Bot framework to public.
+here we are. After some time and thoughts i give my Telegram Bot framework  to public.
+It is based on C#.
 
 It is module which is based on the original TelegramBotLibrary you will find in nuget.
 
@@ -30,7 +31,7 @@ Every Form has some events which will get raised at specific times. On every for
 
 ```
 public class StartForm : FormBase
-    {
+{
 
 
         public override async Task PreLoad(MessageResult message)
@@ -72,7 +73,7 @@ public class StartForm : FormBase
 
         }
 
-    }
+}
 
 ```
 
