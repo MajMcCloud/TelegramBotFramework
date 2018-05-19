@@ -125,11 +125,13 @@ public class SimpleForm : FormBase
 			case "hello":
 			case "hi":
 
+				//Send him a simple message
 				await this.Device.Send("Hello you there !");
 			break;
 
 			case "maybe":
 
+				//Send him a simple message and reply to the one of himself
 				await this.Device.Send("Maybe what?", replyTo: messageId);
 
 			break;
@@ -137,6 +139,7 @@ public class SimpleForm : FormBase
 			case "bye":
 			case "ciao":
 		
+				//Send him a simple message
 				await this.Device.Send("Ok, take care !");
 			break;
 		}
