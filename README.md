@@ -26,6 +26,62 @@ bb.Start();
 
 ```
 
+Every Form has some events which will get raised at specific times. On every form you are able to get notes about the "Remote Device" like ChatId and other stuff your carrying. From there you build up you apps:
+
+```
+public class StartForm : FormBase
+    {
+
+
+        public override async Task PreLoad(MessageResult message)
+        {
+
+        }
+
+        public override async Task Init(params object[] param)
+        {
+            
+        }
+
+        public override async Task Opened()
+        {
+
+        }
+
+        public override async Task Closed()
+        {
+
+        }
+
+        public override async Task Load(MessageResult message)
+        {
+            await this.Device.Send("Hello world!");
+        }
+
+
+
+        public override async Task Action(MessageResult message)
+        {
+
+
+        }
+
+
+        public override async Task Render(MessageResult message)
+        {
+
+        }
+
+    }
+
+```
+
+For instance send a message after loading a specific form:
+
+```
+await this.Device.Send("Hello world!");
+```
+
 
 ---
 
