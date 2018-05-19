@@ -14,32 +14,32 @@ namespace TelegramBaseTest
         static void Main(string[] args)
         {
 
+            String APIKey = "";
 
-
-            BotBase<TestForm> bb = new BotBase<TestForm>("480896099:AAHo0KIurkdugqdZ1tYh7sik3tJ9guH2uuI");
+            BotBase<TestForm> bb = new BotBase<TestForm>(APIKey);
 
             bb.SystemCalls.Add("/start");
             bb.SystemCalls.Add("/form1");
             bb.SystemCalls.Add("/form2");
 
-            bb.SystemCall += (s, en) =>
+            bb.SystemCall += async (s, en) =>
             {
-                switch(en.Command)
+                switch (en.Command)
                 {
                     case "/form1":
 
                         var form1 = new TestForm();
-                        form1.Init();
+                        await form1.Init();
 
-                        en.Device.ActiveForm.NavigateTo(form1);
+                        await en.Device.ActiveForm.NavigateTo(form1);
 
                         break;
                     case "/form2":
 
                         var form2 = new TestForm2();
-                        form2.Init();
+                        await form2.Init();
 
-                        en.Device.ActiveForm.NavigateTo(form2);
+                        await en.Device.ActiveForm.NavigateTo(form2);
 
                         break;
                 }
@@ -48,7 +48,7 @@ namespace TelegramBaseTest
 
             bb.Start();
 
-            
+
 
             Console.WriteLine("Telegram Bot started...");
 
