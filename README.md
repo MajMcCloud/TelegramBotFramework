@@ -9,7 +9,7 @@ It gives you features which will look/feel like WinForms or have a good way to c
 
 ---
 
-How to start:
+## How to start:
 
 Within your empty App your need to put some initial lines including your APIKey to get things started. The "BotBase" Class will manage a lot of things for you, like system calls, action events and so on. "StartForm" is your first Formular which every user will get internally redirected to, like a start page, you could redirect from there later in code, so users won't recognize it. It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBase.Form.
 
@@ -93,6 +93,63 @@ await tf.Init();
 
 await this.NavigateTo(tf);
 ```
+
+## Simple Message Handling
+
+On every input the user is sending back to the bot Action event get raised. So here we could manage to send something back to him. For sure we could also manage different button inputs:
+
+### Lets start with text messages
+
+
+
+```
+public class SimpleForm : FormBase
+{
+
+
+        public override async Task Load(MessageResult message)
+        {
+            await this.Device.Send("Hello world!");
+        }
+
+
+
+        public override async Task Action(MessageResult message)
+        {
+		//message.MessageText will work also, cause it is a string you could manage a lot different scenerios here
+
+		var messageId = message.MessageId;
+
+		switch (message.Command)
+           	{
+			case "hello":
+			case "hi":
+
+				await this.Device.Send("Hello you there !");
+			break;
+
+			case "maybe":
+
+				await this.Device.Send("Maybe what?", replyTo: messageId);
+
+			break;
+		
+			case "bye":
+			case "ciao":
+		
+				await this.Device.Send("Ok, take care !");
+			break;
+		}
+        }
+
+
+}
+
+```
+
+
+
+
 
 ---
 
