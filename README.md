@@ -82,6 +82,16 @@ For instance send a message after loading a specific form:
 await this.Device.Send("Hello world!");
 ```
 
+Or you want to goto a different form?
+Go ahead, create it, initialize it and navigate to it:
+
+```
+var tf = new TestForm();
+
+await tf.Init();
+
+await this.NavigateTo(tf);
+```
 
 ---
 
