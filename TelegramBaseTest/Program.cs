@@ -16,7 +16,7 @@ namespace TelegramBaseTest
 
             String APIKey = "";
 
-            BotBase<TestForm2> bb = new BotBase<TestForm2>(APIKey);
+            BotBase<Start> bb = new BotBase<Start>(APIKey);
 
             bb.SystemCalls.Add("/start");
             bb.SystemCalls.Add("/form1");
