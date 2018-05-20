@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBotBase.Form
@@ -71,9 +70,7 @@ namespace TelegramBotBase.Form
 
         public static implicit operator InlineKeyboardMarkup(ButtonForm form)
         {
-            InlineKeyboardMarkup ikm = new InlineKeyboardMarkup();
-
-            ikm.InlineKeyboard = form.ToArray();
+            InlineKeyboardMarkup ikm = new InlineKeyboardMarkup(form.ToArray());
 
             return ikm;
         }

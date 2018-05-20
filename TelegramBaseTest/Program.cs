@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase;
 using TelegramBotBase.Form;
-using TelegramBotBase.Tests;
+using TelegramBaseTest.Tests;
 
 namespace TelegramBaseTest
 {
@@ -16,7 +16,7 @@ namespace TelegramBaseTest
 
             String APIKey = "";
 
-            BotBase<TestForm> bb = new BotBase<TestForm>(APIKey);
+            BotBase<TestForm2> bb = new BotBase<TestForm2>(APIKey);
 
             bb.SystemCalls.Add("/start");
             bb.SystemCalls.Add("/form1");

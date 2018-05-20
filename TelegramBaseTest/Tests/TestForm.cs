@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Tests
+namespace TelegramBaseTest.Tests
 {
     public class TestForm : FormBase
     {
@@ -22,12 +22,12 @@ namespace TelegramBotBase.Tests
 
         public override async Task Opened()
         {
-            await this.Device.Send("Willkommen in Formular 1");
+            await this.Device.Send("Welcome to Form 1");
         }
 
         public override async Task Closed()
         {
-            await this.Device.Send("Tschüss in Formular 1");
+            await this.Device.Send("Ciao from Form 1");
         }
 
         public override async Task Load(MessageResult message)
@@ -59,6 +59,9 @@ namespace TelegramBotBase.Tests
 
                 default:
 
+                    if (message.RawMessageData == null)
+                        return;
+
                     this.LastMessage = message.RawMessageData.Message.Text;
 
                     break;
@@ -73,7 +76,7 @@ namespace TelegramBotBase.Tests
             if (message.Command == "reply")
             {
 
-                await this.Device.Send("Letzte Nachricht: " + this.LastMessage);
+                await this.Device.Send("Last message: " + this.LastMessage);
 
             }
 

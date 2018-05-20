@@ -6,12 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Tests
+namespace TelegramBaseTest.Tests
 {
     public class TestForm2 : FormBase
     {
@@ -23,12 +22,12 @@ namespace TelegramBotBase.Tests
 
         public override async Task Opened()
         {
-            await this.Device.Send("Willkommen in Formular 2");
+            await this.Device.Send("Welcome to Form 2");
         }
 
         public override async Task Closed()
         {
-            await this.Device.Send("Tschüss in Formular 2");
+            await this.Device.Send("Ciao from Form 2");
         }
 
         public override async Task Load(MessageResult message)
@@ -58,14 +57,14 @@ namespace TelegramBotBase.Tests
                 var fto = new TestForm2();
                 await fto.Init();
 
-                AlertDialog ad = new AlertDialog("Dies ist eine Meldung !", "Ok", fto);
+                AlertDialog ad = new AlertDialog("This is a message", "Ok", fto);
 
 
                 await this.NavigateTo(ad);
             }
             else if (call.Value == "prompt")
             {
-                PromptDialog pd = new PromptDialog("Bitte bestätigen !", new ButtonBase("Ok", "ok"), new ButtonBase("Abbrechen", "cancel"));
+                PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
 
                 var tf = new TestForm2();
 
@@ -89,7 +88,7 @@ namespace TelegramBotBase.Tests
 
                 g.FillRectangle(Brushes.White, 0, 0, bmp.Width, bmp.Height);
 
-                g.DrawString("Testbild", new Font("Arial", 24, FontStyle.Bold, GraphicsUnit.Pixel), Brushes.Black, new PointF(50, 50));
+                g.DrawString("Test Image", new Font("Arial", 24, FontStyle.Bold, GraphicsUnit.Pixel), Brushes.Black, new PointF(50, 50));
 
             }
 
@@ -97,9 +96,9 @@ namespace TelegramBotBase.Tests
 
             ButtonForm btn = new ButtonForm();
 
-            btn.AddButtonRow(new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")), new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")));
+            //btn.AddButtonRow(new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")), new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")));
 
-            btn.AddButtonRow(new ButtonBase("Info Dialog", CallbackData.Create("navigate", "alert")), new ButtonBase("Bestätigungs Dialog", CallbackData.Create("navigate", "prompt")));
+            btn.AddButtonRow(new ButtonBase("Information Prompt", CallbackData.Create("navigate", "alert")), new ButtonBase("Confirmation Prompt", CallbackData.Create("navigate", "prompt")));
 
 
             await this.Device.SendPhoto(bmp, "Test", btn);

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -123,7 +124,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task SendPhoto(FileToSend file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task SendPhoto(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             if (this.ActiveForm == null)
                 return;
@@ -151,7 +152,7 @@ namespace TelegramBotBase.Sessions
         {
             using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
             {
-                var fts = new FileToSend(name, fileStream);
+                InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
                 await SendPhoto(fts, buttons, replyTo, disableNotification);
             }
@@ -169,7 +170,7 @@ namespace TelegramBotBase.Sessions
         {
             using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
             {
-                var fts = new FileToSend(name, fileStream);
+                InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
                 await SendPhoto(fts, buttons, replyTo, disableNotification);
             }
@@ -189,7 +190,7 @@ namespace TelegramBotBase.Sessions
         {
             MemoryStream ms = new MemoryStream(document);
 
-            FileToSend fts = new FileToSend(filename, ms);
+            InputOnlineFile fts = new InputOnlineFile(ms, filename);
 
             await SendDocument(fts, caption, buttons, replyTo, disableNotification);
         }
@@ -203,7 +204,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task SendDocument(FileToSend document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task SendDocument(InputOnlineFile document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             InlineKeyboardMarkup markup = null;
             if (buttons != null)
