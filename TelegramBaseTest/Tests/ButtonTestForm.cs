@@ -27,6 +27,8 @@ namespace TelegramBaseTest.Tests
             if (call == null)
                 return;
 
+            message.Handled = true;
+
             switch (call.Value)
             {
                 case "button1":
@@ -60,6 +62,12 @@ namespace TelegramBaseTest.Tests
                     await st.Init();
 
                     await this.NavigateTo(st);
+
+                    break;
+
+                default:
+
+                    message.Handled = false;
 
                     break;
             }
