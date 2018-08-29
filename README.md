@@ -178,6 +178,8 @@ public class ButtonTestForm : AutoCleanForm
             if (call == null)
                 return;
 
+            message.Handled = true;
+
             switch (call.Value)
             {
                 case "button1":
@@ -211,6 +213,12 @@ public class ButtonTestForm : AutoCleanForm
                     await st.Init();
 
                     await this.NavigateTo(st);
+
+                    break;
+
+                default:
+
+                    message.Handled = false;
 
                     break;
             }
