@@ -95,9 +95,23 @@ namespace TelegramBotBase.Sessions
                 markup = buttons;
             }
 
-            var message = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+            Message m = null;
 
-            OnMessageSent(new MessageSentEventArgs(message.MessageId, message));
+            try
+            {
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            {
+                return;
+            }
+            catch
+            {
+                return;
+            }
+
+
+            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
         }
 
         /// <summary>
@@ -107,14 +121,27 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task Send(String text, InlineKeyboardMarkup markup , int replyTo = 0, bool disableNotification = false)
+        public async Task Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false)
         {
             if (this.ActiveForm == null)
                 return;
 
-            var message = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+            Message m = null;
 
-            OnMessageSent(new MessageSentEventArgs(message.MessageId, message));
+            try
+            {
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            {
+                return;
+            }
+            catch
+            {
+                return;
+            }
+
+            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
         }
 
         /// <summary>
@@ -135,9 +162,22 @@ namespace TelegramBotBase.Sessions
                 markup = buttons;
             }
 
-            var message = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+            Message m = null;
 
-            OnMessageSent(new MessageSentEventArgs(message.MessageId, message));
+            try
+            {
+                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            {
+                return;
+            }
+            catch
+            {
+                return;
+            }
+
+            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
         }
 
         /// <summary>
@@ -212,7 +252,7 @@ namespace TelegramBotBase.Sessions
                 markup = buttons;
             }
 
-            var message = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption,  replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
+            var message = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
 
             OnMessageSent(new MessageSentEventArgs(message.MessageId, message));
         }

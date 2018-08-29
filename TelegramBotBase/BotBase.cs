@@ -86,6 +86,10 @@ namespace TelegramBotBase
             {
                 Client_TryMessage(sender, e);
             }
+            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            {
+
+            }
             catch (Exception ex)
             {
                 DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
