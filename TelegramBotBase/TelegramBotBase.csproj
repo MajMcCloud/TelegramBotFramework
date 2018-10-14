@@ -58,7 +58,9 @@
   <ItemGroup>
     <Compile Include="Base\ActionResult.cs" />
     <Compile Include="Base\ButtonClickedEventArgs.cs" />
+    <Compile Include="Base\ControlBase.cs" />
     <Compile Include="Base\MessageClient.cs" />
+    <Compile Include="Base\MessageIncomeResult.cs" />
     <Compile Include="Base\MessageResult.cs" />
     <Compile Include="Base\MessageSentEventArgs.cs" />
     <Compile Include="Base\ResultBase.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Base\UnhandledCallEventArgs.cs" />
     <Compile Include="Base\SystemCallEventArgs.cs" />
     <Compile Include="BotBase.cs" />
+    <Compile Include="Controls\ProgressBar.cs" />
     <Compile Include="Form\AlertDialog.cs" />
     <Compile Include="Form\ArrayPromptDialog.cs" />
     <Compile Include="Form\AutoCleanForm.cs" />

@@ -21,7 +21,7 @@ namespace TelegramBotBase
         public SessionBase Sessions { get; set; }
 
         /// <summary>
-        /// Beinhaltet Systembefehle die immer erreichbar sind und nicht an die Formulare weitergereicht werden.  z.b. /start
+        /// Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
         /// </summary>
         public List<String> SystemCalls { get; set; }
 
@@ -29,11 +29,25 @@ namespace TelegramBotBase
 
         private static object __evSessionBegins = new object();
 
+        private static object __evMessage = new object();
+
         private static object __evSystemCall = new object();
 
         private static object __evException = new object();
 
         private static object __evUnhandledCall = new object();
+
+
+        /// <summary>
+        /// SKips all messages during running (good for big delay updates)
+        /// </summary>
+        public bool SkipAllMessages { get; set; } = false;
+
+        /// <summary>
+        /// Loggs all messages and sent them to the event handler
+        /// </summary>
+        public bool LogAllMessages { get; set; } = false;
+
 
         public BotBase(String apiKey)
         {
@@ -82,8 +96,18 @@ namespace TelegramBotBase
 
         private void Client_Message(object sender, MessageResult e)
         {
+            if (this.SkipAllMessages)
+                return;
+
             try
             {
+                if (LogAllMessages)
+                {
+                    DeviceSession ds2 = this.Sessions.GetSession(e.DeviceId);
+                    OnMessage(new MessageIncomeResult(e.DeviceId, ds2, e));
+                }
+
+
                 Client_TryMessage(sender, e);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
@@ -252,6 +276,24 @@ namespace TelegramBotBase
         public void OnSessionBegins(SessionBeginResult e)
         {
             (this.__Events[__evSessionBegins] as EventHandler<SessionBeginResult>)?.Invoke(this, e);
+
+        }
+
+        public event EventHandler<MessageIncomeResult> Message
+        {
+            add
+            {
+                this.__Events.AddHandler(__evMessage, value);
+            }
+            remove
+            {
+                this.__Events.RemoveHandler(__evMessage, value);
+            }
+        }
+
+        public void OnMessage(MessageIncomeResult e)
+        {
+            (this.__Events[__evMessage] as EventHandler<MessageIncomeResult>)?.Invoke(this, e);
 
         }
 

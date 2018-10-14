@@ -21,12 +21,14 @@ namespace TelegramBotBase.Form
         /// </summary>
         public bool FormSwitched { get; set; } = false;
 
+        public List<ControlBase> Controls { get; set; }
+
         public FormBase()
         {
-
+            this.Controls = new List<Base.ControlBase>();
         }
 
-        public FormBase(MessageClient Client)
+        public FormBase(MessageClient Client): this()
         {
             this.Client = Client;
         }
@@ -46,7 +48,10 @@ namespace TelegramBotBase.Form
 
         public virtual async Task Closed()
         {
-
+            foreach (var b in this.Controls)
+            {
+                await b.Cleanup();
+            }
         }
 
         public virtual async Task PreLoad(MessageResult message)

@@ -55,6 +55,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\ButtonTestForm.cs" />
+    <Compile Include="Tests\ProgressTest.cs" />
     <Compile Include="Tests\SimpleForm.cs" />
     <Compile Include="Tests\Start.cs" />
     <Compile Include="Tests\TestForm.cs" />

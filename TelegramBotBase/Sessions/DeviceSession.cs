@@ -62,10 +62,10 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task Edit(int messageId, String text, ButtonForm buttons = null)
+        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null)
         {
             if (this.ActiveForm == null)
-                return;
+                return null;
 
             InlineKeyboardMarkup markup = null;
             if (buttons != null)
@@ -73,8 +73,18 @@ namespace TelegramBotBase.Sessions
                 markup = buttons;
             }
 
-            var message = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
+            try
+            {
+                var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
+                return m;
+            }
+            catch
+            {
+                
+            }
 
+
+            return null;
         }
 
         /// <summary>
@@ -84,10 +94,10 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             if (this.ActiveForm == null)
-                return;
+                return null;
 
             InlineKeyboardMarkup markup = null;
             if (buttons != null)
@@ -103,15 +113,17 @@ namespace TelegramBotBase.Sessions
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
-                return;
+                return null;
             }
             catch
             {
-                return;
+                return null;
             }
 
 
             OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+
+            return m;
         }
 
         /// <summary>
@@ -121,10 +133,10 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false)
         {
             if (this.ActiveForm == null)
-                return;
+                return null;
 
             Message m = null;
 
@@ -134,14 +146,16 @@ namespace TelegramBotBase.Sessions
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
-                return;
+                return null;
             }
             catch
             {
-                return;
+                return null;
             }
 
             OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+
+            return m;
         }
 
         /// <summary>
@@ -151,10 +165,10 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task SendPhoto(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendPhoto(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             if (this.ActiveForm == null)
-                return;
+                return null;
 
             InlineKeyboardMarkup markup = null;
             if (buttons != null)
@@ -170,14 +184,16 @@ namespace TelegramBotBase.Sessions
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
-                return;
+                return null;
             }
             catch
             {
-                return;
+                return null;
             }
 
             OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+
+            return m;
         }
 
         /// <summary>
