@@ -14,7 +14,7 @@ namespace TelegramBaseTest
         static void Main(string[] args)
         {
 
-            String APIKey = "480896099:AAEtq_owUqRH62DR0gYc-ZWRI_TWl8El1YQ";
+            String APIKey = "";
 
             BotBase<Start> bb = new BotBase<Start>(APIKey);
 
