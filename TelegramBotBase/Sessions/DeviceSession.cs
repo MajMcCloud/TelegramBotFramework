@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
@@ -296,12 +297,22 @@ namespace TelegramBotBase.Sessions
 
                 return true;
             }
-            catch
+            catch(ApiRequestException ex)
             {
 
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Löscht die aktuelle Nachricht, oder die übergebene
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> DeleteMessage(Message message)
+        {
+            return await DeleteMessage(message.MessageId);
         }
 
 

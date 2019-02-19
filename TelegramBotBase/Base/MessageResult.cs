@@ -64,7 +64,7 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawCallbackData.CallbackQuery.Data;
+                return this.RawCallbackData?.CallbackQuery?.Data;
             }
         }
 
