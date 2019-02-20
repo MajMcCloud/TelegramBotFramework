@@ -1,3 +1,6 @@
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
+
 Hey guys,
 
 here we are. After some time and thoughts i give my TelegramBot framework  to public.
