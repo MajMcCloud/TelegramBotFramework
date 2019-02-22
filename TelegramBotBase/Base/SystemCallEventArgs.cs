@@ -7,6 +7,9 @@ using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
 {
+    /// <summary>
+    /// Base class for given system call results
+    /// </summary>
     public class SystemCallEventArgs : EventArgs
     {
         public String Command { get; set; }

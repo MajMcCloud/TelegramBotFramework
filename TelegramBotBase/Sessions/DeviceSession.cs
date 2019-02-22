@@ -17,8 +17,14 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Sessions
 {
+    /// <summary>
+    /// Base class for a device/chat session
+    /// </summary>
     public class DeviceSession
     {
+        /// <summary>
+        /// Device or chat id
+        /// </summary>
         public long DeviceId { get; set; }
 
         public DateTime LastAction { get; set; }
@@ -57,7 +63,7 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Bearbeitet die bestehende Text-Nachricht.
+        /// Edits the text message
         /// </summary>
         /// <param name="messageId"></param>
         /// <param name="text"></param>
@@ -89,9 +95,10 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Sendet eine einfache Text-Nachricht.
+        /// Sends a simple text message
         /// </summary>
         /// <param name="text"></param>
+        /// <param name="buttons"></param>
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
@@ -128,9 +135,10 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Sendet eine einfache Text-Nachricht.
+        /// Sends a simple text message
         /// </summary>
         /// <param name="text"></param>
+        /// <param name="markup"></param>
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
@@ -160,9 +168,10 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Sendet ein Bild
+        /// Sends an image
         /// </summary>
         /// <param name="file"></param>
+        /// <param name="buttons"></param>
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
@@ -198,43 +207,49 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Sendet ein Bild
+        /// Sends an image
         /// </summary>
         /// <param name="image"></param>
         /// <param name="name"></param>
+        /// <param name="buttons"></param>
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task SendPhoto(Image image, String name, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendPhoto(Image image, String name, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                await SendPhoto(fts, buttons, replyTo, disableNotification);
+                var m = await SendPhoto(fts, buttons, replyTo, disableNotification);
+
+                return m;
             }
         }
 
         /// <summary>
-        /// Sendet ein Bild
+        /// Sends an image
         /// </summary>
         /// <param name="image"></param>
         /// <param name="name"></param>
+        /// <param name="buttons"></param>
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task SendPhoto(Bitmap image, String name, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendPhoto(Bitmap image, String name, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                await SendPhoto(fts, buttons, replyTo, disableNotification);
+                var m = await SendPhoto(fts, buttons, replyTo, disableNotification);
+
+                return m;
             }
         }
 
         /// <summary>
-        /// Sendet ein Dokument
+        /// Sends an document
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="document"></param>
@@ -243,17 +258,19 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task SendDocument(String filename, byte[] document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendDocument(String filename, byte[] document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             MemoryStream ms = new MemoryStream(document);
 
             InputOnlineFile fts = new InputOnlineFile(ms, filename);
 
-            await SendDocument(fts, caption, buttons, replyTo, disableNotification);
+            var m = await SendDocument(fts, caption, buttons, replyTo, disableNotification);
+
+            return m;
         }
 
         /// <summary>
-        /// Sendet ein Dokument
+        /// Sends an document
         /// </summary>
         /// <param name="document"></param>
         /// <param name="caption"></param>
@@ -261,7 +278,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task SendDocument(InputOnlineFile document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendDocument(InputOnlineFile document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             InlineKeyboardMarkup markup = null;
             if (buttons != null)
@@ -269,13 +286,15 @@ namespace TelegramBotBase.Sessions
                 markup = buttons;
             }
 
-            var message = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
+            var m = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
 
-            OnMessageSent(new MessageSentEventArgs(message.MessageId, message));
+            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+
+            return m;
         }
 
         /// <summary>
-        /// Legt eine Chat Aktion Fest (Wird angezeigt)
+        /// Set a chat action (showed to the user)
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
@@ -285,7 +304,7 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Löscht die aktuelle Nachricht, oder die übergebene
+        /// Deletes a message
         /// </summary>
         /// <param name="messageId"></param>
         /// <returns></returns>
@@ -306,16 +325,18 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Löscht die aktuelle Nachricht, oder die übergebene
+        /// Deletes the given message
         /// </summary>
-        /// <param name="messageId"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         public virtual async Task<bool> DeleteMessage(Message message)
         {
             return await DeleteMessage(message.MessageId);
         }
 
-
+        /// <summary>
+        /// Eventhandler for sent messages
+        /// </summary>
         public event EventHandler<MessageSentEventArgs> MessageSent
         {
             add

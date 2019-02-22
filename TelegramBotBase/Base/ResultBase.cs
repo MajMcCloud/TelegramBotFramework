@@ -23,7 +23,7 @@ namespace TelegramBotBase.Base
         public Telegram.Bot.Types.Message Message { get; set; }
 
         /// <summary>
-        /// Löscht die aktuelle Nachricht, oder die übergebene
+        /// Deletes the current message
         /// </summary>
         /// <param name="messageId"></param>
         /// <returns></returns>
@@ -33,7 +33,7 @@ namespace TelegramBotBase.Base
         }
 
         /// <summary>
-        /// Löscht die aktuelle Nachricht, oder die übergebene
+        ///Deletes the current message or the given one.
         /// </summary>
         /// <param name="messageId"></param>
         /// <returns></returns>

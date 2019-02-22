@@ -7,6 +7,9 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Base
 {
+    /// <summary>
+    /// Button get clicked event
+    /// </summary>
     public class ButtonClickedEventArgs : EventArgs
     {
         public ButtonBase Button { get; set; }

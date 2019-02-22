@@ -7,6 +7,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBotBase.Form
 {
+    /// <summary>
+    /// Base class for an buttons array
+    /// </summary>
     public class ButtonForm
     {
         List<List<ButtonBase>> Buttons = new List<List<ButtonBase>>();
@@ -47,7 +50,7 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
-        /// Fügt die Buttons automatisch aufgesplittet in Spalten ein.
+        /// Add buttons splitted in the amount of columns (i.e. 2 per row...)
         /// </summary>
         /// <param name="buttons"></param>
         /// <param name="buttonsPerRow"></param>

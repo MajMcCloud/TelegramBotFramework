@@ -8,6 +8,9 @@ using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
 {
+    /// <summary>
+    /// A simple prompt dialog with one ok Button
+    /// </summary>
     public class AlertDialog : PromptDialog
     {
         public String ButtonText { get; set; }

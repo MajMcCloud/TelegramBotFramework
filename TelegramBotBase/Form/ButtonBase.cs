@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace TelegramBotBase.Form
 {
+    /// <summary>
+    /// Base class for button handling
+    /// </summary>
     public class ButtonBase
     {
         public String Text { get; set; }

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace TelegramBotBase.Base
 {
+    /// <summary>
+    /// Base class for message handling
+    /// </summary>
     public class MessageClient
     {
 

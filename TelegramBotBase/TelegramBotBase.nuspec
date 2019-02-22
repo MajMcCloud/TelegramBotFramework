@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/MajMcCloud/TelegramBotFramework</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>First release on nuget for easier use.</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>Telegram Bot Framework C# Addon Context Modules</tags>
+    <dependencies>
+      <dependency id="Telegram.Bot" version="14.3.0" />
+      <dependency id="Newtonsoft.Json" version="11.0.2" />
+    </dependencies>
+  </metadata>
+</package>

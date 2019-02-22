@@ -8,6 +8,9 @@ using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Form
 {
+    /// <summary>
+    /// Base class for forms
+    /// </summary>
     public class FormBase : IDisposable
     {
         public DeviceSession Device { get; set; }
@@ -17,7 +20,7 @@ namespace TelegramBotBase.Form
         public bool CustomEventManagement { get; set; } = false;
 
         /// <summary>
-        /// Gibt an, dass das Formular gewechselt wurde, es werden keine weiteren Events ausgeführt
+        /// contains if the form has been switched (navigated)
         /// </summary>
         public bool FormSwitched { get; set; } = false;
 
@@ -34,7 +37,7 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
-        /// Wird nur aufgerufen, beim erstmaligen Laden des Formulares.
+        /// Will get called at the initialization (once per context)
         /// </summary>
         public virtual async Task Init(params object[] args)
         {
@@ -75,30 +78,8 @@ namespace TelegramBotBase.Form
 
         }
 
-        ///// <summary>
-        ///// Navigiert zur neuen Form.
-        ///// </summary>
-        ///// <param name="newForm"></param>
-        ///// <returns></returns>
-        //public async Task NavigateTo(FormBase newForm)
-        //{
-        //    DeviceSession ds = this.Device;
-        //    if (ds == null)
-        //        return;
-
-        //    this.FormSwitched = true;
-
-        //    ds.ActiveForm = newForm;
-        //    newForm.Client = this.Client;
-        //    newForm.Device = ds;
-
-        //    await this.Closed();
-
-        //    await newForm.Opened();
-        //}
-
         /// <summary>
-        /// Navigiert zur neuen Form.
+        /// Navigates to a new form
         /// </summary>
         /// <param name="newForm"></param>
         /// <returns></returns>
@@ -121,6 +102,9 @@ namespace TelegramBotBase.Form
             await newForm.Opened();
         }
 
+        /// <summary>
+        /// Cleanup
+        /// </summary>
         public void Dispose()
         {
             this.Client = null;

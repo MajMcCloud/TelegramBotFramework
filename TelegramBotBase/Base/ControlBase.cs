@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace TelegramBotBase.Base
 {
+    /// <summary>
+    /// Base class for controls
+    /// </summary>
     public class ControlBase
     {
         public Sessions.DeviceSession Device { get; set; }

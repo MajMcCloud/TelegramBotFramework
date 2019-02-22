@@ -10,14 +10,23 @@ using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase
 {
+    /// <summary>
+    /// Bot base class for full Device/Context and Messagehandling
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class BotBase<T>
         where T : FormBase
     {
         public MessageClient Client { get; set; }
 
+        /// <summary>
+        /// Your TelegramBot APIKey
+        /// </summary>
         public String APIKey { get; set; } = "";
 
-
+        /// <summary>
+        /// List of all running/active sessions
+        /// </summary>
         public SessionBase Sessions { get; set; }
 
         /// <summary>
@@ -39,7 +48,7 @@ namespace TelegramBotBase
 
 
         /// <summary>
-        /// SKips all messages during running (good for big delay updates)
+        /// Skips all messages during running (good for big delay updates)
         /// </summary>
         public bool SkipAllMessages { get; set; } = false;
 
@@ -48,7 +57,10 @@ namespace TelegramBotBase
         /// </summary>
         public bool LogAllMessages { get; set; } = false;
 
-
+        /// <summary>
+        /// Simple start of your Bot with the APIKey
+        /// </summary>
+        /// <param name="apiKey"></param>
         public BotBase(String apiKey)
         {
             this.APIKey = apiKey;
@@ -61,6 +73,9 @@ namespace TelegramBotBase
             this.Sessions.Client = this.Client;
         }
 
+        /// <summary>
+        /// Start your Bot
+        /// </summary>
         public void Start()
         {
             if (this.Client == null)
@@ -73,7 +88,9 @@ namespace TelegramBotBase
             this.Client.TelegramClient.StartReceiving();
         }
 
-
+        /// <summary>
+        /// Stop your Bot
+        /// </summary>
         public void Stop()
         {
             if (this.Client == null)
@@ -82,7 +99,11 @@ namespace TelegramBotBase
             this.Client.TelegramClient.StopReceiving();
         }
 
-
+        /// <summary>
+        /// Send a message to all active Sessions.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task SentToAll(String message)
         {
             if (this.Client == null)
@@ -258,7 +279,7 @@ namespace TelegramBotBase
         }
 
         /// <summary>
-        /// Wird aufgerufen wenn eine Session begonnen wird
+        /// Will be called if a session/context gets started
         /// </summary>
 
         public event EventHandler<SessionBeginResult> SessionBegins
@@ -279,6 +300,9 @@ namespace TelegramBotBase
 
         }
 
+        /// <summary>
+        /// Will be called on incomming message
+        /// </summary>
         public event EventHandler<MessageIncomeResult> Message
         {
             add
@@ -297,6 +321,9 @@ namespace TelegramBotBase
 
         }
 
+        /// <summary>
+        /// Will be called if a system call gets raised
+        /// </summary>
         public event EventHandler<SystemCallEventArgs> SystemCall
         {
             add
@@ -315,6 +342,9 @@ namespace TelegramBotBase
 
         }
 
+        /// <summary>
+        /// Will be called on an inner exception
+        /// </summary>
         public event EventHandler<SystemExceptionEventArgs> Exception
         {
             add
@@ -333,6 +363,9 @@ namespace TelegramBotBase
 
         }
 
+        /// <summary>
+        /// Will be called if no form handeled this call
+        /// </summary>
         public event EventHandler<UnhandledCallEventArgs> UnhandledCall
         {
             add

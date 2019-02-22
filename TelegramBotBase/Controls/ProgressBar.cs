@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace TelegramBotBase.Controls
 {
+    /// <summary>
+    /// A simple control for show and managing progress.
+    /// </summary>
     public class ProgressBar : Base.ControlBase
     {
         public enum eProgressStyle

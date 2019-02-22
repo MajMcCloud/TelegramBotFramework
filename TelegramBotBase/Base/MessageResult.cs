@@ -12,6 +12,9 @@ namespace TelegramBotBase.Base
 
         public Telegram.Bot.Args.CallbackQueryEventArgs RawCallbackData { get; set; }
 
+        /// <summary>
+        /// Returns the Device/ChatId
+        /// </summary>
         public override long DeviceId
         {
             get
@@ -21,7 +24,7 @@ namespace TelegramBotBase.Base
         }
 
         /// <summary>
-        /// Die Id der Nachricht
+        /// The message id
         /// </summary>
         public new int MessageId
         {
@@ -48,7 +51,7 @@ namespace TelegramBotBase.Base
         }
 
         /// <summary>
-        /// Ist diese eine Aktion? (z.B.: Button Klick)
+        /// Is this an action ? (i.e. button click)
         /// </summary>
         public bool IsAction
         {
@@ -87,7 +90,7 @@ namespace TelegramBotBase.Base
         }
 
         /// <summary>
-        /// Bestätigt den Erhalt der Aktion.
+        /// Confirm incomming action (i.e. Button click)
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>

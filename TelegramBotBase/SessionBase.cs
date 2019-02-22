@@ -8,6 +8,9 @@ using TelegramBotBase.Form;
 using TelegramBotBase.Sessions;
 namespace TelegramBotBase
 {
+    /// <summary>
+    /// Base class for managing all active sessions
+    /// </summary>
     public class SessionBase
     {
         public MessageClient Client { get; set; }
@@ -20,6 +23,11 @@ namespace TelegramBotBase
             this.SessionList = new Dictionary<long, DeviceSession>();
         }
 
+        /// <summary>
+        /// Get device session from Device/ChatId
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public DeviceSession this[long key]
         {
             get
@@ -32,12 +40,23 @@ namespace TelegramBotBase
             }
         }
 
+        /// <summary>
+        /// Get device session from Device/ChatId
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <returns></returns>
         public DeviceSession GetSession(long deviceId)
         {
             DeviceSession ds = this.SessionList.FirstOrDefault(a => a.Key == deviceId).Value ?? null;
             return ds;
         }
 
+        /// <summary>
+        /// Start a new session
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="deviceId"></param>
+        /// <returns></returns>
         public async Task<DeviceSession> StartSession<T>(long deviceId)
             where T : FormBase
         {
@@ -56,7 +75,10 @@ namespace TelegramBotBase
             return ds;
         }
 
-
+        /// <summary>
+        /// End session
+        /// </summary>
+        /// <param name="deviceId"></param>
         public void EndSession(long deviceId)
         {
             var d = this[deviceId];

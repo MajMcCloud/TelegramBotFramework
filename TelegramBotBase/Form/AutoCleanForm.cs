@@ -8,6 +8,9 @@ using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
 {
+    /// <summary>
+    /// A form which cleans up old messages sent within
+    /// </summary>
     public class AutoCleanForm : FormBase
     {
         List<Message> OldMessages { get; set; }
@@ -16,8 +19,9 @@ namespace TelegramBotBase.Form
 
         public enum eDeleteMode
         {
-            OnEveryCall = 0,
-            OnLeavingForm = 1
+            None = 0,
+            OnEveryCall = 1,
+            OnLeavingForm = 2
         }
 
         public AutoCleanForm()
