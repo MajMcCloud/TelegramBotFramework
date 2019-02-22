@@ -58,6 +58,11 @@ namespace TelegramBotBase
         public bool LogAllMessages { get; set; } = false;
 
         /// <summary>
+        /// How often could a form navigate to another (within one user action/call/message)
+        /// </summary>
+        private const int NavigationMaximum  = 10;
+
+        /// <summary>
         /// Simple start of your Bot with the APIKey
         /// </summary>
         /// <param name="apiKey"></param>
@@ -158,7 +163,7 @@ namespace TelegramBotBase
             ds.LastMessage = e.MessageId;
 
 
-            //Ist das ein Systembefehl ?
+            //Is this a systemcall ?
             if (e.Message.Text != null && this.SystemCalls.Contains(e.Message.Text))
             {
                 var sce = new SystemCallEventArgs(e.Message.Text, ds.DeviceId, ds);
@@ -170,14 +175,14 @@ namespace TelegramBotBase
 
             int i = 0;
 
-            //Sollten die Formulare gewechselt werden, alle durchgehen (maximal 10 Versuche, um Schleifen zu verhindern)
+            //Should formulars get navigated (allow maximum of 10, to dont get loops)
             do
             {
                 i++;
 
                 activeForm = ds.ActiveForm;
 
-                //Wenn das Formular sich selbst um die Events kümmert, nicht weiter machen
+                //If the form manages the events by itselfs, skip here
                 if (activeForm.CustomEventManagement)
                     return;
 
@@ -187,15 +192,11 @@ namespace TelegramBotBase
                 //Loading Event
                 await activeForm.Load(e);
 
-                ////Action Event
-                //if (!activeForm.FormSwitched)
-                //    await activeForm.Action(e);
-
                 //Render Event
                 if (!activeForm.FormSwitched)
                     await activeForm.Render(e);
 
-            } while (activeForm.FormSwitched && i < 10);
+            } while (activeForm.FormSwitched && i < NavigationMaximum);
 
         }
 
@@ -228,14 +229,14 @@ namespace TelegramBotBase
 
             int i = 0;
 
-            //Sollten die Formulare gewechselt werden, alle durchgehen (maximal 10 Versuche, um Schleifen zu verhindern)
+            //Should formulars get navigated (allow maximum of 10, to dont get loops)
             do
             {
                 i++;
 
                 activeForm = ds.ActiveForm;
 
-                //Wenn das Formular sich selbst um die Events kümmert, nicht weiter machen
+                //If the form manages the events by itselfs, skip here
                 if (activeForm.CustomEventManagement)
                     return;
 
@@ -274,7 +275,7 @@ namespace TelegramBotBase
                 if (!activeForm.FormSwitched)
                     await activeForm.Render(e);
 
-            } while (activeForm.FormSwitched && i < 10);
+            } while (activeForm.FormSwitched && i < NavigationMaximum);
 
         }
 
