@@ -27,8 +27,6 @@ namespace TelegramBaseTest.Tests
 
                     var sf = new SimpleForm();
 
-                    await sf.Init();
-
                     await this.NavigateTo(sf);
 
                     break;
@@ -36,8 +34,6 @@ namespace TelegramBaseTest.Tests
                 case "buttons":
 
                     var bf = new ButtonTestForm();
-
-                    await bf.Init();
 
                     await this.NavigateTo(bf);
 
@@ -47,9 +43,15 @@ namespace TelegramBaseTest.Tests
 
                     var pf = new ProgressTest();
 
-                    await pf.Init();
-
                     await this.NavigateTo(pf);
+
+                    break;
+
+                case "registration":
+
+                    var reg = new Register.Start();
+
+                    await this.NavigateTo(reg);
 
                     break;
             }
@@ -64,7 +66,7 @@ namespace TelegramBaseTest.Tests
 
             btn.AddButtonRow(new ButtonBase("#1 Simple Text", new CallbackData("a", "text").Serialize()), new ButtonBase("#2 Button Test", new CallbackData("a", "buttons").Serialize()));
             btn.AddButtonRow(new ButtonBase("#3 Progress Bar", new CallbackData("a", "progress").Serialize()));
-
+            btn.AddButtonRow(new ButtonBase("#4 Registration Example", new CallbackData("a", "registration").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }
