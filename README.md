@@ -121,9 +121,7 @@ Below we have 3 options.
 
 
 ```
-            String APIKey = "";
-
-            BotBase<Start> bb = new BotBase<Start>(APIKey);
+            BotBase<Start> bb = new BotBase<Start>("{YOUR API KEY}");
 
             bb.SystemCalls.Add("/start");
             bb.SystemCalls.Add("/form1");
