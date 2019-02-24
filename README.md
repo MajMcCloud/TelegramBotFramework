@@ -540,7 +540,7 @@ To give you an example about the possiblities, i added into the Test project an 
 ```
 
 There is also a second example, where every of these 3 inputs gets requested by a different formular (class). Just for imagination of the possiblites.
-Cause its to much Text, i didnt have added it here. You will find it under TelegramBaseTest/Tests/Register/PerStep
+Cause its to much Text, i didnt have added it here. You will find it under [TelegramBaseTest/Tests/Register/PerStep.cs](TelegramBaseTest/Tests/Register/PerStep.cs)
 Beginn there and navigate your way through these Steps in the subfolder.
 
 ---
