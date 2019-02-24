@@ -249,7 +249,289 @@ public class ButtonTestForm : AutoCleanForm
 
 ```
 
+### Now some controls (Example #3 - Progress Bar Test)
 
+Sometimes it makes sense to show the end user a type of progressbar or status. For this i tried to make a simple control, which is useful for some situations.
+Maybe, if i  got more ideas, i will add other "controls" in the future.
+
+```
+
+public class ProgressTest : AutoCleanForm
+    {
+
+        public ProgressTest()
+        {
+            this.DeleteMode = eDeleteMode.OnLeavingForm;
+        }
+
+        public override async Task Opened()
+        {
+            await this.Device.Send("Welcome to ProgressTest");
+        }
+
+        public override async Task Action(MessageResult message)
+        {
+            var call = message.GetData<CallbackData>();
+
+            await message.ConfirmAction();
+
+
+            if (call == null)
+                return;
+
+            TelegramBotBase.Controls.ProgressBar Bar = null;
+
+            switch (call.Value)
+            {
+                case "standard":
+
+                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.standard);
+                    Bar.Device = this.Device;
+
+                    await Bar.Render();
+
+                    this.Controls.Add(Bar);
+
+                    for (int i = 0; i <= 100; i++)
+                    {
+                        Bar.Value++;
+                        await Bar.Render();
+
+                        Thread.Sleep(250);
+                    }
+
+                    break;
+
+                case "squares":
+
+                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squares);
+                    Bar.Device = this.Device;
+
+                    await Bar.Render();
+
+                    this.Controls.Add(Bar);
+
+                    for (int i = 0; i <= 100; i++)
+                    {
+                        Bar.Value++;
+                        await Bar.Render();
+
+                        Thread.Sleep(250);
+                    }
+
+                    break;
+
+                case "circles":
+
+                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.circles);
+                    Bar.Device = this.Device;
+
+                    await Bar.Render();
+
+                    this.Controls.Add(Bar);
+
+                    for (int i = 0; i <= 100; i++)
+                    {
+                        Bar.Value++;
+                        await Bar.Render();
+
+                        Thread.Sleep(250);
+                    }
+
+                    break;
+
+                case "lines":
+
+                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.lines);
+                    Bar.Device = this.Device;
+
+                    await Bar.Render();
+
+                    this.Controls.Add(Bar);
+
+                    for (int i = 0; i <= 100; i++)
+                    {
+                        Bar.Value++;
+                        await Bar.Render();
+
+                        Thread.Sleep(250);
+                    }
+
+                    break;
+
+                case "squaredlines":
+
+                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squaredLines);
+                    Bar.Device = this.Device;
+
+                    await Bar.Render();
+
+                    this.Controls.Add(Bar);
+
+                    for (int i = 0; i <= 100; i++)
+                    {
+                        Bar.Value++;
+                        await Bar.Render();
+
+                        Thread.Sleep(250);
+                    }
+
+
+                    break;
+
+                case "start":
+
+                    var sf = new Start();
+
+                    await sf.Init();
+
+                    await this.NavigateTo(sf);
+
+                    break;
+
+                default:
+
+
+
+                    break;
+            }
+
+
+        }
+
+
+        public override async Task Render(MessageResult message)
+        {
+            ButtonForm btn = new ButtonForm();
+            btn.AddButtonRow(new ButtonBase("Standard", new CallbackData("a", "standard").Serialize()), new ButtonBase("Squares", new CallbackData("a", "squares").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("Circles", new CallbackData("a", "circles").Serialize()), new ButtonBase("Lines", new CallbackData("a", "lines").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("Squared Line", new CallbackData("a", "squaredlines").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("Back to start", new CallbackData("a", "start").Serialize()));
+
+            await this.Device.Send("Choose your progress bar:", btn);
+        }
+
+        public override async Task Closed()
+        {
+            foreach(var b in this.Controls)
+            {
+                await b.Cleanup();
+            }
+
+            await this.Device.Send("Ciao from ProgressTest");
+        }
+
+
+
+    }
+
+
+```
+
+### Registration Example (Example #4 - Registration Form Test)
+
+I read it a lot in different Telegram groups that some developers are searching for easy solutions to create context based apps. For this is my project an ideal solution here.
+To give you an example about the possiblities, i added into the Test project an example for a registration form.
+
+```
+
+    public class PerForm : AutoCleanForm
+    {
+        public String EMail { get; set; }
+
+        public String Firstname { get; set; }
+
+        public String Lastname { get; set; }
+
+        public async override Task Load(MessageResult message)
+        {
+            if (message.MessageText.Trim() == "")
+                return;
+
+            if (this.Firstname == null)
+            {
+                this.Firstname = message.MessageText;
+                return;
+            }
+
+            if (this.Lastname == null)
+            {
+                this.Lastname = message.MessageText;
+                return;
+            }
+
+            if (this.EMail == null)
+            {
+                this.EMail = message.MessageText;
+                return;
+            }
+
+        }
+
+        public async override Task Action(MessageResult message)
+        {
+            var call = message.GetData<CallbackData>();
+
+            await message.ConfirmAction();
+
+            if (call == null)
+                return;
+
+            switch (call.Value)
+            {
+                case "back":
+
+                    var start = new Start();
+
+                    await this.NavigateTo(start);
+
+                    break;
+
+            }
+
+
+        }
+
+        public async override Task Render(MessageResult message)
+        {
+            if (this.Firstname == null)
+            {
+                await this.Device.Send("Please sent your firstname:");
+                return;
+            }
+
+            if (this.Lastname == null)
+            {
+                await this.Device.Send("Please sent your lastname:");
+                return;
+            }
+
+            if (this.EMail == null)
+            {
+                await this.Device.Send("Please sent your email address:");
+                return;
+            }
+
+
+            String s = "";
+
+            s += "Firstname: " + this.Firstname + "\r\n";
+            s += "Lastname: " + this.Lastname + "\r\n";
+            s += "E-Mail: " + this.EMail + "\r\n";
+
+            ButtonForm bf = new ButtonForm();
+            bf.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
+
+            await this.Device.Send("Your details:\r\n" + s, bf);
+        }
+
+
+    }
+
+```
 
 
 ---
