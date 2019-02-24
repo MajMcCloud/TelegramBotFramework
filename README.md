@@ -256,7 +256,7 @@ Maybe, if i  got more ideas, i will add other "controls" in the future.
 
 ```
 
-public class ProgressTest : AutoCleanForm
+    public class ProgressTest : AutoCleanForm
     {
 
         public ProgressTest()
@@ -288,36 +288,12 @@ public class ProgressTest : AutoCleanForm
                     Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.standard);
                     Bar.Device = this.Device;
 
-                    await Bar.Render();
-
-                    this.Controls.Add(Bar);
-
-                    for (int i = 0; i <= 100; i++)
-                    {
-                        Bar.Value++;
-                        await Bar.Render();
-
-                        Thread.Sleep(250);
-                    }
-
                     break;
 
                 case "squares":
 
                     Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squares);
                     Bar.Device = this.Device;
-
-                    await Bar.Render();
-
-                    this.Controls.Add(Bar);
-
-                    for (int i = 0; i <= 100; i++)
-                    {
-                        Bar.Value++;
-                        await Bar.Render();
-
-                        Thread.Sleep(250);
-                    }
 
                     break;
 
@@ -326,18 +302,6 @@ public class ProgressTest : AutoCleanForm
                     Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.circles);
                     Bar.Device = this.Device;
 
-                    await Bar.Render();
-
-                    this.Controls.Add(Bar);
-
-                    for (int i = 0; i <= 100; i++)
-                    {
-                        Bar.Value++;
-                        await Bar.Render();
-
-                        Thread.Sleep(250);
-                    }
-
                     break;
 
                 case "lines":
@@ -345,37 +309,12 @@ public class ProgressTest : AutoCleanForm
                     Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.lines);
                     Bar.Device = this.Device;
 
-                    await Bar.Render();
-
-                    this.Controls.Add(Bar);
-
-                    for (int i = 0; i <= 100; i++)
-                    {
-                        Bar.Value++;
-                        await Bar.Render();
-
-                        Thread.Sleep(250);
-                    }
-
                     break;
 
                 case "squaredlines":
 
                     Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squaredLines);
                     Bar.Device = this.Device;
-
-                    await Bar.Render();
-
-                    this.Controls.Add(Bar);
-
-                    for (int i = 0; i <= 100; i++)
-                    {
-                        Bar.Value++;
-                        await Bar.Render();
-
-                        Thread.Sleep(250);
-                    }
-
 
                     break;
 
@@ -387,13 +326,26 @@ public class ProgressTest : AutoCleanForm
 
                     await this.NavigateTo(sf);
 
-                    break;
+                    return;
 
                 default:
 
+                    return;
+
+            }
 
 
-                    break;
+            //Render Progress bar and show some "example" progress
+            await Bar.Render();
+
+            this.Controls.Add(Bar);
+
+            for (int i = 0; i <= 100; i++)
+            {
+                Bar.Value++;
+                await Bar.Render();
+
+                Thread.Sleep(250);
             }
 
 
@@ -416,7 +368,7 @@ public class ProgressTest : AutoCleanForm
 
         public override async Task Closed()
         {
-            foreach(var b in this.Controls)
+            foreach (var b in this.Controls)
             {
                 await b.Cleanup();
             }
