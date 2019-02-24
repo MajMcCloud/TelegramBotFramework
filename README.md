@@ -104,6 +104,58 @@ await this.NavigateTo(tf);
 
 All examples are within the test project, so just try it out on your own.
 
+### Add some system calls (Example #0 - System Calls)
+
+Inside of the BotFather you are able to add "Commands" to your TelegramBot. The user will see them, depending on the application as options he could choose.
+I'm calling them Systemcalls. Before start (and later for sure) you could add them to your BotBase. Every time a message comes in they will get checked if they are one of them.
+If so, a special event Handler will get raised where you are easier able to manage the action behind.
+
+Below we habe 3 options.
+
+/start - opens the Startformular
+/form1 - navigates in this context to form1
+/form2 - navigates in this context to form2
+
+
+
+```
+            String APIKey = "";
+
+            BotBase<Start> bb = new BotBase<Start>(APIKey);
+
+            bb.SystemCalls.Add("/start");
+            bb.SystemCalls.Add("/form1");
+            bb.SystemCalls.Add("/form2");
+
+            bb.SystemCall += async (s, en) =>
+            {
+                switch (en.Command)
+                {
+                    case "/form1":
+
+                        var form1 = new TestForm();
+                        await form1.Init();
+
+                        await en.Device.ActiveForm.NavigateTo(form1);
+
+                        break;
+                    case "/form2":
+
+                        var form2 = new TestForm2();
+                        await form2.Init();
+
+                        await en.Device.ActiveForm.NavigateTo(form2);
+
+                        break;
+                }
+
+            };
+
+            bb.Start();
+
+```
+
+
 On every input the user is sending back to the bot the Action event gets raised. So here we could manage to send something back to him. For sure we could also manage different button inputs:
 
 ### Lets start with text messages (Example #1 - Simple Test)
