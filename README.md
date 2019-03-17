@@ -1,6 +1,9 @@
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 
+Telegram Group: [https://t.me/tgbotbase]
+
+
 Hey guys,
 
 here we are. After some time and thoughts i give my TelegramBot framework  to public.
@@ -95,8 +98,6 @@ Go ahead, create it, initialize it and navigate to it:
 ```
 var tf = new TestForm();
 
-await tf.Init();
-
 await this.NavigateTo(tf);
 ```
 
@@ -134,7 +135,6 @@ Below we have 3 options.
                     case "/form1":
 
                         var form1 = new TestForm();
-                        await form1.Init();
 
                         await en.Device.ActiveForm.NavigateTo(form1);
 
@@ -142,7 +142,6 @@ Below we have 3 options.
                     case "/form2":
 
                         var form2 = new TestForm2();
-                        await form2.Init();
 
                         await en.Device.ActiveForm.NavigateTo(form2);
 
@@ -264,8 +263,6 @@ public class ButtonTestForm : AutoCleanForm
                 case "back":
 
                     var st = new Start();
-
-                    await st.Init();
 
                     await this.NavigateTo(st);
 

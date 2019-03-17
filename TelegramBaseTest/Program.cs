@@ -14,7 +14,7 @@ namespace TelegramBaseTest
         static void Main(string[] args)
         {
 
-            String APIKey = " ";
+            String APIKey = "480896099:AAEtq_owUqRH62DR0gYc-ZWRI_TWl8El1YQ";
 
             BotBase<Start> bb = new BotBase<Start>(APIKey);
 
@@ -29,7 +29,6 @@ namespace TelegramBaseTest
                     case "/form1":
 
                         var form1 = new TestForm();
-                        await form1.Init();
 
                         await en.Device.ActiveForm.NavigateTo(form1);
 
@@ -37,7 +36,6 @@ namespace TelegramBaseTest
                     case "/form2":
 
                         var form2 = new TestForm2();
-                        await form2.Init();
 
                         await en.Device.ActiveForm.NavigateTo(form2);
 
