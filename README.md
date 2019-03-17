@@ -1,7 +1,7 @@
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 
-Telegram Group: [https://t.me/tgbotbase]
+Telegram Group: [https://t.me/tgbotbase](https://t.me/tgbotbase)
 
 
 Hey guys,
