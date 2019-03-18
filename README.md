@@ -140,6 +140,8 @@ Below we have 3 options.
 
 /form2 - navigates in this context to form2
 
+/params - demonstrates the use of parameters per command (i.e. /params 1 2 3 test ...)
+
 
 
 ```
@@ -148,6 +150,8 @@ Below we have 3 options.
             bb.SystemCalls.Add("/start");
             bb.SystemCalls.Add("/form1");
             bb.SystemCalls.Add("/form2");
+
+            bb.SystemCalls.Add("/params");
 
             bb.SystemCall += async (s, en) =>
             {
@@ -160,11 +164,20 @@ Below we have 3 options.
                         await en.Device.ActiveForm.NavigateTo(form1);
 
                         break;
+
                     case "/form2":
 
                         var form2 = new TestForm2();
 
                         await en.Device.ActiveForm.NavigateTo(form2);
+
+                        break;
+
+                    case "/params":
+
+                        String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+
+                        await en.Device.Send("Your parameters are " + m, replyTo: en.Device.LastMessage);
 
                         break;
                 }

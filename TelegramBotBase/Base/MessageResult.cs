@@ -61,6 +61,46 @@ namespace TelegramBotBase.Base
             }
         }
 
+        /// <summary>
+        /// Is this a system call ? Starts with a slash and command
+        /// </summary>
+        public bool IsSystemCall
+        {
+            get
+            {
+                return (this.MessageText.StartsWith("/"));
+            }
+        }
+
+        /// <summary>
+        /// Returns a List of all parameters which has been sent with the command itself (i.e. /start 123 456 789 => 123,456,789)
+        /// </summary>
+        public List<String> SystemCallParameters
+        {
+            get
+            {
+                if (!IsSystemCall)
+                    return new List<string>();
+
+                //Split by empty space and skip first entry (command itself), return as list
+                return this.MessageText.Split(' ').Skip(1).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Returns just the System call command (i.e. /start 1 2 3 => /start)
+        /// </summary>
+        public String SystemCommand
+        {
+            get
+            {
+                if (!IsSystemCall)
+                    return null;
+
+                return this.MessageText.Split(' ')[0];
+            }
+        }
+
         public bool Handled { get; set; } = false;
 
         public String RawData

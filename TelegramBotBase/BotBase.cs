@@ -60,7 +60,7 @@ namespace TelegramBotBase
         /// <summary>
         /// How often could a form navigate to another (within one user action/call/message)
         /// </summary>
-        private const int NavigationMaximum  = 10;
+        private const int NavigationMaximum = 10;
 
         /// <summary>
         /// Simple start of your Bot with the APIKey
@@ -162,13 +162,13 @@ namespace TelegramBotBase
             ds.LastAction = DateTime.Now;
             ds.LastMessage = e.MessageId;
 
-
             //Is this a systemcall ?
-            if (e.Message.Text != null && this.SystemCalls.Contains(e.Message.Text))
+            if (e.IsSystemCall && this.SystemCalls.Contains(e.SystemCommand))
             {
-                var sce = new SystemCallEventArgs(e.Message.Text, ds.DeviceId, ds);
+                var sce = new SystemCallEventArgs(e.SystemCommand, e.SystemCallParameters, ds.DeviceId, ds);
                 OnSystemCall(sce);
-                //return;
+
+                return;
             }
 
             FormBase activeForm = null;
@@ -340,7 +340,6 @@ namespace TelegramBotBase
         public void OnSystemCall(SystemCallEventArgs e)
         {
             (this.__Events[__evSystemCall] as EventHandler<SystemCallEventArgs>)?.Invoke(this, e);
-
         }
 
         /// <summary>

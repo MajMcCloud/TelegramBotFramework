@@ -14,9 +14,13 @@ namespace TelegramBotBase.Base
     {
         public String Command { get; set; }
 
+        public List<String> Parameters { get; set; }
+
         public long DeviceId { get; set; }
 
-        public DeviceSession Device {get;set;}
+        public DeviceSession Device { get; set; }
+
+        public bool Handled { get; set; } = false;
 
 
         public SystemCallEventArgs()
@@ -25,9 +29,10 @@ namespace TelegramBotBase.Base
 
         }
 
-        public SystemCallEventArgs(String Command, long DeviceId, DeviceSession Device)
+        public SystemCallEventArgs(String Command, List<String> Parameters, long DeviceId, DeviceSession Device)
         {
             this.Command = Command;
+            this.Parameters = Parameters;
             this.DeviceId = DeviceId;
             this.Device = Device;
         }

@@ -14,13 +14,15 @@ namespace TelegramBaseTest
         static void Main(string[] args)
         {
 
-            String APIKey = "480896099:AAEtq_owUqRH62DR0gYc-ZWRI_TWl8El1YQ";
+            String APIKey = "{YOUR API KEY}";
 
             BotBase<Start> bb = new BotBase<Start>(APIKey);
 
             bb.SystemCalls.Add("/start");
             bb.SystemCalls.Add("/form1");
             bb.SystemCalls.Add("/form2");
+
+            bb.SystemCalls.Add("/params");
 
             bb.SystemCall += async (s, en) =>
             {
@@ -33,11 +35,20 @@ namespace TelegramBaseTest
                         await en.Device.ActiveForm.NavigateTo(form1);
 
                         break;
+
                     case "/form2":
 
                         var form2 = new TestForm2();
 
                         await en.Device.ActiveForm.NavigateTo(form2);
+
+                        break;
+
+                    case "/params":
+
+                        String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+
+                        await en.Device.Send("Your parameters are " + m, replyTo: en.Device.LastMessage);
 
                         break;
                 }
