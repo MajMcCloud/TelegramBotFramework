@@ -13,9 +13,26 @@ Hey guys,
 here we are. After some time and thoughts i give my TelegramBot framework  to public.
 It is based on C#.
 
-It is a module which is based on the original TelegramBotLibrary you will find in nuget.
+It is a module which is based on the original [TelegramBotLibrary](https://github.com/TelegramBots/Telegram.Bot) you will find in nuget.
 
 It gives you features which will look/feel like WinForms or have a good way to create apps with actions and forms.
+
+---
+
+## Index
+
+- [How to Start](#how-to-start)
+- [Message Handling](#message-handling)
+    * [Example #0 - System Calls](#add-some-system-calls-example-0---system-calls)
+
+    * [Example #1 - Simple text messages](#lets-start-with-text-messages-example-1---simple-test)
+
+    * [Example #2 - Button test](#now-some-buttons-example-2---button-test)
+
+    * [Example #3 - Progress Bar control](#now-some-controls-example-3---progress-bar-test)
+
+    * [Example #4 - Registration Formular](#registration-example-example-4---registration-form-test)
+
 
 ---
 
