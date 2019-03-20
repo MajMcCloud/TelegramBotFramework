@@ -42,6 +42,8 @@ namespace TelegramBotBase
 
         private static object __evSystemCall = new object();
 
+        public delegate Task SystemCallEventHandler(object sender, SystemCallEventArgs e);
+
         private static object __evException = new object();
 
         private static object __evUnhandledCall = new object();
@@ -220,7 +222,10 @@ namespace TelegramBotBase
             if (e.IsSystemCall && this.SystemCalls.Contains(e.SystemCommand))
             {
                 var sce = new SystemCallEventArgs(e.SystemCommand, e.SystemCallParameters, e.Message, ds.DeviceId, ds);
-                OnSystemCall(sce);
+                await OnSystemCall(sce);
+
+                if (sce.Handled)
+                    return;
             }
 
             FormBase activeForm = null;
@@ -377,21 +382,13 @@ namespace TelegramBotBase
         /// <summary>
         /// Will be called if a system call gets raised
         /// </summary>
-        public event EventHandler<SystemCallEventArgs> SystemCall
-        {
-            add
-            {
-                this.__Events.AddHandler(__evSystemCall, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evSystemCall, value);
-            }
-        }
+        public event SystemCallEventHandler SystemCall;
 
-        public void OnSystemCall(SystemCallEventArgs e)
+
+        public async Task OnSystemCall(SystemCallEventArgs e)
         {
-            (this.__Events[__evSystemCall] as EventHandler<SystemCallEventArgs>)?.Invoke(this, e);
+            if (this.SystemCall != null)
+                await SystemCall(this, e);
         }
 
         /// <summary>

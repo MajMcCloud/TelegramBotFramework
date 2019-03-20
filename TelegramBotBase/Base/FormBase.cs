@@ -44,6 +44,10 @@ namespace TelegramBotBase.Form
             
         }
 
+        /// <summary>
+        /// Gets invoked if gets navigated to this form
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task Opened()
         {
 
@@ -62,17 +66,31 @@ namespace TelegramBotBase.Form
 
         }
 
+        /// <summary>
+        /// Gets invoked if the form gets loaded and on every message belongs to this context
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public virtual async Task Load(MessageResult message)
         {
 
         }
 
+        /// <summary>
+        /// Gets invoked if the user has clicked a button.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public virtual async Task Action(MessageResult message)
         {
 
         }
 
-
+        /// <summary>
+        /// Gets invoked at the end of the cycle to "Render" text, images, buttons, etc...
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public virtual async Task Render(MessageResult message)
         {
 
