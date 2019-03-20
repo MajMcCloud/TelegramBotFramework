@@ -132,7 +132,7 @@ Inside of the BotFather you are able to add "Commands" to your TelegramBot. The 
 I'm calling them Systemcalls. Before start (and later for sure) you could add them to your BotBase. Every time a message comes in they will get checked if they are one of them.
 If so, a special event Handler will get raised where you are easier able to manage the action behind.
 
-Below we have 3 options.
+Below we have 4 options.
 
 /start - opens the Startformular
 
