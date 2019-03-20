@@ -642,10 +642,6 @@ await this.NavigateTo(pd);
 
 PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
 
-//You could mix here for sure.
-pd.ButtonForms.Add("ok", null);
-pd.ButtonForms.Add("cancel", null);
-
 pd.ButtonClicked += async (s, en) =>
 {
     var tf = new TestForm2();
