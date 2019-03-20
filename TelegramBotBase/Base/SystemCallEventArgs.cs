@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
@@ -22,6 +23,8 @@ namespace TelegramBotBase.Base
 
         public bool Handled { get; set; } = false;
 
+        public Message OriginalMessage { get; set; }
+
 
         public SystemCallEventArgs()
         {
@@ -29,10 +32,11 @@ namespace TelegramBotBase.Base
 
         }
 
-        public SystemCallEventArgs(String Command, List<String> Parameters, long DeviceId, DeviceSession Device)
+        public SystemCallEventArgs(String Command, List<String> Parameters, Message Message, long DeviceId, DeviceSession Device)
         {
             this.Command = Command;
             this.Parameters = Parameters;
+            this.OriginalMessage = Message;
             this.DeviceId = DeviceId;
             this.Device = Device;
         }

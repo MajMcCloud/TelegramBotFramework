@@ -219,10 +219,8 @@ namespace TelegramBotBase
             //Is this a systemcall ?
             if (e.IsSystemCall && this.SystemCalls.Contains(e.SystemCommand))
             {
-                var sce = new SystemCallEventArgs(e.SystemCommand, e.SystemCallParameters, ds.DeviceId, ds);
+                var sce = new SystemCallEventArgs(e.SystemCommand, e.SystemCallParameters, e.Message, ds.DeviceId, ds);
                 OnSystemCall(sce);
-
-                return;
             }
 
             FormBase activeForm = null;
