@@ -593,15 +593,15 @@ Beginn there and navigate your way through these Steps in the subfolder.
 There are some default types of forms to make the interaction with users easier.
 For now we have the following:
 
-	- [AlertDialog](#alert-dialog)
-	  Just a simple dialog with one ok Button.
+- [AlertDialog](#alert-dialog)
+	Just a simple dialog with one Button.
 
-	- [AutoCleanForm](#autocleanform)
-	  A form which needs to be derived from. It will be delete all in the context sent messages to the user after every new message or on leaving the formular and navigates somewhere else.
-	  Makes sense to create a "feeling" of a clean environment for the user. For instance if you have a multilevel menu. This will remove the previously shown menu, and renders the new sub/top level.
+- [AutoCleanForm](#autocleanform)
+	A form which needs to be derived from. It will be delete all in the context sent messages to the user after every new message or on leaving the formular and navigates somewhere else.
+	Makes sense to create a "feeling" of a clean environment for the user. For instance if you have a multilevel menu. This will remove the previously shown menu, and renders the new sub/top level.
 
-	- [PromptDialog](#prompt-dialog)
-	  A simple dialog which is able to show multiple buttons and a Text message. The user could select one option and will get redirected to a different form, depending on the click.
+- [PromptDialog](#prompt-dialog)
+	A simple dialog which is able to show multiple buttons and a Text message. The user could select one option and will get redirected to a different form, depending on the click.
 
 ### Alert Dialog
 

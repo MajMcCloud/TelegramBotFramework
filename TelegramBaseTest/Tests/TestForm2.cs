@@ -73,9 +73,6 @@ namespace TelegramBaseTest.Tests
             {
                 PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
 
-                pd.ButtonForms.Add("ok", null);
-                pd.ButtonForms.Add("cancel", null);
-
                 pd.ButtonClicked += async (s, en) =>
                 {
                     var tf = new TestForm2();
