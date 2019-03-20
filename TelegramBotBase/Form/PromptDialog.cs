@@ -50,7 +50,6 @@ namespace TelegramBotBase.Form
 
             await message.DeleteMessage();
 
-
             ButtonBase button = this.Buttons.FirstOrDefault(a => a.Value == call.Value);
 
             if (button == null)
@@ -72,7 +71,6 @@ namespace TelegramBotBase.Form
         public override async Task Render(MessageResult message)
         {
             ButtonForm btn = new ButtonForm();
-
 
             var buttons = this.Buttons.Select(a => new ButtonBase(a.Text, CallbackData.Create("action", a.Value))).ToList();
             btn.AddButtonRow(buttons);

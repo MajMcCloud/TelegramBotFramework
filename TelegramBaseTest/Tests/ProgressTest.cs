@@ -75,8 +75,6 @@ namespace TelegramBaseTest.Tests
 
                     var sf = new Start();
 
-                    await sf.Init();
-
                     await this.NavigateTo(sf);
 
                     return;

@@ -48,18 +48,14 @@ namespace TelegramBaseTest.Tests
 
                 var tf = new TestForm();
 
-                await tf.Init();
-
                 await this.NavigateTo(tf);
             }
             else if (call.Value == "alert")
             {
                 var fto = new TestForm2();
-                await fto.Init();
 
                 AlertDialog ad = new AlertDialog("This is a message", "Ok", fto);
-
-
+                
                 await this.NavigateTo(ad);
             }
             else if (call.Value == "prompt")
@@ -68,10 +64,24 @@ namespace TelegramBaseTest.Tests
 
                 var tf = new TestForm2();
 
-                await tf.Init();
-
                 pd.ButtonForms.Add("ok", tf);
                 pd.ButtonForms.Add("cancel", tf);
+               
+                await this.NavigateTo(pd);
+            }
+            else if (call.Value == "promptevt")
+            {
+                PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+
+                pd.ButtonForms.Add("ok", null);
+                pd.ButtonForms.Add("cancel", null);
+
+                pd.ButtonClicked += async (s, en) =>
+                {
+                    var tf = new TestForm2();
+                    
+                    await pd.NavigateTo(tf);
+                };
 
                 await this.NavigateTo(pd);
             }
@@ -98,7 +108,11 @@ namespace TelegramBaseTest.Tests
 
             //btn.AddButtonRow(new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")), new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")));
 
-            btn.AddButtonRow(new ButtonBase("Information Prompt", CallbackData.Create("navigate", "alert")), new ButtonBase("Confirmation Prompt", CallbackData.Create("navigate", "prompt")));
+            btn.AddButtonRow(new ButtonBase("Information Prompt", CallbackData.Create("navigate", "alert")));
+
+            btn.AddButtonRow(new ButtonBase("Confirmation Prompt without event", CallbackData.Create("navigate", "prompt")));
+
+            btn.AddButtonRow(new ButtonBase("Confirmation Prompt with event", CallbackData.Create("navigate", "promptevt")));
 
 
             await this.Device.SendPhoto(bmp, "Test", btn);

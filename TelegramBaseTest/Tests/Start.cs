@@ -54,6 +54,22 @@ namespace TelegramBaseTest.Tests
                     await this.NavigateTo(reg);
 
                     break;
+
+                case "form1":
+
+                    var form1 = new TestForm();
+
+                    await this.NavigateTo(form1);
+
+                    break;
+
+                case "form2":
+
+                    var form2 = new TestForm2();
+
+                    await this.NavigateTo(form2);
+
+                    break;
             }
 
 
@@ -67,6 +83,10 @@ namespace TelegramBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#1 Simple Text", new CallbackData("a", "text").Serialize()), new ButtonBase("#2 Button Test", new CallbackData("a", "buttons").Serialize()));
             btn.AddButtonRow(new ButtonBase("#3 Progress Bar", new CallbackData("a", "progress").Serialize()));
             btn.AddButtonRow(new ButtonBase("#4 Registration Example", new CallbackData("a", "registration").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#5 Form1 Command", new CallbackData("a", "form1").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#6 Form2 Command", new CallbackData("a", "form2").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }

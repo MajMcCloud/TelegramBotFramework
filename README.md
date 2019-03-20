@@ -26,6 +26,12 @@ Test the Testproject: [@TGBaseBot](https://t.me/TGBaseBot)
 
     * [Example #4 - Registration Formular](#registration-example-example-4---registration-form-test)
 
+- [Special Forms](#forms)
+
+	* [AlertDialog](#alert-dialog)
+	* [AutoCleanForm](#autocleanform)
+	* [PromptDialog](#prompt-dialog)
+
 
 ---
 
@@ -577,6 +583,82 @@ To give you an example about the possiblities, i added into the Test project an 
 There is also a second example, where every of these 3 inputs gets requested by a different formular (class). Just for imagination of the possiblites.
 Cause its to much Text, i didnt have added it here. You will find it under [TelegramBaseTest/Tests/Register/PerStep.cs](TelegramBaseTest/Tests/Register/PerStep.cs)
 Beginn there and navigate your way through these Steps in the subfolder.
+
+
+---
+
+
+## Forms
+
+There are some default types of forms to make the interaction with users easier.
+For now we have the following:
+
+	* [AlertDialog](#alert-dialog)
+	  Just a simple dialog with one ok Button.
+
+	* [AutoCleanForm](#autocleanform)
+	  A form which needs to be derived from. It will be delete all in the context sent messages to the user after every new message or on leaving the formular and navigates somewhere else.
+	  Makes sense to create a "feeling" of a clean environment for the user. For instance if you have a multilevel menu. This will remove the previously shown menu, and renders the new sub/top level.
+
+	* [PromptDialog](#prompt-dialog)
+	  A simple dialog which is able to show multiple buttons and a Text message. The user could select one option and will get redirected to a different form, depending on the click.
+
+### Alert Dialog
+
+```
+
+        var fto = new TestForm2();
+
+        AlertDialog ad = new AlertDialog("This is a message", "Ok", fto);
+                
+        await this.NavigateTo(ad);
+
+```
+
+
+### AutoCleanForm
+
+
+
+### Prompt Dialog
+
+#### Without Eventhandler (pre-init of form necessary)
+
+```
+
+        PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+
+        var tf = new TestForm2();
+
+        pd.ButtonForms.Add("ok", tf);
+        pd.ButtonForms.Add("cancel", tf);
+               
+        await this.NavigateTo(pd);
+
+```
+
+
+#### With Eventhandler (no pre-init of form necessary)
+
+```
+
+        PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+
+		//You could mix here for sure.
+        pd.ButtonForms.Add("ok", null);
+        pd.ButtonForms.Add("cancel", null);
+
+        pd.ButtonClicked += async (s, en) =>
+        {
+            var tf = new TestForm2();
+            
+			//Remember only to navigate from the current running form. (here it is the prompt dialog, cause we have left the above already)
+            await pd.NavigateTo(tf);
+        };
+
+        await this.NavigateTo(pd);
+
+```
 
 ---
 

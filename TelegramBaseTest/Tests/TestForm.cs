@@ -51,8 +51,6 @@ namespace TelegramBaseTest.Tests
 
                     var tf = new TestForm2();
 
-                    await tf.Init();
-
                     await this.NavigateTo(tf);
 
                     break;

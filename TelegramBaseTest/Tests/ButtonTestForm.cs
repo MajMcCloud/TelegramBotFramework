@@ -59,8 +59,6 @@ namespace TelegramBaseTest.Tests
 
                     var st = new Start();
 
-                    await st.Init();
-
                     await this.NavigateTo(st);
 
                     break;

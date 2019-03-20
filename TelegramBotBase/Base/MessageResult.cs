@@ -62,7 +62,7 @@ namespace TelegramBotBase.Base
         }
 
         /// <summary>
-        /// Is this a system call ? Starts with a slash and command
+        /// Is this a system call ? Starts with a slash '/' and a command
         /// </summary>
         public bool IsSystemCall
         {
