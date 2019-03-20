@@ -79,6 +79,60 @@ namespace TelegramBotBase
         }
 
         /// <summary>
+        /// Simple start of your Bot with the APIKey and a proxyAdress
+        /// </summary>
+        /// <param name="apiKey"></param>
+        /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
+        public BotBase(String apiKey, System.Net.Http.HttpClient proxy)
+        {
+            this.APIKey = apiKey;
+
+            this.Client = new Base.MessageClient(this.APIKey, proxy);
+
+            this.SystemCalls = new List<string>();
+
+            this.Sessions = new SessionBase();
+            this.Sessions.Client = this.Client;
+        }
+
+        /// <summary>
+        /// Simple start of your Bot with the APIKey and a proxyAdress
+        /// </summary>
+        /// <param name="apiKey"></param>
+        /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
+        public BotBase(String apiKey, String proxyBaseAddress)
+        {
+            this.APIKey = apiKey;
+
+            var url = new Uri(proxyBaseAddress);
+
+            this.Client = new Base.MessageClient(this.APIKey, url);
+
+            this.SystemCalls = new List<string>();
+
+            this.Sessions = new SessionBase();
+            this.Sessions.Client = this.Client;
+        }
+
+        /// <summary>
+        /// Simple start of your Bot with the APIKey and a proxyAdress
+        /// </summary>
+        /// <param name="apiKey"></param>
+        /// <param name="proxyHost">i.e. 127.0.0.1</param>
+        /// <param name="proxyPort">i.e. 10000</param>
+        public BotBase(String apiKey, String proxyHost, int proxyPort)
+        {
+            this.APIKey = apiKey;
+
+            this.Client = new Base.MessageClient(this.APIKey, proxyHost, proxyPort);
+
+            this.SystemCalls = new List<string>();
+
+            this.Sessions = new SessionBase();
+            this.Sessions.Client = this.Client;
+        }
+
+        /// <summary>
         /// Start your Bot
         /// </summary>
         public void Start()
@@ -154,13 +208,13 @@ namespace TelegramBotBase
             {
                 ds = await this.Sessions.StartSession<T>(e.DeviceId);
 
-                ds.LastMessage = e.MessageId;
+                ds.LastMessage = e.Message;
 
                 OnSessionBegins(new SessionBeginResult(e.DeviceId, ds));
             }
 
             ds.LastAction = DateTime.Now;
-            ds.LastMessage = e.MessageId;
+            ds.LastMessage = e.Message;
 
             //Is this a systemcall ?
             if (e.IsSystemCall && this.SystemCalls.Contains(e.SystemCommand))
@@ -223,7 +277,7 @@ namespace TelegramBotBase
 
 
             ds.LastAction = DateTime.Now;
-            ds.LastMessage = e.MessageId;
+            ds.LastMessage = e.Message;
 
             FormBase activeForm = null;
 

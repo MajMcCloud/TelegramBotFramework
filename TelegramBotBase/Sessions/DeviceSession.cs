@@ -27,11 +27,31 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         public long DeviceId { get; set; }
 
+        /// <summary>
+        /// When did any last action happend (message received or button clicked)
+        /// </summary>
         public DateTime LastAction { get; set; }
 
+        /// <summary>
+        /// Returns the form where the user/group is at the moment.
+        /// </summary>
         public FormBase ActiveForm { get; set; }
 
-        public int LastMessage { get; set; }
+        /// <summary>
+        /// Returns the ID of the last received message.
+        /// </summary>
+        public int LastMessageId
+        {
+            get
+            {
+                return this.LastMessage?.MessageId ?? -1;
+            }
+        }
+
+        /// <summary>
+        /// Returns the last received message.
+        /// </summary>
+        public Message LastMessage { get; set; }
 
         private MessageClient Client
         {
@@ -41,13 +61,24 @@ namespace TelegramBotBase.Sessions
             }
         }
 
+        /// <summary>
+        /// Returns if the messages is posted within a group.
+        /// </summary>
+        public bool IsGroup
+        {
+            get
+            {
+                return this.LastMessage != null && this.LastMessage.Chat.Id != this.LastMessage.From.Id;
+            }
+        }
+
         public EventHandlerList __Events = new EventHandlerList();
 
         private static object __evMessageSent = new object();
 
         public DeviceSession()
         {
-            this.LastMessage = 0;
+
         }
 
         public DeviceSession(long DeviceId)
@@ -87,7 +118,7 @@ namespace TelegramBotBase.Sessions
             }
             catch
             {
-                
+
             }
 
 
@@ -119,7 +150,7 @@ namespace TelegramBotBase.Sessions
             {
                 m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
             }
-            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            catch (ApiRequestException ex)
             {
                 return null;
             }
@@ -153,7 +184,7 @@ namespace TelegramBotBase.Sessions
             {
                 m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
             }
-            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            catch (ApiRequestException ex)
             {
                 return null;
             }
@@ -192,7 +223,7 @@ namespace TelegramBotBase.Sessions
             {
                 m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
             }
-            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            catch (ApiRequestException ex)
             {
                 return null;
             }
@@ -316,7 +347,7 @@ namespace TelegramBotBase.Sessions
 
                 return true;
             }
-            catch(ApiRequestException ex)
+            catch (ApiRequestException ex)
             {
 
             }

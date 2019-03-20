@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,6 +30,43 @@ namespace TelegramBotBase.Base
         {
             this.APIKey = APIKey;
             this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey);
+
+            Prepare();
+        }
+
+        public MessageClient(String APIKey, HttpClient proxy)
+        {
+            this.APIKey = APIKey;
+            this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey, proxy);
+           
+
+            Prepare();
+        }
+
+        public MessageClient(String APIKey, Uri proxyUrl)
+        {
+            this.APIKey = APIKey;
+
+            var proxy = new WebProxy(proxyUrl);
+
+            this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey, proxy);
+
+            Prepare();
+        }
+
+        /// <summary>
+        /// Initializes the client with a proxy
+        /// </summary>
+        /// <param name="APIKey"></param>
+        /// <param name="proxyHost">i.e. 127.0.0.1</param>
+        /// <param name="proxyPort">i.e. 10000</param>
+        public MessageClient(String APIKey, String proxyHost, int proxyPort)
+        {
+            this.APIKey = APIKey;
+
+            var proxy = new WebProxy(proxyHost, proxyPort);
+
+            this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey, proxy);
 
             Prepare();
         }
