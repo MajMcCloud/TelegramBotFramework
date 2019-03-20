@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Sessions;
@@ -90,6 +91,23 @@ namespace TelegramBotBase
             this.APIKey = apiKey;
 
             this.Client = new Base.MessageClient(this.APIKey, proxy);
+
+            this.SystemCalls = new List<string>();
+
+            this.Sessions = new SessionBase();
+            this.Sessions.Client = this.Client;
+        }
+
+        /// <summary>
+        /// Simple start of your Bot with the APIKey and a TelegramBotClient instance.
+        /// </summary>
+        /// <param name="apiKey"></param>
+        /// <param name="client"></param>
+        public BotBase(String apiKey, TelegramBotClient client)
+        {
+            this.APIKey = apiKey;
+
+            this.Client = new Base.MessageClient(this.APIKey, client);
 
             this.SystemCalls = new List<string>();
 
@@ -261,6 +279,12 @@ namespace TelegramBotBase
         {
             try
             {
+                if (LogAllMessages)
+                {
+                    DeviceSession ds2 = this.Sessions.GetSession(e.DeviceId);
+                    OnMessage(new MessageIncomeResult(e.DeviceId, ds2, e));
+                }
+
                 Client_TryAction(sender, e);
             }
             catch (Exception ex)
