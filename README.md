@@ -157,46 +157,46 @@ Below we have 4 options.
 
 
 ```
-            BotBase<Start> bb = new BotBase<Start>("{YOUR API KEY}");
+BotBase<Start> bb = new BotBase<Start>("{YOUR API KEY}");
 
-            bb.SystemCalls.Add("/start");
-            bb.SystemCalls.Add("/form1");
-            bb.SystemCalls.Add("/form2");
+bb.SystemCalls.Add("/start");
+bb.SystemCalls.Add("/form1");
+bb.SystemCalls.Add("/form2");
 
-            bb.SystemCalls.Add("/params");
+bb.SystemCalls.Add("/params");
 
-            bb.SystemCall += async (s, en) =>
-            {
-                switch (en.Command)
-                {
-                    case "/form1":
+bb.SystemCall += async (s, en) =>
+{
+	switch (en.Command)
+	{
+	    case "/form1":
 
-                        var form1 = new TestForm();
+		var form1 = new TestForm();
 
-                        await en.Device.ActiveForm.NavigateTo(form1);
+		await en.Device.ActiveForm.NavigateTo(form1);
 
-                        break;
+		break;
 
-                    case "/form2":
+	    case "/form2":
 
-                        var form2 = new TestForm2();
+		var form2 = new TestForm2();
 
-                        await en.Device.ActiveForm.NavigateTo(form2);
+		await en.Device.ActiveForm.NavigateTo(form2);
 
-                        break;
+		break;
 
-                    case "/params":
+	    case "/params":
 
-                        String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+		String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
 
-                        await en.Device.Send("Your parameters are " + m, replyTo: en.Device.LastMessage);
+		await en.Device.Send("Your parameters are " + m, replyTo: en.Device.LastMessage);
 
-                        break;
-                }
+		break;
+	}
 
-            };
+};
 
-            bb.Start();
+bb.Start();
 
 ```
 
@@ -211,44 +211,42 @@ On every input the user is sending back to the bot the Action event gets raised.
 public class SimpleForm : FormBase
 {
 
-        public override async Task Opened()
-        {
-            await this.Device.Send("Hello world!");
-        }
+	public override async Task Opened()
+	{
+	    await this.Device.Send("Hello world!");
+	}
 
 
-        public override async Task Load(MessageResult message)
-        {
-            //message.MessageText will work also, cause it is a string you could manage a lot different scenerios here
+	public override async Task Load(MessageResult message)
+	{
+	    //message.MessageText will work also, cause it is a string you could manage a lot different scenerios here
 
-            var messageId = message.MessageId;
+	    var messageId = message.MessageId;
 
-            switch (message.Command)
-            {
-                case "hello":
-                case "hi":
+	    switch (message.Command)
+	    {
+		case "hello":
+		case "hi":
 
-                    //Send him a simple message
-                    await this.Device.Send("Hello you there !");
-                    break;
+		    //Send him a simple message
+		    await this.Device.Send("Hello you there !");
+		    break;
 
-                case "maybe":
+		case "maybe":
 
-                    //Send him a simple message and reply to the one of himself
-                    await this.Device.Send("Maybe what?", replyTo: messageId);
+		    //Send him a simple message and reply to the one of himself
+		    await this.Device.Send("Maybe what?", replyTo: messageId);
 
-                    break;
+		    break;
 
-                case "bye":
-                case "ciao":
+		case "bye":
+		case "ciao":
 
-                    //Send him a simple message
-                    await this.Device.Send("Ok, take care !");
-                    break;
-            }
-        }
-
-
+		    //Send him a simple message
+		    await this.Device.Send("Ok, take care !");
+		    break;
+	    }
+	}
 }
 
 ```
@@ -351,129 +349,129 @@ Maybe, if i  got more ideas, i will add other "controls" in the future.
 
 ```
 
-    public class ProgressTest : AutoCleanForm
+public class ProgressTest : AutoCleanForm
+{
+
+public ProgressTest()
+{
+    this.DeleteMode = eDeleteMode.OnLeavingForm;
+}
+
+public override async Task Opened()
+{
+    await this.Device.Send("Welcome to ProgressTest");
+}
+
+public override async Task Action(MessageResult message)
+{
+    var call = message.GetData<CallbackData>();
+
+    await message.ConfirmAction();
+
+
+    if (call == null)
+	return;
+
+    TelegramBotBase.Controls.ProgressBar Bar = null;
+
+    switch (call.Value)
     {
+	case "standard":
 
-        public ProgressTest()
-        {
-            this.DeleteMode = eDeleteMode.OnLeavingForm;
-        }
+	    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.standard);
+	    Bar.Device = this.Device;
 
-        public override async Task Opened()
-        {
-            await this.Device.Send("Welcome to ProgressTest");
-        }
+	    break;
 
-        public override async Task Action(MessageResult message)
-        {
-            var call = message.GetData<CallbackData>();
+	case "squares":
 
-            await message.ConfirmAction();
+	    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squares);
+	    Bar.Device = this.Device;
 
+	    break;
 
-            if (call == null)
-                return;
+	case "circles":
 
-            TelegramBotBase.Controls.ProgressBar Bar = null;
+	    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.circles);
+	    Bar.Device = this.Device;
 
-            switch (call.Value)
-            {
-                case "standard":
+	    break;
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.standard);
-                    Bar.Device = this.Device;
+	case "lines":
 
-                    break;
+	    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.lines);
+	    Bar.Device = this.Device;
 
-                case "squares":
+	    break;
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squares);
-                    Bar.Device = this.Device;
+	case "squaredlines":
 
-                    break;
+	    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squaredLines);
+	    Bar.Device = this.Device;
 
-                case "circles":
+	    break;
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.circles);
-                    Bar.Device = this.Device;
+	case "start":
 
-                    break;
+	    var sf = new Start();
 
-                case "lines":
+	    await sf.Init();
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.lines);
-                    Bar.Device = this.Device;
+	    await this.NavigateTo(sf);
 
-                    break;
+	    return;
 
-                case "squaredlines":
+	default:
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squaredLines);
-                    Bar.Device = this.Device;
-
-                    break;
-
-                case "start":
-
-                    var sf = new Start();
-
-                    await sf.Init();
-
-                    await this.NavigateTo(sf);
-
-                    return;
-
-                default:
-
-                    return;
-
-            }
-
-
-            //Render Progress bar and show some "example" progress
-            await Bar.Render();
-
-            this.Controls.Add(Bar);
-
-            for (int i = 0; i <= 100; i++)
-            {
-                Bar.Value++;
-                await Bar.Render();
-
-                Thread.Sleep(250);
-            }
-
-
-        }
-
-
-        public override async Task Render(MessageResult message)
-        {
-            ButtonForm btn = new ButtonForm();
-            btn.AddButtonRow(new ButtonBase("Standard", new CallbackData("a", "standard").Serialize()), new ButtonBase("Squares", new CallbackData("a", "squares").Serialize()));
-
-            btn.AddButtonRow(new ButtonBase("Circles", new CallbackData("a", "circles").Serialize()), new ButtonBase("Lines", new CallbackData("a", "lines").Serialize()));
-
-            btn.AddButtonRow(new ButtonBase("Squared Line", new CallbackData("a", "squaredlines").Serialize()));
-
-            btn.AddButtonRow(new ButtonBase("Back to start", new CallbackData("a", "start").Serialize()));
-
-            await this.Device.Send("Choose your progress bar:", btn);
-        }
-
-        public override async Task Closed()
-        {
-            foreach (var b in this.Controls)
-            {
-                await b.Cleanup();
-            }
-
-            await this.Device.Send("Ciao from ProgressTest");
-        }
-
-
+	    return;
 
     }
+
+
+    //Render Progress bar and show some "example" progress
+    await Bar.Render();
+
+    this.Controls.Add(Bar);
+
+    for (int i = 0; i <= 100; i++)
+    {
+	Bar.Value++;
+	await Bar.Render();
+
+	Thread.Sleep(250);
+    }
+
+
+}
+
+
+public override async Task Render(MessageResult message)
+{
+    ButtonForm btn = new ButtonForm();
+    btn.AddButtonRow(new ButtonBase("Standard", new CallbackData("a", "standard").Serialize()), new ButtonBase("Squares", new CallbackData("a", "squares").Serialize()));
+
+    btn.AddButtonRow(new ButtonBase("Circles", new CallbackData("a", "circles").Serialize()), new ButtonBase("Lines", new CallbackData("a", "lines").Serialize()));
+
+    btn.AddButtonRow(new ButtonBase("Squared Line", new CallbackData("a", "squaredlines").Serialize()));
+
+    btn.AddButtonRow(new ButtonBase("Back to start", new CallbackData("a", "start").Serialize()));
+
+    await this.Device.Send("Choose your progress bar:", btn);
+}
+
+public override async Task Closed()
+{
+    foreach (var b in this.Controls)
+    {
+	await b.Cleanup();
+    }
+
+    await this.Device.Send("Ciao from ProgressTest");
+}
+
+
+
+}
 
 
 ```
@@ -485,98 +483,98 @@ To give you an example about the possiblities, i added into the Test project an 
 
 ```
 
-    public class PerForm : AutoCleanForm
+public class PerForm : AutoCleanForm
+{
+public String EMail { get; set; }
+
+public String Firstname { get; set; }
+
+public String Lastname { get; set; }
+
+public async override Task Load(MessageResult message)
+{
+    if (message.MessageText.Trim() == "")
+	return;
+
+    if (this.Firstname == null)
     {
-        public String EMail { get; set; }
+	this.Firstname = message.MessageText;
+	return;
+    }
 
-        public String Firstname { get; set; }
+    if (this.Lastname == null)
+    {
+	this.Lastname = message.MessageText;
+	return;
+    }
 
-        public String Lastname { get; set; }
+    if (this.EMail == null)
+    {
+	this.EMail = message.MessageText;
+	return;
+    }
 
-        public async override Task Load(MessageResult message)
-        {
-            if (message.MessageText.Trim() == "")
-                return;
+}
 
-            if (this.Firstname == null)
-            {
-                this.Firstname = message.MessageText;
-                return;
-            }
+public async override Task Action(MessageResult message)
+{
+    var call = message.GetData<CallbackData>();
 
-            if (this.Lastname == null)
-            {
-                this.Lastname = message.MessageText;
-                return;
-            }
+    await message.ConfirmAction();
 
-            if (this.EMail == null)
-            {
-                this.EMail = message.MessageText;
-                return;
-            }
+    if (call == null)
+	return;
 
-        }
+    switch (call.Value)
+    {
+	case "back":
 
-        public async override Task Action(MessageResult message)
-        {
-            var call = message.GetData<CallbackData>();
+	    var start = new Start();
 
-            await message.ConfirmAction();
+	    await this.NavigateTo(start);
 
-            if (call == null)
-                return;
-
-            switch (call.Value)
-            {
-                case "back":
-
-                    var start = new Start();
-
-                    await this.NavigateTo(start);
-
-                    break;
-
-            }
-
-
-        }
-
-        public async override Task Render(MessageResult message)
-        {
-            if (this.Firstname == null)
-            {
-                await this.Device.Send("Please sent your firstname:");
-                return;
-            }
-
-            if (this.Lastname == null)
-            {
-                await this.Device.Send("Please sent your lastname:");
-                return;
-            }
-
-            if (this.EMail == null)
-            {
-                await this.Device.Send("Please sent your email address:");
-                return;
-            }
-
-
-            String s = "";
-
-            s += "Firstname: " + this.Firstname + "\r\n";
-            s += "Lastname: " + this.Lastname + "\r\n";
-            s += "E-Mail: " + this.EMail + "\r\n";
-
-            ButtonForm bf = new ButtonForm();
-            bf.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
-
-            await this.Device.Send("Your details:\r\n" + s, bf);
-        }
-
+	    break;
 
     }
+
+
+}
+
+public async override Task Render(MessageResult message)
+{
+    if (this.Firstname == null)
+    {
+	await this.Device.Send("Please sent your firstname:");
+	return;
+    }
+
+    if (this.Lastname == null)
+    {
+	await this.Device.Send("Please sent your lastname:");
+	return;
+    }
+
+    if (this.EMail == null)
+    {
+	await this.Device.Send("Please sent your email address:");
+	return;
+    }
+
+
+    String s = "";
+
+    s += "Firstname: " + this.Firstname + "\r\n";
+    s += "Lastname: " + this.Lastname + "\r\n";
+    s += "E-Mail: " + this.EMail + "\r\n";
+
+    ButtonForm bf = new ButtonForm();
+    bf.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
+
+    await this.Device.Send("Your details:\r\n" + s, bf);
+}
+
+
+}
 
 ```
 
@@ -607,11 +605,11 @@ For now we have the following:
 
 ```
 
-        var fto = new TestForm2();
+var fto = new TestForm2();
 
-        AlertDialog ad = new AlertDialog("This is a message", "Ok", fto);
-                
-        await this.NavigateTo(ad);
+AlertDialog ad = new AlertDialog("This is a message", "Ok", fto);
+
+await this.NavigateTo(ad);
 
 ```
 
@@ -626,14 +624,14 @@ For now we have the following:
 
 ```
 
-        PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
 
-        var tf = new TestForm2();
+var tf = new TestForm2();
 
-        pd.ButtonForms.Add("ok", tf);
-        pd.ButtonForms.Add("cancel", tf);
-               
-        await this.NavigateTo(pd);
+pd.ButtonForms.Add("ok", tf);
+pd.ButtonForms.Add("cancel", tf);
+
+await this.NavigateTo(pd);
 
 ```
 
@@ -642,21 +640,21 @@ For now we have the following:
 
 ```
 
-        PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
 
-		//You could mix here for sure.
-        pd.ButtonForms.Add("ok", null);
-        pd.ButtonForms.Add("cancel", null);
+//You could mix here for sure.
+pd.ButtonForms.Add("ok", null);
+pd.ButtonForms.Add("cancel", null);
 
-        pd.ButtonClicked += async (s, en) =>
-        {
-            var tf = new TestForm2();
-            
-			//Remember only to navigate from the current running form. (here it is the prompt dialog, cause we have left the above already)
-            await pd.NavigateTo(tf);
-        };
+pd.ButtonClicked += async (s, en) =>
+{
+    var tf = new TestForm2();
 
-        await this.NavigateTo(pd);
+    //Remember only to navigate from the current running form. (here it is the prompt dialog, cause we have left the above already)
+    await pd.NavigateTo(tf);
+};
+
+await this.NavigateTo(pd);
 
 ```
 
