@@ -29,7 +29,9 @@ Test the Testproject: [@TGBaseBot](https://t.me/TGBaseBot)
 - [Special Forms](#forms)
 
 	* [AlertDialog](#alert-dialog)
+	
 	* [AutoCleanForm](#autocleanform)
+	
 	* [PromptDialog](#prompt-dialog)
 
 
