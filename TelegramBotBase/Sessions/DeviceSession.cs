@@ -335,6 +335,32 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
+        /// Requests the contact from the user.
+        /// </summary>
+        /// <param name="buttonText"></param>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
+        public async Task<Message> RequestContact(String buttonText = "Send your contact", String requestMessage = "Give me your phone number!")
+        {
+            var rck = new ReplyKeyboardMarkup(KeyboardButton.WithRequestContact(buttonText));
+
+            return await this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rck);
+        }
+
+        /// <summary>
+        /// Requests the location from the user.
+        /// </summary>
+        /// <param name="buttonText"></param>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
+        public async Task<Message> RequestLocation(String buttonText = "Send your location", String requestMessage = "Give me your location!")
+        {
+            var rcl = new ReplyKeyboardMarkup(KeyboardButton.WithRequestLocation(buttonText));
+            
+            return await this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rcl);
+        }
+
+        /// <summary>
         /// Deletes a message
         /// </summary>
         /// <param name="messageId"></param>
