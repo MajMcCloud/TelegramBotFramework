@@ -267,6 +267,13 @@ namespace TelegramBotBase
                 //Loading Event
                 await activeForm.Load(e);
 
+                //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document)
+                if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Contact | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Document | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Location |
+                    e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Photo | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Video | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Audio)
+                {
+                    await activeForm.SentData(new DataResult(e));
+                }
+
                 //Render Event
                 if (!activeForm.FormSwitched)
                     await activeForm.Render(e);

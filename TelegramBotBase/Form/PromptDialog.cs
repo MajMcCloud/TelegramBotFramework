@@ -38,6 +38,15 @@ namespace TelegramBotBase.Form
             this.Buttons = Buttons.ToList();
         }
 
+        /// <summary>
+        /// Adds one Button
+        /// </summary>
+        /// <param name="button"></param>
+        public void AddButton(ButtonBase button)
+        {
+            this.Buttons.Add(button);
+        }
+
         public override async Task Action(MessageResult message)
         {
             var call = message.GetData<CallbackData>();

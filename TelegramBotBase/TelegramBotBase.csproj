@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Base\ButtonClickedEventArgs.cs" />
     <Compile Include="Base\ControlBase.cs" />
+    <Compile Include="Base\DataResult.cs" />
     <Compile Include="Base\MessageClient.cs" />
     <Compile Include="Base\MessageIncomeResult.cs" />
     <Compile Include="Base\MessageResult.cs" />

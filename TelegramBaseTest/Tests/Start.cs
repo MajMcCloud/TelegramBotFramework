@@ -70,6 +70,16 @@ namespace TelegramBaseTest.Tests
                     await this.NavigateTo(form2);
 
                     break;
+
+                case "data":
+
+                    message.Handled = true;
+
+                    var data = new DataForm();
+
+                    await this.NavigateTo(data);
+
+                    break;
             }
 
 
@@ -87,6 +97,8 @@ namespace TelegramBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#5 Form1 Command", new CallbackData("a", "form1").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#6 Form2 Command", new CallbackData("a", "form2").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#7 Data Handling", new CallbackData("a", "data").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }

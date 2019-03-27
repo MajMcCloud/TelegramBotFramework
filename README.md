@@ -55,7 +55,7 @@ It gives you features which will look/feel like WinForms or have a good way to c
 Within your empty App your need to put some initial lines including your APIKey to get things started. 
 The "BotBase" Class will manage a lot of things for you, like system calls, action events and so on. 
 "StartForm" is your first Formular which every user will get internally redirected to, like a start page, you could redirect from there later in code, so users won't recognize it. 
-It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBase.Form.
+It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBase.Base
 
 
 ```
@@ -83,35 +83,45 @@ public class StartForm : FormBase
 
         }
 
+		//Gets invoked during Navigation to this form
         public override async Task Init(params object[] param)
         {
             
         }
 
+		//Gets invoked if the form gets opened (with Form.NavigateTo(NewForm))
         public override async Task Opened()
         {
 
         }
 
+		//Gets invoked if the form gets leaved
         public override async Task Closed()
         {
 
         }
 
+		//Gets invoked on every Message/Action/Data in this context
         public override async Task Load(MessageResult message)
         {
             await this.Device.Send("Hello world!");
         }
 
-
-
+		//Gets invoked on Button clicks
         public override async Task Action(MessageResult message)
         {
 
 
         }
 
+		//Gets invoked on Data uploades by the user (of type Photo, Audio, Video, Contact, Location, Document)
+		public override async Task SentData(DataResult data)
+        {
 
+
+		}
+
+		//Gets invoked on every Message/Action/Data to render Design or Response 
         public override async Task Render(MessageResult message)
         {
 
@@ -626,7 +636,10 @@ await this.NavigateTo(ad);
 
 ```
 
-PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+PromptDialog pd = new PromptDialog("Please confirm");
+
+pd.AddButton(new ButtonBase("Ok", "ok"));
+pd.AddButton(new ButtonBase("Cancel", "cancel"));
 
 var tf = new TestForm2();
 

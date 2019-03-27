@@ -87,6 +87,16 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
+        /// Gets invoked if the user has sent some media (Photo, Audio, Video, Contact, Location, Document)
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public virtual async Task SentData(DataResult message)
+        {
+
+        }
+
+        /// <summary>
         /// Gets invoked at the end of the cycle to "Render" text, images, buttons, etc...
         /// </summary>
         /// <param name="message"></param>

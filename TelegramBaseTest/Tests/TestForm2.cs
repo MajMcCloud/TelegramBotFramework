@@ -60,7 +60,10 @@ namespace TelegramBaseTest.Tests
             }
             else if (call.Value == "prompt")
             {
-                PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+                PromptDialog pd = new PromptDialog("Please confirm");
+
+                pd.AddButton(new ButtonBase("Ok", "ok"));
+                pd.AddButton(new ButtonBase("Cancel", "cancel"));
 
                 var tf = new TestForm2();
 

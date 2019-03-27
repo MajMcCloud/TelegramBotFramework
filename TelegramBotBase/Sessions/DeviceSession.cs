@@ -114,6 +114,7 @@ namespace TelegramBotBase.Sessions
             try
             {
                 var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
+
                 return m;
             }
             catch
@@ -149,6 +150,8 @@ namespace TelegramBotBase.Sessions
             try
             {
                 m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+
+                OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
             }
             catch (ApiRequestException ex)
             {
@@ -158,9 +161,6 @@ namespace TelegramBotBase.Sessions
             {
                 return null;
             }
-
-
-            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
 
             return m;
         }
@@ -183,6 +183,8 @@ namespace TelegramBotBase.Sessions
             try
             {
                 m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+
+                OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
             }
             catch (ApiRequestException ex)
             {
@@ -192,8 +194,6 @@ namespace TelegramBotBase.Sessions
             {
                 return null;
             }
-
-            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
 
             return m;
         }
@@ -222,6 +222,8 @@ namespace TelegramBotBase.Sessions
             try
             {
                 m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+
+                OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
             }
             catch (ApiRequestException ex)
             {
@@ -231,8 +233,6 @@ namespace TelegramBotBase.Sessions
             {
                 return null;
             }
-
-            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
 
             return m;
         }
@@ -318,7 +318,7 @@ namespace TelegramBotBase.Sessions
             }
 
             var m = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
-
+            
             OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
 
             return m;
@@ -339,11 +339,12 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="buttonText"></param>
         /// <param name="requestMessage"></param>
+        /// <param name="OneTimeOnly"></param>
         /// <returns></returns>
-        public async Task<Message> RequestContact(String buttonText = "Send your contact", String requestMessage = "Give me your phone number!")
+        public async Task<Message> RequestContact(String buttonText = "Send your contact", String requestMessage = "Give me your phone number!", bool OneTimeOnly = true)
         {
             var rck = new ReplyKeyboardMarkup(KeyboardButton.WithRequestContact(buttonText));
-
+            rck.OneTimeKeyboard = OneTimeOnly;
             return await this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rck);
         }
 
@@ -352,11 +353,12 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="buttonText"></param>
         /// <param name="requestMessage"></param>
+        /// <param name="OneTimeOnly"></param>
         /// <returns></returns>
-        public async Task<Message> RequestLocation(String buttonText = "Send your location", String requestMessage = "Give me your location!")
+        public async Task<Message> RequestLocation(String buttonText = "Send your location", String requestMessage = "Give me your location!", bool OneTimeOnly = true)
         {
             var rcl = new ReplyKeyboardMarkup(KeyboardButton.WithRequestLocation(buttonText));
-            
+            rcl.OneTimeKeyboard = OneTimeOnly;
             return await this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rcl);
         }
 
