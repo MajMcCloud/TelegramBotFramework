@@ -83,45 +83,45 @@ public class StartForm : FormBase
 
         }
 		
-		//Gets invoked during Navigation to this form
+	//Gets invoked during Navigation to this form
         public override async Task Init(params object[] param)
         {
             
         }
 		
-		//Gets invoked if the form gets opened (with Form.NavigateTo(NewForm))
+	//Gets invoked if the form gets opened (with Form.NavigateTo(NewForm))
         public override async Task Opened()
         {
 
         }
 		
-		//Gets invoked if the form gets leaved
+	//Gets invoked if the form gets leaved
         public override async Task Closed()
         {
 
         }
 		
-		//Gets invoked on every Message/Action/Data in this context
+	//Gets invoked on every Message/Action/Data in this context
         public override async Task Load(MessageResult message)
         {
             await this.Device.Send("Hello world!");
         }
 		
-		//Gets invoked on Button clicks
+	//Gets invoked on Button clicks
         public override async Task Action(MessageResult message)
         {
 
 
         }
 		
-		//Gets invoked on Data uploades by the user (of type Photo, Audio, Video, Contact, Location, Document)
-		public override async Task SentData(DataResult data)
+	//Gets invoked on Data uploades by the user (of type Photo, Audio, Video, Contact, Location, Document)
+	public override async Task SentData(DataResult data)
         {
 
 
-		}
+	}
 		
-		//Gets invoked on every Message/Action/Data to render Design or Response 
+	//Gets invoked on every Message/Action/Data to render Design or Response 
         public override async Task Render(MessageResult message)
         {
 
