@@ -10,6 +10,8 @@
 
 Test the Testproject: [@TGBaseBot](https://t.me/TGBaseBot)
 
+Join the Telegram Group: [https://t.me/tgbotbase](https://t.me/tgbotbase)
+
 ---
 
 ## Index
