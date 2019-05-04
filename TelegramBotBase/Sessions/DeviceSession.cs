@@ -83,7 +83,7 @@ namespace TelegramBotBase.Sessions
             }
         }
 
-        public EventHandlerList __Events = new EventHandlerList();
+        private EventHandlerList __Events = new EventHandlerList();
 
         private static object __evMessageSent = new object();
         private static object __evMessageReceived = new object();
@@ -139,6 +139,39 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
+        /// Edits the text message
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <param name="text"></param>
+        /// <param name="buttons"></param>
+        /// <returns></returns>
+        public async Task<Message> Edit(Message message, ButtonForm buttons = null)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            InlineKeyboardMarkup markup = null;
+            if (buttons != null)
+            {
+                markup = buttons;
+            }
+
+            try
+            {
+                var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, replyMarkup: markup);
+
+                return m;
+            }
+            catch
+            {
+
+            }
+
+
+            return null;
+        }
+
+        /// <summary>
         /// Sends a simple text message
         /// </summary>
         /// <param name="text"></param>
@@ -163,7 +196,7 @@ namespace TelegramBotBase.Sessions
             {
                 m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs( m));
+                OnMessageSent(new MessageSentEventArgs(m));
             }
             catch (ApiRequestException ex)
             {
@@ -330,7 +363,7 @@ namespace TelegramBotBase.Sessions
             }
 
             var m = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
-            
+
             OnMessageSent(new MessageSentEventArgs(m));
 
             return m;
@@ -384,7 +417,7 @@ namespace TelegramBotBase.Sessions
             try
             {
                 await this.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, messageId);
-                
+
                 return true;
             }
             catch (ApiRequestException ex)
