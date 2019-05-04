@@ -2,15 +2,15 @@
 # .Net Telegram Bot Framework - Context based addon
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
-[![telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://t.me/tgbotbase)
+[![telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://www.t.me/tgbotbase)
 
 
 [![license](https://img.shields.io/github/license/MajMcCloud/telegrambotframework.svg?style=flat-square&maxAge=2592000&label=License)](https://raw.githubusercontent.com/MajMcCloud/TelegramBotFramework/master/LICENCE.md)
 [![downloads](https://img.shields.io/nuget/dt/TelegramBotBase.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase)
 
-Test the Testproject: [@TGBaseBot](https://t.me/TGBaseBot)
+Test the Testproject: [@TGBaseBot](https://www.t.me/TGBaseBot)
 
-Join the Telegram Group: [https://t.me/tgbotbase](https://t.me/tgbotbase)
+Join the Telegram Group: [https://www.t.me/tgbotbase](https://www.t.me/tgbotbase)
 
 ---
 
@@ -222,12 +222,17 @@ On every input the user is sending back to the bot the Action event gets raised.
 
 
 ```
-public class SimpleForm : FormBase
+public class SimpleForm : AutoCleanForm
 {
-
+        public SimpleForm()
+        {
+            this.DeleteSide = eSide.Both;
+            this.DeleteMode = eDeleteMode.OnLeavingForm;
+        }
+	
 	public override async Task Opened()
 	{
-	    await this.Device.Send("Hello world!");
+	    await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
 	}
 
 
