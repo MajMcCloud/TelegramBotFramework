@@ -15,10 +15,6 @@ namespace TelegramBaseTest.Tests
 
         String LastMessage { get; set; }
 
-        public override async Task Init(params object[] param)
-        {
-            
-        }
 
         public override async Task Opened()
         {
@@ -28,12 +24,6 @@ namespace TelegramBaseTest.Tests
         public override async Task Closed()
         {
             await this.Device.Send("Ciao from Form 1");
-        }
-
-        public override async Task Load(MessageResult message)
-        {
-
-
         }
 
 

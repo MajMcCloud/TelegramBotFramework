@@ -201,12 +201,15 @@ namespace TelegramBotBase
 
             try
             {
+                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+                e.Device = ds;
+
                 if (LogAllMessages)
                 {
-                    DeviceSession ds2 = this.Sessions.GetSession(e.DeviceId);
-                    OnMessage(new MessageIncomeResult(e.DeviceId, ds2, e));
+                    OnMessage(new MessageIncomeResult(e.DeviceId, ds, e));
                 }
 
+                ds?.OnMessageReceived(new MessageReceivedEventArgs(e.Message));
 
                 Client_TryMessage(sender, e);
             }
@@ -223,10 +226,11 @@ namespace TelegramBotBase
 
         private async void Client_TryMessage(object sender, MessageResult e)
         {
-            DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+            DeviceSession ds = e.Device;
             if (ds == null)
             {
                 ds = await this.Sessions.StartSession<T>(e.DeviceId);
+                e.Device = ds;
 
                 ds.LastMessage = e.Message;
 
@@ -286,10 +290,12 @@ namespace TelegramBotBase
         {
             try
             {
+                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+                e.Device = ds;
+
                 if (LogAllMessages)
                 {
-                    DeviceSession ds2 = this.Sessions.GetSession(e.DeviceId);
-                    OnMessage(new MessageIncomeResult(e.DeviceId, ds2, e));
+                    OnMessage(new MessageIncomeResult(e.DeviceId, ds, e));
                 }
 
                 Client_TryAction(sender, e);
@@ -303,10 +309,11 @@ namespace TelegramBotBase
 
         private async void Client_TryAction(object sender, MessageResult e)
         {
-            DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+            DeviceSession ds = e.Device;
             if (ds == null)
             {
                 ds = await this.Sessions.StartSession<T>(e.DeviceId);
+                e.Device = ds;
             }
 
 

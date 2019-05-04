@@ -15,10 +15,6 @@ namespace TelegramBaseTest.Tests
     public class TestForm2 : FormBase
     {
 
-        public override async Task Init(params object[] param)
-        {
-
-        }
 
         public override async Task Opened()
         {
@@ -30,10 +26,6 @@ namespace TelegramBaseTest.Tests
             await this.Device.Send("Ciao from Form 2");
         }
 
-        public override async Task Load(MessageResult message)
-        {
-
-        }
 
         public override async Task Action(MessageResult message)
         {

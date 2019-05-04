@@ -8,12 +8,18 @@ using TelegramBotBase.Form;
 
 namespace TelegramBaseTest.Tests
 {
-    public class SimpleForm : FormBase
+    public class SimpleForm : AutoCleanForm
     {
+
+        public SimpleForm()
+        {
+            this.DeleteSide = eSide.Both;
+            this.DeleteMode = eDeleteMode.OnLeavingForm;
+        }
 
         public override async Task Opened()
         {
-            await this.Device.Send("Hello world! (send 'back' to get back to Start)");
+            await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
         }
 
 

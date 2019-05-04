@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 
 namespace TelegramBotBase.Base
 {
-    public class MessageSentEventArgs
+    public class MessageReceivedEventArgs
     {
         public int MessageId
         {
@@ -19,11 +19,10 @@ namespace TelegramBotBase.Base
 
         public Message Message { get; set; }
 
-        public MessageSentEventArgs(Message message)
+        public MessageReceivedEventArgs(Message m)
         {
-            this.Message = message;
+            this.Message = m;
         }
-
 
     }
 }

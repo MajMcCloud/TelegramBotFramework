@@ -17,6 +17,8 @@ namespace TelegramBotBase.Form
 
         public eDeleteMode DeleteMode { get; set; }
 
+        public eSide DeleteSide { get; set; }
+
         public enum eDeleteMode
         {
             None = 0,
@@ -24,10 +26,18 @@ namespace TelegramBotBase.Form
             OnLeavingForm = 2
         }
 
+        public enum eSide
+        {
+            BotOnly = 0,
+            UserOnly = 1,
+            Both = 2
+        }
+
         public AutoCleanForm()
         {
             this.OldMessages = new List<Message>();
             this.DeleteMode = eDeleteMode.OnEveryCall;
+            this.DeleteSide = eSide.BotOnly;
 
         }
 
@@ -37,10 +47,24 @@ namespace TelegramBotBase.Form
                 return;
 
             this.Device.MessageSent += Device_MessageSent;
+
+            this.Device.MessageReceived += Device_MessageReceived;
+        }
+
+
+        private void Device_MessageReceived(object sender, MessageReceivedEventArgs e)
+        {
+            if (this.DeleteSide == eSide.BotOnly)
+                return;
+
+            this.OldMessages.Add(e.Message);
         }
 
         private void Device_MessageSent(object sender, MessageSentEventArgs e)
         {
+            if (this.DeleteSide == eSide.UserOnly)
+                return;
+
             this.OldMessages.Add(e.Message);
         }
 
@@ -49,19 +73,11 @@ namespace TelegramBotBase.Form
             if (this.DeleteMode != eDeleteMode.OnEveryCall)
                 return;
 
-            while (this.OldMessages.Count > 0)
-            {
-                if (!await this.Device.DeleteMessage(this.OldMessages[0].MessageId))
-                {
-                    //Nachricht konnte nicht gelöscht werden, vermutlich existiert diese nicht mehr
-                    if (this.OldMessages.Count > 0)
-                        this.OldMessages.RemoveAt(0);
-                }
-            }
+            await MessageCleanup();
         }
 
         /// <summary>
-        /// Fügt eine Nachricht zu der Liste der löschenden hinzu.
+        /// Adds a message to this of removable ones
         /// </summary>
         /// <param name="Id"></param>
         public void AddMessage(Message m)
@@ -70,7 +86,7 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
-        /// Behält die Nachricht mit der angegebenen Id.
+        /// Keeps the message by removing it from the list
         /// </summary>
         /// <param name="Id"></param>
         public void LeaveMessage(int Id)
@@ -83,7 +99,7 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
-        /// Behält die zuletzt gesendete Nachricht.
+        /// Keeps the last sent message
         /// </summary>
         public void LeaveLastMessage()
         {
@@ -98,9 +114,24 @@ namespace TelegramBotBase.Form
             if (this.DeleteMode != eDeleteMode.OnLeavingForm)
                 return;
 
-            foreach (var m in this.OldMessages)
+            await MessageCleanup();
+        }
+
+
+        /// <summary>
+        /// Cleans up all remembered messages.
+        /// </summary>
+        /// <returns></returns>
+        public async Task MessageCleanup()
+        {
+            while (this.OldMessages.Count > 0)
             {
-                await this.Device.DeleteMessage(m.MessageId);
+                if (!await this.Device.DeleteMessage(this.OldMessages[0].MessageId))
+                {
+                    //Message can't be deleted cause it seems not to exist anymore
+                    if (this.OldMessages.Count > 0)
+                        this.OldMessages.RemoveAt(0);
+                }
             }
         }
     }

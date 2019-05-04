@@ -68,13 +68,25 @@ namespace TelegramBotBase.Sessions
         {
             get
             {
-                return this.LastMessage != null && this.LastMessage.Chat.Id != this.LastMessage.From.Id;
+                return this.LastMessage != null && (this.LastMessage.Chat.Type == ChatType.Group | this.LastMessage.Chat.Type == ChatType.Supergroup);
+            }
+        }
+
+        /// <summary>
+        /// Returns if the messages is posted within a channel.
+        /// </summary>
+        public bool IsChannel
+        {
+            get
+            {
+                return this.LastMessage != null && this.LastMessage.Chat.Type == ChatType.Channel;
             }
         }
 
         public EventHandlerList __Events = new EventHandlerList();
 
         private static object __evMessageSent = new object();
+        private static object __evMessageReceived = new object();
 
         public DeviceSession()
         {
@@ -151,7 +163,7 @@ namespace TelegramBotBase.Sessions
             {
                 m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+                OnMessageSent(new MessageSentEventArgs( m));
             }
             catch (ApiRequestException ex)
             {
@@ -184,7 +196,7 @@ namespace TelegramBotBase.Sessions
             {
                 m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+                OnMessageSent(new MessageSentEventArgs(m));
             }
             catch (ApiRequestException ex)
             {
@@ -223,7 +235,7 @@ namespace TelegramBotBase.Sessions
             {
                 m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
 
-                OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+                OnMessageSent(new MessageSentEventArgs(m));
             }
             catch (ApiRequestException ex)
             {
@@ -319,7 +331,7 @@ namespace TelegramBotBase.Sessions
 
             var m = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
             
-            OnMessageSent(new MessageSentEventArgs(m.MessageId, m));
+            OnMessageSent(new MessageSentEventArgs(m));
 
             return m;
         }
@@ -372,7 +384,7 @@ namespace TelegramBotBase.Sessions
             try
             {
                 await this.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, messageId);
-
+                
                 return true;
             }
             catch (ApiRequestException ex)
@@ -414,5 +426,25 @@ namespace TelegramBotBase.Sessions
             (this.__Events[__evMessageSent] as EventHandler<MessageSentEventArgs>)?.Invoke(this, e);
         }
 
+        /// <summary>
+        /// Eventhandler for received messages
+        /// </summary>
+        public event EventHandler<MessageReceivedEventArgs> MessageReceived
+        {
+            add
+            {
+                this.__Events.AddHandler(__evMessageReceived, value);
+            }
+            remove
+            {
+                this.__Events.RemoveHandler(__evMessageReceived, value);
+            }
+        }
+
+
+        public void OnMessageReceived(MessageReceivedEventArgs e)
+        {
+            (this.__Events[__evMessageReceived] as EventHandler<MessageReceivedEventArgs>)?.Invoke(this, e);
+        }
     }
 }

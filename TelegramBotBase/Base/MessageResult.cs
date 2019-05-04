@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
 {
@@ -22,6 +23,9 @@ namespace TelegramBotBase.Base
                 return this.RawMessageData?.Message?.Chat.Id ?? this.RawCallbackData?.CallbackQuery.Message?.Chat.Id ?? 0;
             }
         }
+
+        public DeviceSession Device
+        { get; set; }
 
         /// <summary>
         /// The message id
