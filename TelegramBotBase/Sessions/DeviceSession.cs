@@ -38,6 +38,16 @@ namespace TelegramBotBase.Sessions
         public FormBase ActiveForm { get; set; }
 
         /// <summary>
+        /// Returns the previous shown form
+        /// </summary>
+        public FormBase PreviousForm { get; set; }
+
+        /// <summary>
+        /// contains if the form has been switched (navigated)
+        /// </summary>
+        public bool FormSwitched { get; set; } = false;
+
+        /// <summary>
         /// Returns the ID of the last received message.
         /// </summary>
         public int LastMessageId

@@ -258,6 +258,9 @@ namespace TelegramBotBase
             do
             {
                 i++;
+                
+                //Reset navigation
+                ds.FormSwitched = false;
 
                 activeForm = ds.ActiveForm;
 
@@ -279,10 +282,10 @@ namespace TelegramBotBase
                 }
 
                 //Render Event
-                if (!activeForm.FormSwitched)
+                if (!ds.FormSwitched)
                     await activeForm.Render(e);
 
-            } while (activeForm.FormSwitched && i < NavigationMaximum);
+            } while (ds.FormSwitched && i < NavigationMaximum);
 
         }
 
@@ -329,6 +332,9 @@ namespace TelegramBotBase
             {
                 i++;
 
+                //Reset navigation
+                ds.FormSwitched = false;
+
                 activeForm = ds.ActiveForm;
 
                 //If the form manages the events by itselfs, skip here
@@ -342,7 +348,7 @@ namespace TelegramBotBase
                 await activeForm.Load(e);
 
                 //Action Event
-                if (!activeForm.FormSwitched)
+                if (!ds.FormSwitched)
                 {
                     await activeForm.Action(e);
 
@@ -353,7 +359,7 @@ namespace TelegramBotBase
 
                         if (uhc.Handled)
                         {
-                            if (activeForm.FormSwitched)
+                            if (ds.FormSwitched)
                             {
                                 continue;
                             }
@@ -367,10 +373,10 @@ namespace TelegramBotBase
                 }
 
                 //Render Event
-                if (!activeForm.FormSwitched)
+                if (!ds.FormSwitched)
                     await activeForm.Render(e);
 
-            } while (activeForm.FormSwitched && i < NavigationMaximum);
+            } while (ds.FormSwitched && i < NavigationMaximum);
 
         }
 

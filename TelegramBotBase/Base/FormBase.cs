@@ -20,9 +20,9 @@ namespace TelegramBotBase.Form
         public bool CustomEventManagement { get; set; } = false;
 
         /// <summary>
-        /// contains if the form has been switched (navigated)
+        /// has this formular already been disposed ?
         /// </summary>
-        public bool FormSwitched { get; set; } = false;
+        public bool IsDisposed { get; set; } = false;
 
         public List<ControlBase> Controls { get; set; }
 
@@ -117,11 +117,13 @@ namespace TelegramBotBase.Form
             if (ds == null)
                 return;
 
-            this.FormSwitched = true;
+            ds.FormSwitched = true;
 
             ds.ActiveForm = newForm;
             newForm.Client = this.Client;
             newForm.Device = ds;
+
+            ds.PreviousForm = this;
 
             await newForm.Init(args);
 
@@ -137,7 +139,7 @@ namespace TelegramBotBase.Form
         {
             this.Client = null;
             this.Device = null;
-            this.FormSwitched = false;
+            this.IsDisposed = true;
         }
     }
 }
