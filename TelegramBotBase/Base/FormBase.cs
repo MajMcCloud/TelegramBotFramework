@@ -119,11 +119,11 @@ namespace TelegramBotBase.Form
 
             ds.FormSwitched = true;
 
+            ds.PreviousForm = ds.ActiveForm;
+
             ds.ActiveForm = newForm;
             newForm.Client = this.Client;
             newForm.Device = ds;
-
-            ds.PreviousForm = this;
 
             await newForm.Init(args);
 
