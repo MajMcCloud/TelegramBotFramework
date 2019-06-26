@@ -12,6 +12,8 @@ Test the Testproject: [@TGBaseBot](https://www.t.me/TGBaseBot)
 
 Join the Telegram Group: [https://www.t.me/tgbotbase](https://www.t.me/tgbotbase)
 
+Download a release: [Releases](https://github.com/MajMcCloud/TelegramBotFramework/releases)
+
 ---
 
 ## Index
