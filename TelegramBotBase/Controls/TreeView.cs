@@ -1,0 +1,120 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TelegramBotBase.Base;
+using TelegramBotBase.Form;
+
+namespace TelegramBotBase.Controls
+{
+    public class TreeView : ControlBase
+    {
+        public List<TreeViewNode> Nodes { get; set; }
+
+        public TreeViewNode SelectedNode { get; set; }
+
+        public TreeViewNode VisibleNode { get; set; }
+
+        public String Title { get; set; }
+
+        private int? MessageId { get; set; }
+
+        public String MoveUpIcon { get; set; } = "🔼 up";
+
+        public TreeView()
+        {
+            this.Nodes = new List<TreeViewNode>();
+            this.Title = "Select node";
+        }
+
+
+        public override async Task Action(MessageResult result)
+        {
+            await result.ConfirmAction();
+
+            if (result.Handled)
+                return;
+
+            var value = result.RawData;
+
+            switch (value)
+            {
+                case "up":
+                case "parent":
+
+                    this.VisibleNode = (this.VisibleNode?.ParentNode);
+
+                    result.Handled = true;
+
+                    break;
+                default:
+
+                    var n = (this.VisibleNode != null ? this.VisibleNode.FindNodeByValue(value) : this.Nodes.FirstOrDefault(a => a.Value == value));
+
+                    if (n != null)
+                    {
+                        if (n.ChildNodes.Count > 0)
+                        {
+                            this.VisibleNode = n;
+                        }
+                        else
+                        {
+                            this.SelectedNode = (this.SelectedNode != n ? n : null);
+                        }
+
+                        result.Handled = true;
+                    }
+
+                    break;
+
+            }
+
+        }
+
+
+        public override async Task Render(MessageResult result)
+        {
+            var startnode = this.VisibleNode;
+
+            var nodes = (startnode?.ChildNodes ?? this.Nodes);
+
+            ButtonForm bf = new ButtonForm();
+
+            if (startnode != null)
+            {
+                bf.AddButtonRow(new ButtonBase(this.MoveUpIcon, "up"), new ButtonBase(startnode.Text, "parent"));
+            }
+
+            foreach (var n in nodes)
+            {
+                var s = n.Text;
+                if (this.SelectedNode == n)
+                {
+                    s = "[ " + s + " ]";
+                }
+
+                bf.AddButtonRow(new ButtonBase(s, n.Value, n.Url));
+            }
+
+
+
+            if (this.MessageId != null)
+            {
+                var m = await this.Device.Edit(this.MessageId.Value, this.Title, bf);
+            }
+            else
+            {
+                var m = await this.Device.Send(this.Title, bf);
+                this.MessageId = m.MessageId;
+            }
+        }
+
+        public String GetPath()
+        {
+            return (this.VisibleNode?.GetPath() ?? "\\");
+        }
+
+
+    }
+}

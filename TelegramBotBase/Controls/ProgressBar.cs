@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Controls
 {
@@ -220,7 +221,7 @@ namespace TelegramBotBase.Controls
 
         }
 
-        public async override Task Render()
+        public async override Task Render(MessageResult result)
         {
             if (!this.RenderNecessary)
             {
