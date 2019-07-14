@@ -67,9 +67,9 @@ namespace TelegramBotBase
             DeviceSession ds = new Sessions.DeviceSession(deviceId, start);
 
             start.Device = ds;
-            await start.Init();
+            await start.OnInit(new InitEventArgs());
 
-            await start.Opened();
+            await start.OnOpened(new EventArgs());
 
             this[deviceId] = ds;
             return ds;

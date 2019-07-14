@@ -77,6 +77,9 @@ namespace TelegramBotBase.Form
 
         public static implicit operator InlineKeyboardMarkup(ButtonForm form)
         {
+            if (form == null)
+                return null;
+
             InlineKeyboardMarkup ikm = new InlineKeyboardMarkup(form.ToArray());
 
             return ikm;

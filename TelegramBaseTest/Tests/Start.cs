@@ -8,8 +8,12 @@ using TelegramBotBase.Form;
 
 namespace TelegramBaseTest.Tests
 {
-    public class Start : FormBase
+    public class Start : AutoCleanForm
     {
+        public Start()
+        {
+            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+        }
 
         public override async Task Action(MessageResult message)
         {
@@ -80,6 +84,36 @@ namespace TelegramBaseTest.Tests
                     await this.NavigateTo(data);
 
                     break;
+
+                case "calendar":
+
+                    message.Handled = true;
+
+                    var calendar = new Controls.CalendarPickerForm();
+
+                    await this.NavigateTo(calendar);
+
+                    break;
+
+                case "month":
+
+                    message.Handled = true;
+
+                    var month = new Controls.MonthPickerForm();
+
+                    await this.NavigateTo(month);
+
+                    break;
+
+                case "treeview":
+
+                    message.Handled = true;
+
+                    var tree = new Controls.TreeViewForms();
+
+                    await this.NavigateTo(tree);
+
+                    break;
             }
 
 
@@ -99,6 +133,10 @@ namespace TelegramBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#6 Form2 Command", new CallbackData("a", "form2").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#7 Data Handling", new CallbackData("a", "data").Serialize()));
+            btn.AddButtonRow(new ButtonBase("#8 Calendar Picker", new CallbackData("a", "calendar").Serialize()));
+            btn.AddButtonRow(new ButtonBase("#9 Month Picker", new CallbackData("a", "month").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#10 TreeView", new CallbackData("a", "treeview").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }

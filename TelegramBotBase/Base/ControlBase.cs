@@ -13,8 +13,25 @@ namespace TelegramBotBase.Base
     {
         public Sessions.DeviceSession Device { get; set; }
 
-        public virtual async Task Render()
+        public int ID { get; set; }
+
+        /// <summary>
+        /// Defines if the control should be rendered and invoked with actions
+        /// </summary>
+        public bool Enabled { get; set; } = true;
+
+        public virtual async Task Action(MessageResult result)
         {
+
+
+
+        }
+
+        public virtual async Task Render(MessageResult result)
+        {
+
+
+
 
         }
 

@@ -11,7 +11,12 @@ namespace TelegramBaseTest.Tests
     public class ButtonTestForm : AutoCleanForm
     {
 
-        public override async Task Opened()
+        public ButtonTestForm()
+        {
+            this.Opened += ButtonTestForm_Opened;
+        }
+
+        private async Task ButtonTestForm_Opened(object sender, EventArgs e)
         {
             await this.Device.Send("Hello world! (Click 'back' to get back to Start)");
         }
@@ -82,6 +87,8 @@ namespace TelegramBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("Button 1", new CallbackData("a", "button1").Serialize()), new ButtonBase("Button 2", new CallbackData("a", "button2").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("Button 3", new CallbackData("a", "button3").Serialize()), new ButtonBase("Button 4", new CallbackData("a", "button4").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("Google.com", "google", "https://www.google.com"), new ButtonBase("Telegram", "telegram", "https://telegram.org/"));
 
             btn.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
 

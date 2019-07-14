@@ -16,16 +16,24 @@ namespace TelegramBaseTest.Tests
     {
 
 
-        public override async Task Opened()
+        public TestForm2()
+        {
+            this.Opened += TestForm2_Opened;
+            this.Closed += TestForm2_Closed;
+        }
+
+        private async Task TestForm2_Opened(object sender, EventArgs e)
         {
             await this.Device.Send("Welcome to Form 2");
         }
 
-        public override async Task Closed()
+        private async Task TestForm2_Closed(object sender, EventArgs e)
         {
             await this.Device.Send("Ciao from Form 2");
         }
 
+
+      
 
         public override async Task Action(MessageResult message)
         {

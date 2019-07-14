@@ -15,13 +15,18 @@ namespace TelegramBaseTest.Tests
 
         String LastMessage { get; set; }
 
+        public TestForm()
+        {
+            this.Opened += TestForm_Opened;
+            this.Closed += TestForm_Closed;
+        }
 
-        public override async Task Opened()
+        private async Task TestForm_Opened(object sender, EventArgs e)
         {
             await this.Device.Send("Welcome to Form 1");
         }
 
-        public override async Task Closed()
+        private async Task TestForm_Closed(object sender, EventArgs e)
         {
             await this.Device.Send("Ciao from Form 1");
         }

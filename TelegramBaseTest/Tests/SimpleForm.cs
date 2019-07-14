@@ -13,15 +13,16 @@ namespace TelegramBaseTest.Tests
 
         public SimpleForm()
         {
-            this.DeleteSide = eSide.Both;
-            this.DeleteMode = eDeleteMode.OnLeavingForm;
+            this.DeleteSide = TelegramBotBase.Enums.eSide.Both;
+            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+
+            this.Opened += SimpleForm_Opened;
         }
 
-        public override async Task Opened()
+        private async Task SimpleForm_Opened(object sender, EventArgs e)
         {
             await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
         }
-
 
         public override async Task Load(MessageResult message)
         {

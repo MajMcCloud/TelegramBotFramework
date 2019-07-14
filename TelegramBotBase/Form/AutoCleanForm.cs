@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBotBase.Base;
+using TelegramBotBase.Enums;
 
 namespace TelegramBotBase.Form
 {
@@ -19,37 +20,7 @@ namespace TelegramBotBase.Form
 
         public eSide DeleteSide { get; set; }
 
-        public enum eDeleteMode
-        {
-            /// <summary>
-            /// Don't delete any message.
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Delete messages on every callback/action.
-            /// </summary>
-            OnEveryCall = 1,
-            /// <summary>
-            /// Delete on leaving this form.
-            /// </summary>
-            OnLeavingForm = 2
-        }
-
-        public enum eSide
-        {
-            /// <summary>
-            /// Delete only messages from this bot.
-            /// </summary>
-            BotOnly = 0,
-            /// <summary>
-            /// Delete only user messages.
-            /// </summary>
-            UserOnly = 1,
-            /// <summary>
-            /// Delete all messages in this context.
-            /// </summary>
-            Both = 2
-        }
+        
 
         public AutoCleanForm()
         {
@@ -57,9 +28,14 @@ namespace TelegramBotBase.Form
             this.DeleteMode = eDeleteMode.OnEveryCall;
             this.DeleteSide = eSide.BotOnly;
 
+            this.Init +=  AutoCleanForm_Init;
+
+            this.Closed += AutoCleanForm_Closed;
+
         }
 
-        public override async Task Init(params object[] args)
+
+        private async Task AutoCleanForm_Init(object sender, InitEventArgs e)
         {
             if (this.Device == null)
                 return;
@@ -127,14 +103,13 @@ namespace TelegramBotBase.Form
             this.OldMessages.RemoveAt(this.OldMessages.Count - 1);
         }
 
-        public async override Task Closed()
+        private async Task AutoCleanForm_Closed(object sender, EventArgs e)
         {
             if (this.DeleteMode != eDeleteMode.OnLeavingForm)
                 return;
 
             await MessageCleanup();
         }
-
 
         /// <summary>
         /// Cleans up all remembered messages.

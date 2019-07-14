@@ -12,10 +12,16 @@ namespace TelegramBaseTest.Tests.Register.Steps
     {
         public Data UserData { get; set; }
 
-        public async override Task Init(params object[] args)
+        public Step1()
+        {
+            this.Init += Step1_Init;
+        }
+
+        private async Task Step1_Init(object sender, InitEventArgs e)
         {
             this.UserData = new Data();
         }
+
 
         public async override Task Load(MessageResult message)
         {

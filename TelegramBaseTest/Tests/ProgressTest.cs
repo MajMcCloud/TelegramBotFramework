@@ -14,10 +14,13 @@ namespace TelegramBaseTest.Tests
 
         public ProgressTest()
         {
-            this.DeleteMode = eDeleteMode.OnLeavingForm;
+            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            this.Opened += ProgressTest_Opened;
+            this.Closed += ProgressTest_Closed;
         }
 
-        public override async Task Opened()
+
+        private async Task ProgressTest_Opened(object sender, EventArgs e)
         {
             await this.Device.Send("Welcome to ProgressTest");
         }
@@ -87,14 +90,14 @@ namespace TelegramBaseTest.Tests
 
 
             //Render Progress bar and show some "example" progress
-            await Bar.Render();
+            await Bar.Render(message);
 
             this.Controls.Add(Bar);
 
             for (int i = 0; i <= 100; i++)
             {
                 Bar.Value++;
-                await Bar.Render();
+                await Bar.Render(message);
 
                 Thread.Sleep(250);
             }
@@ -117,17 +120,10 @@ namespace TelegramBaseTest.Tests
             await this.Device.Send("Choose your progress bar:", btn);
         }
 
-        public override async Task Closed()
+        private async Task ProgressTest_Closed(object sender, EventArgs e)
         {
-            foreach (var b in this.Controls)
-            {
-                await b.Cleanup();
-            }
-
             await this.Device.Send("Ciao from ProgressTest");
         }
-
-
 
     }
 }

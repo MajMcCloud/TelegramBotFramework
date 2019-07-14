@@ -127,11 +127,7 @@ namespace TelegramBotBase.Sessions
             if (this.ActiveForm == null)
                 return null;
 
-            InlineKeyboardMarkup markup = null;
-            if (buttons != null)
-            {
-                markup = buttons;
-            }
+            InlineKeyboardMarkup markup = buttons;
 
             try
             {
@@ -160,11 +156,7 @@ namespace TelegramBotBase.Sessions
             if (this.ActiveForm == null)
                 return null;
 
-            InlineKeyboardMarkup markup = null;
-            if (buttons != null)
-            {
-                markup = buttons;
-            }
+            InlineKeyboardMarkup markup = buttons;
 
             try
             {
@@ -194,11 +186,7 @@ namespace TelegramBotBase.Sessions
             if (this.ActiveForm == null)
                 return null;
 
-            InlineKeyboardMarkup markup = null;
-            if (buttons != null)
-            {
-                markup = buttons;
-            }
+            InlineKeyboardMarkup markup = buttons;
 
             Message m = null;
 
@@ -254,6 +242,39 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
+        /// Sends a simple text message
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="markup"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> Send(String text, ReplyKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            Message m = null;
+
+            try
+            {
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+
+                OnMessageSent(new MessageSentEventArgs(m));
+            }
+            catch (ApiRequestException ex)
+            {
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+
+            return m;
+        }
+
+        /// <summary>
         /// Sends an image
         /// </summary>
         /// <param name="file"></param>
@@ -266,11 +287,7 @@ namespace TelegramBotBase.Sessions
             if (this.ActiveForm == null)
                 return null;
 
-            InlineKeyboardMarkup markup = null;
-            if (buttons != null)
-            {
-                markup = buttons;
-            }
+            InlineKeyboardMarkup markup = buttons;
 
             Message m = null;
 
