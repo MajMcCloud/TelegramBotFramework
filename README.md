@@ -38,6 +38,14 @@ Download a release: [Releases](https://github.com/MajMcCloud/TelegramBotFramewor
 	
 	* [PromptDialog](#prompt-dialog)
 
+- [Controls](#controls)
+	* [ProgressBar](#progress-bar)
+	
+	* [CalendarPicker](#calendar-picker)
+	
+	* [MonthPicker](#month-picker)
+	
+	+ [TreeView](#tree-view)
 
 ---
 
@@ -641,6 +649,8 @@ await this.NavigateTo(ad);
 
 ### Prompt Dialog
 
+No example yet
+
 #### Without Eventhandler (pre-init of form necessary)
 
 ```
@@ -678,6 +688,31 @@ await this.NavigateTo(pd);
 
 ```
 
+
+
+## Controls
+
+### Progress Bar
+	![Progress Bar](/images/progressbar.PNG)
+
+
+### Calendar Picker
+	![Calendar Picker](/images/calendarpicker.PNG)
+
+
+### Month Picker
+	![Step1](/images/monthpicker1.PNG)
+	![Step2](/images/monthpicker2.PNG)
+	
+	
+### Tree View
+	![Step1](/images/treeview1.PNG)
+	![Step2](/images/treeview2.PNG)
+	![Step3](/images/treeview3.PNG)
+	![Step4](/images/treeview4.PNG)
+	
+	
+	
 ---
 
 I will add more notes to it soon, so stay tuned.
