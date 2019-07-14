@@ -1,4 +1,5 @@
 
+
 # .Net Telegram Bot Framework - Context based addon
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
@@ -38,6 +39,14 @@ Download a release: [Releases](https://github.com/MajMcCloud/TelegramBotFramewor
 	
 	* [PromptDialog](#prompt-dialog)
 
+- [Controls](#controls)
+	* [ProgressBar](#progress-bar)
+	
+	* [CalendarPicker](#calendar-picker)
+	
+	* [MonthPicker](#month-picker)
+	
+	+ [TreeView](#tree-view)
 
 ---
 
@@ -641,6 +650,8 @@ await this.NavigateTo(ad);
 
 ### Prompt Dialog
 
+No example yet
+
 #### Without Eventhandler (pre-init of form necessary)
 
 ```
@@ -678,6 +689,30 @@ await this.NavigateTo(pd);
 
 ```
 
+
+
+## Controls
+
+### Progress Bar
+<img src="images/progressbar.PNG?raw=true" />
+
+
+### Calendar Picker
+<img src="images/calendarpicker.PNG?raw=true" />
+
+
+### Month Picker
+<img src="images/monthpicker1.PNG?raw=true" />
+<img src="images/monthpicker2.PNG?raw=true" />
+	
+	
+### Tree View
+<img src="images/treeview1.PNG?raw=true" />
+<img src="images/treeview2.PNG?raw=true" />
+<img src="images/treeview3.PNG?raw=true" />
+<img src="images/treeview4.PNG?raw=true" />	
+	
+	
 ---
 
 I will add more notes to it soon, so stay tuned.
