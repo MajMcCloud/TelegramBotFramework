@@ -694,24 +694,23 @@ await this.NavigateTo(pd);
 ## Controls
 
 ### Progress Bar
-	![<img src="../master/images/progressbar.PNG" />](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/progressbar.PNG?raw=true)
+<img src="images/progressbar.PNG?raw=true" />
 
 
 ### Calendar Picker
-	![<img src="../master/images/calendarpicker.PNG" />](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/calendarpicker.PNG?raw=true)
+<img src="images/calendarpicker.PNG?raw=true" />
 
 
 ### Month Picker
-	![Step1](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/monthpicker1.PNG)
-	![Step2](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/monthpicker2.PNG)
+<img src="images/monthpicker1.PNG?raw=true" />
+<img src="images/monthpicker2.PNG?raw=true" />
 	
 	
 ### Tree View
-	![Step1](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview1.PNG)
-	![Step2](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview2.PNG)
-	![Step3](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview3.PNG)
-	![Step4](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview4.PNG)
-	
+<img src="images/treeview1.PNG?raw=true" />
+<img src="images/treeview2.PNG?raw=true" />
+<img src="images/treeview3.PNG?raw=true" />
+<img src="images/treeview4.PNG?raw=true" />	
 	
 	
 ---
