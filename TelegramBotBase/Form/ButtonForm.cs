@@ -14,14 +14,18 @@ namespace TelegramBotBase.Form
     {
         List<List<ButtonBase>> Buttons = new List<List<ButtonBase>>();
 
+
+        public IReplyMarkup Markup { get; set; }
+
+
         public ButtonForm()
         {
 
         }
 
-        public void AddButtonRow(List<ButtonBase> row)
+        public void AddButtonRow(IEnumerable<ButtonBase> row)
         {
-            Buttons.Add(row);
+            Buttons.Add(row.ToList());
         }
 
         public void AddButtonRow(params ButtonBase[] row)
@@ -66,7 +70,7 @@ namespace TelegramBotBase.Form
 
         public InlineKeyboardButton[][] ToArray()
         {
-            var ikb = this.Buttons.Select(a => a.Select(b => InlineKeyboardButton.WithCallbackData(b.Text, b.Value)).ToArray()).ToArray();
+            var ikb = this.Buttons.Select(a => a.Select(b => b.ToInlineButton()).ToArray()).ToArray();
 
             return ikb;
         }
