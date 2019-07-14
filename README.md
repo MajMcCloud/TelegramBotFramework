@@ -1,4 +1,5 @@
 
+
 # .Net Telegram Bot Framework - Context based addon
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
@@ -693,23 +694,23 @@ await this.NavigateTo(pd);
 ## Controls
 
 ### Progress Bar
-	![Progress Bar](/images/progressbar.PNG)
+	![<img src="../master/images/progressbar.PNG" />](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/progressbar.PNG?raw=true)
 
 
 ### Calendar Picker
-	![Calendar Picker](/images/calendarpicker.PNG)
+	![<img src="../master/images/calendarpicker.PNG" />](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/calendarpicker.PNG?raw=true)
 
 
 ### Month Picker
-	![Step1](/images/monthpicker1.PNG)
-	![Step2](/images/monthpicker2.PNG)
+	![Step1](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/monthpicker1.PNG)
+	![Step2](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/monthpicker2.PNG)
 	
 	
 ### Tree View
-	![Step1](/images/treeview1.PNG)
-	![Step2](/images/treeview2.PNG)
-	![Step3](/images/treeview3.PNG)
-	![Step4](/images/treeview4.PNG)
+	![Step1](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview1.PNG)
+	![Step2](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview2.PNG)
+	![Step3](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview3.PNG)
+	![Step4](https://github.com/MajMcCloud/TelegramBotFramework/blob/master/images/treeview4.PNG)
 	
 	
 	
