@@ -230,7 +230,7 @@ On every input the user is sending back to the bot the Action event gets raised.
 
 ### Lets start with text messages (Example #1 - Simple Test)
 
-
+<img src="images/example1.PNG" />
 
 ```
 public class SimpleForm : AutoCleanForm
@@ -285,6 +285,7 @@ public class SimpleForm : AutoCleanForm
 
 I using a different base class (AutoCleanForm) I created for a better "feeling" inside the bot which will delete "old" messages from this form. You have some settings within this class to manage when messages should be getting deleted.
 
+<img src="images/example2.PNG" />
 
 ```
 public class ButtonTestForm : AutoCleanForm
@@ -362,6 +363,8 @@ public class ButtonTestForm : AutoCleanForm
 
             btn.AddButtonRow(new ButtonBase("Button 3", new CallbackData("a", "button3").Serialize()), new ButtonBase("Button 4", new CallbackData("a", "button4").Serialize()));
 
+	    btn.AddButtonRow(new ButtonBase("Google.com", "google", "https://www.google.com"), new ButtonBase("Telegram", "telegram", "https://telegram.org/"));
+
             btn.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
 
             await this.Device.Send("Click a button", btn);
@@ -376,6 +379,8 @@ public class ButtonTestForm : AutoCleanForm
 
 Sometimes it makes sense to show the end user a type of progressbar or status. For this i tried to make a simple control, which is useful for some situations.
 Maybe, if i  got more ideas, i will add other "controls" in the future.
+
+<img src="images/example3.PNG" />
 
 ```
 
@@ -511,6 +516,14 @@ public override async Task Closed()
 I read it a lot in different Telegram groups that some developers are searching for easy solutions to create context based apps. For this is my project an ideal solution here.
 To give you an example about the possiblities, i added into the Test project an example for a registration form.
 
+<img src="images/example4.1.PNG" />
+
+<img src="images/example4.2.PNG" />
+
+<img src="images/example4.3.PNG" />
+
+<img src="images/example4.4.PNG" />
+
 ```
 
 public class PerForm : AutoCleanForm
@@ -633,6 +646,8 @@ For now we have the following:
 
 ### Alert Dialog
 
+<img src="images/alertdialog.PNG" />
+
 ```
 
 var fto = new TestForm2();
@@ -646,11 +661,11 @@ await this.NavigateTo(ad);
 
 ### AutoCleanForm
 
-
+No example yet
 
 ### Prompt Dialog
 
-No example yet
+<img src="images/promptdialog.PNG" />
 
 #### Without Eventhandler (pre-init of form necessary)
 
