@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("TelegramBotBase Framework")]
-[assembly: AssemblyDescription("A simple addon for the original C# Telegram Bot library.")]
+[assembly: AssemblyDescription("This is a context based application framework for the C# TelegramBot library.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Florian Dahn")]
 [assembly: AssemblyProduct("TelegramBotBase Framework")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.4.2.0")]
-[assembly: AssemblyFileVersion("1.4.2.0")]
+[assembly: AssemblyVersion("1.5.0.0")]
+[assembly: AssemblyFileVersion("1.5.0.0")]
