@@ -717,6 +717,7 @@ await this.NavigateTo(pd);
 ### Calendar Picker
 <img src="images/calendarpicker.PNG?raw=true" />
 
+<img src="images/calendarpicker.gif?raw=true" />
 
 ### Month Picker
 <img src="images/monthpicker1.PNG?raw=true" />
