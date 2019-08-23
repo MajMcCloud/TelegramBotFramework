@@ -46,7 +46,9 @@ Download a release: [Releases](https://github.com/MajMcCloud/TelegramBotFramewor
 	
 	* [MonthPicker](#month-picker)
 	
-	+ [TreeView](#tree-view)
+	* [TreeView](#tree-view)
+
+	* [ToggleButton](#toggle-button)
 
 ---
 
@@ -727,7 +729,10 @@ await this.NavigateTo(pd);
 <img src="images/treeview3.PNG?raw=true" />
 <img src="images/treeview4.PNG?raw=true" />	
 	
-	
+
+### Toggle Button
+<img src="images/togglebutton.gif?raw=true" />
+
 ---
 
 I will add more notes to it soon, so stay tuned.
