@@ -29,16 +29,16 @@ namespace TelegramBotBase.Controls
         }
 
 
-        public override async Task Action(MessageResult result)
+        public override async Task Action(MessageResult result, String value = null)
         {
             await result.ConfirmAction();
 
             if (result.Handled)
                 return;
 
-            var value = result.RawData;
+            var val = result.RawData;
 
-            switch (value)
+            switch (val)
             {
                 case "up":
                 case "parent":
@@ -50,7 +50,7 @@ namespace TelegramBotBase.Controls
                     break;
                 default:
 
-                    var n = (this.VisibleNode != null ? this.VisibleNode.FindNodeByValue(value) : this.Nodes.FirstOrDefault(a => a.Value == value));
+                    var n = (this.VisibleNode != null ? this.VisibleNode.FindNodeByValue(val) : this.Nodes.FirstOrDefault(a => a.Value == val));
 
                     if (n != null)
                     {

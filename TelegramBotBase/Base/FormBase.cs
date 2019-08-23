@@ -55,7 +55,7 @@ namespace TelegramBotBase.Form
                 return;
 
             var handler = this.Events[__evInit].GetInvocationList().Cast<AsyncEventHandler<InitEventArgs>>();
-            foreach(var h in handler)
+            foreach (var h in handler)
             {
                 await Async.InvokeAllAsync<InitEventArgs>(h, this, e);
             }
@@ -169,6 +169,17 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public async Task ActionControls(MessageResult message)
         {
+            //Looking for the control by id, if not listened, raise event for all
+            if (message.RawData.StartsWith("#c"))
+            {
+                var c = this.Controls.FirstOrDefault(a => a.ControlID == message.RawData.Split('_')[0]);
+                if (c != null)
+                {
+                    await c.Action(message, message.RawData.Split('_')[1]);
+                    return;
+                }
+            }
+
             foreach (var b in this.Controls)
             {
                 if (!b.Enabled)

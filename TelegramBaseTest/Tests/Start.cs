@@ -114,6 +114,16 @@ namespace TelegramBaseTest.Tests
                     await this.NavigateTo(tree);
 
                     break;
+
+                case "togglebuttons":
+
+                    message.Handled = true;
+
+                    var tb = new Controls.ToggleButtons();
+
+                    await this.NavigateTo(tb);
+
+                    break;
             }
 
 
@@ -137,6 +147,8 @@ namespace TelegramBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#9 Month Picker", new CallbackData("a", "month").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#10 TreeView", new CallbackData("a", "treeview").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#11 ToggleButtons", new CallbackData("a", "togglebuttons").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }

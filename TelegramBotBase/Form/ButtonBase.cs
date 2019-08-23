@@ -31,11 +31,12 @@ namespace TelegramBotBase.Form
         }
 
 
-        public InlineKeyboardButton ToInlineButton()
+        public InlineKeyboardButton ToInlineButton(ButtonForm form)
         {
+            String id = (form.DependencyControl != null ? form.DependencyControl.ControlID + "_" : "");
             if (this.Url == null)
             {
-                return InlineKeyboardButton.WithCallbackData(this.Text, this.Value);
+                return InlineKeyboardButton.WithCallbackData(this.Text, id + this.Value);
             }
 
             var ikb = new InlineKeyboardButton();

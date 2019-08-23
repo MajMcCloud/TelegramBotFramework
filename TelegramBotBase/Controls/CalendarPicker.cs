@@ -49,7 +49,7 @@ namespace TelegramBotBase.Controls
 
 
 
-        public override async Task Action(MessageResult result)
+        public override async Task Action(MessageResult result, String value = null)
         {
             await result.ConfirmAction();
 

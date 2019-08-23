@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
 {
@@ -17,10 +18,16 @@ namespace TelegramBotBase.Form
 
         public IReplyMarkup Markup { get; set; }
 
+        public ControlBase DependencyControl { get; set; }
 
         public ButtonForm()
         {
 
+        }
+
+        public ButtonForm(ControlBase control)
+        {
+            this.DependencyControl = control;
         }
 
         public void AddButtonRow(IEnumerable<ButtonBase> row)
@@ -62,7 +69,7 @@ namespace TelegramBotBase.Form
         {
             var sp = SplitTo<ButtonBase>(buttons, buttonsPerRow);
 
-            foreach(var bl in sp)
+            foreach (var bl in sp)
             {
                 AddButtonRow(bl);
             }
@@ -70,7 +77,7 @@ namespace TelegramBotBase.Form
 
         public InlineKeyboardButton[][] ToArray()
         {
-            var ikb = this.Buttons.Select(a => a.Select(b => b.ToInlineButton()).ToArray()).ToArray();
+            var ikb = this.Buttons.Select(a => a.Select(b => b.ToInlineButton(this)).ToArray()).ToArray();
 
             return ikb;
         }
