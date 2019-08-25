@@ -15,6 +15,14 @@ namespace TelegramBotBase.Form
     {
         public String ButtonText { get; set; }
 
+        public AlertDialog(String Message, String ButtonText) : base(Message)
+        {
+            this.Buttons.Add(new ButtonBase(ButtonText, "ok"));
+            this.ButtonText = ButtonText;
+
+        }
+
+        [Obsolete]
         public AlertDialog(String Message, String ButtonText, FormBase FormToOpen = null) : base(Message)
         {
             this.Buttons.Add(new ButtonBase(ButtonText, "ok"));

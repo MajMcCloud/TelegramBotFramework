@@ -15,6 +15,7 @@ namespace TelegramBotBase.Form
 
         public List<ButtonBase> Buttons { get; set; }
 
+        [Obsolete]
         public Dictionary<String, FormBase> ButtonForms { get; set; } = new Dictionary<string, FormBase>();
 
         private EventHandlerList __Events { get; set; } = new EventHandlerList();
