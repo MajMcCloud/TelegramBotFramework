@@ -18,7 +18,7 @@ namespace TelegramBotBase.Markdown
         /// <param name="title"></param>
         /// <param name="tooltip"></param>
         /// <returns></returns>
-        public static String AsLink(this String url, String title = null, String tooltip = null)
+        public static String Link(this String url, String title = null, String tooltip = null)
         {
             switch (OutputMode)
             {
@@ -38,7 +38,7 @@ namespace TelegramBotBase.Markdown
         /// <returns></returns>
         public static String MentionUser(this long userId, String title = null)
         {
-            return AsLink("tg://user?id=" + userId.ToString(), title);
+            return Link("tg://user?id=" + userId.ToString(), title);
         }
 
         /// <summary>
