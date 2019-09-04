@@ -17,6 +17,20 @@ Download a release: [Releases](https://github.com/MajMcCloud/TelegramBotFramewor
 
 ---
 
+Donations
+
+Bitcoin: 1NqyGWmZg8HLp9qQELbf6bChEoba3mxaFc
+
+ETH: 0x795B70CFC27C69603ce115F2b450cbAC5a5460D0
+
+Litecoin: LM5iCN6Nz22wAi8LSFnKgdGGWEtxWfJZXv
+
+DASH: Xb2qyVefvbKTXusHoxZ4Soja2S6R4vLsSr
+
+Thanks !
+
+---
+
 ## Index
 - [Introduction](#introduction)
 - [How to Start](#how-to-start)
