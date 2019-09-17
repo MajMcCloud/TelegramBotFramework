@@ -13,6 +13,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
+using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Sessions
@@ -129,6 +130,11 @@ namespace TelegramBotBase.Sessions
 
             InlineKeyboardMarkup markup = buttons;
 
+            if (text.Length > Constants.Telegram.MaxMessageLength)
+            {
+                throw new MaxLengthException(text.Length);
+            }
+
             try
             {
                 var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
@@ -158,6 +164,11 @@ namespace TelegramBotBase.Sessions
 
             InlineKeyboardMarkup markup = buttons;
 
+            if (message.Text.Length > Constants.Telegram.MaxMessageLength)
+            {
+                throw new MaxLengthException(message.Text.Length);
+            }
+
             try
             {
                 var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, replyMarkup: markup);
@@ -181,7 +192,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -190,9 +201,14 @@ namespace TelegramBotBase.Sessions
 
             Message m = null;
 
+            if (text.Length > Constants.Telegram.MaxMessageLength)
+            {
+                throw new MaxLengthException(text.Length);
+            }
+
             try
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
@@ -216,16 +232,21 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
 
             Message m = null;
 
+            if (text.Length > Constants.Telegram.MaxMessageLength)
+            {
+                throw new MaxLengthException(text.Length);
+            }
+
             try
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
@@ -249,16 +270,21 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ReplyKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> Send(String text, ReplyKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
 
             Message m = null;
 
+            if (text.Length > Constants.Telegram.MaxMessageLength)
+            {
+                throw new MaxLengthException(text.Length);
+            }
+
             try
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
@@ -282,7 +308,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendPhoto(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -293,7 +319,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
