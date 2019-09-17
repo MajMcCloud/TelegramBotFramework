@@ -27,6 +27,9 @@ Litecoin: LM5iCN6Nz22wAi8LSFnKgdGGWEtxWfJZXv
 
 DASH: Xb2qyVefvbKTXusHoxZ4Soja2S6R4vLsSr
 
+Paypal: https://paypal.me/majmccloud
+
+
 Thanks !
 
 ---
