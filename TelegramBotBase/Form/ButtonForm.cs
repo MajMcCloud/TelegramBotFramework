@@ -60,6 +60,14 @@ namespace TelegramBotBase.Form
             return splitted;
         }
 
+        public int Count
+        {
+            get
+            {
+                return this.Buttons.Select(a => a.ToArray()).Aggregate((a, b) => a.Union(b).ToArray()).Length;
+            }
+        }
+
         /// <summary>
         /// Add buttons splitted in the amount of columns (i.e. 2 per row...)
         /// </summary>
@@ -75,9 +83,21 @@ namespace TelegramBotBase.Form
             }
         }
 
-        public InlineKeyboardButton[][] ToArray()
+        public List<ButtonBase> ToList()
+        {
+            return this.Buttons.Aggregate((a, b) => a.Union(b).ToList());
+        }
+
+        public InlineKeyboardButton[][] ToInlineButtonArray()
         {
             var ikb = this.Buttons.Select(a => a.Select(b => b.ToInlineButton(this)).ToArray()).ToArray();
+
+            return ikb;
+        }
+
+        public KeyboardButton[][] ToReplyButtonArray()
+        {
+            var ikb = this.Buttons.Select(a => a.Select(b => b.ToKeyboardButton(this)).ToArray()).ToArray();
 
             return ikb;
         }
@@ -87,7 +107,17 @@ namespace TelegramBotBase.Form
             if (form == null)
                 return null;
 
-            InlineKeyboardMarkup ikm = new InlineKeyboardMarkup(form.ToArray());
+            InlineKeyboardMarkup ikm = new InlineKeyboardMarkup(form.ToInlineButtonArray());
+
+            return ikm;
+        }
+
+        public static implicit operator ReplyKeyboardMarkup(ButtonForm form)
+        {
+            if (form == null)
+                return null;
+
+            ReplyKeyboardMarkup ikm = new ReplyKeyboardMarkup(form.ToReplyButtonArray());
 
             return ikm;
         }

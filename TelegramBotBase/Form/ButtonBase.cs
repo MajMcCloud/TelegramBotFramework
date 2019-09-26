@@ -48,5 +48,17 @@ namespace TelegramBotBase.Form
 
         }
 
+        public KeyboardButton ToKeyboardButton(ButtonForm form)
+        {
+            //String id = (form.DependencyControl != null ? form.DependencyControl.ControlID + "_" : "");
+            if (this.Url == null)
+            {
+                return new KeyboardButton(this.Text);
+            }
+
+            return new KeyboardButton(this.Text);
+
+        }
+
     }
 }

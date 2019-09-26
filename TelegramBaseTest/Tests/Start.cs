@@ -124,6 +124,15 @@ namespace TelegramBaseTest.Tests
                     await this.NavigateTo(tb);
 
                     break;
+                case "buttongrid":
+
+                    message.Handled = true;
+
+                    var bg = new Controls.ButtonGridForm();
+
+                    await this.NavigateTo(bg);
+
+                    break;
             }
 
 
@@ -149,6 +158,8 @@ namespace TelegramBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#10 TreeView", new CallbackData("a", "treeview").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#11 ToggleButtons", new CallbackData("a", "togglebuttons").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#12 ButtonGrid", new CallbackData("a", "buttongrid").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }
