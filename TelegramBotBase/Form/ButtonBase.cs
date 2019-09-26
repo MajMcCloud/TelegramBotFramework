@@ -61,13 +61,7 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public KeyboardButton ToKeyboardButton(ButtonForm form)
         {
-            if (this.Url == null)
-            {
-                return new KeyboardButton(this.Text);
-            }
-
             return new KeyboardButton(this.Text);
-
         }
 
     }
