@@ -25,19 +25,7 @@ namespace TelegramBotBase.Controls
 
         public ButtonForm ButtonsForm { get; set; }
 
-        public int? MessageId
-        {
-            get
-            {
-                return m_iMessageId;
-            }
-            set
-            {
-                m_iMessageId = value;
-            }
-        }
-
-        private int? m_iMessageId = null;
+        public int? MessageId { get; set; }
 
         /// <summary>
         /// Defines which type of Button Keyboard should be rendered.

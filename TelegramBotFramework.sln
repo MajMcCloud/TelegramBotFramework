@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBaseTest", "TelegramBaseTest\TelegramBaseTest.csproj", "{5817184C-0D59-4924-AC6C-6B943967811C}"
 EndProject
@@ -10,6 +10,29 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E9AE1280-C1F3-4960-9D3D-D4F25142E838}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{AF4C8238-A0F0-41AC-8C0A-33E143AEBFCD}"
+	ProjectSection(SolutionItems) = preProject
+		images\alertdialog.PNG = images\alertdialog.PNG
+		images\calendarpicker.gif = images\calendarpicker.gif
+		images\calendarpicker.PNG = images\calendarpicker.PNG
+		images\example1.PNG = images\example1.PNG
+		images\example2.PNG = images\example2.PNG
+		images\example3.PNG = images\example3.PNG
+		images\example4.1.PNG = images\example4.1.PNG
+		images\example4.2.PNG = images\example4.2.PNG
+		images\example4.3.PNG = images\example4.3.PNG
+		images\example4.4.PNG = images\example4.4.PNG
+		images\monthpicker1.PNG = images\monthpicker1.PNG
+		images\monthpicker2.PNG = images\monthpicker2.PNG
+		images\progressbar.PNG = images\progressbar.PNG
+		images\promptdialog.PNG = images\promptdialog.PNG
+		images\togglebutton.gif = images\togglebutton.gif
+		images\treeview1.PNG = images\treeview1.PNG
+		images\treeview2.PNG = images\treeview2.PNG
+		images\treeview3.PNG = images\treeview3.PNG
+		images\treeview4.PNG = images\treeview4.PNG
 	EndProjectSection
 EndProject
 Global
@@ -29,6 +52,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AF4C8238-A0F0-41AC-8C0A-33E143AEBFCD} = {E9AE1280-C1F3-4960-9D3D-D4F25142E838}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4245F162-E263-45E0-A16A-ED5F411A4AFC}
