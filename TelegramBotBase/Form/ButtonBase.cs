@@ -31,6 +31,11 @@ namespace TelegramBotBase.Form
         }
 
 
+        /// <summary>
+        /// Returns an inline Button
+        /// </summary>
+        /// <param name="form"></param>
+        /// <returns></returns>
         public InlineKeyboardButton ToInlineButton(ButtonForm form)
         {
             String id = (form.DependencyControl != null ? form.DependencyControl.ControlID + "_" : "");
@@ -48,9 +53,14 @@ namespace TelegramBotBase.Form
 
         }
 
+
+        /// <summary>
+        /// Returns a KeyBoardButton
+        /// </summary>
+        /// <param name="form"></param>
+        /// <returns></returns>
         public KeyboardButton ToKeyboardButton(ButtonForm form)
         {
-            //String id = (form.DependencyControl != null ? form.DependencyControl.ControlID + "_" : "");
             if (this.Url == null)
             {
                 return new KeyboardButton(this.Text);
