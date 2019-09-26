@@ -157,6 +157,38 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
+        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            if (text.Length > Constants.Telegram.MaxMessageLength)
+            {
+                throw new MaxLengthException(text.Length);
+            }
+
+            try
+            {
+                var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
+
+                return m;
+            }
+            catch
+            {
+
+            }
+
+
+            return null;
+        }
+
+        /// <summary>
+        /// Edits the text message
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <param name="text"></param>
+        /// <param name="buttons"></param>
+        /// <returns></returns>
         public async Task<Message> Edit(Message message, ButtonForm buttons = null)
         {
             if (this.ActiveForm == null)
@@ -270,7 +302,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ReplyKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
