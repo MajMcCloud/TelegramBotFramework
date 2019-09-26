@@ -267,6 +267,9 @@ namespace TelegramBotBase
                 //Pre Loading Event
                 await activeForm.PreLoad(e);
 
+                //Send Load event to controls
+                await activeForm.LoadControls(e);
+
                 //Loading Event
                 await activeForm.Load(e);
 
@@ -279,7 +282,13 @@ namespace TelegramBotBase
 
                 //Render Event
                 if (!ds.FormSwitched)
+                {
+
+                    await activeForm.RenderControls(e);
+
                     await activeForm.Render(e);
+                }
+                    
 
             } while (ds.FormSwitched && i < NavigationMaximum);
 
@@ -335,6 +344,9 @@ namespace TelegramBotBase
 
                 //Pre Loading Event
                 await activeForm.PreLoad(e);
+
+                //Send Load event to controls
+                await activeForm.LoadControls(e);
 
                 //Loading Event
                 await activeForm.Load(e);

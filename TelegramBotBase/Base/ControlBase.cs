@@ -28,6 +28,14 @@ namespace TelegramBotBase.Base
         /// </summary>
         public bool Enabled { get; set; } = true;
 
+
+        public virtual async Task Load(MessageResult result)
+        {
+
+
+
+        }
+
         public virtual async Task Action(MessageResult result, String value = null)
         {
 

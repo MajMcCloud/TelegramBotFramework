@@ -153,6 +153,33 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
+        /// Gets invoked if a message was sent or an action triggered
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public async Task LoadControls(MessageResult message)
+        {
+            //Looking for the control by id, if not listened, raise event for all
+            if (message.RawData?.StartsWith("#c") ?? false)
+            {
+                var c = this.Controls.FirstOrDefault(a => a.ControlID == message.RawData.Split('_')[0]);
+                if (c != null)
+                {
+                    await c.Load(message);
+                    return;
+                }
+            }
+
+            foreach (var b in this.Controls)
+            {
+                if (!b.Enabled)
+                    continue;
+
+                await b.Load(message);
+            }
+        }
+
+        /// <summary>
         /// Gets invoked if the form gets loaded and on every message belongs to this context
         /// </summary>
         /// <param name="message"></param>
@@ -161,6 +188,8 @@ namespace TelegramBotBase.Form
         {
 
         }
+
+
 
         /// <summary>
         /// Gets invoked if the user clicked a button.
@@ -186,6 +215,9 @@ namespace TelegramBotBase.Form
                     continue;
 
                 await b.Action(message);
+
+                if (message.Handled)
+                    return;
             }
         }
 
@@ -265,6 +297,10 @@ namespace TelegramBotBase.Form
             await newForm.OnOpened(new EventArgs());
         }
 
+        /// <summary>
+        /// Adds a control to the formular and sets its ID and Device.
+        /// </summary>
+        /// <param name="control"></param>
         public void AddControl(ControlBase control)
         {
             control.ID = this.Controls.Count + 1;
