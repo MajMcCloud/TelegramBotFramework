@@ -18,7 +18,7 @@ namespace TelegramBotBase.Form
 
         public eDeleteMode DeleteMode { get; set; }
 
-        public eSide DeleteSide { get; set; }
+        public eDeleteSide DeleteSide { get; set; }
 
         
 
@@ -26,7 +26,7 @@ namespace TelegramBotBase.Form
         {
             this.OldMessages = new List<Message>();
             this.DeleteMode = eDeleteMode.OnEveryCall;
-            this.DeleteSide = eSide.BotOnly;
+            this.DeleteSide = eDeleteSide.BotOnly;
 
             this.Init +=  AutoCleanForm_Init;
 
@@ -48,7 +48,7 @@ namespace TelegramBotBase.Form
 
         private void Device_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            if (this.DeleteSide == eSide.BotOnly)
+            if (this.DeleteSide == eDeleteSide.BotOnly)
                 return;
 
             this.OldMessages.Add(e.Message);
@@ -56,7 +56,7 @@ namespace TelegramBotBase.Form
 
         private void Device_MessageSent(object sender, MessageSentEventArgs e)
         {
-            if (this.DeleteSide == eSide.UserOnly)
+            if (this.DeleteSide == eDeleteSide.UserOnly)
                 return;
 
             this.OldMessages.Add(e.Message);

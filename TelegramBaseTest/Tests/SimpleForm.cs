@@ -13,7 +13,7 @@ namespace TelegramBaseTest.Tests
 
         public SimpleForm()
         {
-            this.DeleteSide = TelegramBotBase.Enums.eSide.Both;
+            this.DeleteSide = TelegramBotBase.Enums.eDeleteSide.Both;
             this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
 
             this.Opened += SimpleForm_Opened;
