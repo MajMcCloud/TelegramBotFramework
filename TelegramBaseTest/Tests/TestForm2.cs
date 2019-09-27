@@ -52,23 +52,37 @@ namespace TelegramBaseTest.Tests
             }
             else if (call.Value == "alert")
             {
-                var fto = new TestForm2();
+                AlertDialog ad = new AlertDialog("This is a message", "Ok");
 
-                AlertDialog ad = new AlertDialog("This is a message", "Ok", fto);
-                
+                ad.ButtonClicked += async (s, en) =>
+                {
+                    var fto = new TestForm2();
+                    await this.NavigateTo(fto);
+                };
+
                 await this.NavigateTo(ad);
             }
             else if (call.Value == "prompt")
             {
                 PromptDialog pd = new PromptDialog("Please confirm");
 
+                pd.ButtonClicked += async (s, en) =>
+                {
+                    if(en.Button.Value == "ok")
+                    {
+                        var tf = new TestForm2();
+                        await pd.NavigateTo(tf);
+                    }
+                    else if(en.Button.Value == "cancel")
+                    {
+                        var tf = new TestForm2();
+                        await pd.NavigateTo(tf);
+                    }
+
+                };
+
                 pd.AddButton(new ButtonBase("Ok", "ok"));
                 pd.AddButton(new ButtonBase("Cancel", "cancel"));
-
-                var tf = new TestForm2();
-
-                pd.ButtonForms.Add("ok", tf);
-                pd.ButtonForms.Add("cancel", tf);
                
                 await this.NavigateTo(pd);
             }

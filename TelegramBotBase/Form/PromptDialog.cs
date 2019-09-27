@@ -15,9 +15,6 @@ namespace TelegramBotBase.Form
 
         public List<ButtonBase> Buttons { get; set; }
 
-        [Obsolete]
-        public Dictionary<String, FormBase> ButtonForms { get; set; } = new Dictionary<string, FormBase>();
-
         private EventHandlerList __Events { get; set; } = new EventHandlerList();
 
         private static object __evButtonClicked { get; } = new object();
@@ -68,13 +65,6 @@ namespace TelegramBotBase.Form
             }
 
             OnButtonClicked(new ButtonClickedEventArgs(button));
-
-            FormBase fb = ButtonForms.ContainsKey(call.Value) ? ButtonForms[call.Value] : null;
-
-            if (fb != null)
-            {
-                await this.NavigateTo(fb);
-            }
         }
 
 

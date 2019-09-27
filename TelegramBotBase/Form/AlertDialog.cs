@@ -22,15 +22,5 @@ namespace TelegramBotBase.Form
 
         }
 
-        [Obsolete]
-        public AlertDialog(String Message, String ButtonText, FormBase FormToOpen = null) : base(Message)
-        {
-            this.Buttons.Add(new ButtonBase(ButtonText, "ok"));
-            this.ButtonText = ButtonText;
-
-            if (FormToOpen != null)
-                this.ButtonForms.Add("ok", FormToOpen);
-        }
-
     }
 }
