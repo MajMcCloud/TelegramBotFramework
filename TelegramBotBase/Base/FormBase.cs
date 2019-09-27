@@ -312,12 +312,12 @@ namespace TelegramBotBase.Form
         /// Removes control from the formular and runs a cleanup on it.
         /// </summary>
         /// <param name="control"></param>
-        public async void RemoveControl(ControlBase control)
+        public void RemoveControl(ControlBase control)
         {
             if (!this.Controls.Contains(control))
                 return;
 
-            await control.Cleanup();
+            control.Cleanup().Wait();
 
             this.Controls.Remove(control);
         }

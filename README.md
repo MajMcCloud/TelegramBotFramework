@@ -688,26 +688,8 @@ No example yet
 
 <img src="images/promptdialog.PNG" />
 
-#### Without Eventhandler (pre-init of form necessary)
 
-```
-
-PromptDialog pd = new PromptDialog("Please confirm");
-
-pd.AddButton(new ButtonBase("Ok", "ok"));
-pd.AddButton(new ButtonBase("Cancel", "cancel"));
-
-var tf = new TestForm2();
-
-pd.ButtonForms.Add("ok", tf);
-pd.ButtonForms.Add("cancel", tf);
-
-await this.NavigateTo(pd);
-
-```
-
-
-#### With Eventhandler (no pre-init of form necessary)
+#### With Eventhandler
 
 ```
 
