@@ -32,21 +32,26 @@ namespace TelegramBotBase.Controls
         /// </summary>
         public eKeyboardType KeyboardType
         {
-            get; private set;
+            get
+            {
+
+                return m_eKeyboardType;
+            }
+            set
+            {
+                if(m_eKeyboardType != value)
+                {
+                    this.RenderNecessary = true;
+
+                    Cleanup().Wait();
+
+                    m_eKeyboardType = value;
+                }
+                
+            }
         }
 
-        public async Task SetKeyboardType(eKeyboardType type)
-        {
-            if (KeyboardType == type)
-                return;
-
-            this.RenderNecessary = true;
-
-            Cleanup().Wait();
-
-            KeyboardType = type;
-
-        }
+        private eKeyboardType m_eKeyboardType = eKeyboardType.ReplyKeyboard;
 
         private bool m_bVisible = true;
 

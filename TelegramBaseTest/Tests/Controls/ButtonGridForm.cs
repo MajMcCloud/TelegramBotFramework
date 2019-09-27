@@ -24,7 +24,7 @@ namespace TelegramBaseTest.Tests.Controls
         {
             m_Buttons = new ButtonGrid();
 
-            await m_Buttons.SetKeyboardType(TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard);
+            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
 
             ButtonForm bf = new ButtonForm();
 
@@ -58,10 +58,10 @@ namespace TelegramBaseTest.Tests.Controls
                 switch (m_Buttons.KeyboardType)
                 {
                     case TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard:
-                        await m_Buttons.SetKeyboardType(TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard);
+                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
                         break;
                     case TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard:
-                        await m_Buttons.SetKeyboardType(TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard);
+                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
                         break;
                 }
 
