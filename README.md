@@ -67,6 +67,8 @@ Thanks !
 
 	* [ToggleButton](#toggle-button)
 
+	* [ButtonGrid](#button-grid)
+
 ---
 
 ## Introduction
@@ -750,6 +752,9 @@ await this.NavigateTo(pd);
 
 ### Toggle Button
 <img src="images/togglebutton.gif?raw=true" />
+
+### Button Grid
+<img src="images/buttongrid.gif?raw=true" />
 
 ---
 
