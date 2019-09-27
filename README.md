@@ -671,9 +671,13 @@ For now we have the following:
 
 ```
 
-var fto = new TestForm2();
+AlertDialog ad = new AlertDialog("This is a message", "Ok");
 
-AlertDialog ad = new AlertDialog("This is a message", "Ok", fto);
+ad.ButtonClicked += async (s, en) =>
+{
+    var fto = new TestForm2();
+    await this.NavigateTo(fto);
+};
 
 await this.NavigateTo(ad);
 

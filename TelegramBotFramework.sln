@@ -15,6 +15,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{AF4C8238-A0F0-41AC-8C0A-33E143AEBFCD}"
 	ProjectSection(SolutionItems) = preProject
 		images\alertdialog.PNG = images\alertdialog.PNG
+		images\buttongrid.gif = images\buttongrid.gif
 		images\calendarpicker.gif = images\calendarpicker.gif
 		images\calendarpicker.PNG = images\calendarpicker.PNG
 		images\example1.PNG = images\example1.PNG
