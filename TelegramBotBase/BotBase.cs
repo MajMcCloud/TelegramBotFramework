@@ -175,6 +175,9 @@ namespace TelegramBotBase
             if (this.Client == null)
                 return;
 
+            this.Client.Message -= Client_Message;
+            this.Client.Action -= Client_Action;
+
             this.Client.TelegramClient.StopReceiving();
         }
 
