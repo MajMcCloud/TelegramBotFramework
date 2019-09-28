@@ -10,12 +10,15 @@
     <projectUrl>https://github.com/MajMcCloud/TelegramBotFramework</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>First release on nuget for easier use.</releaseNotes>
+    <releaseNotes>This is a context based application framework for the C# TelegramBot library.</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags>Telegram Bot Framework C# Addon Context Modules</tags>
     <dependencies>
       <dependency id="Telegram.Bot" version="14.3.0" />
       <dependency id="Newtonsoft.Json" version="11.0.2" />
+      <dependency id="System.Net.Requests" version="4.3.0" />
     </dependencies>
+   <repository type="git"
+               url="https://github.com/MajMcCloud/TelegramBotFramework" />
   </metadata>
 </package>
