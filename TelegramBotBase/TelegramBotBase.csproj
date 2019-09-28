@@ -3,12 +3,15 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/MajMcCloud/TelegramBotFramework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MajMcCloud/TelegramBotFramework</RepositoryUrl>
     <PackageReleaseNotes>- moving from .Net Framework 4.7.2 to  .Net Standard 2.1 for the Library and .Net Core 3.0 for the test project!</PackageReleaseNotes>
     <Configurations>Debug;Release;</Configurations>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
