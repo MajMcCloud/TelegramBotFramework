@@ -298,6 +298,53 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
+        /// Opens this form modal, but don't closes the original ones
+        /// </summary>
+        /// <param name="newForm"></param>
+        /// <returns></returns>
+        public async Task OpenModal(ModalDialog newForm, params object[] args)
+        {
+            DeviceSession ds = this.Device;
+            if (ds == null)
+                return;
+
+            var parentForm = this;
+
+            ds.FormSwitched = true;
+
+            ds.PreviousForm = ds.ActiveForm;
+
+            ds.ActiveForm = newForm;
+            newForm.Client = parentForm.Client;
+            newForm.Device = ds;
+
+            newForm.Closed += async (s, en) =>
+            {
+                await CloseModal(newForm, parentForm);
+            };
+
+            await newForm.OnInit(new InitEventArgs(args));
+
+            await newForm.OnOpened(new EventArgs());
+        }
+
+        public async Task CloseModal(ModalDialog modalForm, FormBase oldForm)
+        {
+            DeviceSession ds = this.Device;
+            if (ds == null)
+                return;
+
+            if (modalForm == null)
+                throw new Exception("No modal form");
+
+            ds.FormSwitched = true;
+
+            ds.PreviousForm = ds.ActiveForm;
+
+            ds.ActiveForm = oldForm;
+        }
+
+        /// <summary>
         /// Adds a control to the formular and sets its ID and Device.
         /// </summary>
         /// <param name="control"></param>

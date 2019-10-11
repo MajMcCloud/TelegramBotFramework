@@ -8,7 +8,7 @@ using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
 {
-    public class PromptDialog : FormBase
+    public class PromptDialog : ModalDialog
     {
         public String Message { get; set; }
 
@@ -53,6 +53,8 @@ namespace TelegramBotBase.Form
 
 
             OnCompleted(new EventArgs());
+
+            await this.CloseForm();
         }
 
 

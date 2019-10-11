@@ -31,7 +31,7 @@ namespace TelegramBaseTest.Tests
         {
             await this.Device.Send("Ciao from Form 2");
         }
-
+        
 
 
 
@@ -84,12 +84,9 @@ namespace TelegramBaseTest.Tests
                 pd.Completed += async (s, en) =>
                 {
                     await this.Device.Send("Hello " + pd.Value);
-
-                    var tf = new TestForm2();
-                    await pd.NavigateTo(tf);
                 };
 
-                await this.NavigateTo(pd);
+                await this.OpenModal(pd);
             }
 
 

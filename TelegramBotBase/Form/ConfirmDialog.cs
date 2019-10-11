@@ -8,7 +8,7 @@ using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
 {
-    public class ConfirmDialog : FormBase
+    public class ConfirmDialog : ModalDialog
     {
         public String Message { get; set; }
 
