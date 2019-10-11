@@ -56,6 +56,8 @@ Thanks !
 	
 	* [PromptDialog](#prompt-dialog)
 
+	* [ConfirmDialog](#confirm-dialog)
+
 - [Controls](#controls)
 	* [ProgressBar](#progress-bar)
 	
@@ -663,6 +665,9 @@ For now we have the following:
 	Makes sense to create a "feeling" of a clean environment for the user. For instance if you have a multilevel menu. This will remove the previously shown menu, and renders the new sub/top level.
 
 - [PromptDialog](#prompt-dialog)
+	A simple dialog which will show a message and then waits for a text input (response).
+
+- [ConfirmDialog](#confirm-dialog)
 	A simple dialog which is able to show multiple buttons and a Text message. The user could select one option and will get redirected to a different form, depending on the click.
 
 ### Alert Dialog
@@ -693,17 +698,16 @@ No example yet
 <img src="images/promptdialog.PNG" />
 
 
-#### With Eventhandler
 
 ```
 
-PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+PromptDialog pd = new PromptDialog("Please tell me your name ?");
 
-pd.ButtonClicked += async (s, en) =>
+pd.Completed += async (s, en) =>
 {
-    var tf = new TestForm2();
+	await this.Device.Send("Hello " + pd.Value);
 
-    //Remember only to navigate from the current running form. (here it is the prompt dialog, cause we have left the above already)
+    var tf = new TestForm2();
     await pd.NavigateTo(tf);
 };
 
@@ -711,6 +715,27 @@ await this.NavigateTo(pd);
 
 ```
 
+### Confirm Dialog
+
+<img src="images/confirmdialog.PNG" />
+
+
+
+```
+
+ConfirmDialog cd = new ConfirmDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+
+cd.ButtonClicked += async (s, en) =>
+{
+    var tf = new TestForm2();
+
+    //Remember only to navigate from the current running form. (here it is the prompt dialog, cause we have left the above already)
+    await cd.NavigateTo(tf);
+};
+
+await this.NavigateTo(cd);
+
+```
 
 
 ## Controls
