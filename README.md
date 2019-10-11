@@ -706,12 +706,9 @@ PromptDialog pd = new PromptDialog("Please tell me your name ?");
 pd.Completed += async (s, en) =>
 {
 	await this.Device.Send("Hello " + pd.Value);
-
-    var tf = new TestForm2();
-    await pd.NavigateTo(tf);
 };
 
-await this.NavigateTo(pd);
+await this.OpenModal(pd);
 
 ```
 
