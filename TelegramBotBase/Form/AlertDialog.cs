@@ -11,7 +11,7 @@ namespace TelegramBotBase.Form
     /// <summary>
     /// A simple prompt dialog with one ok Button
     /// </summary>
-    public class AlertDialog : PromptDialog
+    public class AlertDialog : ConfirmDialog
     {
         public String ButtonText { get; set; }
 

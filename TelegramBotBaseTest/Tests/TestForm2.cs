@@ -33,7 +33,7 @@ namespace TelegramBaseTest.Tests
         }
 
 
-      
+
 
         public override async Task Action(MessageResult message)
         {
@@ -42,6 +42,8 @@ namespace TelegramBaseTest.Tests
             await message.ConfirmAction();
 
             await message.DeleteMessage();
+
+            message.Handled = true;
 
             if (call.Value == "testform1")
             {
@@ -62,38 +64,28 @@ namespace TelegramBaseTest.Tests
 
                 await this.NavigateTo(ad);
             }
-            else if (call.Value == "prompt")
+            else if (call.Value == "confirm")
             {
-                PromptDialog pd = new PromptDialog("Please confirm");
-
-                pd.ButtonClicked += async (s, en) =>
-                {
-                    if(en.Button.Value == "ok")
-                    {
-                        var tf = new TestForm2();
-                        await pd.NavigateTo(tf);
-                    }
-                    else if(en.Button.Value == "cancel")
-                    {
-                        var tf = new TestForm2();
-                        await pd.NavigateTo(tf);
-                    }
-
-                };
-
-                pd.AddButton(new ButtonBase("Ok", "ok"));
-                pd.AddButton(new ButtonBase("Cancel", "cancel"));
-               
-                await this.NavigateTo(pd);
-            }
-            else if (call.Value == "promptevt")
-            {
-                PromptDialog pd = new PromptDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
+                ConfirmDialog pd = new ConfirmDialog("Please confirm", new ButtonBase("Ok", "ok"), new ButtonBase("Cancel", "cancel"));
 
                 pd.ButtonClicked += async (s, en) =>
                 {
                     var tf = new TestForm2();
-                    
+
+                    await pd.NavigateTo(tf);
+                };
+
+                await this.NavigateTo(pd);
+            }
+            else if (call.Value == "prompt")
+            {
+                PromptDialog pd = new PromptDialog("Please tell me your name ?");
+
+                pd.Completed += async (s, en) =>
+                {
+                    await this.Device.Send("Hello " + pd.Value);
+
+                    var tf = new TestForm2();
                     await pd.NavigateTo(tf);
                 };
 
@@ -124,9 +116,9 @@ namespace TelegramBaseTest.Tests
 
             btn.AddButtonRow(new ButtonBase("Information Prompt", CallbackData.Create("navigate", "alert")));
 
-            btn.AddButtonRow(new ButtonBase("Confirmation Prompt without event", CallbackData.Create("navigate", "prompt")));
+            btn.AddButtonRow(new ButtonBase("Confirmation Prompt with event", CallbackData.Create("navigate", "confirm")));
 
-            btn.AddButtonRow(new ButtonBase("Confirmation Prompt with event", CallbackData.Create("navigate", "promptevt")));
+            btn.AddButtonRow(new ButtonBase("Request Prompt", CallbackData.Create("navigate", "prompt")));
 
 
             await this.Device.SendPhoto(bmp, "Test", btn);

@@ -12,12 +12,12 @@ namespace TelegramBotBase.Form
     {
         public String Message { get; set; }
 
-
-        public List<ButtonBase> Buttons { get; set; }
+        public String Value { get; set; }
 
         private EventHandlerList __Events { get; set; } = new EventHandlerList();
 
-        private static object __evButtonClicked { get; } = new object();
+        private static object __evCompleted { get; } = new object();
+
 
         public PromptDialog()
         {
@@ -27,73 +27,50 @@ namespace TelegramBotBase.Form
         public PromptDialog(String Message)
         {
             this.Message = Message;
-            this.Buttons = new List<Form.ButtonBase>();
         }
 
-        public PromptDialog(String Message, params ButtonBase[] Buttons)
+        public async override Task Load(MessageResult message)
         {
-            this.Message = Message;
-            this.Buttons = Buttons.ToList();
-        }
-
-        /// <summary>
-        /// Adds one Button
-        /// </summary>
-        /// <param name="button"></param>
-        public void AddButton(ButtonBase button)
-        {
-            this.Buttons.Add(button);
-        }
-
-        public override async Task Action(MessageResult message)
-        {
-            var call = message.GetData<CallbackData>();
-            if (call == null)
+            if (message.Handled)
                 return;
 
-            message.Handled = true;
-
-            await message.ConfirmAction();
-
-            await message.DeleteMessage();
-
-            ButtonBase button = this.Buttons.FirstOrDefault(a => a.Value == call.Value);
-
-            if (button == null)
+            if (this.Value == null)
             {
-                return;
+                this.Value = message.MessageText;
             }
 
-            OnButtonClicked(new ButtonClickedEventArgs(button));
-        }
 
+        }
 
         public override async Task Render(MessageResult message)
         {
-            ButtonForm btn = new ButtonForm();
 
-            var buttons = this.Buttons.Select(a => new ButtonBase(a.Text, CallbackData.Create("action", a.Value))).ToList();
-            btn.AddButtonRow(buttons);
+            if (this.Value == null)
+            {
+                await this.Device.Send(this.Message);
+                return;
+            }
 
-            await this.Device.Send(this.Message, btn);
+
+            OnCompleted(new EventArgs());
         }
 
 
-        public event EventHandler<ButtonClickedEventArgs> ButtonClicked
+        public event EventHandler<EventArgs> Completed
         {
             add
             {
-                this.__Events.AddHandler(__evButtonClicked, value);
+                this.__Events.AddHandler(__evCompleted, value);
             }
             remove
             {
-                this.__Events.RemoveHandler(__evButtonClicked, value);
+                this.__Events.RemoveHandler(__evCompleted, value);
             }
         }
 
-        public void OnButtonClicked(ButtonClickedEventArgs e)
+        public void OnCompleted(EventArgs e)
         {
-            (this.__Events[__evButtonClicked] as EventHandler<ButtonClickedEventArgs>)?.Invoke(this, e);
+            (this.__Events[__evCompleted] as EventHandler<EventArgs>)?.Invoke(this, e);
         }
 
     }
