@@ -28,7 +28,7 @@ namespace TelegramBotBase.Form
         public List<ControlBase> Controls { get; set; }
 
 
-        private EventHandlerList Events = new EventHandlerList();
+        public EventHandlerList Events = new EventHandlerList();
 
 
         private static object __evInit = new object();
@@ -117,6 +117,7 @@ namespace TelegramBotBase.Form
                 await Async.InvokeAllAsync<EventArgs>(h, this, e);
             }
         }
+
 
         /// <summary>
         /// Form has been closed (left)

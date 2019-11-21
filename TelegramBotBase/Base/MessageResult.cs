@@ -54,6 +54,14 @@ namespace TelegramBotBase.Base
             }
         }
 
+        public Telegram.Bot.Types.Enums.MessageType MessageType
+        {
+            get
+            {
+                return this.RawMessageData?.Message?.Type ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
+            }
+        }
+
         /// <summary>
         /// Is this an action ? (i.e. button click)
         /// </summary>

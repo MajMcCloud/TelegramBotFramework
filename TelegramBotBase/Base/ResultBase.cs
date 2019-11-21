@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TelegramBotBase.Base
 {
-    public class ResultBase
+    public class ResultBase : EventArgs
     {
         public MessageClient Client { get; set; }
 
