@@ -8,7 +8,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Controls;
 
-namespace TelegramBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls
 {
     public class CalendarPickerForm : AutoCleanForm
     {
@@ -39,7 +39,7 @@ namespace TelegramBaseTest.Tests.Controls
             {
                 case "back":
 
-                    var s = new Start();
+                    var s = new Menu();
 
                     await this.NavigateTo(s);
 

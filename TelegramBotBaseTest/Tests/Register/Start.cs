@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBaseTest.Tests.Register
+namespace TelegramBotBaseTest.Tests.Register
 {
     public class Start : AutoCleanForm
     {
@@ -43,7 +43,7 @@ namespace TelegramBaseTest.Tests.Register
                     break;
                 case "backtodashboard":
 
-                    var start = new Tests.Start();
+                    var start = new Tests.Menu();
 
                     await this.NavigateTo(start);
 

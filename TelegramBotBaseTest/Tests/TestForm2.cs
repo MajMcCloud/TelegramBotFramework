@@ -10,7 +10,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBaseTest.Tests
+namespace TelegramBotBaseTest.Tests
 {
     public class TestForm2 : FormBase
     {

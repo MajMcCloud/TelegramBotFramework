@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBaseTest.Tests
+namespace TelegramBotBaseTest.Tests
 {
     public class TestForm : FormBase
     {

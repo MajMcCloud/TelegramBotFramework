@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Controls;
 using TelegramBotBase.Form;
 
-namespace TelegramBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls
 {
     public class ToggleButtons : AutoCleanForm
     {

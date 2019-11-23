@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TelegramBaseTest.Tests.Register.Steps
+namespace TelegramBotBaseTest.Tests.Register.Steps
 {
     public class Data
     {

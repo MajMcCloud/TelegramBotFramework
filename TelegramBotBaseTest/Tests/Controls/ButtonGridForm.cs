@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Controls;
 using TelegramBotBase.Form;
 
-namespace TelegramBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls
 {
     public class ButtonGridForm : AutoCleanForm
     {
@@ -50,7 +50,7 @@ namespace TelegramBaseTest.Tests.Controls
 
             if (e.Button.Value == "back")
             {
-                var start = new Start();
+                var start = new Menu();
                 await this.NavigateTo(start);
             }
             else if (e.Button.Value == "switch")

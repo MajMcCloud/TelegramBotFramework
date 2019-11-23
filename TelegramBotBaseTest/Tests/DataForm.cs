@@ -9,7 +9,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBaseTest.Tests
+namespace TelegramBotBaseTest.Tests
 {
     public class DataForm : AutoCleanForm
     {
@@ -110,7 +110,7 @@ namespace TelegramBaseTest.Tests
 
                     message.Handled = true;
 
-                    var start = new Start();
+                    var start = new Menu();
 
                     await this.NavigateTo(start);
 

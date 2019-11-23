@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBaseTest.Tests
+namespace TelegramBotBaseTest.Tests
 {
     public class SimpleForm : AutoCleanForm
     {
@@ -55,7 +55,7 @@ namespace TelegramBaseTest.Tests
 
                 case "back":
 
-                    var st = new Start();
+                    var st = new Menu();
 
                     await this.NavigateTo(st);
 

@@ -7,7 +7,7 @@ using TelegramBotBase.Form;
 using TelegramBotBase.Controls;
 using TelegramBotBase.Base;
 
-namespace TelegramBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls
 {
     public class TreeViewForms : AutoCleanForm
     {
@@ -60,7 +60,7 @@ namespace TelegramBaseTest.Tests.Controls
 
                     message.Handled = true;
 
-                    var start = new Start();
+                    var start = new Menu();
 
                     await this.NavigateTo(start);
 
