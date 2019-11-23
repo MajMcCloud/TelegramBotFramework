@@ -523,6 +523,57 @@ namespace TelegramBotBase.Sessions
             return await DeleteMessage(message.MessageId);
         }
 
+
+        public virtual async Task ChangeChatPermissions(ChatPermissions permissions)
+        {
+            try
+            {
+                await this.Client.TelegramClient.SetChatPermissionsAsync(this.DeviceId, permissions);
+            }
+            catch
+            {
+
+            }
+        }
+
+        public virtual async Task RestrictUser(int userId, ChatPermissions permissions, DateTime until = default(DateTime))
+        {
+            try
+            {
+                await this.Client.TelegramClient.RestrictChatMemberAsync(this.DeviceId, userId, permissions, until);
+            }
+            catch
+            {
+
+            }
+        }
+
+        public virtual async Task<ChatMember> GetChatUser(int userId)
+        {
+            try
+            {
+                return await this.Client.TelegramClient.GetChatMemberAsync(this.DeviceId, userId);
+            }
+            catch
+            {
+
+            }
+            return null;
+        }
+
+        public virtual async Task KickUser(int userId, DateTime until = default(DateTime))
+        {
+            try
+            {
+                await this.Client.TelegramClient.KickChatMemberAsync(this.DeviceId, userId, until);
+            }
+            catch
+            {
+
+            }
+        }
+
+
         /// <summary>
         /// Eventhandler for sent messages
         /// </summary>
