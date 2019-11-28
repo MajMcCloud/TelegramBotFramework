@@ -26,6 +26,15 @@ namespace TelegramBotBaseTest.Tests
             return true;
         }
 
+        public override Task<bool> OpenChannel(MessageResult e)
+        {
+            return base.OpenChannel(e);
+        }
+
+        public override Task<bool> OpenSupergroup(MessageResult e)
+        {
+            return base.OpenSupergroup(e);
+        }
 
     }
 }

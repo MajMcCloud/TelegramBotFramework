@@ -71,6 +71,12 @@ Thanks !
 
 	* [ButtonGrid](#button-grid)
 
+- [Groups](#groups)
+	* [SplitterForm](#splitter-form)
+
+	* [GroupForm](#group-form)
+
+
 ---
 
 ## Introduction
@@ -763,6 +769,126 @@ await this.NavigateTo(cd);
 
 ### Button Grid
 <img src="images/buttongrid.gif?raw=true" />
+
+
+## Groups
+
+For working with groups, there are multiple different tools which helps to work with and allows bot also to manage "Single-User" chats and group chats.
+
+### Splitter Form
+
+
+An easy way to switch between a "Single-User" form and one for managing a group is the SplitterForm base class.
+It calls special methods which you can override and then move from there to the form you need.
+
+The OpenGroup method is the "backup" if OpenChannel or OpenSupergroup is not overridden. Same for Open, it is "backup" if none of the previous methods has been overridden.
+
+
+```
+
+public class Start : SplitterForm
+{
+        public override async Task<bool> Open(MessageResult e)
+        {
+            var st = new Menu();
+            await this.NavigateTo(st);
+
+            return true;
+        }
+
+
+        public override async Task<bool> OpenGroup(MessageResult e)
+        {
+            var st = new Groups.LinkReplaceTest();
+            await this.NavigateTo(st);
+
+            return true;
+        }
+		
+        public override Task<bool> OpenChannel(MessageResult e)
+        {
+            return base.OpenChannel(e);
+        }
+
+        public override Task<bool> OpenSupergroup(MessageResult e)
+        {
+            return base.OpenSupergroup(e);
+        }
+}
+	
+```
+
+
+### Group Form
+
+For managing groups im introducing a new base class called "GroupForm". This one has special events which should make it easier to work with groups and channels.
+In the Example project is a simple example for deleting a url written by a user and incrementing an internal counter. At every url he writes he got blocked for a small amount of time and the messages gots deleted. At 3 "failes" the user gets kicked of the group and blocked.
+
+```
+public class GroupForm : FormBase
+{
+
+
+        public override async Task Load(MessageResult message)
+        {
+            switch (message.MessageType)
+            {
+                case Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded:
+
+                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded, message, message.RawMessageData.Message.NewChatMembers));
+
+                    break;
+                case Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft:
+
+                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft, message, message.RawMessageData.Message.LeftChatMember));
+
+                    break;
+
+                case Telegram.Bot.Types.Enums.MessageType.ChatPhotoChanged:
+                case Telegram.Bot.Types.Enums.MessageType.ChatPhotoDeleted:
+                case Telegram.Bot.Types.Enums.MessageType.ChatTitleChanged:
+                case Telegram.Bot.Types.Enums.MessageType.MigratedFromGroup:
+                case Telegram.Bot.Types.Enums.MessageType.MigratedToSupergroup:
+                case Telegram.Bot.Types.Enums.MessageType.MessagePinned:
+                case Telegram.Bot.Types.Enums.MessageType.GroupCreated:
+                case Telegram.Bot.Types.Enums.MessageType.SupergroupCreated:
+
+                    await OnGroupChanged(new GroupChangedEventArgs(message.MessageType, message));
+
+                    break;
+
+                default:
+
+                    OnMessage(message);
+
+                    break;
+            }
+
+
+        }
+
+        public virtual async Task OnMemberChanges(MemberChangeEventArgs e)
+        {
+
+        }
+
+
+        public virtual async Task OnGroupChanged(GroupChangedEventArgs e)
+        {
+
+        }
+
+
+        public virtual async Task OnMessage(MessageResult e)
+        {
+
+        }
+}
+```
+
+
+
+
 
 ---
 
