@@ -1,24 +1,27 @@
-<?xml version="1.0"?>
-<package >
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <id>TelegramBotBase</id>
+    <version>2.1.0</version>
+    <authors>TelegramBotBase</authors>
+    <owners>TelegramBotBase</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/MajMcCloud/TelegramBotFramework</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <releaseNotes>This is a context based application framework for the C# TelegramBot library.</releaseNotes>
-    <copyright>Copyright 2019</copyright>
-    <tags>Telegram Bot Framework C# Addon Context Modules</tags>
+    <description>Package Description</description>
+    <releaseNotes>- moving from .Net Framework 4.7.2 to  .Net Standard 2.1 for the Library and .Net Core 3.0 for the test project!</releaseNotes>
+    <repository url="https://github.com/MajMcCloud/TelegramBotFramework" />
     <dependencies>
-      <dependency id="Telegram.Bot" version="14.3.0" />
-      <dependency id="Newtonsoft.Json" version="11.0.2" />
-      <dependency id="System.Net.Requests" version="4.3.0" />
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers" />
+        <dependency id="System.Drawing.Common" version="4.6.0" exclude="Build,Analyzers" />
+        <dependency id="Telegram.Bot" version="15.0.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers" />
+        <dependency id="System.Drawing.Common" version="4.6.0" exclude="Build,Analyzers" />
+        <dependency id="Telegram.Bot" version="15.0.0" exclude="Build,Analyzers" />
+      </group>
     </dependencies>
-   <repository type="git"
-               url="https://github.com/MajMcCloud/TelegramBotFramework" />
   </metadata>
 </package>

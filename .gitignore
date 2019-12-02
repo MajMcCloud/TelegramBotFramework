@@ -240,3 +240,15 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+MigrationBackup
+TelegramBotBase/nuget.exe
+Material
+TelegramBotBase/cp.ps1
+TelegramBotBase/TelegramBotBase.nuspec
+Program.cs
+TelegramBotBase/Archive
+/TelegramBotBase/TelegramBotBase.1.5.0.zip
+/TelegramBotBase/TelegramBotBase.1.5.1.zip
+/TelegramBotBase/TelegramBotBase.1.5.2.zip
+/TelegramBotBase/cpush.ps1
+/TelegramBotBase/cpack.ps1

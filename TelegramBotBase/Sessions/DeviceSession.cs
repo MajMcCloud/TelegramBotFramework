@@ -492,6 +492,26 @@ namespace TelegramBotBase.Sessions
             return await this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rcl);
         }
 
+        public async Task<Message> HideReplyKeyboard(String closedMsg = "Closed", bool autoDeleteResponse = true)
+        {
+            try
+            {
+                var m = await this.Send(closedMsg, new ReplyKeyboardRemove());
+
+                if (autoDeleteResponse && m != null)
+                {
+                    await this.DeleteMessage(m);
+                }
+
+                return m;
+            }
+            catch
+            {
+
+            }
+            return null;
+        }
+
         /// <summary>
         /// Deletes a message
         /// </summary>

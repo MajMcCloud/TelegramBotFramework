@@ -20,6 +20,28 @@ namespace TelegramBotBase.Form
 
         public ControlBase DependencyControl { get; set; }
 
+        /// <summary>
+        /// Contains the number of rows.
+        /// </summary>
+        public int Rows
+        {
+            get
+            {
+                return Buttons.Count;
+            }
+        }
+
+        /// <summary>
+        /// Contains the highest number of columns in an row.
+        /// </summary>
+        public int Cols
+        {
+            get
+            {
+                return Buttons.Select(a => a.Count).OrderByDescending(a => a).FirstOrDefault();
+            }
+        }
+
         public ButtonForm()
         {
 

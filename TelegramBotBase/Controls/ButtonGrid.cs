@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
+using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Controls
@@ -27,6 +28,15 @@ namespace TelegramBotBase.Controls
 
         public int? MessageId { get; set; }
 
+
+        /// <summary>
+        /// Optional. Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
+        /// Source: https://core.telegram.org/bots/api#replykeyboardmarkup
+        /// </summary>
+        public bool ResizeKeyboard { get; set; } = false;
+
+        public bool OneTimeKeyboard { get; set; } = false;
+
         /// <summary>
         /// Defines which type of Button Keyboard should be rendered.
         /// </summary>
@@ -39,7 +49,7 @@ namespace TelegramBotBase.Controls
             }
             set
             {
-                if(m_eKeyboardType != value)
+                if (m_eKeyboardType != value)
                 {
                     this.RenderNecessary = true;
 
@@ -47,7 +57,7 @@ namespace TelegramBotBase.Controls
 
                     m_eKeyboardType = value;
                 }
-                
+
             }
         }
 
@@ -133,6 +143,36 @@ namespace TelegramBotBase.Controls
             if (!this.RenderNecessary)
                 return;
 
+
+            switch (m_eKeyboardType)
+            {
+                case eKeyboardType.InlineKeyBoard:
+
+                    if (ButtonsForm.Rows > 13)
+                    {
+                        throw new MaximumRowsReachedException() { Value = ButtonsForm.Rows, Maximum = 13 };
+                    }
+
+                    if (ButtonsForm.Rows > 8)
+                    {
+                        throw new MaximumColsException() { Value = ButtonsForm.Rows, Maximum = 8 };
+                    }
+
+                    break;
+                case eKeyboardType.ReplyKeyboard:
+
+                    if (ButtonsForm.Rows > 25)
+                    {
+                        throw new MaximumRowsReachedException() { Value = ButtonsForm.Rows, Maximum = 25 };
+                    }
+
+                    if (ButtonsForm.Rows > 12)
+                    {
+                        throw new MaximumColsException() { Value = ButtonsForm.Rows, Maximum = 12 };
+                    }
+                    break;
+            }
+
             Message m = null;
             if (this.MessageId != null)
             {
@@ -142,12 +182,15 @@ namespace TelegramBotBase.Controls
                     case eKeyboardType.ReplyKeyboard:
                         if (this.ButtonsForm.Count == 0)
                         {
-                            await this.Device.Send("", new ReplyKeyboardRemove());
+                            await this.Device.HideReplyKeyboard();
                             this.MessageId = null;
                         }
                         else
                         {
-                            m = await this.Device.Send(this.Title, (ReplyKeyboardMarkup)this.ButtonsForm, disableNotification: true);
+                            var rkm = (ReplyKeyboardMarkup)this.ButtonsForm;
+                            rkm.ResizeKeyboard = this.ResizeKeyboard;
+                            rkm.OneTimeKeyboard = this.OneTimeKeyboard;
+                            m = await this.Device.Send(this.Title, rkm, disableNotification: true);
                         }
 
                         break;
@@ -164,7 +207,10 @@ namespace TelegramBotBase.Controls
                 switch (this.KeyboardType)
                 {
                     case eKeyboardType.ReplyKeyboard:
-                        m = await this.Device.Send(this.Title, (ReplyKeyboardMarkup)this.ButtonsForm, disableNotification: true);
+                        var rkm = (ReplyKeyboardMarkup)this.ButtonsForm;
+                        rkm.ResizeKeyboard = this.ResizeKeyboard;
+                        rkm.OneTimeKeyboard = this.OneTimeKeyboard;
+                        m = await this.Device.Send(this.Title, rkm, disableNotification: true);
                         break;
 
                     case eKeyboardType.InlineKeyBoard:
@@ -194,7 +240,7 @@ namespace TelegramBotBase.Controls
 
             if (this.KeyboardType == eKeyboardType.ReplyKeyboard)
             {
-                await this.Device.Send("", new ReplyKeyboardRemove());
+                await this.Device.HideReplyKeyboard(autoDeleteResponse: false);
             }
 
         }

@@ -291,7 +291,7 @@ namespace TelegramBotBase.Form
 
             await newForm.OnInit(new InitEventArgs(args));
 
-            await this.CloseControls();
+            this.CloseControls().Wait();
 
             await this.OnClosed(new EventArgs());
 
