@@ -144,7 +144,7 @@ namespace TelegramBotBase.Form
         {
             foreach (var b in this.Controls)
             {
-                await b.Cleanup();
+                b.Cleanup().Wait();
             }
         }
 
@@ -289,11 +289,11 @@ namespace TelegramBotBase.Form
             newForm.Client = this.Client;
             newForm.Device = ds;
 
-            await newForm.OnInit(new InitEventArgs(args));
-
             this.CloseControls().Wait();
 
             await this.OnClosed(new EventArgs());
+
+            await newForm.OnInit(new InitEventArgs(args));
 
             await newForm.OnOpened(new EventArgs());
         }
