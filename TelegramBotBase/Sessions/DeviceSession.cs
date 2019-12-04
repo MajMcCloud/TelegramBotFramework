@@ -410,6 +410,76 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
+        /// Sends an video
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="buttons"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> SendVideo(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            InlineKeyboardMarkup markup = buttons;
+
+            Message m = null;
+
+            try
+            {
+                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId, file, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+
+                OnMessageSent(new MessageSentEventArgs(m));
+            }
+            catch (ApiRequestException ex)
+            {
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+
+            return m;
+        }
+
+        /// <summary>
+        /// Sends an video
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="buttons"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> SendVideo(String url, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            InlineKeyboardMarkup markup = buttons;
+
+            Message m = null;
+
+            try
+            {
+                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId,new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+
+                OnMessageSent(new MessageSentEventArgs(m));
+            }
+            catch (ApiRequestException ex)
+            {
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+
+            return m;
+        }
+
+        /// <summary>
         /// Sends an document
         /// </summary>
         /// <param name="filename"></param>
