@@ -56,7 +56,7 @@ namespace TelegramBotBase.Form
 
             var buttons = this.Buttons.Aggregate((a, b) => a.Union(b).ToArray()).ToList();
 
-            if (call == null)
+            if(call==null)
             {
                 return;
             }
@@ -83,7 +83,7 @@ namespace TelegramBotBase.Form
         {
             ButtonForm btn = new ButtonForm();
 
-            foreach (var bl in this.Buttons)
+            foreach(var bl in this.Buttons)
             {
                 btn.AddButtonRow(bl.Select(a => new ButtonBase(a.Text, CallbackData.Create("action", a.Value))).ToList());
             }
