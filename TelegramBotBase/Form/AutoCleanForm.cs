@@ -108,7 +108,7 @@ namespace TelegramBotBase.Form
             if (this.DeleteMode != eDeleteMode.OnLeavingForm)
                 return;
 
-            await MessageCleanup();
+            MessageCleanup().Wait();
         }
 
         /// <summary>
