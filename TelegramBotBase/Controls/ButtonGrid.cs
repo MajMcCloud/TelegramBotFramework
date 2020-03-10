@@ -37,6 +37,10 @@ namespace TelegramBotBase.Controls
 
         public bool OneTimeKeyboard { get; set; } = false;
 
+        public bool HideKeyboardOnCleanup { get; set; } = true;
+
+        public bool DeletePreviousMessage { get; set; } = true;
+
         /// <summary>
         /// Defines which type of Button Keyboard should be rendered.
         /// </summary>
@@ -72,6 +76,12 @@ namespace TelegramBotBase.Controls
 
         }
 
+        public ButtonGrid(eKeyboardType type) : this()
+        {
+            m_eKeyboardType = type;
+        }
+
+
         public ButtonGrid(ButtonForm form)
         {
             this.ButtonsForm = form;
@@ -101,12 +111,16 @@ namespace TelegramBotBase.Controls
                 return;
 
 
-            var button = ButtonsForm.ToList().FirstOrDefault(a => a.Text == result.MessageText);
+            var button = ButtonsForm.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText);
 
             if (button == null)
                 return;
 
             OnButtonClicked(new ButtonClickedEventArgs(button));
+
+            //Remove button click message
+            if (this.DeletePreviousMessage)
+                await Device.DeleteMessage(result.MessageId);
 
             result.Handled = true;
 
@@ -170,6 +184,7 @@ namespace TelegramBotBase.Controls
                     {
                         throw new MaximumColsException() { Value = ButtonsForm.Rows, Maximum = 12 };
                     }
+
                     break;
             }
 
@@ -187,6 +202,9 @@ namespace TelegramBotBase.Controls
                         }
                         else
                         {
+                            if (this.DeletePreviousMessage)
+                                await this.Device.DeleteMessage(this.MessageId.Value);
+
                             var rkm = (ReplyKeyboardMarkup)this.ButtonsForm;
                             rkm.ResizeKeyboard = this.ResizeKeyboard;
                             rkm.OneTimeKeyboard = this.OneTimeKeyboard;
@@ -229,6 +247,15 @@ namespace TelegramBotBase.Controls
         }
 
 
+        /// <summary>
+        /// Tells the control that it has been updated.
+        /// </summary>
+        public void Updated()
+        {
+            this.RenderNecessary = true;
+        }
+
+
         public async override Task Cleanup()
         {
             if (this.MessageId == null)
@@ -238,9 +265,9 @@ namespace TelegramBotBase.Controls
 
             this.MessageId = null;
 
-            if (this.KeyboardType == eKeyboardType.ReplyKeyboard)
+            if (this.KeyboardType == eKeyboardType.ReplyKeyboard && this.HideKeyboardOnCleanup)
             {
-                await this.Device.HideReplyKeyboard(autoDeleteResponse: false);
+                await this.Device.HideReplyKeyboard();
             }
 
         }
