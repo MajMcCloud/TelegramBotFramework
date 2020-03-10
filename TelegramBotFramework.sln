@@ -12,6 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{BFA71E3F-31C0-4FC1-A320-4DCF704768C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommandsBot", "Examples\SystemCommandsBot\SystemCommandsBot.csproj", "{FC484952-3060-4F87-9809-4CD66D6961C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,16 @@ Global
 		{88EC0E02-583D-4B9D-956C-81D63C8CFCFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88EC0E02-583D-4B9D-956C-81D63C8CFCFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88EC0E02-583D-4B9D-956C-81D63C8CFCFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC484952-3060-4F87-9809-4CD66D6961C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC484952-3060-4F87-9809-4CD66D6961C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC484952-3060-4F87-9809-4CD66D6961C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC484952-3060-4F87-9809-4CD66D6961C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FC484952-3060-4F87-9809-4CD66D6961C0} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59CB40E1-9FA7-4867-A56F-4F418286F057}
