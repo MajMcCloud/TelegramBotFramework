@@ -7,24 +7,16 @@ using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
 {
-    public class MessageIncomeResult : EventArgs
+    public class SessionBeginEventArgs : EventArgs
     {
-
         public long DeviceId { get; set; }
 
         public DeviceSession Device { get; set; }
 
-        public MessageResult Message { get; set; }
-
-        public MessageIncomeResult(long DeviceId, DeviceSession Device, MessageResult message)
+        public SessionBeginEventArgs(long DeviceId, DeviceSession Device)
         {
             this.DeviceId = DeviceId;
             this.Device = Device;
-            this.Message = message;
         }
-
-
-
-
     }
 }
