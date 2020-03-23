@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Telegram.Bot.Types.Enums;
+using TelegramBotBase.Base;
 
-namespace TelegramBotBase.Base
+namespace TelegramBotBase.Args
 {
     public class GroupChangedEventArgs : EventArgs
     {

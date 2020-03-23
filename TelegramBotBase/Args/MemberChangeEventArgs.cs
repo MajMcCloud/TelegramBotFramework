@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using TelegramBotBase.Base;
 
-namespace TelegramBotBase.Base
+namespace TelegramBotBase.Args
 {
     public class MemberChangeEventArgs : EventArgs
     {

@@ -97,7 +97,7 @@ namespace TelegramBotBase.Base
             this.RawMessageData = message.RawMessageData;
             this.Message = message.Message;
 
-            
+            this.Client = message.Client;
         }
 
         public async Task<InputOnlineFile> DownloadDocument()

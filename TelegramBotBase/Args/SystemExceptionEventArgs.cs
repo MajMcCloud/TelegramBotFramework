@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Sessions;
 
-namespace TelegramBotBase.Base
+namespace TelegramBotBase.Args
 {
     public class SystemExceptionEventArgs : EventArgs
     {

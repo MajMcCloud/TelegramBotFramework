@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Base
+namespace TelegramBotBase.Args
 {
     /// <summary>
     /// Button get clicked event

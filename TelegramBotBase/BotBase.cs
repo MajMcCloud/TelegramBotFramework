@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Sessions;
@@ -60,6 +61,7 @@ namespace TelegramBotBase
         /// </summary>
         public bool LogAllMessages { get; set; } = false;
 
+
         /// <summary>
         /// How often could a form navigate to another (within one user action/call/message)
         /// </summary>
@@ -74,6 +76,7 @@ namespace TelegramBotBase
             this.APIKey = apiKey;
 
             this.Client = new Base.MessageClient(this.APIKey);
+            this.Client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
 
             this.SystemCalls = new List<string>();
 

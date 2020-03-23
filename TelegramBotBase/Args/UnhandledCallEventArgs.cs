@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBotBase.Sessions;
 
-namespace TelegramBotBase.Base
+namespace TelegramBotBase.Args
 {
     public class UnhandledCallEventArgs : EventArgs
     {
