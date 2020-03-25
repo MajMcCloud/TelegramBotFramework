@@ -290,6 +290,15 @@ namespace TelegramBotBase.Form
             newForm.Client = this.Client;
             newForm.Device = ds;
 
+            //Notify prior to close
+            foreach (var b in this.Controls)
+            {
+                if (!b.Enabled)
+                    continue;
+
+                await b.Hidden(true);
+            }
+
             this.CloseControls().Wait();
 
             await this.OnClosed(new EventArgs());
@@ -324,6 +333,14 @@ namespace TelegramBotBase.Form
             {
                 await CloseModal(newForm, parentForm);
             };
+
+            foreach (var b in this.Controls)
+            {
+                if (!b.Enabled)
+                    continue;
+
+                await b.Hidden(false);
+            }
 
             await newForm.OnInit(new InitEventArgs(args));
 
