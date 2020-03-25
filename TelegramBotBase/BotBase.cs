@@ -8,6 +8,7 @@ using Telegram.Bot;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
+using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase
@@ -170,6 +171,7 @@ namespace TelegramBotBase
             this.Client.TelegramClient.StartReceiving();
         }
 
+
         /// <summary>
         /// Stop your Bot
         /// </summary>
@@ -212,7 +214,7 @@ namespace TelegramBotBase
 
                 if (LogAllMessages)
                 {
-                    OnMessage(new MessageIncomeResult(e.DeviceId, ds, e));
+                    OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
                 }
 
                 ds?.OnMessageReceived(new MessageReceivedEventArgs(e.Message));
@@ -240,7 +242,7 @@ namespace TelegramBotBase
 
                 ds.LastMessage = e.Message;
 
-                OnSessionBegins(new SessionBeginResult(e.DeviceId, ds));
+                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
             }
 
             ds.LastAction = DateTime.Now;
@@ -289,14 +291,15 @@ namespace TelegramBotBase
                 //Render Event
                 if (!ds.FormSwitched)
                 {
-
                     await activeForm.RenderControls(e);
 
                     await activeForm.Render(e);
                 }
-                    
+
+                e.IsFirstHandler = false;
 
             } while (ds.FormSwitched && i < NavigationMaximum);
+
 
         }
 
@@ -309,7 +312,7 @@ namespace TelegramBotBase
 
                 if (LogAllMessages)
                 {
-                    OnMessage(new MessageIncomeResult(e.DeviceId, ds, e));
+                    OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
                 }
 
                 Client_TryAction(sender, e);
@@ -394,6 +397,8 @@ namespace TelegramBotBase
                     await activeForm.Render(e);
                 }
 
+                e.IsFirstHandler = false;
+
             } while (ds.FormSwitched && i < NavigationMaximum);
 
         }
@@ -402,7 +407,7 @@ namespace TelegramBotBase
         /// Will be called if a session/context gets started
         /// </summary>
 
-        public event EventHandler<SessionBeginResult> SessionBegins
+        public event EventHandler<SessionBeginEventArgs> SessionBegins
         {
             add
             {
@@ -414,16 +419,16 @@ namespace TelegramBotBase
             }
         }
 
-        public void OnSessionBegins(SessionBeginResult e)
+        public void OnSessionBegins(SessionBeginEventArgs e)
         {
-            (this.__Events[__evSessionBegins] as EventHandler<SessionBeginResult>)?.Invoke(this, e);
+            (this.__Events[__evSessionBegins] as EventHandler<SessionBeginEventArgs>)?.Invoke(this, e);
 
         }
 
         /// <summary>
         /// Will be called on incomming message
         /// </summary>
-        public event EventHandler<MessageIncomeResult> Message
+        public event EventHandler<MessageIncomeEventArgs> Message
         {
             add
             {
@@ -435,9 +440,9 @@ namespace TelegramBotBase
             }
         }
 
-        public void OnMessage(MessageIncomeResult e)
+        public void OnMessage(MessageIncomeEventArgs e)
         {
-            (this.__Events[__evMessage] as EventHandler<MessageIncomeResult>)?.Invoke(this, e);
+            (this.__Events[__evMessage] as EventHandler<MessageIncomeEventArgs>)?.Invoke(this, e);
 
         }
 

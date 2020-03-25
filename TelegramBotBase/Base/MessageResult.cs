@@ -113,6 +113,11 @@ namespace TelegramBotBase.Base
             }
         }
 
+        /// <summary>
+        /// Returns if this message will be used on the first form or not.
+        /// </summary>
+        public bool IsFirstHandler { get; set; } = true;
+
         public bool Handled { get; set; } = false;
 
         public String RawData

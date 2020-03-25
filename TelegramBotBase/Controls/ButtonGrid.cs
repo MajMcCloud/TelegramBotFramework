@@ -49,7 +49,6 @@ namespace TelegramBotBase.Controls
         {
             get
             {
-
                 return m_eKeyboardType;
             }
             set
@@ -111,6 +110,8 @@ namespace TelegramBotBase.Controls
             if (this.KeyboardType != eKeyboardType.ReplyKeyboard)
                 return;
 
+            if (!result.IsFirstHandler)
+                return;
 
             var button = ButtonsForm.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText);
 
@@ -130,6 +131,9 @@ namespace TelegramBotBase.Controls
         public async override Task Action(MessageResult result, string value = null)
         {
             if (result.Handled)
+                return;
+
+            if (!result.IsFirstHandler)
                 return;
 
             await result.ConfirmAction();
@@ -247,6 +251,14 @@ namespace TelegramBotBase.Controls
 
         }
 
+        public override async Task Hidden(bool FormClose)
+        {
+            //Prepare for opening Modal, and comming back
+            if (!FormClose)
+            {
+                this.Updated();
+            }
+        }
 
         /// <summary>
         /// Tells the control that it has been updated.
@@ -256,20 +268,34 @@ namespace TelegramBotBase.Controls
             this.RenderNecessary = true;
         }
 
-
         public async override Task Cleanup()
         {
             if (this.MessageId == null)
                 return;
 
-            await this.Device.DeleteMessage(this.MessageId.Value);
-
-            this.MessageId = null;
-
-            if (this.KeyboardType == eKeyboardType.ReplyKeyboard && this.HideKeyboardOnCleanup)
+            switch (this.KeyboardType)
             {
-                await this.Device.HideReplyKeyboard();
+                case eKeyboardType.InlineKeyBoard:
+
+                    await this.Device.DeleteMessage(this.MessageId.Value);
+
+                    this.MessageId = null;
+
+                    break;
+                case eKeyboardType.ReplyKeyboard:
+
+                    if (this.HideKeyboardOnCleanup)
+                    {
+                        await this.Device.HideReplyKeyboard();
+                    }
+
+                    this.MessageId = null;
+
+                    break;
             }
+
+
+
 
         }
 
