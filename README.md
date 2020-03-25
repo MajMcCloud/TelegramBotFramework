@@ -76,6 +76,10 @@ Thanks !
 
 	* [GroupForm](#group-form)
 
+- [State Machine and Session Serialization]
+
+    * In the making, is comming soon.
+
 
 ---
 
