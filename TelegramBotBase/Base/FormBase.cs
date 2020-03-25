@@ -276,7 +276,7 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="newForm"></param>
         /// <returns></returns>
-        public async Task NavigateTo(FormBase newForm, params object[] args)
+        public virtual async Task NavigateTo(FormBase newForm, params object[] args)
         {
             DeviceSession ds = this.Device;
             if (ds == null)
@@ -313,7 +313,7 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="newForm"></param>
         /// <returns></returns>
-        public async Task OpenModal(ModalDialog newForm, params object[] args)
+        public virtual async Task OpenModal(ModalDialog newForm, params object[] args)
         {
             DeviceSession ds = this.Device;
             if (ds == null)
