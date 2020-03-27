@@ -124,6 +124,16 @@ namespace TelegramBotBase.Form
             return ikb;
         }
 
+        /// <summary>
+        /// Returns the first Button with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public ButtonBase GetButtonByValue(String value)
+        {
+            return this.ToList().Where(a => a.Value == value).FirstOrDefault();
+        }
+
         public static implicit operator InlineKeyboardMarkup(ButtonForm form)
         {
             if (form == null)
