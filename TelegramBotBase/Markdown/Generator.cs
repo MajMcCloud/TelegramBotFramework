@@ -42,7 +42,7 @@ namespace TelegramBotBase.Markdown
         }
 
         /// <summary>
-        /// Returns a bold link in Markdown or HTML
+        /// Returns a bold text in Markdown or HTML
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -51,7 +51,7 @@ namespace TelegramBotBase.Markdown
             switch (OutputMode)
             {
                 case ParseMode.Markdown:
-                    return "**" + text + "**";
+                    return "*" + text + "*";
                 case ParseMode.Html:
                     return "<b>" + text + "</b>";
             }
@@ -59,7 +59,24 @@ namespace TelegramBotBase.Markdown
         }
 
         /// <summary>
-        /// Returns a italic link in Markdown or HTML
+        /// Returns a strike through in Markdown or HTML
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static String Strikesthrough(this String text)
+        {
+            switch (OutputMode)
+            {
+                case ParseMode.Markdown:
+                    return "~" + text + "~";
+                case ParseMode.Html:
+                    return "<s>" + text + "</s>";
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Returns a italic text in Markdown or HTML
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -68,7 +85,7 @@ namespace TelegramBotBase.Markdown
             switch (OutputMode)
             {
                 case ParseMode.Markdown:
-                    return "__" + text + "__";
+                    return "_" + text + "_";
                 case ParseMode.Html:
                     return "<i>" + text + "</i>";
             }
@@ -76,7 +93,24 @@ namespace TelegramBotBase.Markdown
         }
 
         /// <summary>
-        /// Returns a monospace link in Markdown or HTML
+        /// Returns a underline text in Markdown or HTML
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static String Underline(this String text)
+        {
+            switch (OutputMode)
+            {
+                case ParseMode.Markdown:
+                    return "__" + text + "__";
+                case ParseMode.Html:
+                    return "<u>" + text + "</u>";
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Returns a monospace text in Markdown or HTML
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -93,7 +127,7 @@ namespace TelegramBotBase.Markdown
         }
 
         /// <summary>
-        /// Returns a multi monospace link in Markdown or HTML
+        /// Returns a multi monospace text in Markdown or HTML
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
