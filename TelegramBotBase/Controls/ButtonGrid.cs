@@ -167,27 +167,27 @@ namespace TelegramBotBase.Controls
             {
                 case eKeyboardType.InlineKeyBoard:
 
-                    if (ButtonsForm.Rows > 13)
+                    if (ButtonsForm.Rows > Constants.Telegram.MaxInlineKeyBoardRows)
                     {
-                        throw new MaximumRowsReachedException() { Value = ButtonsForm.Rows, Maximum = 13 };
+                        throw new MaximumRowsReachedException() { Value = ButtonsForm.Rows, Maximum = Constants.Telegram.MaxInlineKeyBoardRows };
                     }
 
-                    if (ButtonsForm.Rows > 8)
+                    if (ButtonsForm.Cols > Constants.Telegram.MaxInlineKeyBoardCols)
                     {
-                        throw new MaximumColsException() { Value = ButtonsForm.Rows, Maximum = 8 };
+                        throw new MaximumColsException() { Value = ButtonsForm.Rows, Maximum = Constants.Telegram.MaxInlineKeyBoardCols };
                     }
 
                     break;
                 case eKeyboardType.ReplyKeyboard:
 
-                    if (ButtonsForm.Rows > 25)
+                    if (ButtonsForm.Rows > Constants.Telegram.MaxReplyKeyboardRows)
                     {
-                        throw new MaximumRowsReachedException() { Value = ButtonsForm.Rows, Maximum = 25 };
+                        throw new MaximumRowsReachedException() { Value = ButtonsForm.Rows, Maximum = Constants.Telegram.MaxReplyKeyboardRows };
                     }
 
-                    if (ButtonsForm.Rows > 12)
+                    if (ButtonsForm.Cols > Constants.Telegram.MaxReplyKeyboardCols)
                     {
-                        throw new MaximumColsException() { Value = ButtonsForm.Rows, Maximum = 12 };
+                        throw new MaximumColsException() { Value = ButtonsForm.Rows, Maximum = Constants.Telegram.MaxReplyKeyboardCols };
                     }
 
                     break;
