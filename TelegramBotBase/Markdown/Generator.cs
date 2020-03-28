@@ -7,6 +7,9 @@ using Telegram.Bot.Types.Enums;
 
 namespace TelegramBotBase.Markdown
 {
+    /// <summary>
+    /// https://core.telegram.org/bots/api#markdownv2-style
+    /// </summary>
     public static class Generator
     {
         public static ParseMode OutputMode { get; set; } = ParseMode.Markdown;
