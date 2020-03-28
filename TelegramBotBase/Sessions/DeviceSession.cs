@@ -502,6 +502,34 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
+        /// Generates a Textfile from scratch with the specified encoding. (Default is UTF8)
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="textcontent"></param>
+        /// <param name="encoding">Default is UTF8</param>
+        /// <param name="caption"></param>
+        /// <param name="buttons"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> SendTextFile(String filename, String textcontent, Encoding encoding = null, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        {
+            encoding = encoding ?? Encoding.UTF8;
+
+            var ms = new MemoryStream();
+            var sw = new StreamWriter(ms, encoding);
+
+            sw.Write(textcontent);
+            sw.Flush();
+
+            var content = ms.ToArray();
+
+            var m = await SendDocument(filename, content, caption, buttons, replyTo, disableNotification);
+
+            return m;
+        }
+
+        /// <summary>
         /// Sends an document
         /// </summary>
         /// <param name="document"></param>
