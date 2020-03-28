@@ -138,9 +138,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
-
-                return m;
+                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
             }
             catch
             {
@@ -170,9 +168,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
-
-                return m;
+                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
             }
             catch
             {
@@ -204,9 +200,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                var m = await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, replyMarkup: markup);
-
-                return m;
+                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, replyMarkup: markup);
             }
             catch
             {
@@ -383,9 +377,7 @@ namespace TelegramBotBase.Sessions
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                var m = await SendPhoto(fts, buttons, replyTo, disableNotification);
-
-                return m;
+                return await SendPhoto(fts, buttons, replyTo, disableNotification);
             }
         }
 
@@ -404,9 +396,7 @@ namespace TelegramBotBase.Sessions
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                var m = await SendPhoto(fts, buttons, replyTo, disableNotification);
-
-                return m;
+                return await SendPhoto(fts, buttons, replyTo, disableNotification);
             }
         }
 
@@ -496,9 +486,7 @@ namespace TelegramBotBase.Sessions
 
             InputOnlineFile fts = new InputOnlineFile(ms, filename);
 
-            var m = await SendDocument(fts, caption, buttons, replyTo, disableNotification);
-
-            return m;
+            return await SendDocument(fts, caption, buttons, replyTo, disableNotification);
         }
 
         /// <summary>
@@ -524,9 +512,7 @@ namespace TelegramBotBase.Sessions
 
             var content = ms.ToArray();
 
-            var m = await SendDocument(filename, content, caption, buttons, replyTo, disableNotification);
-
-            return m;
+            return await SendDocument(filename, content, caption, buttons, replyTo, disableNotification);
         }
 
         /// <summary>
