@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Form;
 using TelegramBotBase.Controls;
 using TelegramBotBase.Base;
+using TelegramBotBase.Args;
 
 namespace TelegramBotBaseTest.Tests.Controls
 {
@@ -21,7 +22,7 @@ namespace TelegramBotBaseTest.Tests.Controls
             this.Init += TreeViewForms_Init;
         }
 
-        private async Task TreeViewForms_Init(object sender, TelegramBotBase.Base.InitEventArgs e)
+        private async Task TreeViewForms_Init(object sender, InitEventArgs e)
         {
             view = new TreeView();
 

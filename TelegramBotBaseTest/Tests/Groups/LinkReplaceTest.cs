@@ -79,6 +79,10 @@ namespace TelegramBotBaseTest.Tests.Groups
             if (e.Message.From.IsBot)
                 return;
 
+            //Are urls inside his message ?
+            if (!HasLinks(e.MessageText))
+                return;
+
             var u = await Device.GetChatUser(from);
 
             //Don't kick Admins or Creators
@@ -87,11 +91,6 @@ namespace TelegramBotBaseTest.Tests.Groups
                 await this.Device.Send("You won't get kicked,...not this time.");
                 return;
             }
-
-            //Are urls inside his message ?
-            if (!HasLinks(e.MessageText))
-                return;
-
 
             await e.Device.DeleteMessage(e.MessageId);
 

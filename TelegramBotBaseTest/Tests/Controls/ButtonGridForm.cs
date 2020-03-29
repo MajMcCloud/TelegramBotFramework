@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TelegramBotBase.Args;
 using TelegramBotBase.Controls;
 using TelegramBotBase.Form;
 
@@ -20,7 +21,7 @@ namespace TelegramBotBaseTest.Tests.Controls
             this.Init += ButtonGridForm_Init;
         }
 
-        private async Task ButtonGridForm_Init(object sender, TelegramBotBase.Base.InitEventArgs e)
+        private async Task ButtonGridForm_Init(object sender, InitEventArgs e)
         {
             m_Buttons = new ButtonGrid();
 
@@ -43,7 +44,7 @@ namespace TelegramBotBaseTest.Tests.Controls
 
         }
 
-        private async void Bg_ButtonClicked(object sender, TelegramBotBase.Base.ButtonClickedEventArgs e)
+        private async void Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
         {
             if (e.Button == null)
                 return;
