@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using TelegramBotBase.Args;
+using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
@@ -165,6 +166,7 @@ namespace TelegramBotBase
                 return;
 
             this.Client.Message += Client_Message;
+            this.Client.MessageEdit += Client_MessageEdit;
             this.Client.Action += Client_Action;
 
 
@@ -202,7 +204,7 @@ namespace TelegramBotBase
             }
         }
 
-        private void Client_Message(object sender, MessageResult e)
+        private async void Client_Message(object sender, MessageResult e)
         {
             if (this.SkipAllMessages)
                 return;
@@ -219,7 +221,7 @@ namespace TelegramBotBase
 
                 ds?.OnMessageReceived(new MessageReceivedEventArgs(e.Message));
 
-                Client_TryMessage(sender, e);
+                await Client_TryMessage(sender, e);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
@@ -232,7 +234,7 @@ namespace TelegramBotBase
             }
         }
 
-        private async void Client_TryMessage(object sender, MessageResult e)
+        private async Task Client_TryMessage(object sender, MessageResult e)
         {
             DeviceSession ds = e.Device;
             if (ds == null)
@@ -245,6 +247,7 @@ namespace TelegramBotBase
                 OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
             }
 
+            ds.ChatTitle = e.Message.Chat.Username ?? e.Message.Chat.Title;
             ds.LastAction = DateTime.Now;
             ds.LastMessage = e.Message;
 
@@ -303,6 +306,61 @@ namespace TelegramBotBase
 
         }
 
+        private async void Client_MessageEdit(object sender, MessageResult e)
+        {
+            if (this.SkipAllMessages)
+                return;
+
+            try
+            {
+                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+                e.Device = ds;
+
+                if (LogAllMessages)
+                {
+                    OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
+                }
+
+                //Call same, to handle received liked edited
+                ds?.OnMessageReceived(new MessageReceivedEventArgs(e.Message));
+
+                await Client_TryMessageEdit(sender, e);
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            {
+
+            }
+            catch (Exception ex)
+            {
+                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+                OnException(new SystemExceptionEventArgs(e.Message.Text, ds?.DeviceId ?? -1, ds, ex));
+            }
+        }
+
+        private async Task Client_TryMessageEdit(object sender, MessageResult e)
+        {
+            DeviceSession ds = e.Device;
+            if (ds == null)
+            {
+                ds = await this.Sessions.StartSession<T>(e.DeviceId);
+                e.Device = ds;
+            }
+
+            ds.ChatTitle = e.Message.Chat.Username ?? e.Message.Chat.Title;
+            ds.LastAction = DateTime.Now;
+            ds.LastMessage = e.Message;
+
+            //Pre Loading Event
+            await ds.ActiveForm.Edited(e);
+
+            //When form has been switched due navigation within the edit method, reopen Client_Message
+            if (ds.FormSwitched)
+            {
+                await Client_TryMessage(sender, e);
+            }
+
+        }
+
         private void Client_Action(object sender, MessageResult e)
         {
             try
@@ -333,7 +391,7 @@ namespace TelegramBotBase
                 e.Device = ds;
             }
 
-
+            ds.ChatTitle = e.Message.Chat.Username ?? e.Message.Chat.Title;
             ds.LastAction = DateTime.Now;
             ds.LastMessage = e.Message;
 

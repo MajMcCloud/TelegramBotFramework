@@ -30,6 +30,11 @@ namespace TelegramBotBase.Sessions
         public long DeviceId { get; set; }
 
         /// <summary>
+        /// Username of user or group
+        /// </summary>
+        public String ChatTitle { get; set; }
+
+        /// <summary>
         /// When did any last action happend (message received or button clicked)
         /// </summary>
         public DateTime LastAction { get; set; }

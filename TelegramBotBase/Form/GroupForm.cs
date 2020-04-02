@@ -49,12 +49,16 @@ namespace TelegramBotBase.Form
 
                 default:
 
-                    OnMessage(message);
+                    await OnMessage(message);
 
                     break;
             }
 
+        }
 
+        public override async Task Edited(MessageResult message)
+        {
+            await OnMessageEdit(message);
         }
 
         public virtual async Task OnMemberChanges(MemberChangeEventArgs e)
@@ -70,6 +74,11 @@ namespace TelegramBotBase.Form
 
 
         public virtual async Task OnMessage(MessageResult e)
+        {
+
+        }
+
+        public virtual async Task OnMessageEdit(MessageResult e)
         {
 
         }

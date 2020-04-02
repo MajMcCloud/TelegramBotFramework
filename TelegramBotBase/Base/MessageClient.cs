@@ -23,6 +23,8 @@ namespace TelegramBotBase.Base
 
         private static object __evOnMessage = new object();
 
+        private static object __evOnMessageEdit = new object();
+
         private static object __evCallbackQuery = new object();
 
 
@@ -84,12 +86,10 @@ namespace TelegramBotBase.Base
         {
             this.TelegramClient.Timeout = new TimeSpan(0, 0, 30);
 
-
             this.TelegramClient.OnMessage += TelegramClient_OnMessage;
+            this.TelegramClient.OnMessageEdited += TelegramClient_OnMessageEdited;
             this.TelegramClient.OnCallbackQuery += TelegramClient_OnCallbackQuery;
-
         }
-
 
         private async void TelegramClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
@@ -102,6 +102,25 @@ namespace TelegramBotBase.Base
                 var mr = new MessageResult(e);
                 mr.Client = this;
                 OnMessage(mr);
+            }
+            catch
+            {
+
+            }
+        }
+
+
+        private async void TelegramClient_OnMessageEdited(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        {
+            //Skip empty messages by default
+            if (e.Message == null)
+                return;
+
+            try
+            {
+                var mr = new MessageResult(e);
+                mr.Client = this;
+                OnMessageEdit(mr);
             }
             catch
             {
@@ -141,6 +160,23 @@ namespace TelegramBotBase.Base
         public void OnMessage(MessageResult result)
         {
             (this.__Events[__evOnMessage] as EventHandler<MessageResult>)?.Invoke(this, result);
+        }
+
+        public event EventHandler<MessageResult> MessageEdit
+        {
+            add
+            {
+                this.__Events.AddHandler(__evOnMessageEdit, value);
+            }
+            remove
+            {
+                this.__Events.RemoveHandler(__evOnMessageEdit, value);
+            }
+        }
+
+        public void OnMessageEdit(MessageResult result)
+        {
+            (this.__Events[__evOnMessageEdit] as EventHandler<MessageResult>)?.Invoke(this, result);
         }
 
         public event EventHandler<MessageResult> Action

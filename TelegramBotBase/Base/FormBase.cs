@@ -191,6 +191,15 @@ namespace TelegramBotBase.Form
 
         }
 
+        /// <summary>
+        /// Gets invoked, when a messages has been edited.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public virtual async Task Edited(MessageResult message)
+        {
+
+        }
 
 
         /// <summary>
