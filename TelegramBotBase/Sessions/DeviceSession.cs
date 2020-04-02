@@ -244,7 +244,7 @@ namespace TelegramBotBase.Sessions
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
-            catch (ApiRequestException ex)
+            catch (ApiRequestException)
             {
                 return null;
             }
@@ -282,7 +282,7 @@ namespace TelegramBotBase.Sessions
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
-            catch (ApiRequestException ex)
+            catch (ApiRequestException)
             {
                 return null;
             }
@@ -320,7 +320,7 @@ namespace TelegramBotBase.Sessions
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
-            catch (ApiRequestException ex)
+            catch (ApiRequestException)
             {
                 return null;
             }
@@ -355,7 +355,7 @@ namespace TelegramBotBase.Sessions
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
-            catch (ApiRequestException ex)
+            catch (ApiRequestException)
             {
                 return null;
             }
@@ -428,7 +428,7 @@ namespace TelegramBotBase.Sessions
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
-            catch (ApiRequestException ex)
+            catch (ApiRequestException)
             {
                 return null;
             }
@@ -463,7 +463,7 @@ namespace TelegramBotBase.Sessions
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
-            catch (ApiRequestException ex)
+            catch (ApiRequestException)
             {
                 return null;
             }
@@ -615,7 +615,7 @@ namespace TelegramBotBase.Sessions
 
                 return true;
             }
-            catch (ApiRequestException ex)
+            catch (ApiRequestException)
             {
 
             }
