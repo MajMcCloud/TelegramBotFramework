@@ -133,6 +133,16 @@ namespace TelegramBotBaseTest.Tests.Groups
         }
 
         /// <summary>
+        /// Call onmessage also on edited message, if someone want to spoof a failed message and insert a link.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public override async Task OnMessageEdit(MessageResult message)
+        {
+            await OnMessage(message);
+        }
+
+        /// <summary>
         /// https://stackoverflow.com/a/20651284
         /// </summary>
         /// <param name="str"></param>
