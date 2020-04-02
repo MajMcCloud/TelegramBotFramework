@@ -39,9 +39,20 @@ namespace TelegramBotBase.Markdown
         /// <param name="userId"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public static String MentionUser(this long userId, String title = null)
+        public static String MentionUser(this int userId, String title = null)
         {
             return Link("tg://user?id=" + userId.ToString(), title);
+        }
+
+        /// <summary>
+        /// Returns a Link to the User, title is optional.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="title"></param>
+        /// <returns></returns>
+        public static String MentionUser(this String username, String title = null)
+        {
+            return Link("tg://user?id=" + username, title);
         }
 
         /// <summary>
