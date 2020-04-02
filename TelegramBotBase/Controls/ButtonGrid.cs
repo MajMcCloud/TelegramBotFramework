@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -18,6 +19,8 @@ namespace TelegramBotBase.Controls
     {
 
         public String Title { get; set; } = "Toggle";
+
+        public String ConfirmationText { get; set; } = "";
 
         private bool RenderNecessary = true;
 
@@ -41,6 +44,8 @@ namespace TelegramBotBase.Controls
         public bool HideKeyboardOnCleanup { get; set; } = true;
 
         public bool DeletePreviousMessage { get; set; } = true;
+
+        public ParseMode MessageParseMode { get; set; } = ParseMode.Default;
 
         /// <summary>
         /// Defines which type of Button Keyboard should be rendered.
@@ -66,8 +71,6 @@ namespace TelegramBotBase.Controls
         }
 
         private eKeyboardType m_eKeyboardType = eKeyboardType.ReplyKeyboard;
-
-        private bool m_bVisible = true;
 
         public ButtonGrid()
         {
@@ -136,7 +139,7 @@ namespace TelegramBotBase.Controls
             if (!result.IsFirstHandler)
                 return;
 
-            await result.ConfirmAction();
+            await result.ConfirmAction(this.ConfirmationText ?? "");
 
             //Find clicked button depending on Text or Value (depending on markup type)
             switch (this.KeyboardType)
@@ -213,7 +216,7 @@ namespace TelegramBotBase.Controls
                             var rkm = (ReplyKeyboardMarkup)this.ButtonsForm;
                             rkm.ResizeKeyboard = this.ResizeKeyboard;
                             rkm.OneTimeKeyboard = this.OneTimeKeyboard;
-                            m = await this.Device.Send(this.Title, rkm, disableNotification: true);
+                            m = await this.Device.Send(this.Title, rkm, disableNotification: true, parseMode: MessageParseMode);
                         }
 
                         break;
@@ -233,11 +236,11 @@ namespace TelegramBotBase.Controls
                         var rkm = (ReplyKeyboardMarkup)this.ButtonsForm;
                         rkm.ResizeKeyboard = this.ResizeKeyboard;
                         rkm.OneTimeKeyboard = this.OneTimeKeyboard;
-                        m = await this.Device.Send(this.Title, rkm, disableNotification: true);
+                        m = await this.Device.Send(this.Title, rkm, disableNotification: true, parseMode: MessageParseMode);
                         break;
 
                     case eKeyboardType.InlineKeyBoard:
-                        m = await this.Device.Send(this.Title, (InlineKeyboardMarkup)this.ButtonsForm, disableNotification: true);
+                        m = await this.Device.Send(this.Title, (InlineKeyboardMarkup)this.ButtonsForm, disableNotification: true, parseMode: MessageParseMode);
                         break;
                 }
 
