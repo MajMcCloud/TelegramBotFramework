@@ -107,6 +107,8 @@ namespace TelegramBotBase.Form
             }
         }
 
+        
+
         public async Task OnClosed(EventArgs e)
         {
             if (this.Events[__evClosed] == null)
@@ -134,6 +136,16 @@ namespace TelegramBotBase.Form
             {
                 this.Events.RemoveHandler(__evClosed, value);
             }
+        }
+
+        /// <summary>
+        /// Get invoked when a modal child from has been closed.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public virtual async Task ReturnFromModal(ModalDialog modal)
+        {
+
         }
 
 
@@ -337,6 +349,7 @@ namespace TelegramBotBase.Form
             ds.ActiveForm = newForm;
             newForm.Client = parentForm.Client;
             newForm.Device = ds;
+            newForm.ParentForm = parentForm;
 
             newForm.Closed += async (s, en) =>
             {

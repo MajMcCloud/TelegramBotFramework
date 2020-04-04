@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
@@ -18,6 +19,9 @@ namespace TelegramBotBase.Form
 
         private static object __evCompleted { get; } = new object();
 
+        public bool ShowBackButton { get; set; } = false;
+
+        public String BackLabel { get; set; } = "Zurück";
 
         public PromptDialog()
         {
@@ -34,6 +38,13 @@ namespace TelegramBotBase.Form
             if (message.Handled)
                 return;
 
+            if (this.ShowBackButton && message.MessageText == BackLabel)
+            {
+                await this.CloseForm();
+
+                return;
+            }
+
             if (this.Value == null)
             {
                 this.Value = message.MessageText;
@@ -47,6 +58,14 @@ namespace TelegramBotBase.Form
 
             if (this.Value == null)
             {
+                if (this.ShowBackButton)
+                {
+                    ButtonForm bf = new ButtonForm();
+                    bf.AddButtonRow(new ButtonBase(BackLabel, "back"));
+                    await this.Device.Send(this.Message, (ReplyMarkupBase)bf);
+                    return;
+                }
+
                 await this.Device.Send(this.Message);
                 return;
             }
