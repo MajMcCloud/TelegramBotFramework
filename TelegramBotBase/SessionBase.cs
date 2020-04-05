@@ -90,5 +90,22 @@ namespace TelegramBotBase
             }
         }
 
+        /// <summary>
+        /// Returns all active User Sessions.
+        /// </summary>
+        /// <returns></returns>
+        public List<DeviceSession> GetUserSessions()
+        {
+            return this.SessionList.Where(a => a.Key > 0).Select(a => a.Value).ToList();
+        }
+
+        /// <summary>
+        /// Returns all active Group Sessions.
+        /// </summary>
+        /// <returns></returns>
+        public List<DeviceSession> GetGroupSessions()
+        {
+            return this.SessionList.Where(a => a.Key < 0).Select(a => a.Value).ToList();
+        }
     }
 }
