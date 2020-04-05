@@ -539,9 +539,17 @@ namespace TelegramBotBase
 
                 this.Sessions.SessionList.Add(s.DeviceId, device);
 
-                await form.OnInit(new InitEventArgs());
+                try
+                {
+                    await form.OnInit(new InitEventArgs());
 
-                await form.OnOpened(new EventArgs());
+                    await form.OnOpened(new EventArgs());
+                }
+                catch
+                {
+                    //Skip on exception
+                    this.Sessions.SessionList.Remove(s.DeviceId);
+                }
             }
 
         }
