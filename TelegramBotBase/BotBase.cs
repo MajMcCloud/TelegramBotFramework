@@ -584,6 +584,11 @@ namespace TelegramBotBase
                     se.FormUri = form.GetType().FullName;
                     se.QualifiedName = form.GetType().AssemblyQualifiedName;
 
+                    if (form.GetType().GetCustomAttributes(typeof(IgnoreState), true).Length != 0)
+                    {
+                        continue;
+                    }
+
                     //Is Subclass of IStateForm
                     var iform = form as IStateForm;
                     if (iform != null)
