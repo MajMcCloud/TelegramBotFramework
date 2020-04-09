@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.Enums;
 
@@ -155,6 +156,23 @@ namespace TelegramBotBase.Markdown
                     return "<pre>" + text + "</pre>";
             }
             return text;
+        }
+
+        /// <summary>
+        /// Escapes all characters as stated in the documentation: https://core.telegram.org/bots/api#markdownv2-style
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static String MarkdownV2Escape(this String text, params char[] toKeep)
+        {
+            char[] toEscape = new char[] { '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!' };
+
+            return text.EscapeAll(toEscape.Where(a => !toKeep.Contains(a)).Select(a => a.ToString()).ToArray());
+        }
+
+        public static string EscapeAll(this string seed, String[] chars, char escapeCharacter = '\\')
+        {
+            return chars.Aggregate(seed, (str, cItem) => str.Replace(cItem, escapeCharacter + cItem));
         }
     }
 }

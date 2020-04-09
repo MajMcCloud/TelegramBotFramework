@@ -16,6 +16,7 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
+using TelegramBotBase.Markdown;
 
 namespace TelegramBotBase.Sessions
 {
@@ -224,7 +225,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -238,42 +239,9 @@ namespace TelegramBotBase.Sessions
                 throw new MaxLengthException(text.Length);
             }
 
-            try
+            if (parseMode == ParseMode.MarkdownV2 && MarkdownV2AutoEscape)
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
-
-                OnMessageSent(new MessageSentEventArgs(m));
-            }
-            catch (ApiRequestException)
-            {
-                return null;
-            }
-            catch
-            {
-                return null;
-            }
-
-            return m;
-        }
-
-        /// <summary>
-        /// Sends a simple text message
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="markup"></param>
-        /// <param name="replyTo"></param>
-        /// <param name="disableNotification"></param>
-        /// <returns></returns>
-        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
-        {
-            if (this.ActiveForm == null)
-                return null;
-
-            Message m = null;
-
-            if (text.Length > Constants.Telegram.MaxMessageLength)
-            {
-                throw new MaxLengthException(text.Length);
+                text = text.MarkdownV2Escape();
             }
 
             try
@@ -302,7 +270,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -312,6 +280,54 @@ namespace TelegramBotBase.Sessions
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
                 throw new MaxLengthException(text.Length);
+            }
+
+            if (parseMode == ParseMode.MarkdownV2 && MarkdownV2AutoEscape)
+            {
+                text = text.MarkdownV2Escape();
+            }
+
+            try
+            {
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+
+                OnMessageSent(new MessageSentEventArgs(m));
+            }
+            catch (ApiRequestException)
+            {
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+
+            return m;
+        }
+
+        /// <summary>
+        /// Sends a simple text message
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="markup"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            Message m = null;
+
+            if (text.Length > Constants.Telegram.MaxMessageLength)
+            {
+                throw new MaxLengthException(text.Length);
+            }
+
+            if (parseMode == ParseMode.MarkdownV2 && MarkdownV2AutoEscape)
+            {
+                text = text.MarkdownV2Escape();
             }
 
             try
@@ -459,7 +475,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId,new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
