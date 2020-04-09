@@ -175,7 +175,7 @@ namespace TelegramBotBase
 
             if (this.StateMachine != null)
             {
-                LoadSessionStates();
+                this.Sessions.LoadSessionStates(this.StateMachine);
             }
 
             this.Client.TelegramClient.StartReceiving();
@@ -197,7 +197,7 @@ namespace TelegramBotBase
 
             if (this.StateMachine != null)
             {
-                SaveSessionStates();
+                this.Sessions.SaveSessionStates(this.StateMachine);
             }
         }
 
@@ -473,158 +473,6 @@ namespace TelegramBotBase
             } while (ds.FormSwitched && i < NavigationMaximum);
 
         }
-
-        /// <summary>
-        /// Loads the previously saved states from the machine.
-        /// </summary>
-        private async void LoadSessionStates()
-        {
-            if (this.StateMachine == null)
-            {
-                throw new ArgumentNullException("StateMachine", "No StateMachine defined. Please set one to property BotBase.StateMachine");
-            }
-
-            var container = this.StateMachine.LoadFormStates();
-
-            foreach (var s in container.States)
-            {
-                Type t = Type.GetType(s.QualifiedName);
-                if (t == null || !t.IsSubclassOf(typeof(FormBase)))
-                {
-                    continue;
-                }
-
-                var form = t.GetConstructor(new Type[] { }).Invoke(new object[] { }) as FormBase;
-
-                if (s.Values != null && s.Values.Count > 0)
-                {
-                    var properties = s.Values.Where(a => a.Key.StartsWith("$"));
-                    var fields = form.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
-
-                    foreach (var p in properties)
-                    {
-                        var f = fields.FirstOrDefault(a => a.Name == p.Key.Substring(1));
-                        if (f == null)
-                            continue;
-
-                        try
-                        {
-                            f.SetValue(form, p.Value);
-                        }
-                        catch (ArgumentException ex)
-                        {
-
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                }
-
-                //Is Subclass of IStateForm
-                var iform = form as IStateForm;
-                if (iform != null)
-                {
-                    var ls = new LoadStateEventArgs();
-                    ls.Values = s.Values;
-                    iform.LoadState(ls);
-                }
-
-
-                form.Client = Client;
-                var device = new DeviceSession(s.DeviceId, form);
-
-                device.ChatTitle = s.ChatTitle;
-
-                this.Sessions.SessionList.Add(s.DeviceId, device);
-
-                try
-                {
-                    await form.OnInit(new InitEventArgs());
-
-                    await form.OnOpened(new EventArgs());
-                }
-                catch
-                {
-                    //Skip on exception
-                    this.Sessions.SessionList.Remove(s.DeviceId);
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Saves all open states into the machine.
-        /// </summary>
-        private void SaveSessionStates()
-        {
-            if (this.StateMachine == null)
-            {
-                throw new ArgumentNullException("StateMachine", "No StateMachine defined. Please set one to property BotBase.StateMachine");
-            }
-
-            var states = new List<StateEntry>();
-
-            foreach (var s in Sessions.SessionList)
-            {
-                if (s.Value == null)
-                {
-                    continue;
-                }
-
-                var form = s.Value.ActiveForm;
-
-
-                try
-                {
-                    var se = new StateEntry();
-                    se.DeviceId = s.Key;
-                    se.ChatTitle = s.Value.ChatTitle;
-                    se.FormUri = form.GetType().FullName;
-                    se.QualifiedName = form.GetType().AssemblyQualifiedName;
-
-                    if (form.GetType().GetCustomAttributes(typeof(IgnoreState), true).Length != 0)
-                    {
-                        continue;
-                    }
-
-                    //Is Subclass of IStateForm
-                    var iform = form as IStateForm;
-                    if (iform != null)
-                    {
-                        //Loading Session states
-                        SaveStateEventArgs ssea = new SaveStateEventArgs();
-                        iform.SaveState(ssea);
-
-                        se.Values = ssea.Values;
-                    }
-
-                    //Search for public properties with SaveState attribute
-                    var fields = form.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
-
-                    foreach (var f in fields)
-                    {
-                        var val = f.GetValue(form);
-
-                        se.Values.Add("$" + f.Name, val);
-                    }
-
-                    states.Add(se);
-                }
-                catch
-                {
-                    //Continue on error (skip this form)
-                    continue;
-                }
-            }
-
-            var sc = new StateContainer();
-            sc.States = states;
-
-            this.StateMachine.SaveFormStates(new SaveStatesEventArgs(sc));
-        }
-
 
         /// <summary>
         /// Will be called if a session/context gets started
