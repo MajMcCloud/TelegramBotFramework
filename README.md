@@ -74,11 +74,15 @@ Thanks !
 - [Groups](#groups)
 	* [SplitterForm](#splitter-form)
 
-	* [GroupForm](#group-form)
+    * [GroupForm](#group-form)
 
-- [State Machine and Session Serialization](#statemachine)
+- [State Machine and Session Serialization (v3.0.0)](#statemachine-and-sessions)
 
-    * In the making, is comming soon.
+    * [StateMachines](#statemachines)
+
+    * [Interfaces](#interfaces)
+
+    * [Attributes](#attributes)
 
 
 ---
@@ -891,7 +895,142 @@ public class GroupForm : FormBase
 ```
 
 
+## Statemachine and Sessions (v3.0.0)
 
+Depending on the usecases and the overall structure of a Telegram Bot it is essential to have some kind of session serialization or state machine to keep the user context after restarts of the bot (ie. due to updates) or crashes.
+For this I have created some easy to implement structures which fits into the current environment.
+
+Below you find all possiblities.
+
+### Statemachines
+
+    There are actually 3 types of example state machines you could use. A state machine is a kind of serializer which saves the important session data in a reusable structure like JSON or XML.
+
+    You could use one of the following state machines:
+
+    - SimpleJSONStateMachine
+        Is easy to use and useful for simple structures like basic datatypes. Did not work for complex ones like generics. Use the JSONStateMachine for them.
+        In general you didn't need to do more then, to keep the actual form:
+
+        ```
+        //Prepare the System
+        BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
+
+        //Add Systemcommands if you like, you could catch them later
+        bb.SystemCalls.Add("/start");
+
+        //Set the statemachine and enable it
+        bb.StateMachine = new TelegramBotBase.States.SimpleJSONStateMachine(AppContext.BaseDirectory + "config\\states.json");
+
+        //Start your Bot
+        bb.Start();
+
+        ```
+
+    - JSONStateMachine
+        Is easy to use too, but works for complex datatypes cause it saves there namespaces and additional type informations into the JSON file too.
+        In general you didn't need to do more then, to keep the actual form:
+
+        ```
+        //Prepare the System
+        BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
+
+        //Add Systemcommands if you like, you could catch them later
+        bb.SystemCalls.Add("/start");
+
+        //Set the statemachine and enable it
+        bb.StateMachine = new TelegramBotBase.States.JSONStateMachine(AppContext.BaseDirectory + "config\\states.json");
+
+        //Start your Bot
+        bb.Start();
+
+        ```
+
+    - XMLStateMachine
+
+        The last one, should work like the others. 
+        In general you didn't need to do more then, to keep the actual form:
+
+        ```
+        //Prepare the System
+        BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
+
+        //Add Systemcommands if you like, you could catch them later
+        bb.SystemCalls.Add("/start");
+
+        //Set the statemachine and enable it
+        bb.StateMachine = new TelegramBotBase.States.XMLStateMachine(AppContext.BaseDirectory + "config\\states.json");
+
+        //Start your Bot
+        bb.Start();
+
+        ```
+
+### Interfaces
+
+    There are two interfaces, one for the StateMachine itself, which is useful to build a custom one for a different datatype and one for implementing into a form which should be invoked with events.
+
+    - IStateMachine
+
+        Is the basic StateMachine interface, it has two methods SaveFormStates(SaveStatesEventArgs e) and StateContainer LoadFormStates(), nothing fancy, just simple calls. Implement into both methods your own serialization process.
+
+        ```
+
+        public interface IStateMachine
+        {
+            void SaveFormStates(SaveStatesEventArgs e);
+
+            StateContainer LoadFormStates();
+        }
+
+        ```
+
+
+    - IStateForm
+
+        When implemented, this will invoke one of these two methods: LoadState(LoadStateEventArgs e) or SaveState(SaveStateEventArgs e).
+        They have methods to load or save data from the statemachine of the current form.
+
+        ```
+
+        public interface IStateForm
+        {
+            void LoadState(LoadStateEventArgs e);
+
+            void SaveState(SaveStateEventArgs e);
+        }
+
+        ```
+
+### Attributes
+
+    If you don't want to implement the IStateForm interface, cause there are maybe "just" one or two properties you want to keep and restore, use the following attribute:
+
+    - SaveState
+
+        This will let the engine know, that you want too keep and restore the field automatically. Unlike the IStateForm methods, you have no option to manipulate data.
+
+        ```
+
+        [SaveState]
+        public long UserId { get; set; }
+
+
+        ```
+
+    - IgnoreState
+
+        Due to the fact that Attribute implementation and interace is optional, you want to let the engine maybe know, that you dont want to keep a specific form. So it should get "lost". This attribute will help you here, add it to the form class and it will not get serialized, even if it implements IStateForm or the SaveState attributes.
+
+        ```
+
+        [IgnoreState]
+        public class Registration : STForm
+        {
+
+        }
+
+        ```
 
 
 ---
