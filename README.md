@@ -912,7 +912,7 @@ Below you find all possiblities.
         Is easy to use and useful for simple structures like basic datatypes. Did not work for complex ones like generics. Use the JSONStateMachine for them.
         In general you didn't need to do more then, to keep the actual form:
 
-        ```
+```
         //Prepare the System
         BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
 
@@ -925,13 +925,13 @@ Below you find all possiblities.
         //Start your Bot
         bb.Start();
 
-        ```
+```
 
     - JSONStateMachine
         Is easy to use too, but works for complex datatypes cause it saves there namespaces and additional type informations into the JSON file too.
         In general you didn't need to do more then, to keep the actual form:
 
-        ```
+```
         //Prepare the System
         BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
 
@@ -944,14 +944,14 @@ Below you find all possiblities.
         //Start your Bot
         bb.Start();
 
-        ```
+```
 
     - XMLStateMachine
 
         The last one, should work like the others. 
         In general you didn't need to do more then, to keep the actual form:
 
-        ```
+```
         //Prepare the System
         BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
 
@@ -964,7 +964,7 @@ Below you find all possiblities.
         //Start your Bot
         bb.Start();
 
-        ```
+```
 
 ### Interfaces
 
@@ -974,7 +974,7 @@ Below you find all possiblities.
 
         Is the basic StateMachine interface, it has two methods SaveFormStates(SaveStatesEventArgs e) and StateContainer LoadFormStates(), nothing fancy, just simple calls. Implement into both methods your own serialization process.
 
-        ```
+```
 
         public interface IStateMachine
         {
@@ -983,7 +983,7 @@ Below you find all possiblities.
             StateContainer LoadFormStates();
         }
 
-        ```
+```
 
 
     - IStateForm
@@ -991,7 +991,7 @@ Below you find all possiblities.
         When implemented, this will invoke one of these two methods: LoadState(LoadStateEventArgs e) or SaveState(SaveStateEventArgs e).
         They have methods to load or save data from the statemachine of the current form.
 
-        ```
+```
 
         public interface IStateForm
         {
@@ -1000,7 +1000,7 @@ Below you find all possiblities.
             void SaveState(SaveStateEventArgs e);
         }
 
-        ```
+```
 
 ### Attributes
 
@@ -1010,19 +1010,19 @@ Below you find all possiblities.
 
         This will let the engine know, that you want too keep and restore the field automatically. Unlike the IStateForm methods, you have no option to manipulate data.
 
-        ```
+```
 
         [SaveState]
         public long UserId { get; set; }
 
 
-        ```
+```
 
     - IgnoreState
 
         Due to the fact that Attribute implementation and interace is optional, you want to let the engine maybe know, that you dont want to keep a specific form. So it should get "lost". This attribute will help you here, add it to the form class and it will not get serialized, even if it implements IStateForm or the SaveState attributes.
 
-        ```
+```
 
         [IgnoreState]
         public class Registration : STForm
@@ -1030,7 +1030,7 @@ Below you find all possiblities.
 
         }
 
-        ```
+```
 
 
 ---
