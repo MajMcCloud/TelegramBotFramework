@@ -79,11 +79,24 @@ Thanks !
 - [State Machine and Session Serialization (v3.0.0)](#statemachine-and-sessions)
 
     * [StateMachines](#statemachines)
+    
+        * [SimpleJSONStateMachine](#simplejsonstatemachine)
+	
+        * [JSONStateMachine](#jsonstatemachine)
+	
+        * [XMLStateMachine](#xmlstatemachine)
 
     * [Interfaces](#interfaces)
+    
+        * [IStateMachine](#istatemachine)
+	
+        * [IStateForm](#istateform)
 
     * [Attributes](#attributes)
 
+        * [SaveState](#savestate)
+	
+        * [IgnoreState](#ignorestate)
 
 ---
 
@@ -959,7 +972,7 @@ BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
 bb.SystemCalls.Add("/start");
 
 //Set the statemachine and enable it
-bb.StateMachine = new TelegramBotBase.States.XMLStateMachine(AppContext.BaseDirectory + "config\\states.json");
+bb.StateMachine = new TelegramBotBase.States.XMLStateMachine(AppContext.BaseDirectory + "config\\states.xml");
 
 //Start your Bot
 bb.Start();
