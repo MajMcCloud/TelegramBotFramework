@@ -895,7 +895,7 @@ public class GroupForm : FormBase
 ```
 
 
-## Statemachine and Sessions (v3.0.0)
+## Statemachine and Sessions
 
 Depending on the usecases and the overall structure of a Telegram Bot it is essential to have some kind of session serialization or state machine to keep the user context after restarts of the bot (ie. due to updates) or crashes.
 For this I have created some easy to implement structures which fits into the current environment.
