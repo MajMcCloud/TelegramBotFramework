@@ -87,6 +87,10 @@ namespace TelegramBotBase
         {
             this.APIKey = apiKey;
 
+            this.BotCommands = new List<BotCommand>();
+
+            this.Sessions = new SessionBase();
+
             if (initClient)
             {
                 this.Client = new Base.MessageClient(this.APIKey);
@@ -95,9 +99,7 @@ namespace TelegramBotBase
                 this.Sessions.Client = this.Client;
             }
 
-            this.BotCommands = new List<BotCommand>();
-
-            this.Sessions = new SessionBase();
+            
         }
 
         /// <summary>
