@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
@@ -36,7 +37,10 @@ namespace TelegramBotBase
         /// <summary>
         /// Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
         /// </summary>
-        public List<String> SystemCalls { get; set; }
+        public List<BotCommand> BotCommands { get; set; }
+
+
+        #region "Events"
 
         private EventHandlerList __Events = new EventHandlerList();
 
@@ -46,11 +50,13 @@ namespace TelegramBotBase
 
         private static object __evSystemCall = new object();
 
-        public delegate Task SystemCallEventHandler(object sender, SystemCallEventArgs e);
+        public delegate Task BotCommandEventHandler(object sender, BotCommandEventArgs e);
 
         private static object __evException = new object();
 
         private static object __evUnhandledCall = new object();
+
+        #endregion
 
 
         /// <summary>
@@ -77,17 +83,21 @@ namespace TelegramBotBase
         /// Simple start of your Bot with the APIKey
         /// </summary>
         /// <param name="apiKey"></param>
-        public BotBase(String apiKey)
+        public BotBase(String apiKey, bool initClient = true)
         {
             this.APIKey = apiKey;
 
-            this.Client = new Base.MessageClient(this.APIKey);
-            this.Client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
+            if (initClient)
+            {
+                this.Client = new Base.MessageClient(this.APIKey);
+                this.Client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
 
-            this.SystemCalls = new List<string>();
+                this.Sessions.Client = this.Client;
+            }
+
+            this.BotCommands = new List<BotCommand>();
 
             this.Sessions = new SessionBase();
-            this.Sessions.Client = this.Client;
         }
 
         /// <summary>
@@ -95,15 +105,10 @@ namespace TelegramBotBase
         /// </summary>
         /// <param name="apiKey"></param>
         /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, System.Net.Http.HttpClient proxy)
+        public BotBase(String apiKey, System.Net.Http.HttpClient proxy) : this(apiKey, false)
         {
-            this.APIKey = apiKey;
-
             this.Client = new Base.MessageClient(this.APIKey, proxy);
 
-            this.SystemCalls = new List<string>();
-
-            this.Sessions = new SessionBase();
             this.Sessions.Client = this.Client;
         }
 
@@ -112,15 +117,10 @@ namespace TelegramBotBase
         /// </summary>
         /// <param name="apiKey"></param>
         /// <param name="client"></param>
-        public BotBase(String apiKey, TelegramBotClient client)
+        public BotBase(String apiKey, TelegramBotClient client) : this(apiKey, false)
         {
-            this.APIKey = apiKey;
-
             this.Client = new Base.MessageClient(this.APIKey, client);
 
-            this.SystemCalls = new List<string>();
-
-            this.Sessions = new SessionBase();
             this.Sessions.Client = this.Client;
         }
 
@@ -129,17 +129,12 @@ namespace TelegramBotBase
         /// </summary>
         /// <param name="apiKey"></param>
         /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, String proxyBaseAddress)
+        public BotBase(String apiKey, String proxyBaseAddress) : this(apiKey, false)
         {
-            this.APIKey = apiKey;
-
             var url = new Uri(proxyBaseAddress);
 
             this.Client = new Base.MessageClient(this.APIKey, url);
 
-            this.SystemCalls = new List<string>();
-
-            this.Sessions = new SessionBase();
             this.Sessions.Client = this.Client;
         }
 
@@ -149,15 +144,10 @@ namespace TelegramBotBase
         /// <param name="apiKey"></param>
         /// <param name="proxyHost">i.e. 127.0.0.1</param>
         /// <param name="proxyPort">i.e. 10000</param>
-        public BotBase(String apiKey, String proxyHost, int proxyPort)
+        public BotBase(String apiKey, String proxyHost, int proxyPort) : this(apiKey, false)
         {
-            this.APIKey = apiKey;
-
             this.Client = new Base.MessageClient(this.APIKey, proxyHost, proxyPort);
 
-            this.SystemCalls = new List<string>();
-
-            this.Sessions = new SessionBase();
             this.Sessions.Client = this.Client;
         }
 
@@ -265,10 +255,10 @@ namespace TelegramBotBase
             ds.LastMessage = e.Message;
 
             //Is this a systemcall ?
-            if (e.IsSystemCall && this.SystemCalls.Contains(e.SystemCommand))
+            if (e.IsBotCommand && this.BotCommands.Count(a => a.Command == e.BotCommand) > 0)
             {
-                var sce = new SystemCallEventArgs(e.SystemCommand, e.SystemCallParameters, e.Message, ds.DeviceId, ds);
-                await OnSystemCall(sce);
+                var sce = new BotCommandEventArgs(e.BotCommand, e.BotCommandParameters, e.Message, ds.DeviceId, ds);
+                await OnBotCommand(sce);
 
                 if (sce.Handled)
                     return;
@@ -475,6 +465,16 @@ namespace TelegramBotBase
         }
 
         /// <summary>
+        /// This method will update all local created bot commands to the botfather.
+        /// </summary>
+        public async Task UploadBotCommands()
+        {
+            await this.Client.SetBotCommands(this.BotCommands);
+        }
+
+        #region "Events"
+
+        /// <summary>
         /// Will be called if a session/context gets started
         /// </summary>
 
@@ -518,15 +518,15 @@ namespace TelegramBotBase
         }
 
         /// <summary>
-        /// Will be called if a system call gets raised
+        /// Will be called if a bot command gets raised
         /// </summary>
-        public event SystemCallEventHandler SystemCall;
+        public event BotCommandEventHandler BotCommand;
 
 
-        public async Task OnSystemCall(SystemCallEventArgs e)
+        public async Task OnBotCommand(BotCommandEventArgs e)
         {
-            if (this.SystemCall != null)
-                await SystemCall(this, e);
+            if (this.BotCommand != null)
+                await BotCommand(this, e);
         }
 
         /// <summary>
@@ -570,5 +570,8 @@ namespace TelegramBotBase
             (this.__Events[__evUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
 
         }
+
+        #endregion
+
     }
 }

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 
 namespace TelegramBotBase.Base
 {
@@ -14,6 +15,7 @@ namespace TelegramBotBase.Base
     /// </summary>
     public class MessageClient
     {
+
 
         public String APIKey { get; set; }
 
@@ -40,7 +42,7 @@ namespace TelegramBotBase.Base
         {
             this.APIKey = APIKey;
             this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey, proxy);
-           
+
 
             Prepare();
         }
@@ -141,6 +143,27 @@ namespace TelegramBotBase.Base
 
             }
         }
+
+        /// <summary>
+        /// This will return the current list of bot commands.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<BotCommand[]> GetBotCommands()
+        {
+            return await this.TelegramClient.GetMyCommandsAsync();
+        }
+
+        /// <summary>
+        /// This will set your bot commands to the given list.
+        /// </summary>
+        /// <param name="botcommands"></param>
+        /// <returns></returns>
+        public async Task SetBotCommands(List<BotCommand> botcommands)
+        {
+            await this.TelegramClient.SetMyCommandsAsync(botcommands);
+        }
+
+
 
 
         #region "Events"

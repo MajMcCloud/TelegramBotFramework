@@ -11,7 +11,7 @@ namespace TelegramBotBase.Args
     /// <summary>
     /// Base class for given system call results
     /// </summary>
-    public class SystemCallEventArgs : EventArgs
+    public class BotCommandEventArgs : EventArgs
     {
         public String Command { get; set; }
 
@@ -26,13 +26,13 @@ namespace TelegramBotBase.Args
         public Message OriginalMessage { get; set; }
 
 
-        public SystemCallEventArgs()
+        public BotCommandEventArgs()
         {
 
 
         }
 
-        public SystemCallEventArgs(String Command, List<String> Parameters, Message Message, long DeviceId, DeviceSession Device)
+        public BotCommandEventArgs(String Command, List<String> Parameters, Message Message, long DeviceId, DeviceSession Device)
         {
             this.Command = Command;
             this.Parameters = Parameters;
