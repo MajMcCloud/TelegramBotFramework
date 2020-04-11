@@ -256,8 +256,8 @@ namespace TelegramBotBase
             ds.LastAction = DateTime.Now;
             ds.LastMessage = e.Message;
 
-            //Is this a systemcall ?
-            if (e.IsBotCommand && this.BotCommands.Count(a => a.Command == e.BotCommand) > 0)
+            //Is this a bot command ?
+            if (e.IsBotCommand && this.BotCommands.Count(a => "/" + a.Command == e.BotCommand) > 0)
             {
                 var sce = new BotCommandEventArgs(e.BotCommand, e.BotCommandParameters, e.Message, ds.DeviceId, ds);
                 await OnBotCommand(sce);
