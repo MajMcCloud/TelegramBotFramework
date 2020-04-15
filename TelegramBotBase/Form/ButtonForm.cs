@@ -42,6 +42,15 @@ namespace TelegramBotBase.Form
             }
         }
 
+
+        public List<ButtonBase> this[int row]
+        {
+            get
+            {
+                return Buttons[row];
+            }
+        }
+
         public ButtonForm()
         {
 
@@ -60,6 +69,16 @@ namespace TelegramBotBase.Form
         public void AddButtonRow(params ButtonBase[] row)
         {
             AddButtonRow(row.ToList());
+        }
+
+        public void InsertButtonRow(int index, IEnumerable<ButtonBase> row)
+        {
+            Buttons.Insert(index, row.ToList());
+        }
+
+        public void InsertButtonRow(int index, params ButtonBase[] row)
+        {
+            InsertButtonRow(index, row.ToList());
         }
 
         public static T[][] SplitTo<T>(IEnumerable<T> items, int itemsPerRow = 2)
@@ -86,7 +105,10 @@ namespace TelegramBotBase.Form
         {
             get
             {
-                return this.Buttons.Select(a => a.ToArray()).Aggregate((a, b) => a.Union(b).ToArray()).Length;
+                if (this.Buttons.Count == 0)
+                    return 0;
+
+                return this.Buttons.Select(a => a.ToArray()).ToList().Aggregate((a, b) => a.Union(b).ToArray()).Length;
             }
         }
 
@@ -152,6 +174,31 @@ namespace TelegramBotBase.Form
             ReplyKeyboardMarkup ikm = new ReplyKeyboardMarkup(form.ToReplyButtonArray());
 
             return ikm;
+        }
+
+        /// <summary>
+        /// Creates a copy of this form.
+        /// </summary>
+        /// <returns></returns>
+        public ButtonForm Duplicate()
+        {
+            var bf = new ButtonForm()
+            {
+                Markup = this.Markup,
+                DependencyControl = this.DependencyControl
+            };
+
+            foreach(var b in Buttons)
+            {
+                var lst = new List<ButtonBase>();
+                foreach(var b2 in b)
+                {
+                    lst.Add(b2);
+                }
+                bf.Buttons.Add(lst);
+            }
+
+            return bf;
         }
     }
 }
