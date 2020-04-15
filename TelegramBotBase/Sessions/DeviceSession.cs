@@ -36,6 +36,18 @@ namespace TelegramBotBase.Sessions
         public String ChatTitle { get; set; }
 
         /// <summary>
+        /// Returns the ChatTitle depending on groups/channels or users
+        /// </summary>
+        /// <returns></returns>
+        public String GetChatTitle()
+        {
+            return LastMessage?.Chat.Title 
+                ?? LastMessage?.Chat.Username 
+                ?? LastMessage?.Chat.FirstName 
+                ?? ChatTitle;
+        }
+
+        /// <summary>
         /// When did any last action happend (message received or button clicked)
         /// </summary>
         public DateTime LastAction { get; set; }
@@ -132,9 +144,6 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null)
         {
-            if (this.ActiveForm == null)
-                return null;
-
             InlineKeyboardMarkup markup = buttons;
 
             if (text.Length > Constants.Telegram.MaxMessageLength)
@@ -164,9 +173,6 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup)
         {
-            if (this.ActiveForm == null)
-                return null;
-
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
                 throw new MaxLengthException(text.Length);
@@ -194,9 +200,6 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public async Task<Message> Edit(Message message, ButtonForm buttons = null)
         {
-            if (this.ActiveForm == null)
-                return null;
-
             InlineKeyboardMarkup markup = buttons;
 
             if (message.Text.Length > Constants.Telegram.MaxMessageLength)
@@ -213,6 +216,27 @@ namespace TelegramBotBase.Sessions
 
             }
 
+
+            return null;
+        }
+
+        /// <summary>
+        /// Edits the reply keyboard markup (buttons)
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <param name="bf"></param>
+        /// <returns></returns>
+        public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf)
+        {
+
+            try
+            {
+                return await this.Client.TelegramClient.EditMessageReplyMarkupAsync(this.DeviceId, messageId, bf);
+            }
+            catch
+            {
+
+            }
 
             return null;
         }
