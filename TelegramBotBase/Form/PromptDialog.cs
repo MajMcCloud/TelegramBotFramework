@@ -21,7 +21,7 @@ namespace TelegramBotBase.Form
 
         public bool ShowBackButton { get; set; } = false;
 
-        public String BackLabel { get; set; } = "Zurück";
+        public String BackLabel { get; set; } = Localizations.Default.Language["PromptDialog_Back"];
 
         public PromptDialog()
         {

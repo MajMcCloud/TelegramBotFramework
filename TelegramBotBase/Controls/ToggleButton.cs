@@ -12,15 +12,15 @@ namespace TelegramBotBase.Controls
     public class ToggleButton : ControlBase
     {
 
-        public String UncheckedIcon { get; set; } = "⚪";
+        public String UncheckedIcon { get; set; } = Localizations.Default.Language["ToggleButton_OffIcon"];
 
-        public String CheckedIcon { get; set; } = "⚫";
+        public String CheckedIcon { get; set; } = Localizations.Default.Language["ToggleButton_OnIcon"];
 
-        public String CheckedString { get; set; } = "On";
+        public String CheckedString { get; set; } = Localizations.Default.Language["ToggleButton_On"];
 
-        public String UncheckedString { get; set; } = "Off";
+        public String UncheckedString { get; set; } = Localizations.Default.Language["ToggleButton_Off"];
 
-        public String Title { get; set; } = "Toggle";
+        public String Title { get; set; } = Localizations.Default.Language["ToggleButton_Title"];
 
         public int? MessageId { get; set; }
 

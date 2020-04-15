@@ -18,7 +18,7 @@ namespace TelegramBotBase.Controls
     public class ButtonGrid : Base.ControlBase
     {
 
-        public String Title { get; set; } = "Toggle";
+        public String Title { get; set; } = Localizations.Default.Language["ButtonGrid_Title"];
 
         public String ConfirmationText { get; set; } = "";
 

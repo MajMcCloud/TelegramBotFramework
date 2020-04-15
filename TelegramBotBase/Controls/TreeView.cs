@@ -20,12 +20,12 @@ namespace TelegramBotBase.Controls
 
         private int? MessageId { get; set; }
 
-        public String MoveUpIcon { get; set; } = "🔼 up";
+        public String MoveUpIcon { get; set; } = Localizations.Default.Language["TreeView_LevelUp"];
 
         public TreeView()
         {
             this.Nodes = new List<TreeViewNode>();
-            this.Title = "Select node";
+            this.Title = Localizations.Default.Language["TreeView_Title"];
         }
 
 
@@ -52,19 +52,21 @@ namespace TelegramBotBase.Controls
 
                     var n = (this.VisibleNode != null ? this.VisibleNode.FindNodeByValue(val) : this.Nodes.FirstOrDefault(a => a.Value == val));
 
-                    if (n != null)
-                    {
-                        if (n.ChildNodes.Count > 0)
-                        {
-                            this.VisibleNode = n;
-                        }
-                        else
-                        {
-                            this.SelectedNode = (this.SelectedNode != n ? n : null);
-                        }
+                    if (n == null)
+                        return;
 
-                        result.Handled = true;
+
+                    if (n.ChildNodes.Count > 0)
+                    {
+                        this.VisibleNode = n;
                     }
+                    else
+                    {
+                        this.SelectedNode = (this.SelectedNode != n ? n : null);
+                    }
+
+                    result.Handled = true;
+
 
                     break;
 

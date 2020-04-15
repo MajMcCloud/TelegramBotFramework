@@ -27,7 +27,7 @@ namespace TelegramBotBase.Controls
 
         private int? MessageId { get; set; }
 
-        public String Title { get; set; } = "Pick Date";
+        public String Title { get; set; } = Localizations.Default.Language["CalendarPicker_Title"];
 
         public eMonthPickerMode PickerMode { get; set; }
 
@@ -55,7 +55,7 @@ namespace TelegramBotBase.Controls
 
             switch (result.RawData)
             {
-                case "next":
+                case "$next$":
 
                     switch (this.PickerMode)
                     {
@@ -74,7 +74,7 @@ namespace TelegramBotBase.Controls
 
 
                     break;
-                case "prev":
+                case "$prev$":
 
                     switch (this.PickerMode)
                     {
@@ -93,7 +93,7 @@ namespace TelegramBotBase.Controls
 
                     break;
 
-                case "monthtitle":
+                case "$monthtitle$":
 
                     if (this.EnableMonthView)
                     {
@@ -102,7 +102,7 @@ namespace TelegramBotBase.Controls
 
                     break;
 
-                case "yeartitle":
+                case "$yeartitle$":
 
                     if (this.EnableYearView)
                     {
@@ -110,7 +110,7 @@ namespace TelegramBotBase.Controls
                     }
 
                     break;
-                case "yearstitle":
+                case "$yearstitle$":
 
                     if (this.EnableMonthView)
                     {
@@ -179,7 +179,7 @@ namespace TelegramBotBase.Controls
                     string[] dayNamesNormal = this.Culture.DateTimeFormat.ShortestDayNames;
                     string[] dayNamesShifted = Shift(dayNamesNormal, (int)this.FirstDayOfWeek);
 
-                    bf.AddButtonRow(new ButtonBase("<<", "prev"), new ButtonBase(this.Culture.DateTimeFormat.MonthNames[month.Month - 1] + " " + month.Year.ToString(), "monthtitle"), new ButtonBase(">>", "next"));
+                    bf.AddButtonRow(new ButtonBase(Localizations.Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase(this.Culture.DateTimeFormat.MonthNames[month.Month - 1] + " " + month.Year.ToString(), "$monthtitle$"), new ButtonBase(Localizations.Default.Language["CalendarPicker_NextPage"], "$next$"));
 
                     bf.AddButtonRow(dayNamesShifted.Select(a => new ButtonBase(a, a)).ToList());
 
@@ -223,7 +223,7 @@ namespace TelegramBotBase.Controls
 
                 case eMonthPickerMode.month:
 
-                    bf.AddButtonRow(new ButtonBase("<<", "prev"), new ButtonBase(this.VisibleMonth.Year.ToString("0000"), "yeartitle"), new ButtonBase(">>", "next"));
+                    bf.AddButtonRow(new ButtonBase(Localizations.Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase(this.VisibleMonth.Year.ToString("0000"), "$yeartitle$"), new ButtonBase(Localizations.Default.Language["CalendarPicker_NextPage"], "$next$"));
 
                     var months = this.Culture.DateTimeFormat.MonthNames;
 
@@ -235,7 +235,7 @@ namespace TelegramBotBase.Controls
 
                 case eMonthPickerMode.year:
 
-                    bf.AddButtonRow(new ButtonBase("<<", "prev"), new ButtonBase("Year", "yearstitle"), new ButtonBase(">>", "next"));
+                    bf.AddButtonRow(new ButtonBase(Localizations.Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase("Year", "$yearstitle$"), new ButtonBase(Localizations.Default.Language["CalendarPicker_NextPage"], "$next$"));
 
                     var starti = Math.Floor(this.VisibleMonth.Year / 10f) * 10;
 
