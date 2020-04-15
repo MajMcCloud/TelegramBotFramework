@@ -169,6 +169,12 @@ public class StartForm : FormBase
         {
             await this.Device.Send("Hello world!");
         }
+	
+	//Gets invoked on edited messages
+	public override async Task Edited(MessageResult message)
+        {
+            
+        }
 		
 	//Gets invoked on Button clicks
         public override async Task Action(MessageResult message)
