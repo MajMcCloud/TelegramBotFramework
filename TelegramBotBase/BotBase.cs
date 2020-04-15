@@ -252,7 +252,6 @@ namespace TelegramBotBase
                 OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
             }
 
-            ds.ChatTitle = e.Message.Chat.Username ?? e.Message.Chat.Title;
             ds.LastAction = DateTime.Now;
             ds.LastMessage = e.Message;
 
@@ -351,7 +350,6 @@ namespace TelegramBotBase
                 e.Device = ds;
             }
 
-            ds.ChatTitle = e.Message.Chat.Username ?? e.Message.Chat.Title;
             ds.LastAction = DateTime.Now;
             ds.LastMessage = e.Message;
 
@@ -396,7 +394,6 @@ namespace TelegramBotBase
                 e.Device = ds;
             }
 
-            ds.ChatTitle = e.Message.Chat.Username ?? e.Message.Chat.Title;
             ds.LastAction = DateTime.Now;
             ds.LastMessage = e.Message;
 

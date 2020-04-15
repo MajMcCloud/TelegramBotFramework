@@ -211,12 +211,11 @@ namespace TelegramBotBase
 
                 var form = s.Value.ActiveForm;
 
-
                 try
                 {
                     var se = new StateEntry();
                     se.DeviceId = s.Key;
-                    se.ChatTitle = s.Value.ChatTitle;
+                    se.ChatTitle = s.Value.GetChatTitle();
                     se.FormUri = form.GetType().FullName;
                     se.QualifiedName = form.GetType().AssemblyQualifiedName;
 
