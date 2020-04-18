@@ -1027,7 +1027,7 @@ If you don't want to implement the IStateForm interface, cause there are maybe "
 
 #### SaveState
 
-This will let the engine know, that you want too keep and restore the field automatically. Unlike the IStateForm methods, you have no option to manipulate data.
+This will let the engine know, that you want too keep and restore this field automatically. Unlike the IStateForm methods, you have no option to manipulate data.
 
 ```
 
@@ -1039,7 +1039,7 @@ public long UserId { get; set; }
 
 #### IgnoreState
 
-Due to the fact that Attribute implementation and interace is optional, you want to let the engine maybe know, that you dont want to keep a specific form. So it should get "lost". This attribute will help you here, add it to the form class and it will not get serialized, even if it implements IStateForm or the SaveState attributes.
+Due to the fact that Attribute implementation and interaction is optional, you want to let the engine maybe know, that you don't want to keep a specific form. So it should get "lost". This attribute will help you here, add it to the form class and it will not get serialized, even if it implements IStateForm or the SaveState attributes.
 
 ```
 
