@@ -75,6 +75,7 @@ namespace TelegramBotBase
             SetSetting(eSettings.NavigationMaximum, 10);
             SetSetting(eSettings.LogAllMessages, false);
             SetSetting(eSettings.SkipAllMessages, false);
+            SetSetting(eSettings.SafeSessionsOnConsoleExit, false);
 
             this.BotCommands = new List<BotCommand>();
 
@@ -164,6 +165,15 @@ namespace TelegramBotBase
             if (this.StateMachine != null)
             {
                 this.Sessions.LoadSessionStates(this.StateMachine);
+            }
+
+            //Enable auto session safe
+            if (this.GetSetting(eSettings.SafeSessionsOnConsoleExit, false))
+            {
+                TelegramBotBase.Tools.Console.SetHandler(() =>
+                {
+                    this.Sessions.SaveSessionStates(this.StateMachine);
+                });
             }
 
             this.Client.TelegramClient.StartReceiving();

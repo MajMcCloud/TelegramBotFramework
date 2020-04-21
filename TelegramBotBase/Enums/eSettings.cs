@@ -24,6 +24,10 @@ namespace TelegramBotBase.Enums
         SkipAllMessages = 3,
 
 
+        /// <summary>
+        /// Does stick to the console event handler and safes all sessions on exit.
+        /// </summary>
+        SafeSessionsOnConsoleExit = 4
 
 
 
