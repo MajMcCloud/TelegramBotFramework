@@ -9,6 +9,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
@@ -60,46 +61,41 @@ namespace TelegramBotBase
 
 
         /// <summary>
-        /// Skips all messages during running (good for big delay updates)
-        /// </summary>
-        public bool SkipAllMessages { get; set; } = false;
-
-        /// <summary>
-        /// Loggs all messages and sent them to the event handler
-        /// </summary>
-        public bool LogAllMessages { get; set; } = false;
-
-        /// <summary>
         /// Enable the SessionState (you need to implement on call forms the IStateForm interface)
         /// </summary>
         public IStateMachine StateMachine { get; set; }
 
-        /// <summary>
-        /// How often could a form navigate to another (within one user action/call/message)
-        /// </summary>
-        private const int NavigationMaximum = 10;
+
+        public Dictionary<eSettings, uint> SystemSettings { get; private set; }
+
+        private BotBase()
+        {
+            this.SystemSettings = new Dictionary<eSettings, uint>();
+
+            SetSetting(eSettings.NavigationMaximum, 10);
+            SetSetting(eSettings.LogAllMessages, false);
+            SetSetting(eSettings.SkipAllMessages, false);
+
+            this.BotCommands = new List<BotCommand>();
+
+            this.Sessions = new SessionBase();
+        }
 
         /// <summary>
         /// Simple start of your Bot with the APIKey
         /// </summary>
         /// <param name="apiKey"></param>
-        public BotBase(String apiKey, bool initClient = true)
+        public BotBase(String apiKey, bool initClient = true) : this()
         {
             this.APIKey = apiKey;
 
-            this.BotCommands = new List<BotCommand>();
+            if (!initClient)
+                return;
 
-            this.Sessions = new SessionBase();
+            this.Client = new Base.MessageClient(this.APIKey);
+            this.Client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
 
-            if (initClient)
-            {
-                this.Client = new Base.MessageClient(this.APIKey);
-                this.Client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
-
-                this.Sessions.Client = this.Client;
-            }
-
-            
+            this.Sessions.Client = this.Client;
         }
 
         /// <summary>
@@ -211,7 +207,7 @@ namespace TelegramBotBase
 
         private async void Client_Message(object sender, MessageResult e)
         {
-            if (this.SkipAllMessages)
+            if (this.GetSetting(eSettings.SkipAllMessages, false))
                 return;
 
             try
@@ -219,7 +215,7 @@ namespace TelegramBotBase
                 DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
                 e.Device = ds;
 
-                if (LogAllMessages)
+                if (this.GetSetting(eSettings.LogAllMessages, false))
                 {
                     OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
                 }
@@ -305,14 +301,14 @@ namespace TelegramBotBase
 
                 e.IsFirstHandler = false;
 
-            } while (ds.FormSwitched && i < NavigationMaximum);
+            } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
 
 
         }
 
         private async void Client_MessageEdit(object sender, MessageResult e)
         {
-            if (this.SkipAllMessages)
+            if (this.GetSetting(eSettings.SkipAllMessages, false))
                 return;
 
             try
@@ -320,7 +316,7 @@ namespace TelegramBotBase
                 DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
                 e.Device = ds;
 
-                if (LogAllMessages)
+                if (this.GetSetting(eSettings.LogAllMessages, false))
                 {
                     OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
                 }
@@ -371,7 +367,7 @@ namespace TelegramBotBase
                 DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
                 e.Device = ds;
 
-                if (LogAllMessages)
+                if (this.GetSetting(eSettings.LogAllMessages, false))
                 {
                     OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
                 }
@@ -459,7 +455,7 @@ namespace TelegramBotBase
 
                 e.IsFirstHandler = false;
 
-            } while (ds.FormSwitched && i < NavigationMaximum);
+            } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
 
         }
 
@@ -469,6 +465,54 @@ namespace TelegramBotBase
         public async Task UploadBotCommands()
         {
             await this.Client.SetBotCommands(this.BotCommands);
+        }
+
+        /// <summary>
+        /// Could set a variety of settings to improve the bot handling.
+        /// </summary>
+        /// <param name="set"></param>
+        /// <param name="Value"></param>
+        public void SetSetting(eSettings set, uint Value)
+        {
+            this.SystemSettings[set] = Value;
+        }
+
+        /// <summary>
+        /// Could set a variety of settings to improve the bot handling.
+        /// </summary>
+        /// <param name="set"></param>
+        /// <param name="Value"></param>
+        public void SetSetting(eSettings set, bool Value)
+        {
+            this.SystemSettings[set] = (Value ? 1u : 0u);
+        }
+
+        /// <summary>
+        /// Could get the current value of a setting
+        /// </summary>
+        /// <param name="set"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public uint GetSetting(eSettings set, uint defaultValue)
+        {
+            if (!this.SystemSettings.ContainsKey(set))
+                return defaultValue;
+
+            return this.SystemSettings[set];
+        }
+
+        /// <summary>
+        /// Could get the current value of a setting
+        /// </summary>
+        /// <param name="set"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public bool GetSetting(eSettings set, bool defaultValue)
+        {
+            if (!this.SystemSettings.ContainsKey(set))
+                return defaultValue;
+
+            return this.SystemSettings[set] == 0u ? false : true;
         }
 
         #region "Events"
