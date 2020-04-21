@@ -20,6 +20,10 @@ namespace TelegramBotBase.Localizations
         {
             Values["Language"] = "Deutsch (German)";
             Values["ButtonGrid_Title"] = "Menü";
+            Values["ButtonGrid_NoItems"] = "Es sind keine Einträge vorhanden.";
+            Values["ButtonGrid_PreviousPage"] = "◀️";
+            Values["ButtonGrid_NextPage"] = "▶️";
+            Values["ButtonGrid_CurrentPage"] = "Seite {0} von {1}";
             Values["CalendarPicker_Title"] = "Datum auswählen";
             Values["CalendarPicker_PreviousPage"] = "◀️";
             Values["CalendarPicker_NextPage"] = "▶️";
