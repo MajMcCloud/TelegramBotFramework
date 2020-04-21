@@ -45,6 +45,9 @@ namespace TelegramBotBase.Controls
 
         public bool DeletePreviousMessage { get; set; } = true;
 
+        /// <summary>
+        /// Parsemode of the message.
+        /// </summary>
         public ParseMode MessageParseMode { get; set; } = ParseMode.Default;
 
         /// <summary>
@@ -53,7 +56,7 @@ namespace TelegramBotBase.Controls
         public bool EnablePaging { get; set; } = false;
 
         /// <summary>
-        /// Aktueller Seitenindex
+        /// Index of the current page
         /// </summary>
         public int CurrentPageIndex { get; set; } = 0;
 
@@ -63,6 +66,9 @@ namespace TelegramBotBase.Controls
 
         public String NoItemsLabel = Localizations.Default.Language["ButtonGrid_NoItems"];
 
+        /// <summary>
+        /// Layout of the buttons which should be displayed always on top.
+        /// </summary>
         public List<ButtonBase> HeadLayoutButtonRow { get; set; }
 
         /// <summary>

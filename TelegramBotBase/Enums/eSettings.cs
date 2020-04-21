@@ -25,9 +25,9 @@ namespace TelegramBotBase.Enums
 
 
         /// <summary>
-        /// Does stick to the console event handler and safes all sessions on exit.
+        /// Does stick to the console event handler and saves all sessions on exit.
         /// </summary>
-        SafeSessionsOnConsoleExit = 4
+        SaveSessionsOnConsoleExit = 4
 
 
 
