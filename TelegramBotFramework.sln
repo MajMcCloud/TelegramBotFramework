@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{BF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommandsBot", "Examples\SystemCommandsBot\SystemCommandsBot.csproj", "{FC484952-3060-4F87-9809-4CD66D6961C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinHiderBot", "Examples\JoinHiderBot\JoinHiderBot.csproj", "{E804B9E5-7ACC-49D3-9253-806766C1D9A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,12 +36,17 @@ Global
 		{FC484952-3060-4F87-9809-4CD66D6961C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC484952-3060-4F87-9809-4CD66D6961C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC484952-3060-4F87-9809-4CD66D6961C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E804B9E5-7ACC-49D3-9253-806766C1D9A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E804B9E5-7ACC-49D3-9253-806766C1D9A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E804B9E5-7ACC-49D3-9253-806766C1D9A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E804B9E5-7ACC-49D3-9253-806766C1D9A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FC484952-3060-4F87-9809-4CD66D6961C0} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
+		{E804B9E5-7ACC-49D3-9253-806766C1D9A5} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59CB40E1-9FA7-4867-A56F-4F418286F057}
