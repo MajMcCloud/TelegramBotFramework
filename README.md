@@ -97,6 +97,8 @@ Thanks !
         * [SaveState](#savestate)
 	
         * [IgnoreState](#ignorestate)
+	
+- [Examples](#examples)
 
 ---
 
@@ -1050,6 +1052,19 @@ public class Registration : STForm
 }
 
 ```
+
+
+## Examples
+
+You find all example projects in the "Examples" subfolder.
+
+- [Examples/SystemCommandsBot/](Examples/SystemCommandsBot/) 
+
+Will allow you to run specific system commands or run/kill processes via Bot. Has also a simple authentication mechanism with one password.
+
+- [Examples/JoinHiderBot/](Examples/JoinHiderBot/) 
+
+Will delete Join and Leave messages automatically in groups.
 
 
 ---
