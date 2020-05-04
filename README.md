@@ -224,7 +224,7 @@ await this.NavigateTo(tf);
 
 All examples are within the test project, so just try it out on your own.
 
-### Add some system calls (Example #0 - System Calls)
+### Add some system calls (Example #0 - Bot Commands)
 
 Inside of the BotFather you are able to add "Commands" to your TelegramBot. The user will see them, depending on the application as options he could choose.
 Before start (and later for sure) you could add them to your BotBase. Every time a message comes in they will get checked if they are one of them.
