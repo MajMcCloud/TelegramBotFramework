@@ -118,7 +118,7 @@ It gives you features which will look/feel like WinForms or have a good way to c
 ## How to start:
 
 Within your empty App your need to put some initial lines including your APIKey to get things started. 
-The "BotBase" Class will manage a lot of things for you, like system calls, action events and so on. 
+The "BotBase" Class will manage a lot of things for you, like bot commands, action events and so on. 
 "StartForm" is your first Formular which every user will get internally redirected to, like a start page, you could redirect from there later in code, so users won't recognize it. 
 It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBase.Base
 
@@ -129,7 +129,10 @@ It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBa
 BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
 
 //Add Systemcommands if you like, you could catch them later
-bb.SystemCalls.Add("/start");
+bb.BotCommands.Add(new BotCommand() { Command = "start", Description = "Starts the bot" });
+
+//Update bot commands to botfather
+bb.UploadBotCommands().Wait();
 
 //Start your Bot
 bb.Start();
@@ -224,7 +227,7 @@ All examples are within the test project, so just try it out on your own.
 ### Add some system calls (Example #0 - System Calls)
 
 Inside of the BotFather you are able to add "Commands" to your TelegramBot. The user will see them, depending on the application as options he could choose.
-I'm calling them Systemcalls. Before start (and later for sure) you could add them to your BotBase. Every time a message comes in they will get checked if they are one of them.
+Before start (and later for sure) you could add them to your BotBase. Every time a message comes in they will get checked if they are one of them.
 If so, a special event Handler will get raised where you are easier able to manage the action behind.
 
 Below we have 4 options.
@@ -242,13 +245,12 @@ Below we have 4 options.
 ```
 BotBase<Start> bb = new BotBase<Start>("{YOUR API KEY}");
 
-bb.SystemCalls.Add("/start");
-bb.SystemCalls.Add("/form1");
-bb.SystemCalls.Add("/form2");
+bb.BotCommands.Add(new BotCommand() { Command = "start", Description = "Starts the bot" });
+bb.BotCommands.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
+bb.BotCommands.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
+bb.BotCommands.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
 
-bb.SystemCalls.Add("/params");
-
-bb.SystemCall += async (s, en) =>
+bb.BotCommand += async (s, en) =>
 {
 	switch (en.Command)
 	{
@@ -278,6 +280,9 @@ bb.SystemCall += async (s, en) =>
 	}
 
 };
+
+//Update Bot commands to botfather
+bb.UploadBotCommands().Wait();
 
 bb.Start();
 
