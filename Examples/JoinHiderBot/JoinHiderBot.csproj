@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TelegramBotBase" Version="3.0.0" />
+    <PackageReference Include="TelegramBotBase" Version="3.1.1" />
   </ItemGroup>
 
 </Project>
