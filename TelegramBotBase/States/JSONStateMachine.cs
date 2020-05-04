@@ -36,7 +36,7 @@ namespace TelegramBotBase.States
 
             this.FallbackStateForm = fallbackStateForm;
 
-            if (!this.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
+            if (this.FallbackStateForm != null && !this.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
             {
                 throw new ArgumentException("FallbackStateForm is not a subclass of FormBase");
             }
