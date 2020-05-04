@@ -88,7 +88,7 @@ namespace TelegramBotBase
             if (d != null)
             {
                 this.SessionList.Remove(deviceId);
-                
+
             }
         }
 
@@ -222,7 +222,14 @@ namespace TelegramBotBase
                     //Skip classes where IgnoreState attribute is existing
                     if (form.GetType().GetCustomAttributes(typeof(IgnoreState), true).Length != 0)
                     {
-                        continue;
+                        if (statemachine.DefaultStateForm == null)
+                        {
+                            continue;
+                        }
+
+                        //Replace form by default State one.
+                        se.FormUri = statemachine.DefaultStateForm.FullName;
+                        se.QualifiedName = statemachine.DefaultStateForm.AssemblyQualifiedName;
                     }
 
                     //Is Subclass of IStateForm

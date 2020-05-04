@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Text;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
+using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.States
@@ -18,11 +19,26 @@ namespace TelegramBotBase.States
 
         public bool Overwrite { get; set; }
 
-        public SimpleJSONStateMachine(String file, bool overwrite = true)
+        public Type DefaultStateForm { get; private set; }
+
+        /// <summary>
+        /// Will initialize the state machine.
+        /// </summary>
+        /// <param name="file">Path of the file and name where to save the session details.</param>
+        /// <param name="defaultStateForm">Type of Form which will be saved instead of Form which has <seealso cref="Attributes.IgnoreState"/> attribute declared. Needs to be subclass of <seealso cref="Form.FormBase"/>.</param>
+        /// <param name="overwrite">Declares of the file could be overwritten.</param>
+        public SimpleJSONStateMachine(String file, Type defaultStateForm = null, bool overwrite = true)
         {
             if (file is null)
             {
                 throw new ArgumentNullException(nameof(file));
+            }
+
+            this.DefaultStateForm = defaultStateForm ?? typeof(FormBase);
+
+            if (!this.DefaultStateForm.IsSubclassOf(typeof(FormBase)))
+            {
+                throw new ArgumentException("DefaultStateForm is not a subclass of FormBase");
             }
 
             this.FilePath = file;
