@@ -222,14 +222,15 @@ namespace TelegramBotBase
                     //Skip classes where IgnoreState attribute is existing
                     if (form.GetType().GetCustomAttributes(typeof(IgnoreState), true).Length != 0)
                     {
-                        if (statemachine.DefaultStateForm == null)
+                        //Skip this form, when there is no fallback state form
+                        if (statemachine.FallbackStateForm == null)
                         {
                             continue;
                         }
 
                         //Replace form by default State one.
-                        se.FormUri = statemachine.DefaultStateForm.FullName;
-                        se.QualifiedName = statemachine.DefaultStateForm.AssemblyQualifiedName;
+                        se.FormUri = statemachine.FallbackStateForm.FullName;
+                        se.QualifiedName = statemachine.FallbackStateForm.AssemblyQualifiedName;
                     }
 
                     //Is Subclass of IStateForm

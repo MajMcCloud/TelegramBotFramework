@@ -9,7 +9,7 @@ namespace TelegramBotBase.Interfaces
 {
     public interface IStateMachine
     {
-        Type DefaultStateForm { get; }
+        Type FallbackStateForm { get; }
 
         void SaveFormStates(SaveStatesEventArgs e);
 

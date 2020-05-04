@@ -19,26 +19,26 @@ namespace TelegramBotBase.States
 
         public bool Overwrite { get; set; }
 
-        public Type DefaultStateForm { get; private set; }
+        public Type FallbackStateForm { get; private set; }
 
         /// <summary>
         /// Will initialize the state machine.
         /// </summary>
         /// <param name="file">Path of the file and name where to save the session details.</param>
-        /// <param name="defaultStateForm">Type of Form which will be saved instead of Form which has <seealso cref="Attributes.IgnoreState"/> attribute declared. Needs to be subclass of <seealso cref="Form.FormBase"/>.</param>
+        /// <param name="fallbackStateForm">Type of Form which will be saved instead of Form which has <seealso cref="Attributes.IgnoreState"/> attribute declared. Needs to be subclass of <seealso cref="Form.FormBase"/>.</param>
         /// <param name="overwrite">Declares of the file could be overwritten.</param>
-        public JSONStateMachine(String file, Type defaultStateForm = null, bool overwrite = true)
+        public JSONStateMachine(String file, Type fallbackStateForm = null, bool overwrite = true)
         {
             if (file is null)
             {
                 throw new ArgumentNullException(nameof(file));
             }
 
-            this.DefaultStateForm = defaultStateForm ?? typeof(FormBase);
+            this.FallbackStateForm = fallbackStateForm;
 
-            if (!this.DefaultStateForm.IsSubclassOf(typeof(FormBase)))
+            if (!this.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
             {
-                throw new ArgumentException("DefaultStateForm is not a subclass of FormBase");
+                throw new ArgumentException("FallbackStateForm is not a subclass of FormBase");
             }
 
             this.FilePath = file;
