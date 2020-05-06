@@ -12,6 +12,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
+using static TelegramBotBase.Base.Async;
 
 namespace TelegramBotBase.Controls
 {
@@ -115,7 +116,7 @@ namespace TelegramBotBase.Controls
         }
 
 
-        public event EventHandler<ButtonClickedEventArgs> ButtonClicked
+        public event AsyncEventHandler<ButtonClickedEventArgs> ButtonClicked
         {
             add
             {
@@ -127,9 +128,13 @@ namespace TelegramBotBase.Controls
             }
         }
 
-        public void OnButtonClicked(ButtonClickedEventArgs e)
+        public async Task OnButtonClicked(ButtonClickedEventArgs e)
         {
-            (this.Events[__evButtonClicked] as EventHandler<ButtonClickedEventArgs>)?.Invoke(this, e);
+            var handler = this.Events[__evButtonClicked].GetInvocationList().Cast<AsyncEventHandler<ButtonClickedEventArgs>>();
+            foreach (var h in handler)
+            {
+                await Async.InvokeAllAsync<ButtonClickedEventArgs>(h, this, e);
+            }
         }
 
         public async override Task Load(MessageResult result)
@@ -166,7 +171,7 @@ namespace TelegramBotBase.Controls
             }
 
 
-            OnButtonClicked(new ButtonClickedEventArgs(button));
+            await OnButtonClicked(new ButtonClickedEventArgs(button));
 
             //Remove button click message
             if (this.DeletePreviousMessage)
@@ -219,7 +224,7 @@ namespace TelegramBotBase.Controls
                         return;
                     }
 
-                    OnButtonClicked(new ButtonClickedEventArgs(button));
+                    await OnButtonClicked(new ButtonClickedEventArgs(button));
 
                     result.Handled = true;
 
