@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
 {
+    [IgnoreState]
     public class PromptDialog : ModalDialog
     {
         public String Message { get; set; }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
+using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
@@ -12,10 +13,10 @@ namespace TelegramBotBase.Form
     /// <summary>
     /// A prompt with a lot of buttons
     /// </summary>
+    [IgnoreState]
     public class ArrayPromptDialog : FormBase
     {
         public String Message { get; set; }
-
 
         public ButtonBase[][] Buttons { get; set; }
 

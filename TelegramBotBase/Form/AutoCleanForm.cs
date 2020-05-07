@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBotBase.Args;
+using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 
@@ -15,10 +16,13 @@ namespace TelegramBotBase.Form
     /// </summary>
     public class AutoCleanForm : FormBase
     {
-        List<Message> OldMessages { get; set; }
+        [SaveState]
+        public List<Message> OldMessages { get; set; }
 
+        [SaveState]
         public eDeleteMode DeleteMode { get; set; }
 
+        [SaveState]
         public eDeleteSide DeleteSide { get; set; }
 
         

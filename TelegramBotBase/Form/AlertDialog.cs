@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
@@ -11,6 +12,7 @@ namespace TelegramBotBase.Form
     /// <summary>
     /// A simple prompt dialog with one ok Button
     /// </summary>
+    [IgnoreState]
     public class AlertDialog : ConfirmDialog
     {
         public String ButtonText { get; set; }

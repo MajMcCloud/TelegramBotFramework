@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
+using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Form
 {
+    [IgnoreState]
     public class ConfirmDialog : ModalDialog
     {
         public String Message { get; set; }
-
 
         public List<ButtonBase> Buttons { get; set; }
 
