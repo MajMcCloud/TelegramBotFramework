@@ -135,6 +135,7 @@ namespace TelegramBotBase.Sessions
             this.ActiveForm.Device = this;
         }
 
+
         /// <summary>
         /// Edits the text message
         /// </summary>
@@ -722,6 +723,19 @@ namespace TelegramBotBase.Sessions
 
             }
         }
+
+        public virtual async Task UnbanUser(int userId)
+        {
+            try
+            {
+                await this.Client.TelegramClient.UnbanChatMemberAsync(this.DeviceId, userId);
+            }
+            catch
+            {
+
+            }
+        }
+
 
 
         /// <summary>
