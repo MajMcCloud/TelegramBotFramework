@@ -411,6 +411,19 @@ namespace TelegramBotBase.Form
         }
 
         /// <summary>
+        /// Removes all controls.
+        /// </summary>
+        public void RemoveAllControls()
+        {
+            foreach(var c in this.Controls)
+            {
+                c.Cleanup().Wait();
+
+                this.Controls.Remove(c);
+            }
+        }
+
+        /// <summary>
         /// Cleanup
         /// </summary>
         public void Dispose()
