@@ -33,14 +33,14 @@ namespace TelegramBotBase.Base
         {
 
 
-
+            
         }
 
         public virtual async Task Action(MessageResult result, String value = null)
         {
 
 
-
+            
         }
 
 
@@ -50,18 +50,18 @@ namespace TelegramBotBase.Base
 
 
 
-
+            
         }
 
         public virtual async Task Hidden(bool FormClose)
         {
 
-
+            
         }
 
         public virtual async Task Cleanup()
         {
-
+            
         }
 
     }

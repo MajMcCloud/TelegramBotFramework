@@ -12,7 +12,7 @@ namespace TelegramBotBase.Form
     /// </summary>
     public class ButtonBase
     {
-        public String Text { get; set; }
+        public virtual String Text { get; set; }
 
         public String Value { get; set; }
 
