@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net461;netcoreapp3.1</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/MajMcCloud/TelegramBotFramework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MajMcCloud/TelegramBotFramework</RepositoryUrl>
-    <PackageReleaseNotes>- moving from .Net Framework 4.7.2 to  .Net Standard 2.1 for the Library and .Net Core 3.0 for the test project!</PackageReleaseNotes>
+    <PackageReleaseNotes>- moving from .Net Framework 4.7.2 to  .Net Standard 2.1 for the Library and .Net Core 3.1 for the test project!</PackageReleaseNotes>
     <Configurations>Debug;Release;</Configurations>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
@@ -56,6 +56,7 @@
 
   <ItemGroup>
     <None Remove="cpack.ps1" />
+    <None Remove="cpack_bak.ps1" />
     <None Remove="cpush.ps1" />
     <None Remove="nuget.exe" />
     <None Remove="TelegramBotBase.1.5.0.nupkg" />
@@ -64,6 +65,11 @@
     <None Remove="TelegramBotBase.1.5.1.zip" />
     <None Remove="TelegramBotBase.1.5.2.nupkg" />
     <None Remove="TelegramBotBase.1.5.2.zip" />
+    <None Remove="TelegramBotBase.2.0.0.nupkg" />
+    <None Remove="TelegramBotBase.2.1.0.nupkg" />
+    <None Remove="TelegramBotBase.2.1.0.zip" />
+    <None Remove="TelegramBotBase.3.0.0.nupkg" />
+    <None Remove="TelegramBotBase.3.0.0.zip" />
     <None Remove="TelegramBotBase.nuspec" />
   </ItemGroup>
 
