@@ -20,6 +20,8 @@ namespace TelegramBotBase.Controls
 
         public String UncheckedString { get; set; } = Localizations.Default.Language["ToggleButton_Off"];
 
+        public String ChangedString { get; set; } = Localizations.Default.Language["ToggleButton_Changed"];
+
         public String Title { get; set; } = Localizations.Default.Language["ToggleButton_Title"];
 
         public int? MessageId { get; set; }
@@ -68,7 +70,7 @@ namespace TelegramBotBase.Controls
             if (result.Handled)
                 return;
 
-            await result.ConfirmAction();
+            await result.ConfirmAction(this.ChangedString);
 
             switch (value ?? "unknown")
             {

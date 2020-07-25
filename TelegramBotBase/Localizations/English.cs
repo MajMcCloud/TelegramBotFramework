@@ -18,6 +18,7 @@ namespace TelegramBotBase.Localizations
             Values["ToggleButton_On"] = "On";
             Values["ToggleButton_Off"] = "Off";
             Values["ToggleButton_Title"] = "Toggle";
+            Values["ToggleButton_Changed"] = "Setting changed";
         }
 
 

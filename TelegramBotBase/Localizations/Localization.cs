@@ -35,6 +35,7 @@ namespace TelegramBotBase.Localizations
             Values["ToggleButton_OffIcon"] = "⚪";
             Values["ToggleButton_Title"] = "Schalter";
             Values["PromptDialog_Back"] = "Zurück";
+            Values["ToggleButton_Changed"] = "Einstellung geändert";
             
         }
 
