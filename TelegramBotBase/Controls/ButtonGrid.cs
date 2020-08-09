@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.SymbolStore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +56,14 @@ namespace TelegramBotBase.Controls
         /// Enables automatic paging of buttons when the amount of rows is exceeding the limits.
         /// </summary>
         public bool EnablePaging { get; set; } = false;
+
+
+        /// <summary>
+        /// Enabled a search function.
+        /// </summary>
+        public bool EnableSearch { get; set; } = false;
+
+        public String SearchQuery { get; set; }
 
         /// <summary>
         /// Index of the current page
@@ -149,23 +158,42 @@ namespace TelegramBotBase.Controls
 
             if (button == null)
             {
-                if (result.MessageText != null)
+                if (result.MessageText == null)
+                    return;
+
+                if (result.MessageText == PreviousPageLabel)
                 {
-                    if (result.MessageText == PreviousPageLabel)
-                    {
-                        if (this.CurrentPageIndex > 0)
-                            this.CurrentPageIndex--;
+                    if (this.CurrentPageIndex > 0)
+                        this.CurrentPageIndex--;
 
-                        this.Updated();
-                    }
-                    else if (result.MessageText == NextPageLabel)
-                    {
-                        if (this.CurrentPageIndex < this.PageCount - 1)
-                            this.CurrentPageIndex++;
-
-                        this.Updated();
-                    }
+                    this.Updated();
                 }
+                else if (result.MessageText == NextPageLabel)
+                {
+                    if (this.CurrentPageIndex < this.PageCount - 1)
+                        this.CurrentPageIndex++;
+
+                    this.Updated();
+                }
+                else if (this.EnableSearch)
+                {
+                    if (result.MessageText.StartsWith("🔍"))
+                    {
+                        this.SearchQuery = null;
+                        this.Updated();
+                        return;
+                    }
+
+                    this.SearchQuery = result.MessageText;
+
+                    if (this.SearchQuery != null && this.SearchQuery != "")
+                    {
+                        this.Updated();
+                    }
+
+                }
+
+
 
                 return;
             }
@@ -282,8 +310,16 @@ namespace TelegramBotBase.Controls
 
             Message m = null;
 
-            ButtonForm form = this.ButtonsForm.Duplicate();
+            ButtonForm form = this.ButtonsForm;
 
+            if (this.EnableSearch && this.SearchQuery != null && this.SearchQuery != "")
+            {
+                form = form.FilterDuplicate(this.SearchQuery);
+            }
+            else
+            {
+                form = form.Duplicate();
+            }
 
             if (this.EnablePaging)
             {
@@ -367,11 +403,22 @@ namespace TelegramBotBase.Controls
             {
                 bf.AddButtonRow(new ButtonBase(NoItemsLabel, "$"));
             }
-            
-            
-            bf.InsertButtonRow(0, new ButtonBase(PreviousPageLabel, "$previous$"), new ButtonBase(String.Format(Localizations.Default.Language["ButtonGrid_CurrentPage"], this.CurrentPageIndex + 1, this.PageCount), "$site$"), new ButtonBase(NextPageLabel, "$next$"));
 
-            bf.AddButtonRow(new ButtonBase(PreviousPageLabel, "$previous$"), new ButtonBase(String.Format(Localizations.Default.Language["ButtonGrid_CurrentPage"], this.CurrentPageIndex + 1, this.PageCount), "$site$"), new ButtonBase(NextPageLabel, "$next$"));
+            //🔍
+            List<ButtonBase> lst = new List<ButtonBase>();
+            lst.Add(new ButtonBase(PreviousPageLabel, "$previous$"));
+            lst.Add(new ButtonBase(String.Format(Localizations.Default.Language["ButtonGrid_CurrentPage"], this.CurrentPageIndex + 1, this.PageCount), "$site$"));
+            lst.Add(new ButtonBase(NextPageLabel, "$next$"));
+
+
+            if (this.EnableSearch)
+            {
+                lst.Insert(2, new ButtonBase("🔍 " + (this.SearchQuery ?? ""), "$search$"));
+            }
+
+            bf.InsertButtonRow(0, lst);
+
+            bf.AddButtonRow(lst);
 
             return bf;
         }
