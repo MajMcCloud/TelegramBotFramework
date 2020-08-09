@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,12 +10,12 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Controls
 {
-    public class ButtonGridForm : AutoCleanForm
+    public class ButtonGridPagingForm : AutoCleanForm
     {
 
         ButtonGrid m_Buttons = null;
 
-        public ButtonGridForm()
+        public ButtonGridPagingForm()
         {
             this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
 
@@ -25,15 +26,21 @@ namespace TelegramBotBaseTest.Tests.Controls
         {
             m_Buttons = new ButtonGrid();
 
-            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
+            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
+
+            m_Buttons.EnablePaging = true;
+            m_Buttons.EnableSearch = true;
+
+            m_Buttons.HeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase("Back", "back") };
+
+            var countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
 
             ButtonForm bf = new ButtonForm();
 
-            bf.AddButtonRow(new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch"));
-
-            bf.AddButtonRow(new ButtonBase("Button1", "b1"), new ButtonBase("Button2", "b2"));
-
-            bf.AddButtonRow(new ButtonBase("Button3", "b3"), new ButtonBase("Button4", "b4"));
+            foreach (var c in countries)
+            {
+                bf.AddButtonRow(new ButtonBase(c.EnglishName, c.EnglishName));
+            }
 
             m_Buttons.ButtonsForm = bf;
 
@@ -53,20 +60,6 @@ namespace TelegramBotBaseTest.Tests.Controls
             {
                 var start = new Menu();
                 await this.NavigateTo(start);
-            }
-            else if (e.Button.Value == "switch")
-            {
-                switch (m_Buttons.KeyboardType)
-                {
-                    case TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard:
-                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-                        break;
-                    case TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard:
-                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-                        break;
-                }
-
-
             }
             else
             {

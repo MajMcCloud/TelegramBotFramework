@@ -188,6 +188,7 @@ namespace TelegramBotBase.Controls
 
                     if (this.SearchQuery != null && this.SearchQuery != "")
                     {
+                        this.CurrentPageIndex = 0;
                         this.Updated();
                     }
 
@@ -480,7 +481,14 @@ namespace TelegramBotBase.Controls
                 if (this.ButtonsForm.Count == 0)
                     return 1;
 
-                return (int)Math.Ceiling((decimal)(this.ButtonsForm.Rows / (decimal)(MaximumRow - 3)));
+                var bf = this.ButtonsForm;
+
+                if (this.EnableSearch && this.SearchQuery != null && this.SearchQuery != "")
+                {
+                    bf = bf.FilterDuplicate(this.SearchQuery);
+                }
+
+                return (int)Math.Ceiling((decimal)(bf.Rows / (decimal)(MaximumRow - 3)));
             }
         }
 

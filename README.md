@@ -804,6 +804,8 @@ await this.NavigateTo(cd);
 ### Button Grid
 <img src="images/buttongrid.gif?raw=true" />
 
+#### Paging & Searching
+<img src="images/buttongrid_pagingfilter.gif?raw=true" />
 
 ## Groups
 

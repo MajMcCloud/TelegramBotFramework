@@ -147,6 +147,16 @@ namespace TelegramBotBaseTest.Tests
                     await this.NavigateTo(bg);
 
                     break;
+
+                case "buttongridfilter":
+
+                    message.Handled = true;
+
+                    var bg2 = new Controls.ButtonGridPagingForm();
+
+                    await this.NavigateTo(bg2);
+
+                    break;
             }
 
 
@@ -174,6 +184,8 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#11 ToggleButtons", new CallbackData("a", "togglebuttons").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#12 ButtonGrid", new CallbackData("a", "buttongrid").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#13 ButtonGrid Paging & Filter", new CallbackData("a", "buttongridfilter").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }
