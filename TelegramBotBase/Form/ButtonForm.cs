@@ -188,14 +188,44 @@ namespace TelegramBotBase.Form
                 DependencyControl = this.DependencyControl
             };
 
-            foreach(var b in Buttons)
+            foreach (var b in Buttons)
             {
                 var lst = new List<ButtonBase>();
-                foreach(var b2 in b)
+                foreach (var b2 in b)
                 {
                     lst.Add(b2);
                 }
                 bf.Buttons.Add(lst);
+            }
+
+            return bf;
+        }
+
+        /// <summary>
+        /// Creates a copy of this form and filters by the parameter.
+        /// </summary>
+        /// <returns></returns>
+        public ButtonForm FilterDuplicate(String filter)
+        {
+            var bf = new ButtonForm()
+            {
+                Markup = this.Markup,
+                DependencyControl = this.DependencyControl
+            };
+
+            foreach (var b in Buttons)
+            {
+                var lst = new List<ButtonBase>();
+                foreach (var b2 in b)
+                {
+                    if (b2.Text.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) == -1)
+                        continue;
+
+                    lst.Add(b2);
+                }
+
+                if (lst.Count > 0)
+                    bf.Buttons.Add(lst);
             }
 
             return bf;
