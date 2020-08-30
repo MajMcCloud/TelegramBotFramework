@@ -76,6 +76,8 @@ namespace TelegramBotBase.Controls
 
         public String NoItemsLabel = Localizations.Default.Language["ButtonGrid_NoItems"];
 
+        public String SearchLabel = Localizations.Default.Language["ButtonGrid_SearchFeature"];
+
         /// <summary>
         /// Layout of the buttons which should be displayed always on top.
         /// </summary>
@@ -179,6 +181,12 @@ namespace TelegramBotBase.Controls
                 {
                     if (result.MessageText.StartsWith("🔍"))
                     {
+                        //Sent note about searching
+                        if (this.SearchQuery == null)
+                        {
+                            await this.Device.Send(this.SearchLabel);
+                        }
+
                         this.SearchQuery = null;
                         this.Updated();
                         return;
