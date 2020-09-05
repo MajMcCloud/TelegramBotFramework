@@ -145,6 +145,16 @@ namespace TelegramBotBase
 
                         try
                         {
+                            if (f.PropertyType.IsEnum)
+                            {
+                                var ent = Enum.Parse(f.PropertyType, p.Value.ToString());
+
+                                f.SetValue(form, ent);
+
+                                continue;
+                            }
+
+
                             f.SetValue(form, p.Value);
                         }
                         catch (ArgumentException ex)
