@@ -17,7 +17,7 @@ namespace TelegramBotBase.Form
     public class AutoCleanForm : FormBase
     {
         [SaveState]
-        public List<Message> OldMessages { get; set; }
+        public List<int> OldMessages { get; set; }
 
         [SaveState]
         public eDeleteMode DeleteMode { get; set; }
@@ -29,7 +29,7 @@ namespace TelegramBotBase.Form
 
         public AutoCleanForm()
         {
-            this.OldMessages = new List<Message>();
+            this.OldMessages = new List<int>();
             this.DeleteMode = eDeleteMode.OnEveryCall;
             this.DeleteSide = eDeleteSide.BotOnly;
 
@@ -56,7 +56,7 @@ namespace TelegramBotBase.Form
             if (this.DeleteSide == eDeleteSide.BotOnly)
                 return;
 
-            this.OldMessages.Add(e.Message);
+            this.OldMessages.Add(e.Message.MessageId);
         }
 
         private void Device_MessageSent(object sender, MessageSentEventArgs e)
@@ -64,7 +64,7 @@ namespace TelegramBotBase.Form
             if (this.DeleteSide == eDeleteSide.UserOnly)
                 return;
 
-            this.OldMessages.Add(e.Message);
+            this.OldMessages.Add(e.Message.MessageId);
         }
 
         public override async Task PreLoad(MessageResult message)
@@ -81,7 +81,17 @@ namespace TelegramBotBase.Form
         /// <param name="Id"></param>
         public void AddMessage(Message m)
         {
-            this.OldMessages.Add(m);
+            this.OldMessages.Add(m.MessageId);
+        }
+
+
+        /// <summary>
+        /// Adds a message to this of removable ones
+        /// </summary>
+        /// <param name="Id"></param>
+        public void AddMessage(int messageId)
+        {
+            this.OldMessages.Add(messageId);
         }
 
         /// <summary>
@@ -90,11 +100,7 @@ namespace TelegramBotBase.Form
         /// <param name="Id"></param>
         public void LeaveMessage(int Id)
         {
-            var m = this.OldMessages.FirstOrDefault(a => a.MessageId == Id);
-            if (m == null)
-                return;
-
-            this.OldMessages.Remove(m);
+            this.OldMessages.Remove(Id);
         }
 
         /// <summary>
@@ -124,7 +130,7 @@ namespace TelegramBotBase.Form
         {
             while (this.OldMessages.Count > 0)
             {
-                if (!await this.Device.DeleteMessage(this.OldMessages[0].MessageId))
+                if (!await this.Device.DeleteMessage(this.OldMessages[0]))
                 {
                     //Message can't be deleted cause it seems not to exist anymore
                     if (this.OldMessages.Count > 0)
