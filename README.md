@@ -70,6 +70,8 @@ Thanks !
 	* [ToggleButton](#toggle-button)
 
 	* [ButtonGrid](#button-grid)
+	
+		* [Paging and Searching](#paging--searching)
 
 - [Groups](#groups)
 	* [SplitterForm](#splitter-form)
