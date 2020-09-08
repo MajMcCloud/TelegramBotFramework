@@ -496,6 +496,9 @@ namespace TelegramBotBase.Controls
                     bf = bf.FilterDuplicate(this.SearchQuery);
                 }
 
+                if (bf.Rows == 0)
+                    return 1;
+
                 return (int)Math.Ceiling((decimal)(bf.Rows / (decimal)(MaximumRow - 3)));
             }
         }
