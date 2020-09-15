@@ -130,7 +130,19 @@ namespace TelegramBotBase
                     continue;
                 }
 
-                var form = t.GetConstructor(new Type[] { }).Invoke(new object[] { }) as FormBase;
+                var form = t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
+
+                //No default constructor
+                if (form == null)
+                {
+                    form = Activator.CreateInstance(t) as FormBase;
+
+                    if (form == null)
+                    {
+                        continue;
+                    }
+                }
+
 
                 if (s.Values != null && s.Values.Count > 0)
                 {
