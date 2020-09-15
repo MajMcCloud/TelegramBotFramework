@@ -61,6 +61,11 @@ namespace TelegramBotBase.Form
             this.DependencyControl = control;
         }
 
+        public void AddButtonRow(String Text, String Value, String Url = null)
+        {
+            Buttons.Add(new List<ButtonBase>() { new ButtonBase(Text, Value, Url) });
+        }
+
         public void AddButtonRow(IEnumerable<ButtonBase> row)
         {
             Buttons.Add(row.ToList());
@@ -129,7 +134,7 @@ namespace TelegramBotBase.Form
 
         public List<ButtonBase> ToList()
         {
-            return this.Buttons.Aggregate((a, b) => a.Union(b).ToList());
+            return this.Buttons.DefaultIfEmpty(new List<ButtonBase>()).Aggregate((a, b) => a.Union(b).ToList());
         }
 
         public InlineKeyboardButton[][] ToInlineButtonArray()
