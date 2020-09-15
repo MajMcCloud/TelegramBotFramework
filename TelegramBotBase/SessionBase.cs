@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
@@ -132,15 +134,18 @@ namespace TelegramBotBase
 
                 var form = t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
 
-                //No default constructor
+                //No default constructor, fallback
                 if (form == null)
                 {
-                    form = Activator.CreateInstance(t) as FormBase;
-
-                    if (form == null)
-                    {
+                    if (!statemachine.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
                         continue;
-                    }
+
+                    form = statemachine.FallbackStateForm.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
+
+                    //Fallback failed, due missing default constructor
+                    if (form == null)
+                        continue;
+
                 }
 
 
