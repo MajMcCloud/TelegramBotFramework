@@ -65,6 +65,9 @@ namespace TelegramBotBase.Controls
 
         public String SearchQuery { get; set; }
 
+        public eNavigationBarVisibility NavigationBarVisibility { get; set; } = eNavigationBarVisibility.always;
+
+
         /// <summary>
         /// Index of the current page
         /// </summary>
@@ -413,21 +416,23 @@ namespace TelegramBotBase.Controls
                 bf.AddButtonRow(new ButtonBase(NoItemsLabel, "$"));
             }
 
-            //🔍
-            List<ButtonBase> lst = new List<ButtonBase>();
-            lst.Add(new ButtonBase(PreviousPageLabel, "$previous$"));
-            lst.Add(new ButtonBase(String.Format(Localizations.Default.Language["ButtonGrid_CurrentPage"], this.CurrentPageIndex + 1, this.PageCount), "$site$"));
-            lst.Add(new ButtonBase(NextPageLabel, "$next$"));
-
-
-            if (this.EnableSearch)
+            if (this.NavigationBarVisibility == eNavigationBarVisibility.always | (this.NavigationBarVisibility == eNavigationBarVisibility.auto && PagingNecessary))
             {
-                lst.Insert(2, new ButtonBase("🔍 " + (this.SearchQuery ?? ""), "$search$"));
+                //🔍
+                List<ButtonBase> lst = new List<ButtonBase>();
+                lst.Add(new ButtonBase(PreviousPageLabel, "$previous$"));
+                lst.Add(new ButtonBase(String.Format(Localizations.Default.Language["ButtonGrid_CurrentPage"], this.CurrentPageIndex + 1, this.PageCount), "$site$"));
+                lst.Add(new ButtonBase(NextPageLabel, "$next$"));
+
+                if (this.EnableSearch)
+                {
+                    lst.Insert(2, new ButtonBase("🔍 " + (this.SearchQuery ?? ""), "$search$"));
+                }
+
+                bf.InsertButtonRow(0, lst);
+
+                bf.AddButtonRow(lst);
             }
-
-            bf.InsertButtonRow(0, lst);
-
-            bf.AddButtonRow(lst);
 
             return bf;
         }
@@ -436,7 +441,12 @@ namespace TelegramBotBase.Controls
         {
             get
             {
-                if ((this.KeyboardType == eKeyboardType.InlineKeyBoard && ButtonsForm.Rows > Constants.Telegram.MaxInlineKeyBoardRows) | (this.KeyboardType == eKeyboardType.ReplyKeyboard && ButtonsForm.Rows > Constants.Telegram.MaxReplyKeyboardRows))
+                if (this.KeyboardType == eKeyboardType.InlineKeyBoard && TotalRows > Constants.Telegram.MaxInlineKeyBoardRows)
+                {
+                    return true;
+                }
+
+                if (this.KeyboardType == eKeyboardType.ReplyKeyboard && TotalRows > Constants.Telegram.MaxReplyKeyboardRows)
                 {
                     return true;
                 }
@@ -467,13 +477,28 @@ namespace TelegramBotBase.Controls
         }
 
         /// <summary>
+        /// Returns the number of all rows (layout + navigation + content);
+        /// </summary>
+        public int TotalRows
+        {
+            get
+            {
+                return this.LayoutRows + ButtonsForm.Rows;
+            }
+        }
+
+
+        /// <summary>
         /// Contains the Number of Rows which are used by the layout.
         /// </summary>
         private int LayoutRows
         {
             get
             {
-                int layoutRows = 2;
+                int layoutRows = 0;
+
+                if (this.NavigationBarVisibility == eNavigationBarVisibility.always | this.NavigationBarVisibility == eNavigationBarVisibility.auto)
+                    layoutRows += 2;
 
                 if (this.HeadLayoutButtonRow != null && this.HeadLayoutButtonRow.Count > 0)
                     layoutRows++;
