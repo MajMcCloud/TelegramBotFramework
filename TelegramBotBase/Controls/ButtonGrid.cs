@@ -87,6 +87,11 @@ namespace TelegramBotBase.Controls
         public List<ButtonBase> HeadLayoutButtonRow { get; set; }
 
         /// <summary>
+        /// Layout of columns which should be displayed below the header
+        /// </summary>
+        public List<ButtonBase> SubHeadLayoutButtonRow { get; set; }
+
+        /// <summary>
         /// Defines which type of Button Keyboard should be rendered.
         /// </summary>
         public eKeyboardType KeyboardType
@@ -159,7 +164,9 @@ namespace TelegramBotBase.Controls
             if (!result.IsFirstHandler)
                 return;
 
-            var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText) ?? ButtonsForm.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText);
+            var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
+                        ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
+                        ?? ButtonsForm.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText);
 
             if (button == null)
             {
@@ -236,7 +243,9 @@ namespace TelegramBotBase.Controls
             {
                 case eKeyboardType.InlineKeyBoard:
 
-                    var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData) ?? ButtonsForm.ToList().FirstOrDefault(a => a.Value == result.RawData);
+                    var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
+                                ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
+                                ?? ButtonsForm.ToList().FirstOrDefault(a => a.Value == result.RawData);
 
                     if (button == null)
                     {
@@ -326,7 +335,7 @@ namespace TelegramBotBase.Controls
 
             if (this.EnableSearch && this.SearchQuery != null && this.SearchQuery != "")
             {
-                form = form.FilterDuplicate(this.SearchQuery);
+                form = form.FilterDuplicate(this.SearchQuery, true);
             }
             else
             {
@@ -341,6 +350,18 @@ namespace TelegramBotBase.Controls
             if (this.HeadLayoutButtonRow != null && HeadLayoutButtonRow.Count > 0)
             {
                 form.InsertButtonRow(0, this.HeadLayoutButtonRow);
+            }
+
+            if (this.SubHeadLayoutButtonRow != null && SubHeadLayoutButtonRow.Count > 0)
+            {
+                if (this.IsNavigationBarVisible)
+                {
+                    form.InsertButtonRow(2, this.SubHeadLayoutButtonRow);
+                }
+                else
+                {
+                    form.InsertButtonRow(1, this.SubHeadLayoutButtonRow);
+                }
             }
 
             switch (this.KeyboardType)
@@ -416,7 +437,7 @@ namespace TelegramBotBase.Controls
                 bf.AddButtonRow(new ButtonBase(NoItemsLabel, "$"));
             }
 
-            if (this.NavigationBarVisibility == eNavigationBarVisibility.always | (this.NavigationBarVisibility == eNavigationBarVisibility.auto && PagingNecessary))
+            if (this.IsNavigationBarVisible)
             {
                 //🔍
                 List<ButtonBase> lst = new List<ButtonBase>();
@@ -447,6 +468,19 @@ namespace TelegramBotBase.Controls
                 }
 
                 if (this.KeyboardType == eKeyboardType.ReplyKeyboard && TotalRows > Constants.Telegram.MaxReplyKeyboardRows)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public bool IsNavigationBarVisible
+        {
+            get
+            {
+                if (this.NavigationBarVisibility == eNavigationBarVisibility.always | (this.NavigationBarVisibility == eNavigationBarVisibility.auto && PagingNecessary))
                 {
                     return true;
                 }
@@ -501,6 +535,9 @@ namespace TelegramBotBase.Controls
                     layoutRows += 2;
 
                 if (this.HeadLayoutButtonRow != null && this.HeadLayoutButtonRow.Count > 0)
+                    layoutRows++;
+
+                if (this.SubHeadLayoutButtonRow != null && this.SubHeadLayoutButtonRow.Count > 0)
                     layoutRows++;
 
                 return layoutRows;
