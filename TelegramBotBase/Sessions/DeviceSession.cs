@@ -41,9 +41,9 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public String GetChatTitle()
         {
-            return LastMessage?.Chat.Title 
-                ?? LastMessage?.Chat.Username 
-                ?? LastMessage?.Chat.FirstName 
+            return LastMessage?.Chat.Title
+                ?? LastMessage?.Chat.Username
+                ?? LastMessage?.Chat.FirstName
                 ?? ChatTitle;
         }
 
@@ -381,7 +381,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendPhoto(InputOnlineFile file, String name = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -392,7 +392,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, caption: name, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
@@ -423,7 +423,7 @@ namespace TelegramBotBase.Sessions
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                return await SendPhoto(fts, buttons, replyTo, disableNotification);
+                return await SendPhoto(fts, name: name, buttons, replyTo, disableNotification);
             }
         }
 
@@ -442,7 +442,7 @@ namespace TelegramBotBase.Sessions
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                return await SendPhoto(fts, buttons, replyTo, disableNotification);
+                return await SendPhoto(fts, name: name, buttons, replyTo, disableNotification);
             }
         }
 
@@ -454,7 +454,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(InputOnlineFile file, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendVideo(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -465,7 +465,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId, file, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
