@@ -210,7 +210,7 @@ namespace TelegramBotBase.Form
         /// Creates a copy of this form and filters by the parameter.
         /// </summary>
         /// <returns></returns>
-        public ButtonForm FilterDuplicate(String filter)
+        public ButtonForm FilterDuplicate(String filter, bool ByRow = false)
         {
             var bf = new ButtonForm()
             {
@@ -226,7 +226,16 @@ namespace TelegramBotBase.Form
                     if (b2.Text.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) == -1)
                         continue;
 
-                    lst.Add(b2);
+                    //Copy full row, when at least one match has found.
+                    if (ByRow)
+                    {
+                        lst.AddRange(b);
+                        break;
+                    }
+                    else
+                    {
+                        lst.Add(b2);
+                    }
                 }
 
                 if (lst.Count > 0)
