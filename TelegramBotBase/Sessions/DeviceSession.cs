@@ -381,7 +381,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(InputOnlineFile file, String name = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendPhoto(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -392,7 +392,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, caption: name, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
@@ -417,13 +417,13 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(Image image, String name, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendPhoto(Image image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                return await SendPhoto(fts, name: name, buttons, replyTo, disableNotification);
+                return await SendPhoto(fts, caption: caption, buttons, replyTo, disableNotification);
             }
         }
 
@@ -436,13 +436,13 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(Bitmap image, String name, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendPhoto(Bitmap image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
-                return await SendPhoto(fts, name: name, buttons, replyTo, disableNotification);
+                return await SendPhoto(fts, caption: caption, buttons, replyTo, disableNotification);
             }
         }
 
