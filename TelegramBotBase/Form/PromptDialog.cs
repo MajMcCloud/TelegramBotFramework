@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
@@ -24,6 +25,11 @@ namespace TelegramBotBase.Form
         public bool ShowBackButton { get; set; } = false;
 
         public String BackLabel { get; set; } = Localizations.Default.Language["PromptDialog_Back"];
+
+        /// <summary>
+        /// Contains the RAW received message.
+        /// </summary>
+        public Message ReceivedMessage { get; set; }
 
         public PromptDialog()
         {
@@ -50,6 +56,8 @@ namespace TelegramBotBase.Form
             if (this.Value == null)
             {
                 this.Value = message.MessageText;
+
+                ReceivedMessage = message.Message;
             }
 
 
