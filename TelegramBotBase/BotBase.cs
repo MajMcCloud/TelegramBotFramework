@@ -442,11 +442,8 @@ namespace TelegramBotBase
 
                         if (uhc.Handled)
                         {
-                            if (ds.FormSwitched)
-                            {
-                                continue;
-                            }
-                            else
+                            e.Handled = true;
+                            if (!ds.FormSwitched)
                             {
                                 break;
                             }
