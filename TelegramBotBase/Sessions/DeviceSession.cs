@@ -143,7 +143,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null)
+        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Default)
         {
             InlineKeyboardMarkup markup = buttons;
 
@@ -154,7 +154,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
+                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup);
             }
             catch
             {
@@ -172,7 +172,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup)
+        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup, ParseMode parseMode = ParseMode.Default)
         {
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
@@ -181,7 +181,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, replyMarkup: markup);
+                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup);
             }
             catch
             {
@@ -199,7 +199,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(Message message, ButtonForm buttons = null)
+        public async Task<Message> Edit(Message message, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Default)
         {
             InlineKeyboardMarkup markup = buttons;
 
@@ -210,7 +210,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, replyMarkup: markup);
+                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, parseMode, replyMarkup: markup);
             }
             catch
             {
@@ -250,7 +250,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(long deviceId, String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -271,7 +271,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
@@ -285,6 +285,19 @@ namespace TelegramBotBase.Sessions
             }
 
             return m;
+        }
+
+        /// <summary>
+        /// Sends a simple text message
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="buttons"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        {
+            return await Send(this.DeviceId, text, buttons, replyTo, disableNotification, parseMode, MarkdownV2AutoEscape);
         }
 
         /// <summary>
