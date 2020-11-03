@@ -22,7 +22,7 @@ namespace TelegramBotBase.Form
             await this.OnClosed(new EventArgs());
 
 
-            this.ParentForm?.ReturnFromModal(this);
+            await this.ParentForm?.ReturnFromModal(this);
         }
     }
 }
