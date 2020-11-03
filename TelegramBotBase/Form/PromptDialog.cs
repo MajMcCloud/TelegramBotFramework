@@ -46,6 +46,9 @@ namespace TelegramBotBase.Form
             if (message.Handled)
                 return;
 
+            if (!message.IsFirstHandler)
+                return;
+
             if (this.ShowBackButton && message.MessageText == BackLabel)
             {
                 await this.CloseForm();
@@ -80,6 +83,8 @@ namespace TelegramBotBase.Form
                 return;
             }
 
+
+            message.Handled = true;
 
             OnCompleted(new EventArgs());
 
