@@ -15,6 +15,11 @@ namespace TelegramBotBase.Form
     {
         public String Message { get; set; }
 
+        /// <summary>
+        /// Automatically close form on button click
+        /// </summary>
+        public bool AutoCloseOnClick { get; set; } = true;
+
         public List<ButtonBase> Buttons { get; set; }
 
         private EventHandlerList __Events { get; set; } = new EventHandlerList();
@@ -49,6 +54,12 @@ namespace TelegramBotBase.Form
 
         public override async Task Action(MessageResult message)
         {
+            if (message.Handled)
+                return;
+
+            if (!message.IsFirstHandler)
+                return;
+
             var call = message.GetData<CallbackData>();
             if (call == null)
                 return;
@@ -67,6 +78,9 @@ namespace TelegramBotBase.Form
             }
 
             OnButtonClicked(new ButtonClickedEventArgs(button));
+
+            if (AutoCloseOnClick)
+                await CloseForm();
         }
 
 
