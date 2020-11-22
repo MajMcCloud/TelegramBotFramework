@@ -16,11 +16,14 @@ namespace TelegramBotBase
     /// <summary>
     /// Base class for managing all active sessions
     /// </summary>
-    public class SessionBase
+    public class SessionBase<T>
+        where T : FormBase
     {
         public MessageClient Client { get; set; }
 
         public Dictionary<long, DeviceSession> SessionList { get; set; }
+
+        public BotBase<T> BotBase { get; set; }
 
 
         public SessionBase()
@@ -294,6 +297,18 @@ namespace TelegramBotBase
             sc.States = states;
 
             statemachine.SaveFormStates(new SaveStatesEventArgs(sc));
+        }
+
+        /// <summary>
+        /// Saves all open states into the machine.
+        /// </summary>
+        public void SaveSessionStates()
+        {
+            if (this.BotBase.StateMachine == null)
+                return;
+
+
+            this.SaveSessionStates(this.BotBase.StateMachine);
         }
     }
 }

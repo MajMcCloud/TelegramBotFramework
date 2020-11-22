@@ -33,7 +33,7 @@ namespace TelegramBotBase
         /// <summary>
         /// List of all running/active sessions
         /// </summary>
-        public SessionBase Sessions { get; set; }
+        public SessionBase<T> Sessions { get; set; }
 
         /// <summary>
         /// Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
@@ -79,7 +79,8 @@ namespace TelegramBotBase
 
             this.BotCommands = new List<BotCommand>();
 
-            this.Sessions = new SessionBase();
+            this.Sessions = new SessionBase<T>();
+            this.Sessions.BotBase = this;
         }
 
         /// <summary>
@@ -193,10 +194,7 @@ namespace TelegramBotBase
 
             this.Client.TelegramClient.StopReceiving();
 
-            if (this.StateMachine != null)
-            {
-                this.Sessions.SaveSessionStates(this.StateMachine);
-            }
+            this.Sessions.SaveSessionStates();
         }
 
         /// <summary>
