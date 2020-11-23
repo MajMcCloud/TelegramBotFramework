@@ -160,16 +160,18 @@ public class StartForm : FormBase
         }
 		
 	//Gets invoked if the form gets opened (with Form.NavigateTo(NewForm))
-        public override async Task Opened()
-        {
-
-        }
+    //Replace with event
+    //    public override async Task Opened()
+    //    {
+    //
+    //    }
 		
 	//Gets invoked if the form gets leaved
-        public override async Task Closed()
-        {
-
-        }
+    //Replace with event
+    //    public override async Task Closed()
+    //    {
+    //
+    //    }
 		
 	//Gets invoked on every Message/Action/Data in this context
         public override async Task Load(MessageResult message)
@@ -314,7 +316,7 @@ public class SimpleForm : AutoCleanForm
     }
 
 
-	public override async Task Load(MessageResult message)
+    public override async Task Load(MessageResult message)
 	{
 	    //message.MessageText will work also, cause it is a string you could manage a lot different scenerios here
 
