@@ -159,19 +159,10 @@ public class StartForm : FormBase
             
         }
 		
-	//Gets invoked if the form gets opened (with Form.NavigateTo(NewForm))
-    //Replace with event
-    //    public override async Task Opened()
-    //    {
-    //
-    //    }
-		
-	//Gets invoked if the form gets leaved
-    //Replace with event
-    //    public override async Task Closed()
-    //    {
-    //
-    //    }
+    	//Opened() got replaced with event handler
+
+    	//Closed() got replaced with event handler
+
 		
 	//Gets invoked on every Message/Action/Data in this context
         public override async Task Load(MessageResult message)
