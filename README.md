@@ -300,16 +300,18 @@ On every input the user is sending back to the bot the Action event gets raised.
 ```
 public class SimpleForm : AutoCleanForm
 {
-        public SimpleForm()
-        {
-            this.DeleteSide = eSide.Both;
-            this.DeleteMode = eDeleteMode.OnLeavingForm;
-        }
+    public SimpleForm()
+    {
+        this.DeleteSide = TelegramBotBase.Enums.eDeleteSide.Both;
+        this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+
+        this.Opened += SimpleForm_Opened;
+    }
 	
-	public override async Task Opened()
-	{
-	    await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
-	}
+    private async Task SimpleForm_Opened(object sender, EventArgs e)
+    {
+        await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
+    }
 
 
 	public override async Task Load(MessageResult message)
