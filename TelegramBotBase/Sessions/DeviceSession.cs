@@ -275,9 +275,13 @@ namespace TelegramBotBase.Sessions
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
-            catch (ApiRequestException)
+            catch (ApiRequestException ex)
             {
-                return null;
+                await Task.Delay(ex.Parameters.RetryAfter);
+
+                m = await (this.Client.TelegramClient.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+
+                OnMessageSent(new MessageSentEventArgs(m));
             }
             catch
             {

@@ -118,6 +118,20 @@ namespace TelegramBotBase
         /// <summary>
         /// Loads the previously saved states from the machine.
         /// </summary>
+        public async void LoadSessionStates()
+        {
+            if (BotBase.StateMachine == null)
+            {
+                return;
+            }
+
+            LoadSessionStates(BotBase.StateMachine);
+        }
+
+
+        /// <summary>
+        /// Loads the previously saved states from the machine.
+        /// </summary>
         public async void LoadSessionStates(IStateMachine statemachine)
         {
             if (statemachine == null)

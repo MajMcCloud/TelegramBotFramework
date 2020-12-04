@@ -173,7 +173,7 @@ namespace TelegramBotBase
             {
                 TelegramBotBase.Tools.Console.SetHandler(() =>
                 {
-                    this.Sessions.SaveSessionStates(this.StateMachine);
+                    this.Sessions.SaveSessionStates();
                 });
             }
 
