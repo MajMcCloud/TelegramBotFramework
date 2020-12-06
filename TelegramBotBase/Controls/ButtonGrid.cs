@@ -239,43 +239,38 @@ namespace TelegramBotBase.Controls
             await result.ConfirmAction(this.ConfirmationText ?? "");
 
             //Find clicked button depending on Text or Value (depending on markup type)
-            switch (this.KeyboardType)
+            if (this.KeyboardType != eKeyboardType.InlineKeyBoard)
+                return;
+
+
+            var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
+                        ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
+                        ?? ButtonsForm.ToList().FirstOrDefault(a => a.Value == result.RawData);
+
+            if (button != null)
             {
-                case eKeyboardType.InlineKeyBoard:
+                await OnButtonClicked(new ButtonClickedEventArgs(button));
 
-                    var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-                                ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-                                ?? ButtonsForm.ToList().FirstOrDefault(a => a.Value == result.RawData);
+                result.Handled = true;
+                return;
+            }
 
-                    if (button == null)
-                    {
-                        switch (result.RawData)
-                        {
-                            case "$previous$":
+            switch (result.RawData)
+            {
+                case "$previous$":
 
-                                if (this.CurrentPageIndex > 0)
-                                    this.CurrentPageIndex--;
+                    if (this.CurrentPageIndex > 0)
+                        this.CurrentPageIndex--;
 
-                                this.Updated();
+                    this.Updated();
 
-                                break;
-                            case "$next$":
+                    break;
+                case "$next$":
 
-                                if (this.CurrentPageIndex < this.PageCount - 1)
-                                    this.CurrentPageIndex++;
+                    if (this.CurrentPageIndex < this.PageCount - 1)
+                        this.CurrentPageIndex++;
 
-                                this.Updated();
-
-                                break;
-                        }
-
-
-                        return;
-                    }
-
-                    await OnButtonClicked(new ButtonClickedEventArgs(button));
-
-                    result.Handled = true;
+                    this.Updated();
 
                     break;
             }
