@@ -105,10 +105,16 @@ namespace TelegramBotBase.Base
         {
             var encryptedContent = new System.IO.MemoryStream(this.Document.FileSize);
             var file = await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Document.FileId, encryptedContent);
-            
+
             return new InputOnlineFile(encryptedContent, this.Document.FileName);
         }
 
+
+        /// <summary>
+        /// Downloads a file and saves it to the given path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public async Task DownloadDocument(String path)
         {
             var file = await this.Client.TelegramClient.GetFileAsync(this.Document.FileId);
@@ -118,11 +124,47 @@ namespace TelegramBotBase.Base
             fs.Dispose();
         }
 
+        /// <summary>
+        /// Downloads the document and returns an byte array.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<byte[]> DownloadRawDocument()
+        {
+            MemoryStream ms = new MemoryStream();
+            await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Document.FileId, ms);
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// Downloads  a document and returns it as string. (txt,csv,etc) Default encoding ist UTF8.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<String> DownloadRawTextDocument()
+        {
+            return await DownloadRawTextDocument(Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Downloads  a document and returns it as string. (txt,csv,etc)
+        /// </summary>
+        /// <returns></returns>
+        public async Task<String> DownloadRawTextDocument(Encoding encoding)
+        {
+            MemoryStream ms = new MemoryStream();
+            await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Document.FileId, ms);
+
+            ms.Position = 0;
+
+            var sr = new StreamReader(ms, encoding);
+            
+            return sr.ReadToEnd();
+        }
+
         public async Task<InputOnlineFile> DownloadVideo()
         {
             var encryptedContent = new System.IO.MemoryStream(this.Video.FileSize);
             var file = await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Video.FileId, encryptedContent);
-            
+
             return new InputOnlineFile(encryptedContent, "");
         }
 
@@ -157,7 +199,7 @@ namespace TelegramBotBase.Base
             var photo = this.Photos[index];
             var encryptedContent = new System.IO.MemoryStream(photo.FileSize);
             var file = await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(photo.FileId, encryptedContent);
-            
+
             return new InputOnlineFile(encryptedContent, "");
         }
 
