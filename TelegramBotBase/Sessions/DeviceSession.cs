@@ -16,6 +16,7 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
+using TelegramBotBase.Interfaces;
 using TelegramBotBase.Markdown;
 
 namespace TelegramBotBase.Sessions
@@ -23,7 +24,7 @@ namespace TelegramBotBase.Sessions
     /// <summary>
     /// Base class for a device/chat session
     /// </summary>
-    public class DeviceSession
+    public class DeviceSession : IDeviceSession
     {
         /// <summary>
         /// Device or chat id
@@ -154,7 +155,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup);
+                return await API(a => a.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup));
             }
             catch
             {
@@ -181,7 +182,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup);
+                return await API(a => a.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup));
             }
             catch
             {
@@ -210,7 +211,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await this.Client.TelegramClient.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, parseMode, replyMarkup: markup);
+                return await API(a => a.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, parseMode, replyMarkup: markup));
             }
             catch
             {
@@ -232,7 +233,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await this.Client.TelegramClient.EditMessageReplyMarkupAsync(this.DeviceId, messageId, bf);
+                return await API(a => a.EditMessageReplyMarkupAsync(this.DeviceId, messageId, bf));
             }
             catch
             {
@@ -271,15 +272,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
-
-                OnMessageSent(new MessageSentEventArgs(m));
-            }
-            catch (ApiRequestException ex)
-            {
-                await Task.Delay(ex.Parameters.RetryAfter);
-
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                m = await API(a => a.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
             }
@@ -331,13 +324,9 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                m = await API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
-            }
-            catch (ApiRequestException)
-            {
-                return null;
             }
             catch
             {
@@ -374,13 +363,9 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await (this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                m = await API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
-            }
-            catch (ApiRequestException)
-            {
-                return null;
             }
             catch
             {
@@ -409,13 +394,9 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendPhotoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await API(a => a.SendPhotoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
-            }
-            catch (ApiRequestException)
-            {
-                return null;
             }
             catch
             {
@@ -482,13 +463,9 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await API(a => a.SendVideoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
-            }
-            catch (ApiRequestException)
-            {
-                return null;
             }
             catch
             {
@@ -517,13 +494,9 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await this.Client.TelegramClient.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification);
+                m = await API(a => a.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 OnMessageSent(new MessageSentEventArgs(m));
-            }
-            catch (ApiRequestException)
-            {
-                return null;
             }
             catch
             {
@@ -595,7 +568,7 @@ namespace TelegramBotBase.Sessions
                 markup = buttons;
             }
 
-            var m = await this.Client.TelegramClient.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo);
+            var m = await API(a => a.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo));
 
             OnMessageSent(new MessageSentEventArgs(m));
 
@@ -609,7 +582,7 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public async Task SetAction(ChatAction action)
         {
-            await this.Client.TelegramClient.SendChatActionAsync(this.DeviceId, action);
+            await API(a => a.SendChatActionAsync(this.DeviceId, action));
         }
 
         /// <summary>
@@ -623,7 +596,7 @@ namespace TelegramBotBase.Sessions
         {
             var rck = new ReplyKeyboardMarkup(KeyboardButton.WithRequestContact(buttonText));
             rck.OneTimeKeyboard = OneTimeOnly;
-            return await this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rck);
+            return await API(a => a.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rck));
         }
 
         /// <summary>
@@ -637,7 +610,7 @@ namespace TelegramBotBase.Sessions
         {
             var rcl = new ReplyKeyboardMarkup(KeyboardButton.WithRequestLocation(buttonText));
             rcl.OneTimeKeyboard = OneTimeOnly;
-            return await this.Client.TelegramClient.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rcl);
+            return await API(a => a.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rcl));
         }
 
         public async Task<Message> HideReplyKeyboard(String closedMsg = "Closed", bool autoDeleteResponse = true)
@@ -669,7 +642,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await this.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, messageId);
+                await API(a => a.DeleteMessageAsync(this.DeviceId, messageId));
 
                 return true;
             }
@@ -696,7 +669,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await this.Client.TelegramClient.SetChatPermissionsAsync(this.DeviceId, permissions);
+                await API(a => a.SetChatPermissionsAsync(this.DeviceId, permissions));
             }
             catch
             {
@@ -710,7 +683,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await this.Client.TelegramClient.RestrictChatMemberAsync(this.DeviceId, userId, permissions, until);
+                await API(a => a.RestrictChatMemberAsync(this.DeviceId, userId, permissions, until));
             }
             catch
             {
@@ -722,7 +695,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                return await this.Client.TelegramClient.GetChatMemberAsync(this.DeviceId, userId);
+                return await API(a => a.GetChatMemberAsync(this.DeviceId, userId));
             }
             catch
             {
@@ -735,7 +708,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await this.Client.TelegramClient.KickChatMemberAsync(this.DeviceId, userId, until);
+                await API(a => a.KickChatMemberAsync(this.DeviceId, userId, until));
             }
             catch
             {
@@ -747,7 +720,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await this.Client.TelegramClient.UnbanChatMemberAsync(this.DeviceId, userId);
+                await API(a => a.UnbanChatMemberAsync(this.DeviceId, userId));
             }
             catch
             {
@@ -780,7 +753,7 @@ namespace TelegramBotBase.Sessions
             {
                 return await call(this.Client.TelegramClient);
             }
-            catch(ApiRequestException ex)
+            catch (ApiRequestException ex)
             {
                 await Task.Delay(ex.Parameters.RetryAfter);
 
@@ -788,6 +761,25 @@ namespace TelegramBotBase.Sessions
             }
         }
 
+        /// <summary>
+        /// This will call a function on the TelegramClient and automatically Retry if an limit has been exceeded.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="call"></param>
+        /// <returns></returns>
+        public async Task API(Func<Telegram.Bot.TelegramBotClient, Task> call)
+        {
+            try
+            {
+                await call(this.Client.TelegramClient);
+            }
+            catch (ApiRequestException ex)
+            {
+                await Task.Delay(ex.Parameters.RetryAfter);
+
+                await call(this.Client.TelegramClient);
+            }
+        }
 
 
         #region "Events"
