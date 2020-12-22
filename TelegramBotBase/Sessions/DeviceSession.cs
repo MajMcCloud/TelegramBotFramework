@@ -704,6 +704,8 @@ namespace TelegramBotBase.Sessions
             }
         }
 
+        #region "Users"
+
         public virtual async Task RestrictUser(int userId, ChatPermissions permissions, DateTime until = default(DateTime))
         {
             try
@@ -753,7 +755,42 @@ namespace TelegramBotBase.Sessions
             }
         }
 
+        #endregion
 
+        /// <summary>
+        /// Gives access to the original TelegramClient without any Exception catchings.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="call"></param>
+        /// <returns></returns>
+        public T RAW<T>(Func<Telegram.Bot.TelegramBotClient, T> call)
+        {
+            return call(this.Client.TelegramClient);
+        }
+
+        /// <summary>
+        /// This will call a function on the TelegramClient and automatically Retry if an limit has been exceeded.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="call"></param>
+        /// <returns></returns>
+        public async Task<T> API<T>(Func<Telegram.Bot.TelegramBotClient, Task<T>> call)
+        {
+            try
+            {
+                return await call(this.Client.TelegramClient);
+            }
+            catch(ApiRequestException ex)
+            {
+                await Task.Delay(ex.Parameters.RetryAfter);
+
+                return await call(this.Client.TelegramClient);
+            }
+        }
+
+
+
+        #region "Events"
 
         /// <summary>
         /// Eventhandler for sent messages
@@ -796,5 +833,7 @@ namespace TelegramBotBase.Sessions
         {
             (this.__Events[__evMessageReceived] as EventHandler<MessageReceivedEventArgs>)?.Invoke(this, e);
         }
+
+        #endregion
     }
 }
