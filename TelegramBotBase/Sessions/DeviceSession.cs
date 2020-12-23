@@ -642,7 +642,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await API(a => a.DeleteMessageAsync(this.DeviceId, messageId));
+                await this.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, messageId);
 
                 return true;
             }
@@ -755,16 +755,20 @@ namespace TelegramBotBase.Sessions
             }
             catch (ApiRequestException ex)
             {
-                await Task.Delay(ex.Parameters.RetryAfter);
+                if (ex.Parameters != null)
+                {
+                    await Task.Delay(ex.Parameters.RetryAfter);
 
-                return await call(this.Client.TelegramClient);
+                    return await call(this.Client.TelegramClient);
+                }
             }
+
+            return default(T);
         }
 
         /// <summary>
         /// This will call a function on the TelegramClient and automatically Retry if an limit has been exceeded.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="call"></param>
         /// <returns></returns>
         public async Task API(Func<Telegram.Bot.TelegramBotClient, Task> call)
@@ -775,9 +779,12 @@ namespace TelegramBotBase.Sessions
             }
             catch (ApiRequestException ex)
             {
-                await Task.Delay(ex.Parameters.RetryAfter);
+                if (ex.Parameters != null)
+                {
+                    await Task.Delay(ex.Parameters.RetryAfter);
 
-                await call(this.Client.TelegramClient);
+                    await call(this.Client.TelegramClient);
+                }
             }
         }
 
