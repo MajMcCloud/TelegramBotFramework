@@ -642,7 +642,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await this.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, messageId);
+                await RAW(a => a.DeleteMessageAsync(this.DeviceId, messageId));
 
                 return true;
             }
