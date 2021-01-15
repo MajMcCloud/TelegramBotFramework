@@ -8,7 +8,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Controls
+namespace TelegramBotBase.Controls.Inline
 {
     public class MonthPicker : CalendarPicker
     {

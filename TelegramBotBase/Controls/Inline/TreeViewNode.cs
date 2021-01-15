@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TelegramBotBase.Controls
+namespace TelegramBotBase.Controls.Inline
 {
     public class TreeViewNode
     {

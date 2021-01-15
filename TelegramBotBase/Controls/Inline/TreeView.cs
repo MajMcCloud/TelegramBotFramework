@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Controls
+namespace TelegramBotBase.Controls.Inline
 {
     public class TreeView : ControlBase
     {

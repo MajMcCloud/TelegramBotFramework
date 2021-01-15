@@ -31,7 +31,7 @@ namespace TelegramBotBaseTest.Tests
         {
             await this.Device.Send("Ciao from Form 2");
         }
-        
+
 
 
 
@@ -118,7 +118,7 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("Request Prompt", CallbackData.Create("navigate", "prompt")));
 
 
-            await this.Device.SendPhoto(bmp, "Test", btn);
+            await this.Device.SendPhoto(bmp, "Test", "", btn);
 
         }
 

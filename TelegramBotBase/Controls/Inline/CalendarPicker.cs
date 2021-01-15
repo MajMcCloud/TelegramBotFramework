@@ -11,7 +11,7 @@ using TelegramBotBase.Form;
 using static TelegramBotBase.Tools.Arrays;
 using static TelegramBotBase.Tools.Time;
 
-namespace TelegramBotBase.Controls
+namespace TelegramBotBase.Controls.Inline
 {
     public class CalendarPicker : Base.ControlBase
     {

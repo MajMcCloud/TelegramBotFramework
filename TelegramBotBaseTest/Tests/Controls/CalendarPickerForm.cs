@@ -8,6 +8,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Controls;
 using TelegramBotBase.Args;
+using TelegramBotBase.Controls.Inline;
 
 namespace TelegramBotBaseTest.Tests.Controls
 {

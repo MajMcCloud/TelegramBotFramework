@@ -38,7 +38,6 @@ namespace TelegramBotBaseTest.Tests
             {
                 case "reply":
 
-                    
 
                     break;
 

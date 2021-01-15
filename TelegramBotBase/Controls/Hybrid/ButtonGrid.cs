@@ -15,7 +15,7 @@ using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
 using static TelegramBotBase.Base.Async;
 
-namespace TelegramBotBase.Controls
+namespace TelegramBotBase.Controls.Hybrid
 {
     public class ButtonGrid : Base.ControlBase
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
 
-namespace TelegramBotBase.Controls
+namespace TelegramBotBase.Controls.Inline
 {
     /// <summary>
     /// A simple control for show and managing progress.

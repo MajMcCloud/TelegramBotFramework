@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Controls.Inline;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests
@@ -35,41 +36,41 @@ namespace TelegramBotBaseTest.Tests
             if (call == null)
                 return;
 
-            TelegramBotBase.Controls.ProgressBar Bar = null;
+            ProgressBar Bar = null;
 
             switch (call.Value)
             {
                 case "standard":
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.standard);
+                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.standard);
                     Bar.Device = this.Device;
 
                     break;
 
                 case "squares":
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squares);
+                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.squares);
                     Bar.Device = this.Device;
 
                     break;
 
                 case "circles":
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.circles);
+                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.circles);
                     Bar.Device = this.Device;
 
                     break;
 
                 case "lines":
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.lines);
+                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.lines);
                     Bar.Device = this.Device;
 
                     break;
 
                 case "squaredlines":
 
-                    Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squaredLines);
+                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.squaredLines);
                     Bar.Device = this.Device;
 
                     break;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Controls;
+using TelegramBotBase.Controls.Inline;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Controls
