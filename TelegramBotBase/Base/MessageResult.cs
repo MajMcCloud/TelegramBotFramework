@@ -151,11 +151,11 @@ namespace TelegramBotBase.Base
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task ConfirmAction(String message = "")
+        public async Task ConfirmAction(String message = "", bool showAlert = false, String urlToOpen = null)
         {
             try
             {
-                await this.Client.TelegramClient.AnswerCallbackQueryAsync(this.RawCallbackData.CallbackQuery.Id, message);
+                await this.Client.TelegramClient.AnswerCallbackQueryAsync(this.RawCallbackData.CallbackQuery.Id, message, showAlert, urlToOpen);
             }
             catch
             {
