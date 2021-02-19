@@ -149,6 +149,10 @@ namespace TelegramBotBase
                     continue;
                 }
 
+                //Key already existing
+                if (this.SessionList.ContainsKey(s.DeviceId))
+                    continue;
+
                 var form = t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
 
                 //No default constructor, fallback
