@@ -28,6 +28,14 @@ namespace TelegramBotBase.Base
         /// </summary>
         public bool Enabled { get; set; } = true;
 
+        /// <summary>
+        /// Get invoked when control will be added to a form and invoked.
+        /// </summary>
+        /// <returns></returns>
+        public virtual void Init()
+        {
+
+        }
 
         public virtual async Task Load(MessageResult result)
         {

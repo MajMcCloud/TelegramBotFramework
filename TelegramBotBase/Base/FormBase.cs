@@ -394,6 +394,8 @@ namespace TelegramBotBase.Form
             control.ID = this.Controls.Count + 1;
             control.Device = this.Device;
             this.Controls.Add(control);
+
+            control.Init();
         }
 
         /// <summary>
