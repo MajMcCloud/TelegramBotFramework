@@ -244,5 +244,47 @@ namespace TelegramBotBase.Form
 
             return bf;
         }
+
+        /// <summary>
+        /// Creates a copy of this form and filters by the parameter.
+        /// </summary>
+        /// <returns></returns>
+        public ButtonForm TagDuplicate(List<String> tags, bool ByRow = false)
+        {
+            var bf = new ButtonForm()
+            {
+                Markup = this.Markup,
+                DependencyControl = this.DependencyControl
+            };
+
+            foreach (var b in Buttons)
+            {
+                var lst = new List<ButtonBase>();
+                foreach (var b2 in b)
+                {
+                    if (!(b2 is TagButtonBase tb))
+                        continue;
+
+                    if (!tags.Contains(tb.Tag))
+                        continue;
+
+                    //Copy full row, when at least one match has found.
+                    if (ByRow)
+                    {
+                        lst.AddRange(b);
+                        break;
+                    }
+                    else
+                    {
+                        lst.Add(b2);
+                    }
+                }
+
+                if (lst.Count > 0)
+                    bf.Buttons.Add(lst);
+            }
+
+            return bf;
+        }
     }
 }

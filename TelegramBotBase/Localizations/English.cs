@@ -15,6 +15,7 @@ namespace TelegramBotBase.Localizations
             Values["ButtonGrid_NextPage"] = "▶️";
             Values["ButtonGrid_CurrentPage"] = "Page {0} of {1}";
             Values["ButtonGrid_SearchFeature"] = "💡 Send a message to filter the list. Click the 🔍 to reset the filter.";
+            Values["ButtonGrid_Back"] = "Back";
             Values["CalendarPicker_Title"] = "Pick date";
             Values["CalendarPicker_PreviousPage"] = "◀️";
             Values["CalendarPicker_NextPage"] = "▶️";

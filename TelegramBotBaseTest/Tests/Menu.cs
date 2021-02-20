@@ -160,6 +160,16 @@ namespace TelegramBotBaseTest.Tests
 
                     break;
 
+                case "buttongridtags":
+
+                    message.Handled = true;
+
+                    var bg3 = new Controls.ButtonGridTagForm();
+
+                    await this.NavigateTo(bg3);
+
+                    break;
+
                 case "multiview":
 
                     message.Handled = true;
@@ -199,6 +209,8 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#12 ButtonGrid", new CallbackData("a", "buttongrid").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#13 ButtonGrid Paging & Filter", new CallbackData("a", "buttongridfilter").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#14 ButtonGrid Tags (Filter)", new CallbackData("a", "buttongridtags").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#15 MultiView", new CallbackData("a", "multiview").Serialize()));
 

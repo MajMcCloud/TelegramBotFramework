@@ -10,24 +10,20 @@ namespace TelegramBotBase.Form
     /// <summary>
     /// Base class for button handling
     /// </summary>
-    public class ButtonBase
+    public class TagButtonBase : ButtonBase
     {
-        public virtual String Text { get; set; }
+        public String Tag { get; set; }
 
-        public String Value { get; set; }
-
-        public String Url { get; set; }
-
-        public ButtonBase()
+        public TagButtonBase()
         {
 
         }
 
-        public ButtonBase(String Text, String Value, String Url = null)
+        public TagButtonBase(String Text, String Value, String Tag)
         {
             this.Text = Text;
             this.Value = Value;
-            this.Url = Url;
+            this.Tag = Tag;
         }
 
 
@@ -36,20 +32,11 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="form"></param>
         /// <returns></returns>
-        public virtual InlineKeyboardButton ToInlineButton(ButtonForm form)
+        public override InlineKeyboardButton ToInlineButton(ButtonForm form)
         {
             String id = (form.DependencyControl != null ? form.DependencyControl.ControlID + "_" : "");
-            if (this.Url == null)
-            {
-                return InlineKeyboardButton.WithCallbackData(this.Text, id + this.Value);
-            }
 
-            var ikb = new InlineKeyboardButton();
-
-            ikb.Text = this.Text;
-            ikb.Url = this.Url;
-
-            return ikb;
+            return InlineKeyboardButton.WithCallbackData(this.Text, id + this.Value);
 
         }
 
@@ -59,7 +46,7 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="form"></param>
         /// <returns></returns>
-        public virtual KeyboardButton ToKeyboardButton(ButtonForm form)
+        public override KeyboardButton ToKeyboardButton(ButtonForm form)
         {
             return new KeyboardButton(this.Text);
         }
