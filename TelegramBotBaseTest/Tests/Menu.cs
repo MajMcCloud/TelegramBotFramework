@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
+using TelegramBotBaseTest.Tests.Controls;
 
 namespace TelegramBotBaseTest.Tests
 {
@@ -27,6 +28,7 @@ namespace TelegramBotBaseTest.Tests
             }
 
 
+            await Device.HideReplyKeyboard();
         }
 
         public override async Task Action(MessageResult message)
@@ -157,6 +159,17 @@ namespace TelegramBotBaseTest.Tests
                     await this.NavigateTo(bg2);
 
                     break;
+
+                case "multiview":
+
+                    message.Handled = true;
+
+                    var mvf = new MultiViewForm();
+
+                    await NavigateTo(mvf);
+
+
+                    break;
             }
 
 
@@ -186,6 +199,8 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#12 ButtonGrid", new CallbackData("a", "buttongrid").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#13 ButtonGrid Paging & Filter", new CallbackData("a", "buttongridfilter").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#15 MultiView", new CallbackData("a", "multiview").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }

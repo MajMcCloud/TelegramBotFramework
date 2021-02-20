@@ -19,9 +19,16 @@ namespace TelegramBotBase.Args
 
         public Message Message { get; set; }
 
-        public MessageSentEventArgs(Message message)
+        /// <summary>
+        /// Contains the element, which has called the method.
+        /// </summary>
+        public Type Origin { get; set; }
+
+
+        public MessageSentEventArgs(Message message, Type Origin)
         {
             this.Message = message;
+            this.Origin = Origin;
         }
 
 

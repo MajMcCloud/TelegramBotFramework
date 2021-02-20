@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -258,8 +259,6 @@ namespace TelegramBotBase.Sessions
 
             InlineKeyboardMarkup markup = buttons;
 
-            Message m = null;
-
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
                 throw new MaxLengthException(text.Length);
@@ -272,16 +271,17 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await API(a => a.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = API(a => a.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m));
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
             }
             catch
             {
                 return null;
             }
-
-            return m;
         }
 
         /// <summary>
@@ -310,8 +310,6 @@ namespace TelegramBotBase.Sessions
             if (this.ActiveForm == null)
                 return null;
 
-            Message m = null;
-
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
                 throw new MaxLengthException(text.Length);
@@ -324,16 +322,17 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m));
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
             }
             catch
             {
                 return null;
             }
-
-            return m;
         }
 
         /// <summary>
@@ -349,8 +348,6 @@ namespace TelegramBotBase.Sessions
             if (this.ActiveForm == null)
                 return null;
 
-            Message m = null;
-
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
                 throw new MaxLengthException(text.Length);
@@ -363,16 +360,17 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                m = await API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m));
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
             }
             catch
             {
                 return null;
             }
-
-            return m;
         }
 
         /// <summary>
@@ -390,20 +388,19 @@ namespace TelegramBotBase.Sessions
 
             InlineKeyboardMarkup markup = buttons;
 
-            Message m = null;
-
             try
             {
-                m = await API(a => a.SendPhotoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = API(a => a.SendPhotoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m));
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
             }
             catch
             {
                 return null;
             }
-
-            return m;
         }
 
         /// <summary>
@@ -459,20 +456,19 @@ namespace TelegramBotBase.Sessions
 
             InlineKeyboardMarkup markup = buttons;
 
-            Message m = null;
-
             try
             {
-                m = await API(a => a.SendVideoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = API(a => a.SendVideoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m));
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
             }
             catch
             {
                 return null;
             }
-
-            return m;
         }
 
         /// <summary>
@@ -490,20 +486,19 @@ namespace TelegramBotBase.Sessions
 
             InlineKeyboardMarkup markup = buttons;
 
-            Message m = null;
-
             try
             {
-                m = await API(a => a.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = API(a => a.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
-                OnMessageSent(new MessageSentEventArgs(m));
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
             }
             catch
             {
                 return null;
             }
-
-            return m;
         }
 
         /// <summary>
@@ -568,11 +563,19 @@ namespace TelegramBotBase.Sessions
                 markup = buttons;
             }
 
-            var m = await API(a => a.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo));
+            try
+            {
+                var t = API(a => a.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo));
 
-            OnMessageSent(new MessageSentEventArgs(m));
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
 
-            return m;
+                return await t;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -675,6 +678,23 @@ namespace TelegramBotBase.Sessions
             {
 
             }
+        }
+
+        private Type GetOrigin(StackTrace stackTrace)
+        {
+            for (int i = 0; i < stackTrace.FrameCount; i++)
+            {
+                var methodBase = stackTrace.GetFrame(i).GetMethod();
+
+                //Debug.WriteLine(methodBase.Name);
+
+                if (methodBase.DeclaringType.IsSubclassOf(typeof(FormBase)) | methodBase.DeclaringType.IsSubclassOf(typeof(ControlBase)))
+                {
+                    return methodBase.DeclaringType;
+                }
+            }
+
+            return null;
         }
 
         #region "Users"
