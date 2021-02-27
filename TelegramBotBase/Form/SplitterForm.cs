@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
-using static TelegramBotBase.Base.Async;
+
 
 namespace TelegramBotBase.Form
 {

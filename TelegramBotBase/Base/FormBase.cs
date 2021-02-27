@@ -55,7 +55,10 @@ namespace TelegramBotBase.Form
             if (this.Events[__evInit] == null)
                 return;
 
-            var handler = this.Events[__evInit].GetInvocationList().Cast<AsyncEventHandler<InitEventArgs>>();
+            var handler = this.Events[__evInit]?.GetInvocationList().Cast<AsyncEventHandler<InitEventArgs>>();
+            if (handler == null)
+                return;
+
             foreach (var h in handler)
             {
                 await Async.InvokeAllAsync<InitEventArgs>(h, this, e);
@@ -84,7 +87,10 @@ namespace TelegramBotBase.Form
             if (this.Events[__evOpened] == null)
                 return;
 
-            var handler = this.Events[__evOpened].GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
+            var handler = this.Events[__evOpened]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
+            if (handler == null)
+                return;
+
             foreach (var h in handler)
             {
                 await Async.InvokeAllAsync<EventArgs>(h, this, e);
@@ -114,7 +120,10 @@ namespace TelegramBotBase.Form
             if (this.Events[__evClosed] == null)
                 return;
 
-            var handler = this.Events[__evClosed].GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
+            var handler = this.Events[__evClosed]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
+            if (handler == null)
+                return;
+
             foreach (var h in handler)
             {
                 await Async.InvokeAllAsync<EventArgs>(h, this, e);

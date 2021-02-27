@@ -149,7 +149,10 @@ namespace TelegramBotBase.Controls.Hybrid
 
         public async Task OnButtonClicked(ButtonClickedEventArgs e)
         {
-            var handler = this.Events[__evButtonClicked].GetInvocationList().Cast<AsyncEventHandler<ButtonClickedEventArgs>>();
+            var handler = this.Events[__evButtonClicked]?.GetInvocationList().Cast<AsyncEventHandler<ButtonClickedEventArgs>>();
+            if (handler == null)
+                return;
+
             foreach (var h in handler)
             {
                 await Async.InvokeAllAsync<ButtonClickedEventArgs>(h, this, e);
