@@ -556,7 +556,7 @@ namespace TelegramBotBase.Controls.Hybrid
                 if (bf.Rows == 0)
                     return 1;
 
-                return (int)Math.Ceiling((decimal)(bf.Rows / (decimal)(MaximumRow - 3)));
+                return (int)Math.Ceiling((decimal)(bf.Rows / (decimal)(MaximumRow - this.LayoutRows)));
             }
         }
 
