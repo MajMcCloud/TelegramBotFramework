@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBotBase.Form
 {
+    [DebuggerDisplay("{Text}, {Value}")]
     /// <summary>
     /// Base class for button handling
     /// </summary>
