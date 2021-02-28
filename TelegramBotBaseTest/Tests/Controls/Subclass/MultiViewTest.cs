@@ -14,8 +14,8 @@ namespace TelegramBotBaseTest.Tests.Controls.Subclass
 
         public override async Task Action(MessageResult result, string value = null)
         {
-         
-            switch(result.RawData)
+
+            switch (result.RawData)
             {
                 case "back":
 
@@ -37,23 +37,13 @@ namespace TelegramBotBaseTest.Tests.Controls.Subclass
             ButtonForm bf = new ButtonForm();
             bf.AddButtonRow(new ButtonBase("Back", "back"), new ButtonBase("Next", "next"));
 
-            switch(e.CurrentView)
+            switch (e.CurrentView)
             {
                 case 0:
-
-                    await Device.Send("Page 1", bf);
-
-                    break;
-
                 case 1:
-
-                    await Device.Send("Page 2", bf);
-
-                    break;
-
                 case 2:
 
-                    await Device.Send("Page 3", bf);
+                    await Device.Send($"Page {e.CurrentView + 1}", bf);
 
                     break;
 

@@ -180,6 +180,17 @@ namespace TelegramBotBaseTest.Tests
 
 
                     break;
+
+                case "checkedbuttonlist":
+
+                    message.Handled = true;
+
+                    var cbl = new CheckedButtonListForm();
+
+                    await NavigateTo(cbl);
+
+
+                    break;
             }
 
 
@@ -213,6 +224,8 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#14 ButtonGrid Tags (Filter)", new CallbackData("a", "buttongridtags").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#15 MultiView", new CallbackData("a", "multiview").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#16 CheckedButtonList", new CallbackData("a", "checkedbuttonlist").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }
