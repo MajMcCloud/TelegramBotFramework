@@ -14,6 +14,8 @@ namespace TelegramBotBase.Args
     {
         public ButtonBase Button { get; set; }
 
+        public int Index { get; set; }
+
 
         public ButtonClickedEventArgs()
         {
@@ -23,6 +25,13 @@ namespace TelegramBotBase.Args
         public ButtonClickedEventArgs(ButtonBase button)
         {
             this.Button = button;
+            this.Index = -1;
+        }
+
+        public ButtonClickedEventArgs(ButtonBase button, int Index)
+        {
+            this.Button = button;
+            this.Index = Index;
         }
 
     }

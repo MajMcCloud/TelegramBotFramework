@@ -178,12 +178,18 @@ namespace TelegramBotBase.Controls.Hybrid
             if (!result.IsFirstHandler)
                 return;
 
+            if (result.MessageText == null)
+                return;
+
             var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
                         ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
                         ?? ButtonsForm.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText);
 
-            if (result.MessageText == null)
-                return;
+            var index = HeadLayoutButtonRow?.IndexOf(button)
+                        ?? SubHeadLayoutButtonRow?.IndexOf(button)
+                        ?? ButtonsForm.ToList().IndexOf(button);
+
+
 
             switch (this.SelectedViewIndex)
             {
@@ -191,7 +197,7 @@ namespace TelegramBotBase.Controls.Hybrid
 
                     if (button != null)
                     {
-                        await OnButtonClicked(new ButtonClickedEventArgs(button));
+                        await OnButtonClicked(new ButtonClickedEventArgs(button, index));
 
                         //Remove button click message
                         if (this.DeletePreviousMessage)
@@ -304,6 +310,10 @@ namespace TelegramBotBase.Controls.Hybrid
 
         public async override Task Action(MessageResult result, string value = null)
         {
+            //Find clicked button depending on Text or Value (depending on markup type)
+            if (this.KeyboardType != eKeyboardType.InlineKeyBoard)
+                return;
+
             if (result.Handled)
                 return;
 
@@ -312,18 +322,17 @@ namespace TelegramBotBase.Controls.Hybrid
 
             await result.ConfirmAction(this.ConfirmationText ?? "");
 
-            //Find clicked button depending on Text or Value (depending on markup type)
-            if (this.KeyboardType != eKeyboardType.InlineKeyBoard)
-                return;
-
-
             var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
                         ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
                         ?? ButtonsForm.ToList().FirstOrDefault(a => a.Value == result.RawData);
 
+            var index = HeadLayoutButtonRow?.IndexOf(button)
+                        ?? SubHeadLayoutButtonRow?.IndexOf(button)
+                        ?? ButtonsForm.ToList().IndexOf(button);
+
             if (button != null)
             {
-                await OnButtonClicked(new ButtonClickedEventArgs(button));
+                await OnButtonClicked(new ButtonClickedEventArgs(button, index));
 
                 result.Handled = true;
                 return;

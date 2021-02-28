@@ -67,6 +67,10 @@ namespace TelegramBotBase.Base
             
         }
 
+        /// <summary>
+        /// Will be called on a cleanup.
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task Cleanup()
         {
             

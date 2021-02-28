@@ -151,6 +151,15 @@ namespace TelegramBotBase.Form
             return ikb;
         }
 
+        public int FindRowByButton(ButtonBase button)
+        {
+            var row = this.Buttons.FirstOrDefault(a => a.Count(b => b == button) > 0);
+            if (row == null)
+                return -1;
+
+            return this.Buttons.IndexOf(row);
+        }
+
         /// <summary>
         /// Returns the first Button with the given value.
         /// </summary>

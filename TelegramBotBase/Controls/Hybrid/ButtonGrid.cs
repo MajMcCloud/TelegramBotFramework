@@ -167,67 +167,68 @@ namespace TelegramBotBase.Controls.Hybrid
             if (!result.IsFirstHandler)
                 return;
 
+            if (result.MessageText == null)
+                return;
+
             var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
                         ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
                         ?? ButtonsForm.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText);
 
-            if (button == null)
+            var index = ButtonsForm.FindRowByButton(button);
+
+            if (button != null)
             {
-                if (result.MessageText == null)
-                    return;
+                await OnButtonClicked(new ButtonClickedEventArgs(button, index));
 
-                if (result.MessageText == PreviousPageLabel)
-                {
-                    if (this.CurrentPageIndex > 0)
-                        this.CurrentPageIndex--;
+                //Remove button click message
+                if (this.DeletePreviousMessage)
+                    await Device.DeleteMessage(result.MessageId);
 
-                    this.Updated();
-                }
-                else if (result.MessageText == NextPageLabel)
-                {
-                    if (this.CurrentPageIndex < this.PageCount - 1)
-                        this.CurrentPageIndex++;
-
-                    this.Updated();
-                }
-                else if (this.EnableSearch)
-                {
-                    if (result.MessageText.StartsWith("🔍"))
-                    {
-                        //Sent note about searching
-                        if (this.SearchQuery == null)
-                        {
-                            await this.Device.Send(this.SearchLabel);
-                        }
-
-                        this.SearchQuery = null;
-                        this.Updated();
-                        return;
-                    }
-
-                    this.SearchQuery = result.MessageText;
-
-                    if (this.SearchQuery != null && this.SearchQuery != "")
-                    {
-                        this.CurrentPageIndex = 0;
-                        this.Updated();
-                    }
-
-                }
-
-
-
+                result.Handled = true;
                 return;
             }
 
 
-            await OnButtonClicked(new ButtonClickedEventArgs(button));
+            if (result.MessageText == PreviousPageLabel)
+            {
+                if (this.CurrentPageIndex > 0)
+                    this.CurrentPageIndex--;
 
-            //Remove button click message
-            if (this.DeletePreviousMessage)
-                await Device.DeleteMessage(result.MessageId);
+                this.Updated();
+            }
+            else if (result.MessageText == NextPageLabel)
+            {
+                if (this.CurrentPageIndex < this.PageCount - 1)
+                    this.CurrentPageIndex++;
 
-            result.Handled = true;
+                this.Updated();
+            }
+            else if (this.EnableSearch)
+            {
+                if (result.MessageText.StartsWith("🔍"))
+                {
+                    //Sent note about searching
+                    if (this.SearchQuery == null)
+                    {
+                        await this.Device.Send(this.SearchLabel);
+                    }
+
+                    this.SearchQuery = null;
+                    this.Updated();
+                    return;
+                }
+
+                this.SearchQuery = result.MessageText;
+
+                if (this.SearchQuery != null && this.SearchQuery != "")
+                {
+                    this.CurrentPageIndex = 0;
+                    this.Updated();
+                }
+
+            }
+
+
 
         }
 
@@ -250,9 +251,11 @@ namespace TelegramBotBase.Controls.Hybrid
                         ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
                         ?? ButtonsForm.ToList().FirstOrDefault(a => a.Value == result.RawData);
 
+            var index = ButtonsForm.FindRowByButton(button);
+
             if (button != null)
             {
-                await OnButtonClicked(new ButtonClickedEventArgs(button));
+                await OnButtonClicked(new ButtonClickedEventArgs(button, index));
 
                 result.Handled = true;
                 return;
