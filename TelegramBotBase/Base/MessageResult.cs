@@ -20,12 +20,18 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawMessageData?.Message?.Chat.Id ?? this.RawCallbackData?.CallbackQuery.Message?.Chat.Id ?? 0;
+                return this.RawMessageData?.Message?.Chat.Id
+                    ?? this.RawCallbackData?.CallbackQuery.Message?.Chat.Id
+                    ?? Device?.DeviceId
+                    ?? 0;
             }
         }
 
         public DeviceSession Device
-        { get; set; }
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The message id
@@ -34,7 +40,9 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.Message?.MessageId ?? this.RawCallbackData?.CallbackQuery?.Message?.MessageId ?? 0;
+                return this.Message?.MessageId 
+                    ?? this.RawCallbackData?.CallbackQuery?.Message?.MessageId 
+                    ?? 0;
             }
         }
 
@@ -58,7 +66,8 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawMessageData?.Message?.Type ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
+                return this.RawMessageData?.Message?.Type 
+                    ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
             }
         }
 
@@ -175,6 +184,10 @@ namespace TelegramBotBase.Base
             }
         }
 
+        internal MessageResult()
+        {
+
+        }
 
         public MessageResult(Telegram.Bot.Args.MessageEventArgs rawdata)
         {
