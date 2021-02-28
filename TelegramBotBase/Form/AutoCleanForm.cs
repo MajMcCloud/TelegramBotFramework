@@ -138,16 +138,6 @@ namespace TelegramBotBase.Form
             await Task.WhenAll(tasks);
 
             this.OldMessages.Clear();
-
-            //while (this.OldMessages.Count > 0)
-            //{
-            //    if (!await this.Device.DeleteMessage(this.OldMessages[0]))
-            //    {
-            //        //Message can't be deleted cause it seems not to exist anymore
-            //        if (this.OldMessages.Count > 0)
-            //            this.OldMessages.RemoveAt(0);
-            //    }
-            //}
         }
     }
 }
