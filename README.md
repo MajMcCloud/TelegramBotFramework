@@ -73,6 +73,10 @@ Thanks !
 	
 		* [Paging and Searching](#paging--searching)
 
+    * [TaggedButtonGrid](#tagged-button-grid)
+
+    * [CheckedButtonList](#checked-button-list)
+
 - [Groups](#groups)
 	* [SplitterForm](#splitter-form)
 
@@ -803,6 +807,13 @@ await this.NavigateTo(cd);
 
 #### Paging & Searching
 <img src="images/buttongrid_pagingfilter.gif?raw=true" />
+
+### Tagged Button Grid
+<img src="images/taggedbuttongrid.gif?raw=true" />
+
+### Checked Button List
+<img src="images/checkedbuttonlist.gif?raw=true" />
+
 
 ## Groups
 
