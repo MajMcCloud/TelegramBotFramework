@@ -230,7 +230,7 @@ namespace TelegramBotBase
 
                 ds?.OnMessageReceived(new MessageReceivedEventArgs(e.Message));
 
-                await Client_TryMessage(sender, e);
+                await Client_Loop(sender, e);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
@@ -243,14 +243,86 @@ namespace TelegramBotBase
             }
         }
 
-        private async Task Client_TryMessage(object sender, MessageResult e)
+
+
+        //private async Task Client_TryMessage(object sender, MessageResult e)
+        //{
+        //    DeviceSession ds = e.Device;
+        //    if (ds == null)
+        //    {
+        //        ds = await this.Sessions.StartSession<T>(e.DeviceId);
+        //        e.Device = ds;
+
+        //        ds.LastMessage = e.Message;
+
+        //        OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+        //    }
+
+        //    ds.LastAction = DateTime.Now;
+        //    ds.LastMessage = e.Message;
+
+        //    //Is this a bot command ?
+        //    if (e.IsBotCommand && this.BotCommands.Count(a => "/" + a.Command == e.BotCommand) > 0)
+        //    {
+        //        var sce = new BotCommandEventArgs(e.BotCommand, e.BotCommandParameters, e.Message, ds.DeviceId, ds);
+        //        await OnBotCommand(sce);
+
+        //        if (sce.Handled)
+        //            return;
+        //    }
+
+        //    FormBase activeForm = null;
+
+        //    int i = 0;
+
+        //    //Should formulars get navigated (allow maximum of 10, to dont get loops)
+        //    do
+        //    {
+        //        i++;
+
+        //        //Reset navigation
+        //        ds.FormSwitched = false;
+
+        //        activeForm = ds.ActiveForm;
+
+        //        //Pre Loading Event
+        //        await activeForm.PreLoad(e);
+
+        //        //Send Load event to controls
+        //        await activeForm.LoadControls(e);
+
+        //        //Loading Event
+        //        await activeForm.Load(e);
+
+        //        //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document)
+        //        if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Contact | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Document | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Location |
+        //            e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Photo | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Video | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Audio)
+        //        {
+        //            await activeForm.SentData(new DataResult(e));
+        //        }
+
+        //        //Render Event
+        //        if (!ds.FormSwitched)
+        //        {
+        //            await activeForm.RenderControls(e);
+
+        //            await activeForm.Render(e);
+        //        }
+
+        //        e.IsFirstHandler = false;
+
+        //    } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
+
+
+        //}
+
+        private async Task Client_Loop(object sender, MessageResult e)
         {
             DeviceSession ds = e.Device;
             if (ds == null)
             {
                 ds = await this.Sessions.StartSession<T>(e.DeviceId);
                 e.Device = ds;
-
                 ds.LastMessage = e.Message;
 
                 OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
@@ -299,9 +371,34 @@ namespace TelegramBotBase
                     await activeForm.SentData(new DataResult(e));
                 }
 
-                //Render Event
+                //Action Event
                 if (!ds.FormSwitched)
                 {
+                    if (e.IsAction)
+                    {
+                        //Send Action event to controls
+                        await activeForm.ActionControls(e);
+
+                        //Send Action event to form itself
+                        await activeForm.Action(e);
+
+                        if (!e.Handled)
+                        {
+                            var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
+                            OnUnhandledCall(uhc);
+
+                            if (uhc.Handled)
+                            {
+                                e.Handled = true;
+                                if (!ds.FormSwitched)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    //Render Event
                     await activeForm.RenderControls(e);
 
                     await activeForm.Render(e);
@@ -363,12 +460,12 @@ namespace TelegramBotBase
             //When form has been switched due navigation within the edit method, reopen Client_Message
             if (ds.FormSwitched)
             {
-                await Client_TryMessage(sender, e);
+                await Client_Loop(sender, e);
             }
 
         }
 
-        private void Client_Action(object sender, MessageResult e)
+        private async void Client_Action(object sender, MessageResult e)
         {
             try
             {
@@ -380,7 +477,7 @@ namespace TelegramBotBase
                     OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
                 }
 
-                Client_TryAction(sender, e);
+                await Client_Loop(sender, e);
             }
             catch (Exception ex)
             {
@@ -389,80 +486,80 @@ namespace TelegramBotBase
             }
         }
 
-        private async void Client_TryAction(object sender, MessageResult e)
-        {
-            DeviceSession ds = e.Device;
-            if (ds == null)
-            {
-                ds = await this.Sessions.StartSession<T>(e.DeviceId);
-                e.Device = ds;
-            }
+        //private async void Client_TryAction(object sender, MessageResult e)
+        //{
+        //    DeviceSession ds = e.Device;
+        //    if (ds == null)
+        //    {
+        //        ds = await this.Sessions.StartSession<T>(e.DeviceId);
+        //        e.Device = ds;
+        //    }
 
-            ds.LastAction = DateTime.Now;
-            ds.LastMessage = e.Message;
+        //    ds.LastAction = DateTime.Now;
+        //    ds.LastMessage = e.Message;
 
-            FormBase activeForm = null;
+        //    FormBase activeForm = null;
 
-            int i = 0;
+        //    int i = 0;
 
-            //Should formulars get navigated (allow maximum of 10, to dont get loops)
-            do
-            {
-                i++;
+        //    //Should formulars get navigated (allow maximum of 10, to dont get loops)
+        //    do
+        //    {
+        //        i++;
 
-                //Reset navigation
-                ds.FormSwitched = false;
+        //        //Reset navigation
+        //        ds.FormSwitched = false;
 
-                activeForm = ds.ActiveForm;
+        //        activeForm = ds.ActiveForm;
 
-                //Pre Loading Event
-                await activeForm.PreLoad(e);
+        //        //Pre Loading Event
+        //        await activeForm.PreLoad(e);
 
-                //Send Load event to controls
-                await activeForm.LoadControls(e);
+        //        //Send Load event to controls
+        //        await activeForm.LoadControls(e);
 
-                //Loading Event
-                await activeForm.Load(e);
+        //        //Loading Event
+        //        await activeForm.Load(e);
 
-                //Action Event
-                if (!ds.FormSwitched)
-                {
-                    //Send Action event to controls
-                    await activeForm.ActionControls(e);
+        //        //Action Event
+        //        if (!ds.FormSwitched)
+        //        {
+        //            //Send Action event to controls
+        //            await activeForm.ActionControls(e);
 
-                    //Send Action event to form itself
-                    await activeForm.Action(e);
+        //            //Send Action event to form itself
+        //            await activeForm.Action(e);
 
-                    if (!e.Handled)
-                    {
-                        var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
-                        OnUnhandledCall(uhc);
+        //            if (!e.Handled)
+        //            {
+        //                var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
+        //                OnUnhandledCall(uhc);
 
-                        if (uhc.Handled)
-                        {
-                            e.Handled = true;
-                            if (!ds.FormSwitched)
-                            {
-                                break;
-                            }
-                        }
-                    }
+        //                if (uhc.Handled)
+        //                {
+        //                    e.Handled = true;
+        //                    if (!ds.FormSwitched)
+        //                    {
+        //                        break;
+        //                    }
+        //                }
+        //            }
 
-                }
+        //        }
 
-                //Render Event
-                if (!ds.FormSwitched)
-                {
-                    await activeForm.RenderControls(e);
+        //        //Render Event
+        //        if (!ds.FormSwitched)
+        //        {
+        //            await activeForm.RenderControls(e);
 
-                    await activeForm.Render(e);
-                }
+        //            await activeForm.Render(e);
+        //        }
 
-                e.IsFirstHandler = false;
+        //        e.IsFirstHandler = false;
 
-            } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
+        //    } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
 
-        }
+        //}
 
         /// <summary>
         /// This method will update all local created bot commands to the botfather.
