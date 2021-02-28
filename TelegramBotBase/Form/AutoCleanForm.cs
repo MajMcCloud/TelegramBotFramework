@@ -128,15 +128,26 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public async Task MessageCleanup()
         {
-            while (this.OldMessages.Count > 0)
+            var tasks = new List<Task>();
+
+            foreach (var msg in this.OldMessages)
             {
-                if (!await this.Device.DeleteMessage(this.OldMessages[0]))
-                {
-                    //Message can't be deleted cause it seems not to exist anymore
-                    if (this.OldMessages.Count > 0)
-                        this.OldMessages.RemoveAt(0);
-                }
+                tasks.Add(this.Device.DeleteMessage(msg));
             }
+
+            await Task.WhenAll(tasks);
+
+            this.OldMessages.Clear();
+
+            //while (this.OldMessages.Count > 0)
+            //{
+            //    if (!await this.Device.DeleteMessage(this.OldMessages[0]))
+            //    {
+            //        //Message can't be deleted cause it seems not to exist anymore
+            //        if (this.OldMessages.Count > 0)
+            //            this.OldMessages.RemoveAt(0);
+            //    }
+            //}
         }
     }
 }
