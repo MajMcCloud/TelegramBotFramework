@@ -1081,6 +1081,9 @@ Will allow you to run specific system commands or run/kill processes via Bot. Ha
 
 Will delete Join and Leave messages automatically in groups.
 
+- [Examples/AsyncFormUpdates/](Examples/AsyncFormUpdates/) 
+
+When you want to update forms async without any user interaction (message/action) before. Use the new InvokeMessageLoop method of BotBase.
 
 ---
 
