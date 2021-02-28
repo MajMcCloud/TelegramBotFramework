@@ -411,6 +411,38 @@ namespace TelegramBotBase
 
         }
 
+        /// <summary>
+        /// This will invoke the full message loop for the device even when no "userevent" like message or action has been raised.
+        /// </summary>
+        /// <param name="DeviceId">Contains the device/chat id of the device to update.</param>
+        public async Task InvokeMessageLoop(long DeviceId)
+        {
+            var mr = new MessageResult();
+
+            await InvokeMessageLoop(DeviceId, mr);
+        }
+
+        /// <summary>
+        /// This will invoke the full message loop for the device even when no "userevent" like message or action has been raised.
+        /// </summary>
+        /// <param name="DeviceId">Contains the device/chat id of the device to update.</param>
+        /// <param name="e"></param>
+        public async Task InvokeMessageLoop(long DeviceId, MessageResult e)
+        {
+            try
+            {
+                DeviceSession ds = this.Sessions.GetSession(DeviceId);
+                e.Device = ds;
+                
+                await Client_Loop(this, e);
+            }
+            catch(Exception ex)
+            {
+                DeviceSession ds = this.Sessions.GetSession(DeviceId);
+                OnException(new SystemExceptionEventArgs(e.Message.Text, DeviceId, ds, ex));
+            }
+        }
+
         private async void Client_MessageEdit(object sender, MessageResult e)
         {
             if (this.GetSetting(eSettings.SkipAllMessages, false))
