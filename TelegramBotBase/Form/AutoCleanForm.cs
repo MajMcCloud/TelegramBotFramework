@@ -25,7 +25,7 @@ namespace TelegramBotBase.Form
         [SaveState]
         public eDeleteSide DeleteSide { get; set; }
 
-        
+
 
         public AutoCleanForm()
         {
@@ -33,12 +33,11 @@ namespace TelegramBotBase.Form
             this.DeleteMode = eDeleteMode.OnEveryCall;
             this.DeleteSide = eDeleteSide.BotOnly;
 
-            this.Init +=  AutoCleanForm_Init;
+            this.Init += AutoCleanForm_Init;
 
             this.Closed += AutoCleanForm_Closed;
 
         }
-
 
         private async Task AutoCleanForm_Init(object sender, InitEventArgs e)
         {
@@ -128,16 +127,24 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public async Task MessageCleanup()
         {
-            var tasks = new List<Task>();
-
-            foreach (var msg in this.OldMessages)
+            while (this.OldMessages.Count > 0)
             {
-                tasks.Add(this.Device.DeleteMessage(msg));
-            }
+                var tasks = new List<Task>();
+                var msgs = this.OldMessages.Take(Constants.Telegram.MessageDeletionsPerSecond);
 
-            await Task.WhenAll(tasks);
+                foreach (var msg in msgs)
+                {
+                    tasks.Add(this.Device.DeleteMessage(msg));
+                }
 
-            this.OldMessages.Clear();
+                await Task.WhenAll(tasks);
+
+                foreach(var m in msgs)
+                {
+                    Device.OnMessageDeleted(new MessageDeletedEventArgs(m));
+                    this.OldMessages.Remove(m);
+                }
+            }            
         }
     }
 }
