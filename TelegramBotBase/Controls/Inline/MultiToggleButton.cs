@@ -11,14 +11,20 @@ namespace TelegramBotBase.Controls.Inline
 {
     public class MultiToggleButton : ControlBase
     {
+        /// <summary>
+        /// This contains the selected icon.
+        /// </summary>
+        public String SelectedIcon { get; set; } = Localizations.Default.Language["MultiToggleButton_SelectedIcon"];
 
-        //public String UncheckedIcon { get; set; } = Localizations.Default.Language["ToggleButton_OffIcon"];
+        /// <summary>
+        /// This will appear on the ConfirmAction message (if not empty)
+        /// </summary>
+        public String ChangedString { get; set; } = Localizations.Default.Language["MultiToggleButton_Changed"];
 
-        public String CheckedIcon { get; set; } = "✅";
-
-        public String ChangedString { get; set; } = Localizations.Default.Language["ToggleButton_Changed"];
-
-        public String Title { get; set; } = Localizations.Default.Language["ToggleButton_Title"];
+        /// <summary>
+        /// This holds the title of the control.
+        /// </summary>
+        public String Title { get; set; } = Localizations.Default.Language["MultiToggleButton_Title"];
 
         public int? MessageId { get; set; }
 
@@ -28,7 +34,15 @@ namespace TelegramBotBase.Controls.Inline
 
         private readonly EventHandlerList Events = new EventHandlerList();
 
+        /// <summary>
+        /// This will hold all options available.
+        /// </summary>
         public List<ButtonBase> Options { get; set; }
+
+        /// <summary>
+        /// This will set if an empty selection (null) is allowed.
+        /// </summary>
+        public bool AllowEmptySelection { get; set; } = true;
 
 
         public MultiToggleButton()
@@ -79,7 +93,7 @@ namespace TelegramBotBase.Controls.Inline
                             this.SelectedOption = this.Options[index];
                             OnToggled(new EventArgs());
                         }
-                        else
+                        else if(this.AllowEmptySelection)
                         {
                             this.SelectedOption = null;
                             OnToggled(new EventArgs());
@@ -114,7 +128,7 @@ namespace TelegramBotBase.Controls.Inline
                 var index = this.Options.IndexOf(o);
                 if (o == this.SelectedOption)
                 {
-                    lst.Add(new ButtonBase(CheckedIcon + " " + o.Text, "check$" + index));
+                    lst.Add(new ButtonBase(SelectedIcon + " " + o.Text, "check$" + index));
                     continue;
                 }
 

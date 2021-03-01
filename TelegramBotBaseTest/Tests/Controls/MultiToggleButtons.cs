@@ -31,8 +31,9 @@ namespace TelegramBotBaseTest.Tests.Controls
 
             mtb = new MultiToggleButton();
 
-            mtb.Options = new List<ButtonBase>() { new ButtonBase("Option 4", "4"), new ButtonBase("Option 5", "5"), new ButtonBase("Option 6", "6") };
+            mtb.Options = new List<ButtonBase>() { new ButtonBase("Option 4", "4"), new ButtonBase("Option 5", "5"), new ButtonBase("Option 6", "") };
             mtb.SelectedOption = mtb.Options.FirstOrDefault();
+            mtb.AllowEmptySelection = false;
             mtb.Toggled += Tb_Toggled;
             this.AddControl(mtb);
         }
@@ -40,7 +41,13 @@ namespace TelegramBotBaseTest.Tests.Controls
         private void Tb_Toggled(object sender, EventArgs e)
         {
             var tb = sender as MultiToggleButton;
-            Console.WriteLine(tb.ID.ToString() + " was pressed, and toggled to " + tb.SelectedOption.Value);
+            if (tb.SelectedOption != null)
+            {
+                Console.WriteLine(tb.ID.ToString() + " was pressed, and toggled to " + tb.SelectedOption.Value);
+                return;
+            }
+
+            Console.WriteLine("Selection for " + tb.ID.ToString() + " has been removed.");
         }
     }
 }

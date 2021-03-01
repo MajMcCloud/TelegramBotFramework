@@ -36,6 +36,10 @@ namespace TelegramBotBase.Localizations
             Values["ToggleButton_OnIcon"] = "⚫";
             Values["ToggleButton_OffIcon"] = "⚪";
             Values["ToggleButton_Title"] = "Schalter";
+            Values["ToggleButton_Changed"] = "Ausgewählt";
+            Values["MultiToggleButton_SelectedIcon"] = "✅";
+            Values["MultiToggleButton_Title"] = "Mehrfach-Schalter";
+            Values["MultiToggleButton_Changed"] = "Ausgewählt";
             Values["PromptDialog_Back"] = "Zurück";
             Values["ToggleButton_Changed"] = "Einstellung geändert";
             
