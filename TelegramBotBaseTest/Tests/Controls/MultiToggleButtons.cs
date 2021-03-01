@@ -31,7 +31,7 @@ namespace TelegramBotBaseTest.Tests.Controls
 
             mtb = new MultiToggleButton();
 
-            mtb.Options = new List<ButtonBase>() { new ButtonBase("Option 4", "4"), new ButtonBase("Option 5", "5"), new ButtonBase("Option 6", "") };
+            mtb.Options = new List<ButtonBase>() { new ButtonBase("Option 4", "4"), new ButtonBase("Option 5", "5"), new ButtonBase("Option 6", "6") };
             mtb.SelectedOption = mtb.Options.FirstOrDefault();
             mtb.AllowEmptySelection = false;
             mtb.Toggled += Tb_Toggled;
