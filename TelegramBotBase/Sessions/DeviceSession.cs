@@ -119,6 +119,7 @@ namespace TelegramBotBase.Sessions
 
         private static object __evMessageSent = new object();
         private static object __evMessageReceived = new object();
+        private static object __evMessageDeleted = new object();
 
         public DeviceSession()
         {
@@ -851,6 +852,27 @@ namespace TelegramBotBase.Sessions
         public void OnMessageReceived(MessageReceivedEventArgs e)
         {
             (this.__Events[__evMessageReceived] as EventHandler<MessageReceivedEventArgs>)?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Eventhandler for deleting messages
+        /// </summary>
+        public event EventHandler<MessageDeletedEventArgs> MessageDeleted
+        {
+            add
+            {
+                this.__Events.AddHandler(__evMessageDeleted, value);
+            }
+            remove
+            {
+                this.__Events.RemoveHandler(__evMessageDeleted, value);
+            }
+        }
+
+
+        public void OnMessageDeleted(MessageDeletedEventArgs e)
+        {
+            (this.__Events[__evMessageDeleted] as EventHandler<MessageDeletedEventArgs>)?.Invoke(this, e);
         }
 
         #endregion
