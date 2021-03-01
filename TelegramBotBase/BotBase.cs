@@ -372,32 +372,33 @@ namespace TelegramBotBase
                 }
 
                 //Action Event
-                if (!ds.FormSwitched)
+                if (!ds.FormSwitched && e.IsAction)
                 {
-                    if (e.IsAction)
+                    //Send Action event to controls
+                    await activeForm.ActionControls(e);
+
+                    //Send Action event to form itself
+                    await activeForm.Action(e);
+
+                    if (!e.Handled)
                     {
-                        //Send Action event to controls
-                        await activeForm.ActionControls(e);
+                        var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
+                        OnUnhandledCall(uhc);
 
-                        //Send Action event to form itself
-                        await activeForm.Action(e);
-
-                        if (!e.Handled)
+                        if (uhc.Handled)
                         {
-                            var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
-                            OnUnhandledCall(uhc);
-
-                            if (uhc.Handled)
+                            e.Handled = true;
+                            if (!ds.FormSwitched)
                             {
-                                e.Handled = true;
-                                if (!ds.FormSwitched)
-                                {
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
 
+                }
+
+                if (!ds.FormSwitched)
+                {
                     //Render Event
                     await activeForm.RenderControls(e);
 
@@ -433,10 +434,10 @@ namespace TelegramBotBase
             {
                 DeviceSession ds = this.Sessions.GetSession(DeviceId);
                 e.Device = ds;
-                
+
                 await Client_Loop(this, e);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 DeviceSession ds = this.Sessions.GetSession(DeviceId);
                 OnException(new SystemExceptionEventArgs(e.Message.Text, DeviceId, ds, ex));
