@@ -159,6 +159,22 @@ namespace TelegramBotBase.Controls.Hybrid
             }
         }
 
+        public override void Init()
+        {
+            this.Device.MessageDeleted += Device_MessageDeleted;
+        }
+
+        private void Device_MessageDeleted(object sender, MessageDeletedEventArgs e)
+        {
+            if (this.MessageId == null)
+                return;
+
+            if (e.MessageId != this.MessageId)
+                return;
+
+            this.MessageId = null;
+        }
+
         public async override Task Load(MessageResult result)
         {
             if (this.KeyboardType != eKeyboardType.ReplyKeyboard)
@@ -578,6 +594,11 @@ namespace TelegramBotBase.Controls.Hybrid
             if (!FormClose)
             {
                 this.Updated();
+            }
+            else
+            {
+                //Remove event handler
+                this.Device.MessageDeleted -= Device_MessageDeleted;
             }
         }
 
