@@ -77,6 +77,8 @@ Thanks !
 
     * [CheckedButtonList](#checked-button-list)
 
+    * [MultiToggleButton](#multi-toggle-button)
+
 - [Groups](#groups)
 	* [SplitterForm](#splitter-form)
 
@@ -814,6 +816,8 @@ await this.NavigateTo(cd);
 ### Checked Button List
 <img src="images/checkedbuttonlist.gif?raw=true" />
 
+### Multi Toggle Button
+<img src="images/multitogglebutton.gif?raw=true" />
 
 ## Groups
 
