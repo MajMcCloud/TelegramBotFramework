@@ -396,14 +396,20 @@ namespace TelegramBotBase.Controls.Hybrid
 
                 case eKeyboardType.InlineKeyBoard:
 
+                    //Try to edit message if message id is available
+                    //When the returned message is null then the message has been already deleted, resend it
                     if (this.MessageId != null)
                     {
                         m = await this.Device.Edit(this.MessageId.Value, this.Title, (InlineKeyboardMarkup)form);
+                        if (m != null)
+                        {
+                            this.MessageId = m.MessageId;
+                            return;
+                        }
                     }
-                    else
-                    {
-                        m = await this.Device.Send(this.Title, (InlineKeyboardMarkup)form, disableNotification: true, parseMode: MessageParseMode, MarkdownV2AutoEscape: false);
-                    }
+
+                    //When no message id is available or it has been deleted due the use of AutoCleanForm re-render automatically
+                    m = await this.Device.Send(this.Title, (InlineKeyboardMarkup)form, disableNotification: true, parseMode: MessageParseMode, MarkdownV2AutoEscape: false);
 
                     break;
             }
