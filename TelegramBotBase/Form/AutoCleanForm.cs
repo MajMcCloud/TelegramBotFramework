@@ -142,8 +142,9 @@ namespace TelegramBotBase.Form
                 foreach(var m in msgs)
                 {
                     Device.OnMessageDeleted(new MessageDeletedEventArgs(m));
-                    this.OldMessages.Remove(m);
                 }
+
+                this.OldMessages.RemoveRange(0, msgs.Count());
             }            
         }
     }
