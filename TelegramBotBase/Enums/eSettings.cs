@@ -27,9 +27,14 @@ namespace TelegramBotBase.Enums
         /// <summary>
         /// Does stick to the console event handler and saves all sessions on exit.
         /// </summary>
-        SaveSessionsOnConsoleExit = 4
+        SaveSessionsOnConsoleExit = 4,
 
 
+        /// <summary>
+        /// Indicates the maximum number of times a request that received error 
+        /// 429 will be sent again after a timeout until it receives code 200 or an error code not equal to 429.
+        /// </summary>
+        MaxNumberOfRetries = 5,
 
     }
 }
