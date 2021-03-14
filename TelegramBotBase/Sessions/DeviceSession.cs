@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -876,5 +876,15 @@ namespace TelegramBotBase.Sessions
         }
 
         #endregion
+
+        #region "Static"
+
+        /// <summary>
+        /// Indicates the maximum number of times a request that received error 
+        /// 429 will be sent again after a timeout until it receives code 200 or an error code not equal to 429.
+        /// </summary>
+        public static uint MaxNumberOfRetries { get; set; }
+
+        #endregion "Static"
     }
 }
