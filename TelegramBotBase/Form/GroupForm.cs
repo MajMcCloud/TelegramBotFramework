@@ -41,6 +41,7 @@ namespace TelegramBotBase.Form
                 case Telegram.Bot.Types.Enums.MessageType.MessagePinned:
                 case Telegram.Bot.Types.Enums.MessageType.GroupCreated:
                 case Telegram.Bot.Types.Enums.MessageType.SupergroupCreated:
+                case Telegram.Bot.Types.Enums.MessageType.ChannelCreated:
 
                     await OnGroupChanged(new GroupChangedEventArgs(message.MessageType, message));
 
