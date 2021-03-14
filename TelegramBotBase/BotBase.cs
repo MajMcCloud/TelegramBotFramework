@@ -72,6 +72,7 @@ namespace TelegramBotBase
         {
             this.SystemSettings = new Dictionary<eSettings, uint>();
 
+            SetSetting(eSettings.MaxNumberOfRetries, 5);
             SetSetting(eSettings.NavigationMaximum, 10);
             SetSetting(eSettings.LogAllMessages, false);
             SetSetting(eSettings.SkipAllMessages, false);
@@ -176,6 +177,8 @@ namespace TelegramBotBase
                     this.Sessions.SaveSessionStates();
                 });
             }
+
+            DeviceSession.MaxNumberOfRetries = this.GetSetting(eSettings.MaxNumberOfRetries, 5);
 
             this.Client.TelegramClient.StartReceiving();
         }
