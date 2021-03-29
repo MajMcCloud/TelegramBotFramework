@@ -13,7 +13,15 @@ namespace TelegramBotBase.Form
     [IgnoreState]
     public class ConfirmDialog : ModalDialog
     {
+        /// <summary>
+        /// The message the users sees.
+        /// </summary>
         public String Message { get; set; }
+
+        /// <summary>
+        /// An additional optional value.
+        /// </summary>
+        public object Tag { get; set; }
 
         /// <summary>
         /// Automatically close form on button click
@@ -77,7 +85,7 @@ namespace TelegramBotBase.Form
                 return;
             }
 
-            OnButtonClicked(new ButtonClickedEventArgs(button));
+            OnButtonClicked(new ButtonClickedEventArgs(button) { Tag = this.Tag });
 
             if (AutoCloseOnClick)
                 await CloseForm();
