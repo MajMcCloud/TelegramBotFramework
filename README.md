@@ -77,6 +77,8 @@ Thanks !
 
     * [CheckedButtonList](#checked-button-list)
 
+    * [MultiToggleButton](#multi-toggle-button)
+
 - [Groups](#groups)
 	* [SplitterForm](#splitter-form)
 
@@ -814,6 +816,8 @@ await this.NavigateTo(cd);
 ### Checked Button List
 <img src="images/checkedbuttonlist.gif?raw=true" />
 
+### Multi Toggle Button
+<img src="images/multitogglebutton.gif?raw=true" />
 
 ## Groups
 
@@ -896,6 +900,7 @@ public class GroupForm : FormBase
                 case Telegram.Bot.Types.Enums.MessageType.MessagePinned:
                 case Telegram.Bot.Types.Enums.MessageType.GroupCreated:
                 case Telegram.Bot.Types.Enums.MessageType.SupergroupCreated:
+                case Telegram.Bot.Types.Enums.MessageType.ChannelCreated:
 
                     await OnGroupChanged(new GroupChangedEventArgs(message.MessageType, message));
 
@@ -1081,6 +1086,9 @@ Will allow you to run specific system commands or run/kill processes via Bot. Ha
 
 Will delete Join and Leave messages automatically in groups.
 
+- [Examples/AsyncFormUpdates/](Examples/AsyncFormUpdates/) 
+
+When you want to update forms async without any user interaction (message/action) before. Use the new InvokeMessageLoop method of BotBase.
 
 ---
 

@@ -21,5 +21,7 @@ namespace TelegramBotBase.Constants
 
         public const int MaxReplyKeyboardCols = 12;
 
+        public const int MessageDeletionsPerSecond = 30;
+
     }
 }

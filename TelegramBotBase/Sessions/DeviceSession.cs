@@ -119,6 +119,7 @@ namespace TelegramBotBase.Sessions
 
         private static object __evMessageSent = new object();
         private static object __evMessageReceived = new object();
+        private static object __evMessageDeleted = new object();
 
         public DeviceSession()
         {
@@ -769,20 +770,24 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public async Task<T> API<T>(Func<Telegram.Bot.TelegramBotClient, Task<T>> call)
         {
-            try
+            var numberOfTries = 0;
+            while (numberOfTries < DeviceSession.MaxNumberOfRetries)
             {
-                return await call(this.Client.TelegramClient);
-            }
-            catch (ApiRequestException ex)
-            {
-                if (ex.Parameters != null)
+                try
                 {
-                    await Task.Delay(ex.Parameters.RetryAfter);
+                    return await call(Client.TelegramClient);
+                }
+                catch (ApiRequestException ex)
+                {
+                    if (ex.ErrorCode != 429)
+                        throw;
 
-                    return await call(this.Client.TelegramClient);
+                    if (ex.Parameters != null)
+                        await Task.Delay(ex.Parameters.RetryAfter * 1000);
+
+                    numberOfTries++;
                 }
             }
-
             return default(T);
         }
 
@@ -793,17 +798,23 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public async Task API(Func<Telegram.Bot.TelegramBotClient, Task> call)
         {
-            try
+            var numberOfTries = 0;
+            while (numberOfTries < DeviceSession.MaxNumberOfRetries)
             {
-                await call(this.Client.TelegramClient);
-            }
-            catch (ApiRequestException ex)
-            {
-                if (ex.Parameters != null)
+                try
                 {
-                    await Task.Delay(ex.Parameters.RetryAfter);
+                    await call(Client.TelegramClient);
+                    return;
+                }
+                catch (ApiRequestException ex)
+                {
+                    if (ex.ErrorCode != 429)
+                        throw;
 
-                    await call(this.Client.TelegramClient);
+                    if (ex.Parameters != null)
+                        await Task.Delay(ex.Parameters.RetryAfter * 1000);
+
+                    numberOfTries++;
                 }
             }
         }
@@ -853,6 +864,37 @@ namespace TelegramBotBase.Sessions
             (this.__Events[__evMessageReceived] as EventHandler<MessageReceivedEventArgs>)?.Invoke(this, e);
         }
 
+        /// <summary>
+        /// Eventhandler for deleting messages
+        /// </summary>
+        public event EventHandler<MessageDeletedEventArgs> MessageDeleted
+        {
+            add
+            {
+                this.__Events.AddHandler(__evMessageDeleted, value);
+            }
+            remove
+            {
+                this.__Events.RemoveHandler(__evMessageDeleted, value);
+            }
+        }
+
+
+        public void OnMessageDeleted(MessageDeletedEventArgs e)
+        {
+            (this.__Events[__evMessageDeleted] as EventHandler<MessageDeletedEventArgs>)?.Invoke(this, e);
+        }
+
         #endregion
+
+        #region "Static"
+
+        /// <summary>
+        /// Indicates the maximum number of times a request that received error 
+        /// 429 will be sent again after a timeout until it receives code 200 or an error code not equal to 429.
+        /// </summary>
+        public static uint MaxNumberOfRetries { get; set; }
+
+        #endregion "Static"
     }
 }

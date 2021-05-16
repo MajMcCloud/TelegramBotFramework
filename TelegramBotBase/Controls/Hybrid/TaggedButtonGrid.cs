@@ -170,6 +170,22 @@ namespace TelegramBotBase.Controls.Hybrid
             }
         }
 
+        public override void Init()
+        {
+            this.Device.MessageDeleted += Device_MessageDeleted;
+        }
+
+        private void Device_MessageDeleted(object sender, MessageDeletedEventArgs e)
+        {
+            if (this.MessageId == null)
+                return;
+
+            if (e.MessageId != this.MessageId)
+                return;
+
+            this.MessageId = null;
+        }
+
         public async override Task Load(MessageResult result)
         {
             if (this.KeyboardType != eKeyboardType.ReplyKeyboard)
@@ -185,10 +201,7 @@ namespace TelegramBotBase.Controls.Hybrid
                         ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
                         ?? ButtonsForm.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText);
 
-            var index = HeadLayoutButtonRow?.IndexOf(button)
-                        ?? SubHeadLayoutButtonRow?.IndexOf(button)
-                        ?? ButtonsForm.ToList().IndexOf(button);
-
+            var index = ButtonsForm.FindRowByButton(button);
 
 
             switch (this.SelectedViewIndex)
@@ -326,9 +339,7 @@ namespace TelegramBotBase.Controls.Hybrid
                         ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
                         ?? ButtonsForm.ToList().FirstOrDefault(a => a.Value == result.RawData);
 
-            var index = HeadLayoutButtonRow?.IndexOf(button)
-                        ?? SubHeadLayoutButtonRow?.IndexOf(button)
-                        ?? ButtonsForm.ToList().IndexOf(button);
+            var index = ButtonsForm.FindRowByButton(button);
 
             if (button != null)
             {
@@ -521,15 +532,21 @@ namespace TelegramBotBase.Controls.Hybrid
 
                 case eKeyboardType.InlineKeyBoard:
 
+
+                    //Try to edit message if message id is available
+                    //When the returned message is null then the message has been already deleted, resend it
                     if (this.MessageId != null)
                     {
                         m = await this.Device.Edit(this.MessageId.Value, this.Title, (InlineKeyboardMarkup)form);
-                    }
-                    else
-                    {
-                        m = await this.Device.Send(this.Title, (InlineKeyboardMarkup)form, disableNotification: true, parseMode: MessageParseMode, MarkdownV2AutoEscape: false);
+                        if (m != null)
+                        {
+                            this.MessageId = m.MessageId;
+                            return;
+                        }
                     }
 
+                    //When no message id is available or it has been deleted due the use of AutoCleanForm re-render automatically
+                    m = await this.Device.Send(this.Title, (InlineKeyboardMarkup)form, disableNotification: true, parseMode: MessageParseMode, MarkdownV2AutoEscape: false);
                     break;
             }
 
@@ -781,6 +798,11 @@ namespace TelegramBotBase.Controls.Hybrid
             if (!FormClose)
             {
                 this.Updated();
+            }
+            else
+            {
+                //Remove event handler
+                this.Device.MessageDeleted -= Device_MessageDeleted;
             }
         }
 

@@ -16,6 +16,8 @@ namespace TelegramBotBase.Args
 
         public int Index { get; set; }
 
+        public object Tag { get; set; }
+
 
         public ButtonClickedEventArgs()
         {

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 
@@ -14,9 +15,20 @@ namespace TelegramBotBase.Form
     [IgnoreState]
     public class PromptDialog : ModalDialog
     {
+        /// <summary>
+        /// The message the users sees.
+        /// </summary>
         public String Message { get; set; }
 
+        /// <summary>
+        /// The returned text value by the user.
+        /// </summary>
         public String Value { get; set; }
+
+        /// <summary>
+        /// An additional optional value.
+        /// </summary>
+        public object Tag { get; set; }
 
         private EventHandlerList __Events { get; set; } = new EventHandlerList();
 
@@ -86,13 +98,13 @@ namespace TelegramBotBase.Form
 
             message.Handled = true;
 
-            OnCompleted(new EventArgs());
+            OnCompleted(new PromptDialogCompletedEventArgs() { Tag = this.Tag, Value = this.Value });
 
             await this.CloseForm();
         }
 
 
-        public event EventHandler<EventArgs> Completed
+        public event EventHandler<PromptDialogCompletedEventArgs> Completed
         {
             add
             {
@@ -104,9 +116,9 @@ namespace TelegramBotBase.Form
             }
         }
 
-        public void OnCompleted(EventArgs e)
+        public void OnCompleted(PromptDialogCompletedEventArgs e)
         {
-            (this.__Events[__evCompleted] as EventHandler<EventArgs>)?.Invoke(this, e);
+            (this.__Events[__evCompleted] as EventHandler<PromptDialogCompletedEventArgs>)?.Invoke(this, e);
         }
 
     }

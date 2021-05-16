@@ -16,7 +16,15 @@ namespace TelegramBotBase.Form
     [IgnoreState]
     public class ArrayPromptDialog : FormBase
     {
+        /// <summary>
+        /// The message the users sees.
+        /// </summary>
         public String Message { get; set; }
+
+        /// <summary>
+        /// An additional optional value.
+        /// </summary>
+        public object Tag { get; set; }
 
         public ButtonBase[][] Buttons { get; set; }
 
@@ -70,7 +78,7 @@ namespace TelegramBotBase.Form
                 return;
             }
 
-            OnButtonClicked(new ButtonClickedEventArgs(button));
+            OnButtonClicked(new ButtonClickedEventArgs(button) { Tag = this.Tag });
 
             FormBase fb = ButtonForms.ContainsKey(call.Value) ? ButtonForms[call.Value] : null;
 

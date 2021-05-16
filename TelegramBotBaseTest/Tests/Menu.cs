@@ -140,6 +140,17 @@ namespace TelegramBotBaseTest.Tests
                     await this.NavigateTo(tb);
 
                     break;
+
+                case "multitogglebuttons":
+
+                    message.Handled = true;
+
+                    var mtb = new Controls.MultiToggleButtons();
+
+                    await this.NavigateTo(mtb);
+
+                    break;
+
                 case "buttongrid":
 
                     message.Handled = true;
@@ -216,6 +227,8 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#10 TreeView", new CallbackData("a", "treeview").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#11 ToggleButtons", new CallbackData("a", "togglebuttons").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#11.2 MultiToggleButtons", new CallbackData("a", "multitogglebuttons").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#12 ButtonGrid", new CallbackData("a", "buttongrid").Serialize()));
 
