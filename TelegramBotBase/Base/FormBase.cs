@@ -180,7 +180,7 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task LoadControls(MessageResult message)
+        public virtual async Task LoadControls(MessageResult message)
         {
             //Looking for the control by id, if not listened, raise event for all
             if (message.RawData?.StartsWith("#c") ?? false)
@@ -228,7 +228,7 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task ActionControls(MessageResult message)
+        public virtual async Task ActionControls(MessageResult message)
         {
             //Looking for the control by id, if not listened, raise event for all
             if (message.RawData.StartsWith("#c"))
@@ -278,7 +278,7 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task RenderControls(MessageResult message)
+        public virtual async Task RenderControls(MessageResult message)
         {
             foreach (var b in this.Controls)
             {
@@ -400,6 +400,10 @@ namespace TelegramBotBase.Form
         /// <param name="control"></param>
         public void AddControl(ControlBase control)
         {
+            //Duplicate check
+            if (this.Controls.Contains(control))
+                throw new ArgumentException("Control has been already added.");
+
             control.ID = this.Controls.Count + 1;
             control.Device = this.Device;
             this.Controls.Add(control);
