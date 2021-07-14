@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
-
+using TelegramBotBase.Tools;
 using static TelegramBotBase.Tools.Arrays;
 using static TelegramBotBase.Tools.Time;
 
@@ -36,15 +36,17 @@ namespace TelegramBotBase.Controls.Inline
         public bool EnableMonthView { get; set; } = true;
 
         public bool EnableYearView { get; set; } = true;
-
-        public CalendarPicker()
+        
+        public CalendarPicker(CultureInfo culture)
         {
             this.SelectedDate = DateTime.Today;
             this.VisibleMonth = DateTime.Today;
             this.FirstDayOfWeek = DayOfWeek.Monday;
-            this.Culture = new CultureInfo("de-de");
+            this.Culture = culture;
             this.PickerMode = eMonthPickerMode.day;
         }
+        
+        public CalendarPicker() : this(new CultureInfo("en-en")) { }
 
 
 
@@ -124,13 +126,13 @@ namespace TelegramBotBase.Controls.Inline
                 default:
 
                     int day = 0;
-                    if (result.RawData.StartsWith("d-") && int.TryParse(result.RawData.Split('-')[1], out day))
+                    if (result.RawData.StartsWith("d-") && TryParseDay(result.RawData.Split('-')[1], this.SelectedDate, out day))
                     {
                         this.SelectedDate = new DateTime(this.VisibleMonth.Year, this.VisibleMonth.Month, day);
                     }
 
                     int month = 0;
-                    if (result.RawData.StartsWith("m-") && int.TryParse(result.RawData.Split('-')[1], out month))
+                    if (result.RawData.StartsWith("m-") && TryParseMonth(result.RawData.Split('-')[1], out month))
                     {
                         this.SelectedDate = new DateTime(this.VisibleMonth.Year, month, 1);
                         this.VisibleMonth = this.SelectedDate;
@@ -142,7 +144,7 @@ namespace TelegramBotBase.Controls.Inline
                     }
 
                     int year = 0;
-                    if (result.RawData.StartsWith("y-") && int.TryParse(result.RawData.Split('-')[1], out year))
+                    if (result.RawData.StartsWith("y-") && TryParseYear(result.RawData.Split('-')[1], out year))
                     {
                         this.SelectedDate = new DateTime(year, SelectedDate.Month, SelectedDate.Day);
                         this.VisibleMonth = this.SelectedDate;

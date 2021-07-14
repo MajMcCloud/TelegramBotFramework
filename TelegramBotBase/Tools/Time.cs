@@ -8,6 +8,21 @@ namespace TelegramBotBase.Tools
 {
     public static class Time
     {
+        public static bool TryParseDay(string src, DateTime currentDate, out int resultDay)
+        {
+            return int.TryParse(src, out resultDay) && resultDay >= 1 && resultDay <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+        }
+
+        public static bool TryParseMonth(string src, out int resultMonth)
+        {
+            return int.TryParse(src, out resultMonth) && resultMonth >= 1 && resultMonth <= 12;
+        }
+
+        public static bool TryParseYear(string src, out int resultYear)
+        {
+            return int.TryParse(src, out resultYear) && resultYear >= 0 && resultYear <= DateTime.MaxValue.Year;
+        }
+        
         public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
         {
             int diff = dt.DayOfWeek - startOfWeek;
