@@ -54,5 +54,10 @@ namespace TelegramBotBase.Args
             return false;
         }
 
+        public object GetObject(String key)
+        {
+            return Values[key];
+        }
+
     }
 }

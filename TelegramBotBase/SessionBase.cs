@@ -198,7 +198,7 @@ namespace TelegramBotBase
                         catch (ArgumentException ex)
                         {
 
-                            CustomConversionChecks(form, p, f);
+                            Tools.Conversion.CustomConversionChecks(form, p, f);
 
                         }
                         catch
@@ -240,33 +240,7 @@ namespace TelegramBotBase
 
         }
 
-        private static void CustomConversionChecks(FormBase form, KeyValuePair<string, object> p, System.Reflection.PropertyInfo f)
-        {
-            //Newtonsoft Int64/Int32 converter issue
-            if (f.PropertyType == typeof(Int32))
-            {
-                int i = 0;
-                if(int.TryParse(p.Value.ToString(), out i))
-                {
-                    f.SetValue(form, i);
-                }
-                return;
-            }
-
-            //Newtonsoft Double/Decimal converter issue
-            if(f.PropertyType == typeof(Decimal) | f.PropertyType == typeof(Nullable<Decimal>))
-            {
-                decimal d = 0;
-                if(decimal.TryParse(p.Value.ToString(), out d))
-                {
-                    f.SetValue(form, d);
-                }
-                return;
-            }
-
-
-        }
-
+       
 
 
         /// <summary>

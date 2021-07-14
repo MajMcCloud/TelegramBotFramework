@@ -32,6 +32,10 @@ namespace TelegramBotBase.Args
         {
             Values[key] = value;
         }
+        public void SetObject(String key, object value)
+        {
+            Values[key] = value;
+        }
 
     }
 }
