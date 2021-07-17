@@ -12,7 +12,7 @@ namespace TelegramBotBaseTest.Tests.Groups
     public class LinkReplaceTest : TelegramBotBase.Form.GroupForm
     {
 
-        Dictionary<int, int> Counter { get; set; } = new Dictionary<int, int>();
+        Dictionary<long, int> Counter { get; set; } = new Dictionary<long, int>();
 
         private const int Maximum = 3;
 
