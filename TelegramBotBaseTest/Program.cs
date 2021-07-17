@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests;
-
+using TelegramBotBase.Commands;
 namespace TelegramBotBaseTest
 {
     class Program
@@ -17,7 +17,9 @@ namespace TelegramBotBaseTest
 
             BotBase<Start> bb = new BotBase<Start>(APIKey);
 
-            bb.BotCommands.Add(new BotCommand() { Command = "start", Description = "Starts the bot" });
+            bb.BotCommands.AddStartCommand("Starts the bot");
+            bb.BotCommands.AddHelpCommand("Should show you some help");
+            bb.BotCommands.AddSettingsCommand("Should show you some settings");
             bb.BotCommands.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
             bb.BotCommands.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
             bb.BotCommands.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
