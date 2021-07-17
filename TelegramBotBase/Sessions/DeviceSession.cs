@@ -700,7 +700,7 @@ namespace TelegramBotBase.Sessions
 
         #region "Users"
 
-        public virtual async Task RestrictUser(int userId, ChatPermissions permissions, DateTime until = default(DateTime))
+        public virtual async Task RestrictUser(long userId, ChatPermissions permissions, DateTime until = default(DateTime))
         {
             try
             {
@@ -712,7 +712,7 @@ namespace TelegramBotBase.Sessions
             }
         }
 
-        public virtual async Task<ChatMember> GetChatUser(int userId)
+        public virtual async Task<ChatMember> GetChatUser(long userId)
         {
             try
             {
@@ -725,7 +725,7 @@ namespace TelegramBotBase.Sessions
             return null;
         }
 
-        public virtual async Task KickUser(int userId, DateTime until = default(DateTime))
+        public virtual async Task KickUser(long userId, DateTime until = default(DateTime))
         {
             try
             {
@@ -737,7 +737,7 @@ namespace TelegramBotBase.Sessions
             }
         }
 
-        public virtual async Task UnbanUser(int userId)
+        public virtual async Task UnbanUser(long userId)
         {
             try
             {
