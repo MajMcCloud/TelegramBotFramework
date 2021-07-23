@@ -155,6 +155,8 @@ namespace TelegramBotBase.Form
                         .Max(e =>(int?) ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
                     retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
                 }
+                
+                deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
 
                 oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
                 if (retryAfterTask != null)
