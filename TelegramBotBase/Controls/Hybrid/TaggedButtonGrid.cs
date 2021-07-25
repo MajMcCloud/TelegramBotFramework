@@ -506,27 +506,25 @@ namespace TelegramBotBase.Controls.Hybrid
                 //Reply Keyboard could only be updated with a new keyboard.
                 case eKeyboardType.ReplyKeyboard:
 
-                    if (this.MessageId != null)
+                    if (form.Count == 0)
                     {
-                        if (form.Count == 0)
+                        if (this.MessageId != null)
                         {
                             await this.Device.HideReplyKeyboard();
                             this.MessageId = null;
-                            return;
                         }
-
-                        if (this.DeletePreviousMessage)
-                            await this.Device.DeleteMessage(this.MessageId.Value);
-                    }
-
-                    if (form.Count == 0)
                         return;
+                    }
 
 
                     var rkm = (ReplyKeyboardMarkup)form;
                     rkm.ResizeKeyboard = this.ResizeKeyboard;
                     rkm.OneTimeKeyboard = this.OneTimeKeyboard;
                     m = await this.Device.Send(this.Title, rkm, disableNotification: true, parseMode: MessageParseMode, MarkdownV2AutoEscape: false);
+
+                    //Prevent flicker of keyboard
+                    if (this.DeletePreviousMessage && this.MessageId != null)
+                        await this.Device.DeleteMessage(this.MessageId.Value);
 
                     break;
 
@@ -636,27 +634,28 @@ namespace TelegramBotBase.Controls.Hybrid
                 //Reply Keyboard could only be updated with a new keyboard.
                 case eKeyboardType.ReplyKeyboard:
 
-                    if (this.MessageId != null)
+                    if (bf.Count == 0)
                     {
-                        if (bf.Count == 0)
+                        if (this.MessageId != null)
                         {
                             await this.Device.HideReplyKeyboard();
                             this.MessageId = null;
-                            return;
                         }
-
-                        if (this.DeletePreviousMessage)
-                            await this.Device.DeleteMessage(this.MessageId.Value);
+                        return;
                     }
 
-                    if (bf.Count == 0)
-                        return;
+                    //if (bf.Count == 0)
+                    //    return;
 
 
                     var rkm = (ReplyKeyboardMarkup)bf;
                     rkm.ResizeKeyboard = this.ResizeKeyboard;
                     rkm.OneTimeKeyboard = this.OneTimeKeyboard;
                     m = await this.Device.Send("Choose category", rkm, disableNotification: true, parseMode: MessageParseMode, MarkdownV2AutoEscape: false);
+
+                    //Prevent flicker of keyboard
+                    if (this.DeletePreviousMessage && this.MessageId != null)
+                        await this.Device.DeleteMessage(this.MessageId.Value);
 
                     break;
 
