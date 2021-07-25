@@ -199,7 +199,7 @@ namespace TelegramBotBase.Controls.Hybrid
             if (!result.IsFirstHandler)
                 return;
 
-            if (result.MessageText == null)
+            if (result.MessageText == null || result.MessageText == "")
                 return;
 
             var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText)
@@ -328,14 +328,14 @@ namespace TelegramBotBase.Controls.Hybrid
 
         public async override Task Action(MessageResult result, string value = null)
         {
-            //Find clicked button depending on Text or Value (depending on markup type)
-            if (this.KeyboardType != eKeyboardType.InlineKeyBoard)
-                return;
-
             if (result.Handled)
                 return;
 
             if (!result.IsFirstHandler)
+                return;
+
+            //Find clicked button depending on Text or Value (depending on markup type)
+            if (this.KeyboardType != eKeyboardType.InlineKeyBoard)
                 return;
 
             await result.ConfirmAction(this.ConfirmationText ?? "");
