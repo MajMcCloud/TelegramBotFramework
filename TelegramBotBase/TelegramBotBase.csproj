@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net472;net5;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net5;netcoreapp3.1</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/MajMcCloud/TelegramBotFramework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MajMcCloud/TelegramBotFramework</RepositoryUrl>
-    <PackageReleaseNotes>- moving from .Net Framework 4.7.2 to  .Net Standard 2.1 for the Library and .Net Core 3.1 for the test project!</PackageReleaseNotes>
+    <PackageReleaseNotes>- moving from .Net Framework 4.7.2 to .Net Standard 2.1 for the Library and .Net Core 3.1 for the test project!</PackageReleaseNotes>
     <Configurations>Debug;Release;</Configurations>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
@@ -78,11 +78,19 @@
     <None Remove="TelegramBotBase.2.1.0.zip" />
     <None Remove="TelegramBotBase.3.0.0.nupkg" />
     <None Remove="TelegramBotBase.3.0.0.zip" />
+    <None Remove="TelegramBotBase.3.1.1.nupkg.zip" />
+    <None Remove="TelegramBotBase.3.2.0.nupkg" />
+    <None Remove="TelegramBotBase.3.2.0.snupkg" />
+    <None Remove="TelegramBotBase.3.2.0.zip" />
+    <None Remove="TelegramBotBase.3.2.1.nupkg" />
+    <None Remove="TelegramBotBase.3.2.1.snupkg" />
+    <None Remove="TelegramBotBase.3.2.2.nupkg" />
+    <None Remove="TelegramBotBase.3.2.2.snupkg" />
     <None Remove="TelegramBotBase.nuspec" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     <PackageReference Include="Telegram.Bot" Version="16.0.2" />
