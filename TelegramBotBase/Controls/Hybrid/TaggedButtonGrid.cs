@@ -845,8 +845,27 @@ namespace TelegramBotBase.Controls.Hybrid
             }
 
 
+        /// <summary>
+        /// Checks all tags for filtering.
+        /// </summary>
+        public void CheckAllTags()
+        {
+            this.SelectedTags.Clear();
 
+            this.SelectedTags = this.Tags.Select(a => a).ToList();
 
+            this.Updated();
+
+        }
+
+        /// <summary>
+        /// Unchecks all tags for filtering.
+        /// </summary>
+        public void UncheckAllTags()
+        {
+            this.SelectedTags.Clear();
+
+            this.Updated();
         }
 
     }
