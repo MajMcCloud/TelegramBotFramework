@@ -22,7 +22,7 @@ namespace TelegramBotBase.Form.Navigation
         public int Index { get; set; }
 
         /// <summary>
-        /// Will replace the controller when poping a form with last last remaining form.
+        /// Will replace the controller when poping a form to the root form.
         /// </summary>
         [SaveState]
         public bool ForceCleanupOnLastPop { get; set; }
@@ -112,6 +112,21 @@ namespace TelegramBotBase.Form.Navigation
             {
                 form = History[Index];
                 await form.OnOpened(new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Pop's through all forms back to the root form.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task PopToRootAsync()
+        {
+            if (Index == 0)
+                return;
+
+            while (History.Count > 1)
+            {
+                await PopAsync();
             }
         }
 
