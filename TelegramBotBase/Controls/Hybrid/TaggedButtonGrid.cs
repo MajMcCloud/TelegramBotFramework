@@ -48,6 +48,11 @@ namespace TelegramBotBase.Controls.Hybrid
         public bool DeletePreviousMessage { get; set; } = true;
 
         /// <summary>
+        /// Removes the reply message from a user.
+        /// </summary>
+        public bool DeleteReplyMessage { get; set; } = true;
+
+        /// <summary>
         /// Parsemode of the message.
         /// </summary>
         public ParseMode MessageParseMode { get; set; } = ParseMode.Default;
@@ -213,7 +218,7 @@ namespace TelegramBotBase.Controls.Hybrid
                         await OnButtonClicked(new ButtonClickedEventArgs(button, index));
 
                         //Remove button click message
-                        if (this.DeletePreviousMessage)
+                        if (this.DeleteReplyMessage)
                             await Device.DeleteMessage(result.MessageId);
 
                         result.Handled = true;
