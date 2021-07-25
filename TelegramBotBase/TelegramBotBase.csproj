@@ -62,32 +62,6 @@
     <None Remove="Archive\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="cpack.ps1" />
-    <None Remove="cpack_bak.ps1" />
-    <None Remove="cpush.ps1" />
-    <None Remove="nuget.exe" />
-    <None Remove="TelegramBotBase.1.5.0.nupkg" />
-    <None Remove="TelegramBotBase.1.5.0.zip" />
-    <None Remove="TelegramBotBase.1.5.1.nupkg" />
-    <None Remove="TelegramBotBase.1.5.1.zip" />
-    <None Remove="TelegramBotBase.1.5.2.nupkg" />
-    <None Remove="TelegramBotBase.1.5.2.zip" />
-    <None Remove="TelegramBotBase.2.0.0.nupkg" />
-    <None Remove="TelegramBotBase.2.1.0.nupkg" />
-    <None Remove="TelegramBotBase.2.1.0.zip" />
-    <None Remove="TelegramBotBase.3.0.0.nupkg" />
-    <None Remove="TelegramBotBase.3.0.0.zip" />
-    <None Remove="TelegramBotBase.3.1.1.nupkg.zip" />
-    <None Remove="TelegramBotBase.3.2.0.nupkg" />
-    <None Remove="TelegramBotBase.3.2.0.snupkg" />
-    <None Remove="TelegramBotBase.3.2.0.zip" />
-    <None Remove="TelegramBotBase.3.2.1.nupkg" />
-    <None Remove="TelegramBotBase.3.2.1.snupkg" />
-    <None Remove="TelegramBotBase.3.2.2.nupkg" />
-    <None Remove="TelegramBotBase.3.2.2.snupkg" />
-    <None Remove="TelegramBotBase.nuspec" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
