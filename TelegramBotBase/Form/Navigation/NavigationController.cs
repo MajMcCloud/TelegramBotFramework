@@ -121,10 +121,7 @@ namespace TelegramBotBase.Form.Navigation
         /// <returns></returns>
         public virtual async Task PopToRootAsync()
         {
-            if (Index == 0)
-                return;
-
-            while (History.Count > 1)
+            while (Index > 0)
             {
                 await PopAsync();
             }
