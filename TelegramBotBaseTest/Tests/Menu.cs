@@ -192,6 +192,14 @@ namespace TelegramBotBaseTest.Tests
 
                     break;
 
+                case "dynamicbuttongrid":
+
+                    var dg = new Datasources.List();
+
+                    await NavigateTo(dg);
+
+                    break;
+
                 default:
 
                     message.Handled = false;
@@ -236,6 +244,8 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#16 CheckedButtonList", new CallbackData("a", "checkedbuttonlist").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#17 NavigationController (Push/Pop)", new CallbackData("a", "navigationcontroller").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#18 Dynamic ButtonGrid (DataSources)", new CallbackData("a", "dynamicbuttongrid").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }
