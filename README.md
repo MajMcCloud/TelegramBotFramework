@@ -1087,7 +1087,7 @@ public class Registration : STForm
 
 ### As of now
 
-As from earlier topics on this readme you alread know the default way for (cross) navigating between Forms.
+As from earlier topics on this readme you already know the default way for (cross) navigation between Forms.
 It will look something like this:
 
 ```
@@ -1115,7 +1115,10 @@ Thats why I introduced a NavigationController class which manages these situatio
 First you need to create a NavigationController instance at the same position in code, where you want to start the navigation.
 
 You will use the current FormBase instance as a root class within the constructor. So you can later come back to this one.
-Where are using the same Form instance as above.
+
+**Tip**: *You can add also a completely new instance of i.e. a main menu form here to get back to it then. So you are free to choose.*
+
+We are using the same FormBase instance as above.
 
 
 ```
