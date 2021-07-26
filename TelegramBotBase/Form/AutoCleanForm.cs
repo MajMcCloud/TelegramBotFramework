@@ -131,6 +131,7 @@ namespace TelegramBotBase.Form
         {
             var oldMessages = OldMessages.AsEnumerable();
 
+#if !NET472
             while (oldMessages.Any())
             {
                 using var cts = new CancellationTokenSource();
@@ -162,6 +163,43 @@ namespace TelegramBotBase.Form
                 if (retryAfterTask != null)
                     await retryAfterTask;
             }
+#else
+            while (oldMessages.Any())
+            {
+                using (var cts = new CancellationTokenSource())
+                {
+                    var deletedMessages = new ConcurrentBag<int>();
+                    var parallelQuery = OldMessages.AsParallel()
+                                                    .WithCancellation(cts.Token);
+                    Task retryAfterTask = null;
+                    try
+                    {
+                        parallelQuery.ForAll(i =>
+                        {
+                            Device.DeleteMessage(i).GetAwaiter().GetResult();
+                            deletedMessages.Add(i);
+                        });
+                    }
+                    catch (AggregateException ex)
+                    {
+                        cts.Cancel();
+
+                        var retryAfterSeconds = ex.InnerExceptions
+                            .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
+                            .Max(e => (int?)((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
+                        retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
+                    }
+
+                    deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+
+                    oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
+                    if (retryAfterTask != null)
+                        await retryAfterTask;
+                }
+            }
+
+
+#endif
 
             OldMessages.Clear();
         }
