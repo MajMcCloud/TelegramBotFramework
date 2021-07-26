@@ -1132,8 +1132,6 @@ nc.PushAsync(f);
 
 ```
 
-**Tip**: *By default the NavigationController has ForceCleanupOnLastPop enabled, which means that when the stack is again at 1 (due to PopAsync or PopToRootAsync calls) it will replace the controller automatically with the root form you have given to the constructor at the beginning.*
-
 
 Later to open a new form use PushAsync again:
 
@@ -1152,7 +1150,7 @@ await this.NavigationController.PopAsync();
 
 ```
 
-
+**Notice**: *By default the NavigationController has ForceCleanupOnLastPop enabled, which means that when the stack is again at 1 (due to PopAsync or PopToRootAsync calls) it will replace the controller automatically with the root form you have given to the constructor at the beginning.*
 
 
 
