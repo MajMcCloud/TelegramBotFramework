@@ -111,7 +111,7 @@ Thanks !
 
     * [As of Now](#as-of-now)
 
-    * [How to use](#how-to-use)
+    * [How to use](#how-to-use-)
 
 
 
@@ -1095,7 +1095,6 @@ It will look something like this:
 var f = new FormBase();
 await this.NavigateTo(f);
 
-
 ```
 
 Depending on the model and structure of your bot it can make sense, to have more linear navigation instead of "cross" navigation.
@@ -1130,7 +1129,6 @@ await this.NavigateTo(nc);
 
 //Push the new from onto the stack to render it
 nc.PushAsync(f);
-
 
 ```
 
