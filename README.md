@@ -107,7 +107,7 @@ Thanks !
         * [IgnoreState](#ignorestate)
 	
 
-[Navigation and NavigationController (v4.0.0)](#navigiation-and-navigationcontroller)
+- [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
 
     * [As of Now](#as-of-now)
 
