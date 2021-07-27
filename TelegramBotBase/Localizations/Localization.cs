@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TelegramBotBase.Localizations
 {
-    public class Localization
+    public abstract class Localization
     {
         public Dictionary<String, String> Values = new Dictionary<string, string>();
 
