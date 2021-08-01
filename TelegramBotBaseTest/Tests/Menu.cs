@@ -200,6 +200,13 @@ namespace TelegramBotBaseTest.Tests
 
                     break;
 
+                case "notifications":
+
+                    var not = new Notifications.Start();
+                    await NavigateTo(not);
+
+                    break;
+
                 default:
 
                     message.Handled = false;
@@ -246,6 +253,8 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#17 NavigationController (Push/Pop)", new CallbackData("a", "navigationcontroller").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#18 Dynamic ButtonGrid (DataSources)", new CallbackData("a", "dynamicbuttongrid").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#19 Notifications", new CallbackData("a", "notifications").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }
