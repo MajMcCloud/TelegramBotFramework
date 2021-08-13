@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
@@ -127,25 +129,79 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public async Task MessageCleanup()
         {
-            while (this.OldMessages.Count > 0)
+            var oldMessages = OldMessages.AsEnumerable();
+
+#if !NET472
+            while (oldMessages.Any())
             {
-                var tasks = new List<Task>();
-                var msgs = this.OldMessages.Take(Constants.Telegram.MessageDeletionsPerSecond);
-
-                foreach (var msg in msgs)
+                using var cts = new CancellationTokenSource();
+                var deletedMessages = new ConcurrentBag<int>();
+                var parallelQuery = OldMessages.AsParallel()
+                                                .WithCancellation(cts.Token);
+                Task retryAfterTask = null;
+                try
                 {
-                    tasks.Add(this.Device.DeleteMessage(msg));
+                    parallelQuery.ForAll(i =>
+                    {
+                        Device.DeleteMessage(i).GetAwaiter().GetResult();
+                        deletedMessages.Add(i);
+                    });
                 }
-
-                await Task.WhenAll(tasks);
-
-                foreach(var m in msgs)
+                catch (AggregateException ex)
                 {
-                    Device.OnMessageDeleted(new MessageDeletedEventArgs(m));
-                }
+                    cts.Cancel();
 
-                this.OldMessages.RemoveRange(0, msgs.Count());
-            }            
+                    var retryAfterSeconds = ex.InnerExceptions
+                        .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
+                        .Max(e =>(int?) ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
+                    retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
+                }
+                
+                deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+
+                oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
+                if (retryAfterTask != null)
+                    await retryAfterTask;
+            }
+#else
+            while (oldMessages.Any())
+            {
+                using (var cts = new CancellationTokenSource())
+                {
+                    var deletedMessages = new ConcurrentBag<int>();
+                    var parallelQuery = OldMessages.AsParallel()
+                                                    .WithCancellation(cts.Token);
+                    Task retryAfterTask = null;
+                    try
+                    {
+                        parallelQuery.ForAll(i =>
+                        {
+                            Device.DeleteMessage(i).GetAwaiter().GetResult();
+                            deletedMessages.Add(i);
+                        });
+                    }
+                    catch (AggregateException ex)
+                    {
+                        cts.Cancel();
+
+                        var retryAfterSeconds = ex.InnerExceptions
+                            .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
+                            .Max(e => (int?)((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
+                        retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
+                    }
+
+                    deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+
+                    oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
+                    if (retryAfterTask != null)
+                        await retryAfterTask;
+                }
+            }
+
+
+#endif
+
+            OldMessages.Clear();
         }
     }
 }

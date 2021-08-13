@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Args
@@ -17,7 +18,7 @@ namespace TelegramBotBase.Args
         /// <summary>
         /// Contains all buttons within this row, excluding the checkbox.
         /// </summary>
-        public List<ButtonBase> Row { get; set; }
+        public ButtonRow Row { get; set; }
 
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace TelegramBotBase.Args
 
         }
 
-        public CheckedChangedEventArgs(List<ButtonBase> row, int Index, bool Checked)
+        public CheckedChangedEventArgs(ButtonRow row, int Index, bool Checked)
         {
             this.Row = row;
             this.Index = Index;

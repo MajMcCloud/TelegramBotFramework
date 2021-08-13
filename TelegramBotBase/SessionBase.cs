@@ -208,6 +208,13 @@ namespace TelegramBotBase
                     }
                 }
 
+                form.Client = Client;
+                var device = new DeviceSession(s.DeviceId, form);
+
+                device.ChatTitle = s.ChatTitle;
+
+                this.SessionList.Add(s.DeviceId, device);
+
                 //Is Subclass of IStateForm
                 var iform = form as IStateForm;
                 if (iform != null)
@@ -216,14 +223,6 @@ namespace TelegramBotBase
                     ls.Values = s.Values;
                     iform.LoadState(ls);
                 }
-
-
-                form.Client = Client;
-                var device = new DeviceSession(s.DeviceId, form);
-
-                device.ChatTitle = s.ChatTitle;
-
-                this.SessionList.Add(s.DeviceId, device);
 
                 try
                 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Args
@@ -17,6 +18,8 @@ namespace TelegramBotBase.Args
         public int Index { get; set; }
 
         public object Tag { get; set; }
+
+        public ButtonRow Row { get; set; }
 
 
         public ButtonClickedEventArgs()
@@ -36,5 +39,11 @@ namespace TelegramBotBase.Args
             this.Index = Index;
         }
 
+        public ButtonClickedEventArgs(ButtonBase button, int Index, ButtonRow row)
+        {
+            this.Button = button;
+            this.Index = Index;
+            this.Row = row;
+        }
     }
 }

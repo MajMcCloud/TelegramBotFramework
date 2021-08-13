@@ -41,7 +41,9 @@ namespace TelegramBotBaseTest.Tests
             if (call == null)
                 return;
 
-            switch(call.Value)
+            message.Handled = true;
+
+            switch (call.Value)
             {
                 case "text":
 
@@ -93,8 +95,6 @@ namespace TelegramBotBaseTest.Tests
 
                 case "data":
 
-                    message.Handled = true;
-
                     var data = new DataForm();
 
                     await this.NavigateTo(data);
@@ -102,8 +102,6 @@ namespace TelegramBotBaseTest.Tests
                     break;
 
                 case "calendar":
-
-                    message.Handled = true;
 
                     var calendar = new Controls.CalendarPickerForm();
 
@@ -113,8 +111,6 @@ namespace TelegramBotBaseTest.Tests
 
                 case "month":
 
-                    message.Handled = true;
-
                     var month = new Controls.MonthPickerForm();
 
                     await this.NavigateTo(month);
@@ -122,8 +118,6 @@ namespace TelegramBotBaseTest.Tests
                     break;
 
                 case "treeview":
-
-                    message.Handled = true;
 
                     var tree = new Controls.TreeViewForms();
 
@@ -133,8 +127,6 @@ namespace TelegramBotBaseTest.Tests
 
                 case "togglebuttons":
 
-                    message.Handled = true;
-
                     var tb = new Controls.ToggleButtons();
 
                     await this.NavigateTo(tb);
@@ -142,8 +134,6 @@ namespace TelegramBotBaseTest.Tests
                     break;
 
                 case "multitogglebuttons":
-
-                    message.Handled = true;
 
                     var mtb = new Controls.MultiToggleButtons();
 
@@ -153,8 +143,6 @@ namespace TelegramBotBaseTest.Tests
 
                 case "buttongrid":
 
-                    message.Handled = true;
-
                     var bg = new Controls.ButtonGridForm();
 
                     await this.NavigateTo(bg);
@@ -162,8 +150,6 @@ namespace TelegramBotBaseTest.Tests
                     break;
 
                 case "buttongridfilter":
-
-                    message.Handled = true;
 
                     var bg2 = new Controls.ButtonGridPagingForm();
 
@@ -173,8 +159,6 @@ namespace TelegramBotBaseTest.Tests
 
                 case "buttongridtags":
 
-                    message.Handled = true;
-
                     var bg3 = new Controls.ButtonGridTagForm();
 
                     await this.NavigateTo(bg3);
@@ -182,8 +166,6 @@ namespace TelegramBotBaseTest.Tests
                     break;
 
                 case "multiview":
-
-                    message.Handled = true;
 
                     var mvf = new MultiViewForm();
 
@@ -194,12 +176,40 @@ namespace TelegramBotBaseTest.Tests
 
                 case "checkedbuttonlist":
 
-                    message.Handled = true;
-
                     var cbl = new CheckedButtonListForm();
 
                     await NavigateTo(cbl);
 
+
+                    break;
+
+                case "navigationcontroller":
+
+                    var nc = new Navigation.Start();
+
+                    await NavigateTo(nc);
+
+
+                    break;
+
+                case "dynamicbuttongrid":
+
+                    var dg = new Datasources.List();
+
+                    await NavigateTo(dg);
+
+                    break;
+
+                case "notifications":
+
+                    var not = new Notifications.Start();
+                    await NavigateTo(not);
+
+                    break;
+
+                default:
+
+                    message.Handled = false;
 
                     break;
             }
@@ -239,6 +249,12 @@ namespace TelegramBotBaseTest.Tests
             btn.AddButtonRow(new ButtonBase("#15 MultiView", new CallbackData("a", "multiview").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("#16 CheckedButtonList", new CallbackData("a", "checkedbuttonlist").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#17 NavigationController (Push/Pop)", new CallbackData("a", "navigationcontroller").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#18 Dynamic ButtonGrid (DataSources)", new CallbackData("a", "dynamicbuttongrid").Serialize()));
+
+            btn.AddButtonRow(new ButtonBase("#19 Notifications", new CallbackData("a", "notifications").Serialize()));
 
             await this.Device.Send("Choose your test:", btn);
         }

@@ -32,6 +32,7 @@ namespace TelegramBotBaseTest.Tests.Controls
             m_Buttons.EnablePaging = true;
 
             m_Buttons.HeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase("Back", "back") };
+            
 
             var countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
 
@@ -45,7 +46,9 @@ namespace TelegramBotBaseTest.Tests.Controls
             m_Buttons.Tags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
             m_Buttons.SelectedTags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
 
-            m_Buttons.ButtonsForm = bf;
+            m_Buttons.EnableCheckAllTools = true;
+
+            m_Buttons.DataSource = new TelegramBotBase.Datasources.ButtonFormDataSource(bf);
 
             m_Buttons.ButtonClicked += Bg_ButtonClicked;
 
@@ -57,11 +60,13 @@ namespace TelegramBotBaseTest.Tests.Controls
             if (e.Button == null)
                 return;
 
-            if (e.Button.Value == "back")
+            switch (e.Button.Value)
             {
-                var start = new Menu();
-                await this.NavigateTo(start);
-                return;
+
+                case "back":
+                    var start = new Menu();
+                    await this.NavigateTo(start);
+                    return;
 
             }
 

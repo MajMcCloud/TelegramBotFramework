@@ -35,12 +35,12 @@ namespace TelegramBotBaseTest.Tests.Controls
 
             ButtonForm bf = new ButtonForm();
 
-            for(int i = 0;i < 30;i++)
+            for (int i = 0; i < 30; i++)
             {
-                bf.AddButtonRow($"{i}. Item", i.ToString());
+                bf.AddButtonRow($"{i + 1}. Item", i.ToString());
             }
 
-            m_Buttons.ButtonsForm = bf;
+            m_Buttons.DataSource = new TelegramBotBase.Datasources.ButtonFormDataSource(bf);
 
             m_Buttons.ButtonClicked += Bg_ButtonClicked;
             m_Buttons.CheckedChanged += M_Buttons_CheckedChanged;
@@ -58,29 +58,32 @@ namespace TelegramBotBaseTest.Tests.Controls
             if (e.Button == null)
                 return;
 
-            if (e.Button.Value == "back")
+            switch (e.Button.Value)
             {
-                var start = new Menu();
-                await this.NavigateTo(start);
-            }
-            else if (e.Button.Value == "switch")
-            {
-                switch (m_Buttons.KeyboardType)
-                {
-                    case TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard:
-                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-                        break;
-                    case TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard:
-                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-                        break;
-                }
+                case "back":
+
+                    var start = new Menu();
+                    await NavigateTo(start);
+                    break;
 
 
-            }
-            else
-            {
+                case "switch":
+                    switch (m_Buttons.KeyboardType)
+                    {
+                        case TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard:
+                            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
+                            break;
+                        case TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard:
+                            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
+                            break;
+                    }
 
-                await this.Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
+
+                    break;
+
+                default:
+                    await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
+                    break;
             }
 
 

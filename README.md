@@ -106,6 +106,16 @@ Thanks !
 	
         * [IgnoreState](#ignorestate)
 	
+
+- [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
+
+    * [As of Now](#as-of-now)
+
+    * [How to use](#how-to-use-)
+
+
+
+
 - [Examples](#examples)
 
 ---
@@ -1072,6 +1082,81 @@ public class Registration : STForm
 }
 
 ```
+
+## Navigation and NavigationController
+
+### As of now
+
+As from earlier topics on this readme you already know the default way for (cross) navigation between Forms.
+It will look something like this:
+
+```
+
+var f = new FormBase();
+await this.NavigateTo(f);
+
+```
+
+Depending on the model and structure of your bot it can make sense, to have more linear navigation instead of "cross" navigation.
+
+In example you have a bot which shows a list of football teams. And when clicking on it you want to open the team details and latest matches.
+
+After the matches you want to maybe switch to a different teams and take a look at their statistics and matches.
+
+At some point, you "just" want to get back to the first team so like on Android your clicking the "back" button multiple times.
+
+This can become really complicated, when not having some controller below which handle these "Push/Pop" calls.
+
+Thats why I introduced a NavigationController class which manages these situations and the stack.
+
+
+### How to use ?
+
+First you need to create a NavigationController instance at the same position in code, where you want to start the navigation.
+
+You will use the current FormBase instance as a root class within the constructor. So you can later come back to this one.
+
+**Tip**: *You can add also a completely new instance of i.e. a main menu form here to get back to it then. So you are free to choose.*
+
+We are using the same FormBase instance as above.
+
+
+```
+
+var nc = new NavigationController(this);
+
+var f = new FormBase();
+
+//Replace the current form in the context with the controller.
+await this.NavigateTo(nc);
+
+//Push the new from onto the stack to render it
+nc.PushAsync(f);
+
+```
+
+
+Later to open a new form use PushAsync again:
+
+```
+
+await this.NavigationController.PushAsync(newForm);
+
+```
+
+When you want to go back one Form on the stack use PopAsync:
+
+
+```
+
+await this.NavigationController.PopAsync();
+
+```
+
+**Notice**: *By default the NavigationController has ForceCleanupOnLastPop enabled, which means that when the stack is again at 1 (due to PopAsync or PopToRootAsync calls) it will replace the controller automatically with the root form you have given to the constructor at the beginning.*
+
+
+
 
 
 ## Examples
