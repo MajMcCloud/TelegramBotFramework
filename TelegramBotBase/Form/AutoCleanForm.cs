@@ -49,8 +49,15 @@ namespace TelegramBotBase.Form
             this.Device.MessageSent += Device_MessageSent;
 
             this.Device.MessageReceived += Device_MessageReceived;
+
+            this.Device.MessageDeleted += Device_MessageDeleted;
         }
 
+        private void Device_MessageDeleted(object sender, MessageDeletedEventArgs e)
+        {
+            if (OldMessages.Contains(e.MessageId))
+                OldMessages.Remove(e.MessageId);
+        }
 
         private void Device_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
@@ -157,7 +164,7 @@ namespace TelegramBotBase.Form
                     retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
                 }
                 
-                deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+                //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
 
                 oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
                 if (retryAfterTask != null)
@@ -190,7 +197,7 @@ namespace TelegramBotBase.Form
                         retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
                     }
 
-                    deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+                    //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
 
                     oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
                     if (retryAfterTask != null)
