@@ -169,11 +169,9 @@ public class StartForm : FormBase
 
         }
 		
-	//Gets invoked during Navigation to this form
-        public override async Task Init(params object[] param)
-        {
-            
-        }
+	    //Gets invoked during Navigation to this form
+
+        //Init() got replaced with event handler
 		
     	//Opened() got replaced with event handler
 
