@@ -20,8 +20,7 @@ namespace TelegramBotBase
     /// Bot base class for full Device/Context and Messagehandling
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BotBase<T>
-        where T : FormBase
+    public class BotBase
     {
         public MessageClient Client { get; set; }
 
@@ -33,7 +32,7 @@ namespace TelegramBotBase
         /// <summary>
         /// List of all running/active sessions
         /// </summary>
-        public SessionBase<T> Sessions { get; set; }
+        public SessionBase Sessions { get; set; }
 
         /// <summary>
         /// Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
@@ -68,7 +67,7 @@ namespace TelegramBotBase
 
         public Dictionary<eSettings, uint> SystemSettings { get; private set; }
 
-        private BotBase()
+        private BotBase(IStartFormFactory factory)
         {
             this.SystemSettings = new Dictionary<eSettings, uint>();
 
@@ -80,7 +79,7 @@ namespace TelegramBotBase
 
             this.BotCommands = new List<BotCommand>();
 
-            this.Sessions = new SessionBase<T>();
+            this.Sessions = new SessionBase(factory);
             this.Sessions.BotBase = this;
         }
 
@@ -88,7 +87,10 @@ namespace TelegramBotBase
         /// Simple start of your Bot with the APIKey
         /// </summary>
         /// <param name="apiKey"></param>
-        public BotBase(String apiKey, bool initClient = true) : this()
+        /// <param name="startFormFactory"></param>
+        /// <param name="initClient"></param>
+        public BotBase(String apiKey, IStartFormFactory startFormFactory, bool initClient = true)
+            : this(startFormFactory)
         {
             this.APIKey = apiKey;
 
@@ -106,7 +108,8 @@ namespace TelegramBotBase
         /// </summary>
         /// <param name="apiKey"></param>
         /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, System.Net.Http.HttpClient proxy) : this(apiKey, false)
+        /// <param name="startFormFactory"></param>
+        public BotBase(String apiKey, IStartFormFactory startFormFactory, System.Net.Http.HttpClient proxy) : this(apiKey, startFormFactory, false)
         {
             this.Client = new Base.MessageClient(this.APIKey, proxy);
 
@@ -117,8 +120,9 @@ namespace TelegramBotBase
         /// Simple start of your Bot with the APIKey and a TelegramBotClient instance.
         /// </summary>
         /// <param name="apiKey"></param>
+        /// <param name="startFormFactory"></param>
         /// <param name="client"></param>
-        public BotBase(String apiKey, TelegramBotClient client) : this(apiKey, false)
+        public BotBase(String apiKey, IStartFormFactory startFormFactory, TelegramBotClient client) : this(apiKey, startFormFactory, false)
         {
             this.Client = new Base.MessageClient(this.APIKey, client);
 
@@ -129,8 +133,9 @@ namespace TelegramBotBase
         /// Simple start of your Bot with the APIKey and a proxyAdress
         /// </summary>
         /// <param name="apiKey"></param>
+        /// <param name="startFormFactory"></param>
         /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, String proxyBaseAddress) : this(apiKey, false)
+        public BotBase(String apiKey, IStartFormFactory startFormFactory, String proxyBaseAddress) : this(apiKey, startFormFactory, false)
         {
             var url = new Uri(proxyBaseAddress);
 
@@ -143,9 +148,10 @@ namespace TelegramBotBase
         /// Simple start of your Bot with the APIKey and a proxyAdress
         /// </summary>
         /// <param name="apiKey"></param>
+        /// <param name="startFormFactory"></param>
         /// <param name="proxyHost">i.e. 127.0.0.1</param>
         /// <param name="proxyPort">i.e. 10000</param>
-        public BotBase(String apiKey, String proxyHost, int proxyPort) : this(apiKey, false)
+        public BotBase(String apiKey, IStartFormFactory startFormFactory, String proxyHost, int proxyPort) : this(apiKey, startFormFactory, false)
         {
             this.Client = new Base.MessageClient(this.APIKey, proxyHost, proxyPort);
 
@@ -172,10 +178,7 @@ namespace TelegramBotBase
             //Enable auto session saving
             if (this.GetSetting(eSettings.SaveSessionsOnConsoleExit, false))
             {
-                TelegramBotBase.Tools.Console.SetHandler(() =>
-                {
-                    this.Sessions.SaveSessionStates();
-                });
+                TelegramBotBase.Tools.Console.SetHandler(() => { this.Sessions.SaveSessionStates(); });
             }
 
             DeviceSession.MaxNumberOfRetries = this.GetSetting(eSettings.MaxNumberOfRetries, 5);
@@ -237,7 +240,6 @@ namespace TelegramBotBase
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
-
             }
             catch (Exception ex)
             {
@@ -245,7 +247,6 @@ namespace TelegramBotBase
                 OnException(new SystemExceptionEventArgs(e.Message.Text, ds?.DeviceId ?? -1, ds, ex));
             }
         }
-
 
 
         //private async Task Client_TryMessage(object sender, MessageResult e)
@@ -324,7 +325,7 @@ namespace TelegramBotBase
             DeviceSession ds = e.Device;
             if (ds == null)
             {
-                ds = await this.Sessions.StartSession<T>(e.DeviceId);
+                ds = await this.Sessions.StartSession(e.DeviceId);
                 e.Device = ds;
                 ds.LastMessage = e.Message;
 
@@ -368,8 +369,12 @@ namespace TelegramBotBase
                 await activeForm.Load(e);
 
                 //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document)
-                if (e.MessageType == Telegram.Bot.Types.Enums.MessageType.Contact | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Document | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Location |
-                    e.MessageType == Telegram.Bot.Types.Enums.MessageType.Photo | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Video | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Audio)
+                if (e.MessageType == Telegram.Bot.Types.Enums.MessageType.Contact |
+                    e.MessageType == Telegram.Bot.Types.Enums.MessageType.Document |
+                    e.MessageType == Telegram.Bot.Types.Enums.MessageType.Location |
+                    e.MessageType == Telegram.Bot.Types.Enums.MessageType.Photo |
+                    e.MessageType == Telegram.Bot.Types.Enums.MessageType.Video |
+                    e.MessageType == Telegram.Bot.Types.Enums.MessageType.Audio)
                 {
                     await activeForm.SentData(new DataResult(e));
                 }
@@ -385,7 +390,8 @@ namespace TelegramBotBase
 
                     if (!e.Handled)
                     {
-                        var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
+                        var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId,
+                            e.Message, ds);
                         OnUnhandledCall(uhc);
 
                         if (uhc.Handled)
@@ -397,7 +403,6 @@ namespace TelegramBotBase
                             }
                         }
                     }
-
                 }
 
                 if (!ds.FormSwitched)
@@ -409,10 +414,7 @@ namespace TelegramBotBase
                 }
 
                 e.IsFirstHandler = false;
-
             } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
-
-
         }
 
         /// <summary>
@@ -469,7 +471,6 @@ namespace TelegramBotBase
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
-
             }
             catch (Exception ex)
             {
@@ -483,7 +484,7 @@ namespace TelegramBotBase
             DeviceSession ds = e.Device;
             if (ds == null)
             {
-                ds = await this.Sessions.StartSession<T>(e.DeviceId);
+                ds = await this.Sessions.StartSession(e.DeviceId);
                 e.Device = ds;
             }
 
@@ -498,7 +499,6 @@ namespace TelegramBotBase
             {
                 await Client_Loop(sender, e);
             }
-
         }
 
         private async void Client_Action(object sender, MessageResult e)
@@ -658,23 +658,15 @@ namespace TelegramBotBase
         /// <summary>
         /// Will be called if a session/context gets started
         /// </summary>
-
         public event EventHandler<SessionBeginEventArgs> SessionBegins
         {
-            add
-            {
-                this.__Events.AddHandler(__evSessionBegins, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evSessionBegins, value);
-            }
+            add { this.__Events.AddHandler(__evSessionBegins, value); }
+            remove { this.__Events.RemoveHandler(__evSessionBegins, value); }
         }
 
         public void OnSessionBegins(SessionBeginEventArgs e)
         {
             (this.__Events[__evSessionBegins] as EventHandler<SessionBeginEventArgs>)?.Invoke(this, e);
-
         }
 
         /// <summary>
@@ -682,20 +674,13 @@ namespace TelegramBotBase
         /// </summary>
         public event EventHandler<MessageIncomeEventArgs> Message
         {
-            add
-            {
-                this.__Events.AddHandler(__evMessage, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evMessage, value);
-            }
+            add { this.__Events.AddHandler(__evMessage, value); }
+            remove { this.__Events.RemoveHandler(__evMessage, value); }
         }
 
         public void OnMessage(MessageIncomeEventArgs e)
         {
             (this.__Events[__evMessage] as EventHandler<MessageIncomeEventArgs>)?.Invoke(this, e);
-
         }
 
         /// <summary>
@@ -715,20 +700,13 @@ namespace TelegramBotBase
         /// </summary>
         public event EventHandler<SystemExceptionEventArgs> Exception
         {
-            add
-            {
-                this.__Events.AddHandler(__evException, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evException, value);
-            }
+            add { this.__Events.AddHandler(__evException, value); }
+            remove { this.__Events.RemoveHandler(__evException, value); }
         }
 
         public void OnException(SystemExceptionEventArgs e)
         {
             (this.__Events[__evException] as EventHandler<SystemExceptionEventArgs>)?.Invoke(this, e);
-
         }
 
         /// <summary>
@@ -736,23 +714,15 @@ namespace TelegramBotBase
         /// </summary>
         public event EventHandler<UnhandledCallEventArgs> UnhandledCall
         {
-            add
-            {
-                this.__Events.AddHandler(__evUnhandledCall, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evUnhandledCall, value);
-            }
+            add { this.__Events.AddHandler(__evUnhandledCall, value); }
+            remove { this.__Events.RemoveHandler(__evUnhandledCall, value); }
         }
 
         public void OnUnhandledCall(UnhandledCallEventArgs e)
         {
             (this.__Events[__evUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-
         }
 
         #endregion
-
     }
 }

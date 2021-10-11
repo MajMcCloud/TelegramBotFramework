@@ -16,18 +16,19 @@ namespace TelegramBotBase
     /// <summary>
     /// Base class for managing all active sessions
     /// </summary>
-    public class SessionBase<T>
-        where T : FormBase
+    public class SessionBase
     {
         public MessageClient Client { get; set; }
 
         public Dictionary<long, DeviceSession> SessionList { get; set; }
 
-        public BotBase<T> BotBase { get; set; }
+        public BotBase BotBase { get; set; }
+        
+        public IStartFormFactory StartFormFactory { get; set; }
 
-
-        public SessionBase()
+        public SessionBase(IStartFormFactory startFormFactory)
         {
+            StartFormFactory = startFormFactory;
             this.SessionList = new Dictionary<long, DeviceSession>();
         }
 
@@ -65,19 +66,18 @@ namespace TelegramBotBase
         /// <typeparam name="T"></typeparam>
         /// <param name="deviceId"></param>
         /// <returns></returns>
-        public async Task<DeviceSession> StartSession<T>(long deviceId)
-            where T : FormBase
+        public async Task<DeviceSession> StartSession(long deviceId)
         {
-            T start = typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { }) as T;
+            var start = StartFormFactory.CreateForm();
 
-            start.Client = this.Client;
+            start.Client = Client;
 
-            DeviceSession ds = new Sessions.DeviceSession(deviceId, start);
+            var ds = new DeviceSession(deviceId, start);
 
             start.Device = ds;
             await start.OnInit(new InitEventArgs());
 
-            await start.OnOpened(new EventArgs());
+            await start.OnOpened(EventArgs.Empty);
 
             this[deviceId] = ds;
             return ds;

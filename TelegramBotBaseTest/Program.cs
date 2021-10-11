@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBotBase;
+using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests;
 using TelegramBotBase.Commands;
@@ -15,7 +16,7 @@ namespace TelegramBotBaseTest
         static void Main(string[] args)
         {
 
-            BotBase<Start> bb = new BotBase<Start>(APIKey);
+            BotBase bb = new BotBase(APIKey, new SimpleStartFormFactory(typeof(Start)));
 
             bb.BotCommands.AddStartCommand("Starts the bot");
             bb.BotCommands.AddHelpCommand("Should show you some help");
