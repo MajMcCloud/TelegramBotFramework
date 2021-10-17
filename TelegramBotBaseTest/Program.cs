@@ -8,14 +8,22 @@ using TelegramBotBase;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests;
 using TelegramBotBase.Commands;
+using TelegramBotBase.Builder;
+
 namespace TelegramBotBaseTest
 {
     class Program
     {
         static void Main(string[] args)
         {
+            String APIKey = "";
 
-            BotBase<Start> bb = new BotBase<Start>(APIKey);
+            var bb = BotBaseBuilder
+                      .Create()
+                      .WithAPIKey(APIKey)
+                      .WithStartForm<Start>()
+                      .NoProxy()
+                      .Build();
 
             bb.BotCommands.AddStartCommand("Starts the bot");
             bb.BotCommands.AddHelpCommand("Should show you some help");
