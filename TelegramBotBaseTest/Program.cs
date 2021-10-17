@@ -23,14 +23,19 @@ namespace TelegramBotBaseTest
                       .WithAPIKey(APIKey)
                       .WithStartForm<Start>()
                       .NoProxy()
+                      .Configure(a =>
+                      {
+                          a.AddStartCommand("Starts the bot");
+                          a.AddHelpCommand("Should show you some help");
+                          a.AddSettingsCommand("Should show you some settings");
+                          a.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
+                          a.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
+                          a.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
+                      })
+                      .NoSerialization()
                       .Build();
 
-            bb.BotCommands.AddStartCommand("Starts the bot");
-            bb.BotCommands.AddHelpCommand("Should show you some help");
-            bb.BotCommands.AddSettingsCommand("Should show you some settings");
-            bb.BotCommands.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
-            bb.BotCommands.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
-            bb.BotCommands.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
+
 
             bb.BotCommand += async (s, en) =>
             {

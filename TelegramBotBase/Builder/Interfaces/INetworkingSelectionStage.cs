@@ -13,13 +13,13 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="proxyAddress"></param>
         /// <returns></returns>
-        IBuildingStage WithProxy(String proxyAddress);
+        IBotCommandsStage WithProxy(String proxyAddress);
 
         /// <summary>
         /// Do not choose a proxy as network configuration.
         /// </summary>
         /// <returns></returns>
-        IBuildingStage NoProxy();
+        IBotCommandsStage NoProxy();
 
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        IBuildingStage WithBotClient(TelegramBotClient client);
+        IBotCommandsStage WithBotClient(TelegramBotClient client);
 
         /// <summary>
         /// Sets the custom proxy host and port.
@@ -35,14 +35,14 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <param name="proxyHost"></param>
         /// <param name="Port"></param>
         /// <returns></returns>
-        IBuildingStage WithHostAndPort(String proxyHost, int Port);
+        IBotCommandsStage WithHostAndPort(String proxyHost, int Port);
 
         /// <summary>
         /// Uses a custom http client.
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        IBuildingStage WithHttpClient(HttpClient client);
+        IBotCommandsStage WithHttpClient(HttpClient client);
 
 
     }
