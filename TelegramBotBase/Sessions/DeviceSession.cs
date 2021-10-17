@@ -644,18 +644,12 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public virtual async Task<bool> DeleteMessage(int messageId = -1)
         {
-            try
-            {
-                await RAW(a => a.DeleteMessageAsync(this.DeviceId, messageId));
 
-                return true;
-            }
-            catch (ApiRequestException)
-            {
+            await RAW(a => a.DeleteMessageAsync(this.DeviceId, messageId));
 
-            }
+            OnMessageDeleted(new MessageDeletedEventArgs(messageId));
 
-            return false;
+            return true;
         }
 
         /// <summary>

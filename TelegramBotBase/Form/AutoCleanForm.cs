@@ -49,8 +49,15 @@ namespace TelegramBotBase.Form
             this.Device.MessageSent += Device_MessageSent;
 
             this.Device.MessageReceived += Device_MessageReceived;
+
+            this.Device.MessageDeleted += Device_MessageDeleted;
         }
 
+        private void Device_MessageDeleted(object sender, MessageDeletedEventArgs e)
+        {
+            if (OldMessages.Contains(e.MessageId))
+                OldMessages.Remove(e.MessageId);
+        }
 
         private void Device_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
@@ -143,8 +150,15 @@ namespace TelegramBotBase.Form
                 {
                     parallelQuery.ForAll(i =>
                     {
-                        Device.DeleteMessage(i).GetAwaiter().GetResult();
-                        deletedMessages.Add(i);
+                        try
+                        {
+                            Device.DeleteMessage(i).GetAwaiter().GetResult();
+                            deletedMessages.Add(i);
+                        }
+                        catch (ApiRequestException req) when (req.ErrorCode == 400)
+                        {
+                            deletedMessages.Add(i);
+                        }
                     });
                 }
                 catch (AggregateException ex)
@@ -153,11 +167,11 @@ namespace TelegramBotBase.Form
 
                     var retryAfterSeconds = ex.InnerExceptions
                         .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
-                        .Max(e =>(int?) ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
+                        .Max(e => (int?)((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
                     retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
                 }
-                
-                deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+
+                //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
 
                 oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
                 if (retryAfterTask != null)
@@ -176,8 +190,15 @@ namespace TelegramBotBase.Form
                     {
                         parallelQuery.ForAll(i =>
                         {
-                            Device.DeleteMessage(i).GetAwaiter().GetResult();
-                            deletedMessages.Add(i);
+                            try
+                            {
+                                Device.DeleteMessage(i).GetAwaiter().GetResult();
+                                deletedMessages.Add(i);
+                            }
+                            catch (ApiRequestException req) when (req.ErrorCode == 400)
+                            {
+                                deletedMessages.Add(i);
+                            }
                         });
                     }
                     catch (AggregateException ex)
@@ -190,7 +211,7 @@ namespace TelegramBotBase.Form
                         retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
                     }
 
-                    deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+                    //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
 
                     oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
                     if (retryAfterTask != null)
