@@ -143,11 +143,19 @@ It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBa
 
 ```
 
-//Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
+//Prepare the System (New in V5)
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .Configure(a =>
+    {
+        a.AddStartCommand("Starts the bot")
 
-//Add Systemcommands if you like, you could catch them later
-bb.BotCommands.Add(new BotCommand() { Command = "start", Description = "Starts the bot" });
+    })
+    .NoSerialization()
+    .Build();
 
 //Update bot commands to botfather
 bb.UploadBotCommands().Wait();
@@ -252,12 +260,22 @@ Below we have 4 options.
 
 
 ```
-BotBase<Start> bb = new BotBase<Start>("{YOUR API KEY}");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .WithStartForm<Start>()
+    .NoProxy()
+    .Configure(a =>
+    {
+        a.AddStartCommand("Starts the bot");
+        a.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
+        a.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
+        a.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
 
-bb.BotCommands.Add(new BotCommand() { Command = "start", Description = "Starts the bot" });
-bb.BotCommands.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
-bb.BotCommands.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
-bb.BotCommands.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
+
+    })
+    .NoSerialization()
+    .Build();
 
 bb.BotCommand += async (s, en) =>
 {
@@ -963,13 +981,17 @@ In general you didn't need to do more then, to keep the actual form:
 
 ```
 //Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
-
-//Add Systemcommands if you like, you could catch them later
-bb.SystemCalls.Add("/start");
-
-//Set the statemachine and enable it
-bb.StateMachine = new TelegramBotBase.States.SimpleJSONStateMachine(AppContext.BaseDirectory + "config\\states.json");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .Configure(a =>
+    {
+        a.AddStartCommand("Starts the bot");
+    })
+    .UseSerialization(new TelegramBotBase.States.SimpleJSONStateMachine(AppContext.BaseDirectory + "config\\states.json"))
+    .Build();
 
 //Start your Bot
 bb.Start();
@@ -982,13 +1004,17 @@ In general you didn't need to do more then, to keep the actual form:
 
 ```
 //Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
-
-//Add Systemcommands if you like, you could catch them later
-bb.SystemCalls.Add("/start");
-
-//Set the statemachine and enable it
-bb.StateMachine = new TelegramBotBase.States.JSONStateMachine(AppContext.BaseDirectory + "config\\states.json");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .Configure(a =>
+    {
+        a.AddStartCommand("Starts the bot");
+    })
+    .UseSerialization(new TelegramBotBase.States.JSONStateMachine(AppContext.BaseDirectory + "config\\states.json"))
+    .Build();
 
 //Start your Bot
 bb.Start();
@@ -1002,13 +1028,17 @@ In general you didn't need to do more then, to keep the actual form:
 
 ```
 //Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
-
-//Add Systemcommands if you like, you could catch them later
-bb.SystemCalls.Add("/start");
-
-//Set the statemachine and enable it
-bb.StateMachine = new TelegramBotBase.States.XMLStateMachine(AppContext.BaseDirectory + "config\\states.xml");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .Configure(a =>
+    {
+        a.AddStartCommand("Starts the bot");
+    })
+    .UseSerialization(new TelegramBotBase.States.XMLStateMachine(AppContext.BaseDirectory + "config\\states.xml"))
+    .Build();
 
 //Start your Bot
 bb.Start();
