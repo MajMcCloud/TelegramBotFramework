@@ -16,14 +16,13 @@ namespace TelegramBotBase
     /// <summary>
     /// Base class for managing all active sessions
     /// </summary>
-    public class SessionBase<T>
-        where T : FormBase
+    public class SessionBase
     {
         public MessageClient Client { get; set; }
 
         public Dictionary<long, DeviceSession> SessionList { get; set; }
 
-        public BotBase<T> BotBase { get; set; }
+        public BotBase BotBase { get; set; }
 
 
         public SessionBase()
@@ -65,10 +64,10 @@ namespace TelegramBotBase
         /// <typeparam name="T"></typeparam>
         /// <param name="deviceId"></param>
         /// <returns></returns>
-        public async Task<DeviceSession> StartSession<T>(long deviceId)
-            where T : FormBase
+        public async Task<DeviceSession> StartSession(long deviceId)
         {
-            T start = typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { }) as T;
+            var start = BotBase.StartFormFactory.CreateForm();
+            //T start = typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { }) as T;
 
             start.Client = this.Client;
 
@@ -239,7 +238,7 @@ namespace TelegramBotBase
 
         }
 
-       
+
 
 
         /// <summary>

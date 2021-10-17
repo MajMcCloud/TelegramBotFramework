@@ -20,8 +20,7 @@ namespace TelegramBotBase
     /// Bot base class for full Device/Context and Messagehandling
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BotBase<T>
-        where T : FormBase
+    public class BotBase
     {
         public MessageClient Client { get; set; }
 
@@ -33,7 +32,7 @@ namespace TelegramBotBase
         /// <summary>
         /// List of all running/active sessions
         /// </summary>
-        public SessionBase<T> Sessions { get; set; }
+        public SessionBase Sessions { get; set; }
 
         /// <summary>
         /// Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
@@ -65,10 +64,15 @@ namespace TelegramBotBase
         /// </summary>
         public IStateMachine StateMachine { get; set; }
 
+        /// <summary>
+        /// Offers functionality to manage the creation process of the start form.
+        /// </summary>
+        public IStartFormFactory StartFormFactory { get; set; }
+
 
         public Dictionary<eSettings, uint> SystemSettings { get; private set; }
 
-        private BotBase()
+        public BotBase()
         {
             this.SystemSettings = new Dictionary<eSettings, uint>();
 
@@ -80,76 +84,8 @@ namespace TelegramBotBase
 
             this.BotCommands = new List<BotCommand>();
 
-            this.Sessions = new SessionBase<T>();
+            this.Sessions = new SessionBase();
             this.Sessions.BotBase = this;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey
-        /// </summary>
-        /// <param name="apiKey"></param>
-        public BotBase(String apiKey, bool initClient = true) : this()
-        {
-            this.APIKey = apiKey;
-
-            if (!initClient)
-                return;
-
-            this.Client = new Base.MessageClient(this.APIKey);
-            this.Client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a proxyAdress
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, System.Net.Http.HttpClient proxy) : this(apiKey, false)
-        {
-            this.Client = new Base.MessageClient(this.APIKey, proxy);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a TelegramBotClient instance.
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="client"></param>
-        public BotBase(String apiKey, TelegramBotClient client) : this(apiKey, false)
-        {
-            this.Client = new Base.MessageClient(this.APIKey, client);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a proxyAdress
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, String proxyBaseAddress) : this(apiKey, false)
-        {
-            var url = new Uri(proxyBaseAddress);
-
-            this.Client = new Base.MessageClient(this.APIKey, url);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a proxyAdress
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="proxyHost">i.e. 127.0.0.1</param>
-        /// <param name="proxyPort">i.e. 10000</param>
-        public BotBase(String apiKey, String proxyHost, int proxyPort) : this(apiKey, false)
-        {
-            this.Client = new Base.MessageClient(this.APIKey, proxyHost, proxyPort);
-
-            this.Sessions.Client = this.Client;
         }
 
         /// <summary>
@@ -324,7 +260,7 @@ namespace TelegramBotBase
             DeviceSession ds = e.Device;
             if (ds == null)
             {
-                ds = await this.Sessions.StartSession<T>(e.DeviceId);
+                ds = await this.Sessions.StartSession(e.DeviceId);
                 e.Device = ds;
                 ds.LastMessage = e.Message;
 
@@ -483,7 +419,7 @@ namespace TelegramBotBase
             DeviceSession ds = e.Device;
             if (ds == null)
             {
-                ds = await this.Sessions.StartSession<T>(e.DeviceId);
+                ds = await this.Sessions.StartSession(e.DeviceId);
                 e.Device = ds;
             }
 
