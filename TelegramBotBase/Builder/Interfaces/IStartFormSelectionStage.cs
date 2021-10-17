@@ -6,7 +6,7 @@ using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Builder.Interfaces
 {
-    public interface IStartFormSelectionPage
+    public interface IStartFormSelectionStage
     {
 
         /// <summary>

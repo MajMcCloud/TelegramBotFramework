@@ -10,7 +10,7 @@ using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Builder
 {
-    public class BotBaseBuilder : IAPIKeySelectionStage, IStartFormSelectionPage, IBuildingStage, INetworkingSelectionStage
+    public class BotBaseBuilder : IAPIKeySelectionStage, IStartFormSelectionStage, IBuildingStage, INetworkingSelectionStage
     {
 
         String apiKey = null;
@@ -24,7 +24,7 @@ namespace TelegramBotBase.Builder
             return new BotBaseBuilder();
         }
 
-        public IStartFormSelectionPage WithAPIKey(string apiKey)
+        public IStartFormSelectionStage WithAPIKey(string apiKey)
         {
             this.apiKey = apiKey;
             return this;
