@@ -150,8 +150,15 @@ namespace TelegramBotBase.Form
                 {
                     parallelQuery.ForAll(i =>
                     {
-                        Device.DeleteMessage(i).GetAwaiter().GetResult();
-                        deletedMessages.Add(i);
+                        try
+                        {
+                            Device.DeleteMessage(i).GetAwaiter().GetResult();
+                            deletedMessages.Add(i);
+                        }
+                        catch (ApiRequestException req) when (req.ErrorCode == 400)
+                        {
+                            deletedMessages.Add(i);
+                        }
                     });
                 }
                 catch (AggregateException ex)
@@ -160,10 +167,10 @@ namespace TelegramBotBase.Form
 
                     var retryAfterSeconds = ex.InnerExceptions
                         .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
-                        .Max(e =>(int?) ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
+                        .Max(e => (int?)((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
                     retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
                 }
-                
+
                 //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
 
                 oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
@@ -183,8 +190,15 @@ namespace TelegramBotBase.Form
                     {
                         parallelQuery.ForAll(i =>
                         {
-                            Device.DeleteMessage(i).GetAwaiter().GetResult();
-                            deletedMessages.Add(i);
+                            try
+                            {
+                                Device.DeleteMessage(i).GetAwaiter().GetResult();
+                                deletedMessages.Add(i);
+                            }
+                            catch (ApiRequestException req) when (req.ErrorCode == 400)
+                            {
+                                deletedMessages.Add(i);
+                            }
                         });
                     }
                     catch (AggregateException ex)
