@@ -23,7 +23,7 @@ namespace TelegramBotBaseTest
                       .WithAPIKey(APIKey)
                       .WithStartForm<Start>()
                       .NoProxy()
-                      .Configure(a =>
+                      .CustomCommands(a =>
                       {
                           a.AddStartCommand("Starts the bot");
                           a.AddHelpCommand("Should show you some help");

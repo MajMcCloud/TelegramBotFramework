@@ -106,7 +106,7 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
-        public ISessionSerializationStage Configure(Action<List<BotCommand>> action)
+        public ISessionSerializationStage CustomCommands(Action<List<BotCommand>> action)
         {
             action?.Invoke(_botcommands);
             return this;
