@@ -141,6 +141,23 @@ namespace TelegramBotBase.Sessions
 
 
         /// <summary>
+        /// Confirm incomming action (i.e. Button click)
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public async Task ConfirmAction(String CallbackQueryId, String message = "", bool showAlert = false, String urlToOpen = null)
+        {
+            try
+            {
+                await this.Client.TelegramClient.AnswerCallbackQueryAsync(CallbackQueryId, message, showAlert, urlToOpen);
+            }
+            catch
+            {
+
+            }
+        }
+
+        /// <summary>
         /// Edits the text message
         /// </summary>
         /// <param name="messageId"></param>
