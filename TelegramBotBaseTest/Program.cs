@@ -21,6 +21,7 @@ namespace TelegramBotBaseTest
             var bb = BotBaseBuilder
                       .Create()
                       .WithAPIKey(APIKey)
+                      .DefaultMessageLoop()
                       .WithStartForm<Start>()
                       .NoProxy()
                       .CustomCommands(a =>
@@ -34,6 +35,7 @@ namespace TelegramBotBaseTest
                       })
                       .NoSerialization()
                       .Build();
+
 
 
 
@@ -67,7 +69,7 @@ namespace TelegramBotBaseTest
                     case "/params":
 
                         String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
-                        
+
                         await en.Device.Send("Your parameters are: " + m, replyTo: en.Device.LastMessageId);
 
                         en.Handled = true;
@@ -82,7 +84,7 @@ namespace TelegramBotBaseTest
 
             bb.SetSetting(TelegramBotBase.Enums.eSettings.LogAllMessages, true);
 
-            bb.Message += (s,en) =>
+            bb.Message += (s, en) =>
             {
                 Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
             };
