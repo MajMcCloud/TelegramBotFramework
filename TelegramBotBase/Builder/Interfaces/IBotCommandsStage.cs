@@ -20,12 +20,13 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <returns></returns>
         ISessionSerializationStage DefaultCommands();
 
+
         /// <summary>
         /// Gives you the ability to add custom commands.
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        ISessionSerializationStage Configure(Action<List<BotCommand>> action);
+        ISessionSerializationStage CustomCommands(Action<List<BotCommand>> action);
 
     }
 }
