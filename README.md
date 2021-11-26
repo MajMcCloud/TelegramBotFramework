@@ -149,7 +149,7 @@ var bb = BotBaseBuilder
     .WithAPIKey("{YOUR API KEY}")
     .WithStartForm<StartForm>()
     .NoProxy()
-    .Configure(a =>
+    .CustomCommands(a =>
     {
         a.AddStartCommand("Starts the bot")
 
@@ -265,7 +265,7 @@ var bb = BotBaseBuilder
     .WithAPIKey("{YOUR API KEY}")
     .WithStartForm<Start>()
     .NoProxy()
-    .Configure(a =>
+    .CustomCommands(a =>
     {
         a.AddStartCommand("Starts the bot");
         a.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
@@ -986,7 +986,7 @@ var bb = BotBaseBuilder
     .WithAPIKey("{YOUR API KEY}")
     .WithStartForm<StartForm>()
     .NoProxy()
-    .Configure(a =>
+    .CustomCommands(a =>
     {
         a.AddStartCommand("Starts the bot");
     })
@@ -1009,7 +1009,7 @@ var bb = BotBaseBuilder
     .WithAPIKey("{YOUR API KEY}")
     .WithStartForm<StartForm>()
     .NoProxy()
-    .Configure(a =>
+    .CustomCommands(a =>
     {
         a.AddStartCommand("Starts the bot");
     })
@@ -1033,7 +1033,7 @@ var bb = BotBaseBuilder
     .WithAPIKey("{YOUR API KEY}")
     .WithStartForm<StartForm>()
     .NoProxy()
-    .Configure(a =>
+    .CustomCommands(a =>
     {
         a.AddStartCommand("Starts the bot");
     })
