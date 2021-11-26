@@ -769,7 +769,7 @@ namespace TelegramBotBase.Sessions
         /// <typeparam name="T"></typeparam>
         /// <param name="call"></param>
         /// <returns></returns>
-        public T RAW<T>(Func<Telegram.Bot.TelegramBotClient, T> call)
+        public T RAW<T>(Func<Telegram.Bot.ITelegramBotClient, T> call)
         {
             return call(this.Client.TelegramClient);
         }
@@ -780,7 +780,7 @@ namespace TelegramBotBase.Sessions
         /// <typeparam name="T"></typeparam>
         /// <param name="call"></param>
         /// <returns></returns>
-        public async Task<T> API<T>(Func<Telegram.Bot.TelegramBotClient, Task<T>> call)
+        public async Task<T> API<T>(Func<Telegram.Bot.ITelegramBotClient, Task<T>> call)
         {
             var numberOfTries = 0;
             while (numberOfTries < DeviceSession.MaxNumberOfRetries)
@@ -794,8 +794,8 @@ namespace TelegramBotBase.Sessions
                     if (ex.ErrorCode != 429)
                         throw;
 
-                    if (ex.Parameters != null)
-                        await Task.Delay(ex.Parameters.RetryAfter * 1000);
+                    if (ex.Parameters != null && ex.Parameters.RetryAfter != null)
+                        await Task.Delay(ex.Parameters.RetryAfter.Value * 1000);
 
                     numberOfTries++;
                 }
@@ -808,7 +808,7 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="call"></param>
         /// <returns></returns>
-        public async Task API(Func<Telegram.Bot.TelegramBotClient, Task> call)
+        public async Task API(Func<Telegram.Bot.ITelegramBotClient, Task> call)
         {
             var numberOfTries = 0;
             while (numberOfTries < DeviceSession.MaxNumberOfRetries)
@@ -823,8 +823,8 @@ namespace TelegramBotBase.Sessions
                     if (ex.ErrorCode != 429)
                         throw;
 
-                    if (ex.Parameters != null)
-                        await Task.Delay(ex.Parameters.RetryAfter * 1000);
+                    if (ex.Parameters != null && ex.Parameters.RetryAfter != null)
+                        await Task.Delay(ex.Parameters.RetryAfter.Value * 1000);
 
                     numberOfTries++;
                 }

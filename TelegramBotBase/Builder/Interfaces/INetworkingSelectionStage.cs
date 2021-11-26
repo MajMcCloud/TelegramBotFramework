@@ -8,6 +8,7 @@ namespace TelegramBotBase.Builder.Interfaces
 {
     public interface INetworkingSelectionStage
     {
+
         /// <summary>
         /// Chooses a proxy as network configuration.
         /// </summary>
@@ -28,6 +29,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <param name="client"></param>
         /// <returns></returns>
         IBotCommandsStage WithBotClient(TelegramBotClient client);
+
 
         /// <summary>
         /// Sets the custom proxy host and port.

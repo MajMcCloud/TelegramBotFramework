@@ -12,7 +12,7 @@ using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Builder
 {
-    public class BotBaseBuilder : IAPIKeySelectionStage, IStartFormSelectionStage, IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage
+    public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage
     {
 
         String _apiKey = null;
@@ -25,16 +25,54 @@ namespace TelegramBotBase.Builder
 
         IStateMachine _statemachine = null;
 
+        IMessageLoopFactory _messageloopfactory = null;
+
         public static IAPIKeySelectionStage Create()
         {
             return new BotBaseBuilder();
         }
 
-        public IStartFormSelectionStage WithAPIKey(string apiKey)
+        #region "Step 1"
+
+        public IMessageLoopSelectionStage WithAPIKey(string apiKey)
         {
             this._apiKey = apiKey;
             return this;
         }
+
+        #endregion
+
+
+        #region "Step 2"
+
+        public IStartFormSelectionStage DefaultMessageLoop()
+        {
+            _messageloopfactory = new Factories.MessageLoops.FormBaseMessageLoop();
+
+            return this;
+        }
+
+        public IStartFormSelectionStage CustomMessageLoop(Type messageLoopClass)
+        {
+            if (messageLoopClass.IsSubclassOf(typeof(IMessageLoopFactory)))
+                throw new ArgumentException($"Not a subclass of {nameof(IMessageLoopFactory)}");
+
+            _messageloopfactory = messageLoopClass.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
+
+            return this;
+        }
+
+        public IStartFormSelectionStage CustomMessageLoop<T>()
+            where T : class, new()
+        {
+            _messageloopfactory = typeof(T).GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
+
+            return this;
+        }
+
+        #endregion
+
+        #region "Step 3"
 
         public INetworkingSelectionStage WithStartForm(Type startFormClass)
         {
@@ -55,6 +93,8 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
+        #endregion
+
 
         public IBotCommandsStage WithProxy(string proxyAddress)
         {
@@ -63,6 +103,7 @@ namespace TelegramBotBase.Builder
             _client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
             return this;
         }
+
 
         public IBotCommandsStage NoProxy()
         {
@@ -78,6 +119,7 @@ namespace TelegramBotBase.Builder
             _client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
             return this;
         }
+
 
         public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort)
         {
@@ -138,6 +180,10 @@ namespace TelegramBotBase.Builder
             bb.BotCommands = _botcommands;
 
             bb.StateMachine = _statemachine;
+
+            bb.MessageLoopFactory = _messageloopfactory;
+
+            bb.MessageLoopFactory.UnhandledCall += bb.MessageLoopFactory_UnhandledCall;
 
             return bb;
         }

@@ -147,6 +147,7 @@ It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBa
 var bb = BotBaseBuilder
     .Create()
     .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
     .CustomCommands(a =>
@@ -263,6 +264,7 @@ Below we have 4 options.
 var bb = BotBaseBuilder
     .Create()
     .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
     .WithStartForm<Start>()
     .NoProxy()
     .CustomCommands(a =>
@@ -984,6 +986,7 @@ In general you didn't need to do more then, to keep the actual form:
 var bb = BotBaseBuilder
     .Create()
     .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
     .CustomCommands(a =>
@@ -1007,6 +1010,7 @@ In general you didn't need to do more then, to keep the actual form:
 var bb = BotBaseBuilder
     .Create()
     .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
     .CustomCommands(a =>
@@ -1031,6 +1035,7 @@ In general you didn't need to do more then, to keep the actual form:
 var bb = BotBaseBuilder
     .Create()
     .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
     .CustomCommands(a =>

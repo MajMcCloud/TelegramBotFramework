@@ -11,7 +11,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="apiKey"></param>
         /// <returns></returns>
-        IStartFormSelectionStage WithAPIKey(String apiKey);
+        IMessageLoopSelectionStage WithAPIKey(String apiKey);
 
     }
 }

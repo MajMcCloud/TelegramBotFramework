@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
@@ -14,7 +15,11 @@ namespace TelegramBotBase.Base
     /// </summary>
     public class DataResult : ResultBase
     {
-        public Telegram.Bot.Args.MessageEventArgs RawMessageData { get; set; }
+
+        //public Telegram.Bot.Args.MessageEventArgs RawMessageData { get; set; }
+
+        public UpdateResult Update { get; set; }
+
 
         public Contact Contact
         {
@@ -64,11 +69,21 @@ namespace TelegramBotBase.Base
             }
         }
 
+
+        //public Telegram.Bot.Types.Enums.MessageType Type
+        //{
+        //    get
+        //    {
+        //        return this.RawMessageData?.Message?.Type ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
+        //    }
+        //}
+
+
         public Telegram.Bot.Types.Enums.MessageType Type
         {
             get
             {
-                return this.RawMessageData?.Message?.Type ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
+                return this.Message?.Type ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
             }
         }
 
@@ -87,23 +102,30 @@ namespace TelegramBotBase.Base
         }
 
 
-        public DataResult(Telegram.Bot.Args.MessageEventArgs rawdata)
+        //public DataResult(Telegram.Bot.Args.MessageEventArgs rawdata)
+        //{
+        //    this.RawMessageData = rawdata;
+        //    this.Message = rawdata.Message;
+        //}
+
+        //public DataResult(MessageResult message)
+        //{
+        //    this.RawMessageData = message.RawMessageData;
+        //    this.Message = message.Message;
+
+        //    this.Client = message.Client;
+        //}
+
+
+        public DataResult(UpdateResult update)
         {
-            this.RawMessageData = rawdata;
-            this.Message = rawdata.Message;
+            this.Update = update;
         }
 
-        public DataResult(MessageResult message)
-        {
-            this.RawMessageData = message.RawMessageData;
-            this.Message = message.Message;
-
-            this.Client = message.Client;
-        }
 
         public async Task<InputOnlineFile> DownloadDocument()
         {
-            var encryptedContent = new System.IO.MemoryStream(this.Document.FileSize);
+            var encryptedContent = new System.IO.MemoryStream(this.Document.FileSize.Value);
             var file = await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Document.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, this.Document.FileName);
@@ -156,13 +178,13 @@ namespace TelegramBotBase.Base
             ms.Position = 0;
 
             var sr = new StreamReader(ms, encoding);
-            
+
             return sr.ReadToEnd();
         }
 
         public async Task<InputOnlineFile> DownloadVideo()
         {
-            var encryptedContent = new System.IO.MemoryStream(this.Video.FileSize);
+            var encryptedContent = new System.IO.MemoryStream(this.Video.FileSize.Value);
             var file = await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Video.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, "");
@@ -179,7 +201,7 @@ namespace TelegramBotBase.Base
 
         public async Task<InputOnlineFile> DownloadAudio()
         {
-            var encryptedContent = new System.IO.MemoryStream(this.Audio.FileSize);
+            var encryptedContent = new System.IO.MemoryStream(this.Audio.FileSize.Value);
             var file = await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Audio.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, "");
@@ -197,7 +219,7 @@ namespace TelegramBotBase.Base
         public async Task<InputOnlineFile> DownloadPhoto(int index)
         {
             var photo = this.Photos[index];
-            var encryptedContent = new System.IO.MemoryStream(photo.FileSize);
+            var encryptedContent = new System.IO.MemoryStream(photo.FileSize.Value);
             var file = await this.Client.TelegramClient.GetInfoAndDownloadFileAsync(photo.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, "");
