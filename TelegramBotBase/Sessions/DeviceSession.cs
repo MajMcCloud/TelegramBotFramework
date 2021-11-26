@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -146,7 +147,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Markdown)
         {
             InlineKeyboardMarkup markup = buttons;
 
@@ -175,7 +176,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup, ParseMode parseMode = ParseMode.Markdown)
         {
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
@@ -202,7 +203,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(Message message, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Edit(Message message, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Markdown)
         {
             InlineKeyboardMarkup markup = buttons;
 
@@ -253,7 +254,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(long deviceId, String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(long deviceId, String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -293,7 +294,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             return await Send(this.DeviceId, text, buttons, replyTo, disableNotification, parseMode, MarkdownV2AutoEscape);
         }
@@ -306,7 +307,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -344,7 +345,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -382,7 +383,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendPhoto(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -450,7 +451,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendVideo(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -480,7 +481,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(String url, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendVideo(String url, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
             if (this.ActiveForm == null)
                 return null;
