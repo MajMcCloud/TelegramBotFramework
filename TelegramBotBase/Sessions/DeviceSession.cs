@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -419,44 +417,6 @@ namespace TelegramBotBase.Sessions
             catch
             {
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// Sends an image
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="name"></param>
-        /// <param name="buttons"></param>
-        /// <param name="replyTo"></param>
-        /// <param name="disableNotification"></param>
-        /// <returns></returns>
-        public async Task<Message> SendPhoto(Image image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
-        {
-            using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
-            {
-                InputOnlineFile fts = new InputOnlineFile(fileStream, name);
-
-                return await SendPhoto(fts, caption: caption, buttons, replyTo, disableNotification);
-            }
-        }
-
-        /// <summary>
-        /// Sends an image
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="name"></param>
-        /// <param name="buttons"></param>
-        /// <param name="replyTo"></param>
-        /// <param name="disableNotification"></param>
-        /// <returns></returns>
-        public async Task<Message> SendPhoto(Bitmap image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
-        {
-            using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
-            {
-                InputOnlineFile fts = new InputOnlineFile(fileStream, name);
-
-                return await SendPhoto(fts, caption: caption, buttons, replyTo, disableNotification);
             }
         }
 
