@@ -31,7 +31,7 @@ namespace TelegramBotBase.Extensions.Images
         /// <returns></returns>
         public static async Task<Message> SendPhoto(this DeviceSession session, Image image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
-            using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
+            using (var fileStream = ToStream(image, ImageFormat.Png))
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 
@@ -50,7 +50,7 @@ namespace TelegramBotBase.Extensions.Images
         /// <returns></returns>
         public static async Task<Message> SendPhoto(this DeviceSession session, Bitmap image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
-            using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
+            using (var fileStream = ToStream(image, ImageFormat.Png))
             {
                 InputOnlineFile fts = new InputOnlineFile(fileStream, name);
 

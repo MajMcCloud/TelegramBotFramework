@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
+using TelegramBotBase.Extensions.Images;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests
