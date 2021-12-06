@@ -9,6 +9,7 @@ using TelegramBotBase.Builder.Interfaces;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder
 {
@@ -163,6 +164,25 @@ namespace TelegramBotBase.Builder
         public IBuildingStage UseSerialization(IStateMachine machine)
         {
             this._statemachine = machine;
+            return this;
+        }
+
+
+        public IBuildingStage UseJSON(string path)
+        {
+            this._statemachine = new JSONStateMachine(path);
+            return this;
+        }
+
+        public IBuildingStage UseSimpleJSON(string path)
+        {
+            this._statemachine = new SimpleJSONStateMachine(path);
+            return this;
+        }
+
+        public IBuildingStage UseXML(string path)
+        {
+            this._statemachine = new XMLStateMachine(path);
             return this;
         }
 

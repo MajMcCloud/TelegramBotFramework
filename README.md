@@ -993,7 +993,7 @@ var bb = BotBaseBuilder
     {
         a.AddStartCommand("Starts the bot");
     })
-    .UseSerialization(new TelegramBotBase.States.SimpleJSONStateMachine(AppContext.BaseDirectory + "config\\states.json"))
+    .UseSimpleJSON(AppContext.BaseDirectory + "config\\states.json")
     .Build();
 
 //Start your Bot
@@ -1017,7 +1017,7 @@ var bb = BotBaseBuilder
     {
         a.AddStartCommand("Starts the bot");
     })
-    .UseSerialization(new TelegramBotBase.States.JSONStateMachine(AppContext.BaseDirectory + "config\\states.json"))
+    .UseJSON(AppContext.BaseDirectory + "config\\states.json")
     .Build();
 
 //Start your Bot
@@ -1042,7 +1042,7 @@ var bb = BotBaseBuilder
     {
         a.AddStartCommand("Starts the bot");
     })
-    .UseSerialization(new TelegramBotBase.States.XMLStateMachine(AppContext.BaseDirectory + "config\\states.xml"))
+    .UseXML(AppContext.BaseDirectory + "config\\states.xml")
     .Build();
 
 //Start your Bot
