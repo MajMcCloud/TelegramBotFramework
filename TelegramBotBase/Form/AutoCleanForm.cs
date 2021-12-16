@@ -138,7 +138,7 @@ namespace TelegramBotBase.Form
         {
             var oldMessages = OldMessages.AsEnumerable();
 
-#if !NET472
+#if !NETSTANDARD2_0
             while (oldMessages.Any())
             {
                 using var cts = new CancellationTokenSource();
