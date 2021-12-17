@@ -18,7 +18,7 @@ namespace TelegramBotBase.Base
 
         //public Telegram.Bot.Args.MessageEventArgs RawMessageData { get; set; }
 
-        public UpdateResult Update { get; set; }
+        public UpdateResult UpdateData { get; set; }
 
 
         public Contact Contact
@@ -87,6 +87,14 @@ namespace TelegramBotBase.Base
             }
         }
 
+        public override Message Message
+        {
+            get
+            {
+                return this.UpdateData?.Message;
+            }
+        }
+
         /// <summary>
         /// Returns the FileId of the first reachable element.
         /// </summary>
@@ -119,7 +127,7 @@ namespace TelegramBotBase.Base
 
         public DataResult(UpdateResult update)
         {
-            this.Update = update;
+            this.UpdateData = update;
         }
 
 
