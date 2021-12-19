@@ -29,8 +29,8 @@ namespace TelegramBotBase.Factories.MessageLoops
             var update = ur.RawData;
 
 
-            if (update.Type != Telegram.Bot.Types.Enums.UpdateType.Message 
-             && update.Type != Telegram.Bot.Types.Enums.UpdateType.EditedMessage 
+            if (update.Type != Telegram.Bot.Types.Enums.UpdateType.Message
+             && update.Type != Telegram.Bot.Types.Enums.UpdateType.EditedMessage
              && update.Type != Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
             {
                 return;
@@ -45,14 +45,9 @@ namespace TelegramBotBase.Factories.MessageLoops
                 if (sce.Handled)
                     return;
             }
-            
-            //var mr = new MessageResult(update);
-            
-            mr.Device = session;
-            
 
-            //var message = update.Message ?? update.EditedMessage;
-            
+            mr.Device = session;
+
             var activeForm = session.ActiveForm;
 
             //Pre Loading Event
@@ -64,11 +59,19 @@ namespace TelegramBotBase.Factories.MessageLoops
             //Loading Event
             await activeForm.Load(mr);
 
-            //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document)
-            if (mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Contact | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Document | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Location |
-                mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Photo | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Video | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Audio)
+
+            //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document) (Ignore Callback Queries)
+            if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
             {
-                await activeForm.SentData(new DataResult(ur));
+                if (mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Contact
+                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Document
+                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Location
+                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Photo
+                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Video
+                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Audio)
+                {
+                    await activeForm.SentData(new DataResult(ur));
+                }
             }
 
             //Action Event
