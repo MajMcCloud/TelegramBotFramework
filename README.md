@@ -158,6 +158,7 @@ var bb = BotBaseBuilder
 
     })
     .NoSerialization()
+    .UseEnglish()
     .Build();
 
 //Update bot commands to botfather
@@ -279,6 +280,7 @@ var bb = BotBaseBuilder
 
     })
     .NoSerialization()
+    .UseEnglish()
     .Build();
 
 bb.BotCommand += async (s, en) =>
@@ -996,6 +998,7 @@ var bb = BotBaseBuilder
         a.AddStartCommand("Starts the bot");
     })
     .UseSimpleJSON(AppContext.BaseDirectory + "config\\states.json")
+    .UseEnglish()
     .Build();
 
 //Start your Bot
@@ -1020,6 +1023,7 @@ var bb = BotBaseBuilder
         a.AddStartCommand("Starts the bot");
     })
     .UseJSON(AppContext.BaseDirectory + "config\\states.json")
+    .UseEnglish()
     .Build();
 
 //Start your Bot
@@ -1045,6 +1049,7 @@ var bb = BotBaseBuilder
         a.AddStartCommand("Starts the bot");
     })
     .UseXML(AppContext.BaseDirectory + "config\\states.xml")
+    .UseEnglish()
     .Build();
 
 //Start your Bot
