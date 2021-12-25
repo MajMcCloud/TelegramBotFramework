@@ -9,11 +9,12 @@ using TelegramBotBase.Builder.Interfaces;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Localizations;
 using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder
 {
-    public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage
+    public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage, ILanguageSelectionStage
     {
 
         String _apiKey = null;
@@ -156,33 +157,56 @@ namespace TelegramBotBase.Builder
         }
 
 
-        public IBuildingStage NoSerialization()
+        public ILanguageSelectionStage NoSerialization()
         {
             return this;
         }
 
-        public IBuildingStage UseSerialization(IStateMachine machine)
+        public ILanguageSelectionStage UseSerialization(IStateMachine machine)
         {
             this._statemachine = machine;
             return this;
         }
 
 
-        public IBuildingStage UseJSON(string path)
+        public ILanguageSelectionStage UseJSON(string path)
         {
             this._statemachine = new JSONStateMachine(path);
             return this;
         }
 
-        public IBuildingStage UseSimpleJSON(string path)
+        public ILanguageSelectionStage UseSimpleJSON(string path)
         {
             this._statemachine = new SimpleJSONStateMachine(path);
             return this;
         }
 
-        public IBuildingStage UseXML(string path)
+        public ILanguageSelectionStage UseXML(string path)
         {
             this._statemachine = new XMLStateMachine(path);
+            return this;
+        }
+
+        public IBuildingStage DefaultLanguage()
+        {
+            return this;
+        }
+
+        public IBuildingStage UseEnglish()
+        {
+            Localizations.Default.Language = new Localizations.English();
+            return this;
+        }
+
+        public IBuildingStage UseGerman()
+        {
+            Localizations.Default.Language = new Localizations.German();
+            return this;
+        }
+
+        public IBuildingStage Custom(Localization language)
+        {
+            Localizations.Default.Language = language;
             return this;
         }
 
@@ -208,5 +232,6 @@ namespace TelegramBotBase.Builder
             return bb;
         }
 
+       
     }
 }

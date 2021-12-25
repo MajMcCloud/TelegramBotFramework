@@ -11,7 +11,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// Do not uses serialization.
         /// </summary>
         /// <returns></returns>
-        IBuildingStage NoSerialization();
+        ILanguageSelectionStage NoSerialization();
 
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="machine"></param>
         /// <returns></returns>
-        IBuildingStage UseSerialization(IStateMachine machine);
+        ILanguageSelectionStage UseSerialization(IStateMachine machine);
 
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        IBuildingStage UseJSON(String path);
+        ILanguageSelectionStage UseJSON(String path);
 
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        IBuildingStage UseSimpleJSON(String path);
+        ILanguageSelectionStage UseSimpleJSON(String path);
 
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        IBuildingStage UseXML(String path);
+        ILanguageSelectionStage UseXML(String path);
 
     }
 }

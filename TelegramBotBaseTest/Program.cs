@@ -34,9 +34,8 @@ namespace TelegramBotBaseTest
                           a.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
                       })
                       .NoSerialization()
+                      .UseEnglish()
                       .Build();
-
-
 
 
             bb.BotCommand += async (s, en) =>
