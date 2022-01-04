@@ -19,9 +19,9 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <summary>
         /// Chooses a custom message loop.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="startFormClass"></param>
         /// <returns></returns>
-        IStartFormSelectionStage CustomMessageLoop(Type startFormClass);
+        IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory startFormClass);
 
 
         /// <summary>

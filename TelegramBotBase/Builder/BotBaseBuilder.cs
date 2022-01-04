@@ -54,12 +54,9 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
-        public IStartFormSelectionStage CustomMessageLoop(Type messageLoopClass)
+        public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
         {
-            if (messageLoopClass.IsSubclassOf(typeof(IMessageLoopFactory)))
-                throw new ArgumentException($"Not a subclass of {nameof(IMessageLoopFactory)}");
-
-            _messageloopfactory = messageLoopClass.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
+            _messageloopfactory = messageLoopClass;
 
             return this;
         }
