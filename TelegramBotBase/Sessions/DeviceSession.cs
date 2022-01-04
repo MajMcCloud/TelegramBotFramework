@@ -697,11 +697,24 @@ namespace TelegramBotBase.Sessions
             return null;
         }
 
+        [Obsolete("User BanUser instead.")]
         public virtual async Task KickUser(long userId, DateTime until = default(DateTime))
         {
             try
             {
-                await API(a => a.KickChatMemberAsync(this.DeviceId, userId, until));
+                await API(a => a.BanChatMemberAsync(this.DeviceId, userId, until));
+            }
+            catch
+            {
+
+            }
+        }
+
+        public virtual async Task BanUser(long userId, DateTime until = default(DateTime))
+        {
+            try
+            {
+                await API(a => a.BanChatMemberAsync(this.DeviceId, userId, until));
             }
             catch
             {
