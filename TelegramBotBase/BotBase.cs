@@ -73,9 +73,14 @@ namespace TelegramBotBase
         /// </summary>
         public IStartFormFactory StartFormFactory { get; set; }
 
+        /// <summary>
+        /// Contains the message loop factory, which cares about "message-management."
+        /// </summary>
         public IMessageLoopFactory MessageLoopFactory { get; set; }
 
-
+        /// <summary>
+        /// All internal used settings.
+        /// </summary>
         public Dictionary<eSettings, uint> SystemSettings { get; private set; }
 
         public BotBase()
@@ -515,6 +520,11 @@ namespace TelegramBotBase
         //    }
         //}
 
+        /// <summary>
+        /// Will get invoke on an unhandled call.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void MessageLoopFactory_UnhandledCall(object sender, UnhandledCallEventArgs e)
         {
             OnUnhandledCall(e);

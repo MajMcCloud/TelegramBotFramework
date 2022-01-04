@@ -18,10 +18,20 @@ namespace TelegramBotBase
     /// </summary>
     public class SessionBase
     {
+        /// <summary>
+        /// The Basic message client.
+        /// </summary>
         public MessageClient Client { get; set; }
 
+        /// <summary>
+        /// A list of all active sessions.
+        /// </summary>
         public Dictionary<long, DeviceSession> SessionList { get; set; }
 
+
+        /// <summary>
+        /// Reference to the Main BotBase instance for later use.
+        /// </summary>
         public BotBase BotBase { get; set; }
 
 
