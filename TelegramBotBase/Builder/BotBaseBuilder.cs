@@ -144,9 +144,9 @@ namespace TelegramBotBase.Builder
 
         public ISessionSerializationStage DefaultCommands()
         {
-            _botcommands.AddStartCommand("Starts the bot");
-            _botcommands.AddHelpCommand("Should show you some help");
-            _botcommands.AddSettingsCommand("Should show you some settings");
+            _botcommands.Start("Starts the bot");
+            _botcommands.Help("Should show you some help");
+            _botcommands.Settings("Should show you some settings");
             return this;
         }
 

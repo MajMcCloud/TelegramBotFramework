@@ -26,12 +26,12 @@ namespace TelegramBotBaseTest
                       .NoProxy()
                       .CustomCommands(a =>
                       {
-                          a.AddStartCommand("Starts the bot");
-                          a.AddHelpCommand("Should show you some help");
-                          a.AddSettingsCommand("Should show you some settings");
-                          a.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
-                          a.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
-                          a.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
+                          a.Start("Starts the bot");
+                          a.Help("Should show you some help");
+                          a.Settings("Should show you some settings");
+                          a.Add("form1", "Opens test form 1");
+                          a.Add("form2", "Opens test form 2");
+                          a.Add("params", "Returns all send parameters as a message.");
                       })
                       .NoSerialization()
                       .UseEnglish()
