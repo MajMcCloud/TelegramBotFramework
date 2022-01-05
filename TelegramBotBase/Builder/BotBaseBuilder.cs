@@ -34,7 +34,7 @@ namespace TelegramBotBase.Builder
             return new BotBaseBuilder();
         }
 
-        #region "Step 1"
+        #region "Step 1 (Basic Stuff)"
 
         public IMessageLoopSelectionStage WithAPIKey(string apiKey)
         {
@@ -45,7 +45,7 @@ namespace TelegramBotBase.Builder
         #endregion
 
 
-        #region "Step 2"
+        #region "Step 2 (Message Loop)"
 
         public IStartFormSelectionStage DefaultMessageLoop()
         {
@@ -71,7 +71,7 @@ namespace TelegramBotBase.Builder
 
         #endregion
 
-        #region "Step 3"
+        #region "Step 3 (Start Form/Factory)" 
 
         public INetworkingSelectionStage WithStartForm(Type startFormClass)
         {
@@ -94,6 +94,7 @@ namespace TelegramBotBase.Builder
 
         #endregion
 
+        #region "Step 4 (Network Settings)"
 
         public IBotCommandsStage WithProxy(string proxyAddress)
         {
@@ -134,6 +135,11 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
+
+        #endregion
+
+        #region "Step 5 (Bot Commands)"
+
         public ISessionSerializationStage NoCommands()
         {
             return this;
@@ -153,6 +159,9 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
+        #endregion
+
+        #region "Step 6 (Serialization)"
 
         public ILanguageSelectionStage NoSerialization()
         {
@@ -184,6 +193,10 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
+        #endregion
+
+        #region "Step 7 (Language)"
+
         public IBuildingStage DefaultLanguage()
         {
             return this;
@@ -206,6 +219,8 @@ namespace TelegramBotBase.Builder
             Localizations.Default.Language = language;
             return this;
         }
+
+        #endregion
 
         public BotBase Build()
         {
