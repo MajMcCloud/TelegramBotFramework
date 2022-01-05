@@ -42,6 +42,63 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
+
+        public IBuildingStage QuickStart(string apiKey, Type StartForm)
+        {
+            this._apiKey = apiKey;
+            this._factory = new Factories.DefaultStartFormFactory(StartForm);
+
+            DefaultMessageLoop();
+
+            NoProxy();
+
+            OnlyStart();
+
+            NoSerialization();
+
+            DefaultLanguage();
+
+            return this;
+        }
+
+
+        public IBuildingStage QuickStart<T>(string apiKey)
+            where T : FormBase
+        {
+            this._apiKey = apiKey;
+            this._factory = new Factories.DefaultStartFormFactory(typeof(T));
+
+            DefaultMessageLoop();
+
+            NoProxy();
+
+            OnlyStart();
+
+            NoSerialization();
+
+            DefaultLanguage();
+
+            return this;
+        }
+
+        public IBuildingStage QuickStart(string apiKey, IStartFormFactory StartFormFactory)
+        {
+            this._apiKey = apiKey;
+            this._factory = StartFormFactory;
+
+            DefaultMessageLoop();
+
+            NoProxy();
+
+            OnlyStart();
+
+            NoSerialization();
+
+            DefaultLanguage();
+
+            return this;
+        }
+
         #endregion
 
 
@@ -252,6 +309,5 @@ namespace TelegramBotBase.Builder
             return bb;
         }
 
-       
     }
 }
