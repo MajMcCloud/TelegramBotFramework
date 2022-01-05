@@ -12,11 +12,6 @@ namespace TelegramBotBase.Base
     public class MessageResult : ResultBase
     {
 
-        //public Telegram.Bot.Args.MessageEventArgs RawMessageData { get; set; }
-
-        //public Telegram.Bot.Args.CallbackQueryEventArgs RawCallbackData { get; set; }
-
-
         public Telegram.Bot.Types.Update UpdateData { get; set; }
 
         /// <summary>
@@ -206,19 +201,6 @@ namespace TelegramBotBase.Base
             this.UpdateData = update;
 
         }
-
-
-        //public MessageResult(Telegram.Bot.Args.MessageEventArgs rawdata)
-        //{
-        //    this.RawMessageData = rawdata;
-        //    this.Message = rawdata.Message;
-        //}
-
-        //public MessageResult(Telegram.Bot.Args.CallbackQueryEventArgs callback)
-        //{
-        //    this.RawCallbackData = callback;
-        //    this.Message = callback.CallbackQuery.Message;
-        //}
 
     }
 }
