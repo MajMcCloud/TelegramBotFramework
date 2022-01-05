@@ -145,6 +145,14 @@ namespace TelegramBotBase.Builder
             return this;
         }
 
+        public ISessionSerializationStage OnlyStart()
+        {
+            _botcommands.Start("Starts the bot");
+
+            return this;
+
+        }
+
         public ISessionSerializationStage DefaultCommands()
         {
             _botcommands.Start("Starts the bot");

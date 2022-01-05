@@ -22,6 +22,13 @@ namespace TelegramBotBase.Builder.Interfaces
 
 
         /// <summary>
+        /// Only adds the start command.
+        /// </summary>
+        /// <returns></returns>
+        ISessionSerializationStage OnlyStart();
+
+
+        /// <summary>
         /// Gives you the ability to add custom commands.
         /// </summary>
         /// <param name="action"></param>
