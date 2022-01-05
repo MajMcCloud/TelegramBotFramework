@@ -39,6 +39,7 @@ Thanks !
 ## Index
 - [Introduction](#introduction)
 - [How to Start](#how-to-start)
+- [Quick Start](#quick-start)
 - [Message Handling](#message-handling)
     * [Example #0 - System Calls](#add-some-system-calls-example-0---system-calls)
 
@@ -240,6 +241,28 @@ var tf = new TestForm();
 
 await this.NavigateTo(tf);
 ```
+
+## Quick Start:
+
+
+When migrating from a previous version or starting completely new, all these options can be a bit overwhelming.
+For this I added a QuickStart option, directly after the Create call. It just need basic parameters like in earlier versions.
+
+
+```
+
+//Prepare the System (New in V5)
+var bb = BotBaseBuilder
+    .Create()
+    .QuickStart("{YOUR API KEY}", StartForm)
+    .Build();
+
+//Start your Bot
+bb.Start();
+
+```
+
+
 
 ## Message Handling
 
