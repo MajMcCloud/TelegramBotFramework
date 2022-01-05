@@ -254,7 +254,7 @@ For this I added a QuickStart option, directly after the Create call. It just ne
 //Prepare the System (New in V5)
 var bb = BotBaseBuilder
     .Create()
-    .QuickStart("{YOUR API KEY}", StartForm)
+    .QuickStart<StartForm>("{YOUR API KEY}")
     .Build();
 
 //Start your Bot
