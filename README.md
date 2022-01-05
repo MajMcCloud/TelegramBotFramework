@@ -154,7 +154,7 @@ var bb = BotBaseBuilder
     .NoProxy()
     .CustomCommands(a =>
     {
-        a.AddStartCommand("Starts the bot")
+        a.Start("Starts the bot")
 
     })
     .NoSerialization()
@@ -272,10 +272,10 @@ var bb = BotBaseBuilder
     .NoProxy()
     .CustomCommands(a =>
     {
-        a.AddStartCommand("Starts the bot");
-        a.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
-        a.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
-        a.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
+        a.Start("Starts the bot");
+        a.Add("form1","Opens test form 1" );
+        a.Add("form2", "Opens test form 2" );
+        a.Add("params", "Returns all send parameters as a message." );
 
 
     })
@@ -995,7 +995,7 @@ var bb = BotBaseBuilder
     .NoProxy()
     .CustomCommands(a =>
     {
-        a.AddStartCommand("Starts the bot");
+        a.Start("Starts the bot");
     })
     .UseSimpleJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
@@ -1020,7 +1020,7 @@ var bb = BotBaseBuilder
     .NoProxy()
     .CustomCommands(a =>
     {
-        a.AddStartCommand("Starts the bot");
+        a.Start("Starts the bot");
     })
     .UseJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
@@ -1046,7 +1046,7 @@ var bb = BotBaseBuilder
     .NoProxy()
     .CustomCommands(a =>
     {
-        a.AddStartCommand("Starts the bot");
+        a.Start("Starts the bot");
     })
     .UseXML(AppContext.BaseDirectory + "config\\states.xml")
     .UseEnglish()
