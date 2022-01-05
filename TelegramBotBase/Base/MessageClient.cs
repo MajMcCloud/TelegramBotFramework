@@ -112,11 +112,6 @@ namespace TelegramBotBase.Base
         {
             this.TelegramClient.Timeout = new TimeSpan(0, 0, 30);
 
-
-            //this.TelegramClient.OnMessage += TelegramClient_OnMessage;
-            //this.TelegramClient.OnMessageEdited += TelegramClient_OnMessageEdited;
-            //this.TelegramClient.OnCallbackQuery += TelegramClient_OnCallbackQuery;
-
         }
 
 
@@ -137,58 +132,6 @@ namespace TelegramBotBase.Base
         {
             __cancellationTokenSource.Cancel();
         }
-
-
-        //private async void TelegramClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
-        //{
-        //    //Skip empty messages by default
-        //    if (e.Message == null)
-        //        return;
-
-        //    try
-        //    {
-        //        var mr = new MessageResult(e);
-        //        mr.Client = this;
-        //        OnMessage(mr);
-        //    }
-        //    catch
-        //    {
-
-        //    }
-        //}
-
-
-        //private async void TelegramClient_OnMessageEdited(object sender, Telegram.Bot.Args.MessageEventArgs e)
-        //{
-        //    //Skip empty messages by default
-        //    if (e.Message == null)
-        //        return;
-
-        //    try
-        //    {
-        //        var mr = new MessageResult(e);
-        //        mr.Client = this;
-        //        OnMessageEdit(mr);
-        //    }
-        //    catch
-        //    {
-
-        //    }
-        //}
-
-        //private async void TelegramClient_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
-        //{
-        //    try
-        //    {
-        //        var ar = new MessageResult(e);
-        //        ar.Client = this;
-        //        OnAction(ar);
-        //    }
-        //    catch
-        //    {
-
-        //    }
-        //}
 
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -254,60 +197,6 @@ namespace TelegramBotBase.Base
         {
             (this.__Events[__evOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
         }
-
-
-        //public event EventHandler<MessageResult> Message
-        //{
-        //    add
-        //    {
-        //        this.__Events.AddHandler(__evOnMessage, value);
-        //    }
-        //    remove
-        //    {
-        //        this.__Events.RemoveHandler(__evOnMessage, value);
-        //    }
-        //}
-
-        //public void OnMessage(MessageResult result)
-        //{
-        //    (this.__Events[__evOnMessage] as EventHandler<MessageResult>)?.Invoke(this, result);
-        //}
-
-
-
-        //public event EventHandler<MessageResult> MessageEdit
-        //{
-        //    add
-        //    {
-        //        this.__Events.AddHandler(__evOnMessageEdit, value);
-        //    }
-        //    remove
-        //    {
-        //        this.__Events.RemoveHandler(__evOnMessageEdit, value);
-        //    }
-        //}
-
-        //public void OnMessageEdit(MessageResult result)
-        //{
-        //    (this.__Events[__evOnMessageEdit] as EventHandler<MessageResult>)?.Invoke(this, result);
-        //}
-
-        //public event EventHandler<MessageResult> Action
-        //{
-        //    add
-        //    {
-        //        this.__Events.AddHandler(__evCallbackQuery, value);
-        //    }
-        //    remove
-        //    {
-        //        this.__Events.RemoveHandler(__evCallbackQuery, value);
-        //    }
-        //}
-
-        //public void OnAction(MessageResult result)
-        //{
-        //    (this.__Events[__evCallbackQuery] as EventHandler<MessageResult>)?.Invoke(this, result);
-        //}
 
 
         #endregion

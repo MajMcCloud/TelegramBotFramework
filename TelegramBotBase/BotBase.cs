@@ -111,10 +111,6 @@ namespace TelegramBotBase
 
             this.Client.MessageLoop += Client_MessageLoop;
 
-            //this.Client.Message += Client_Message;
-            //this.Client.MessageEdit += Client_MessageEdit;
-            //this.Client.Action += Client_Action;
-
 
             if (this.StateMachine != null)
             {
@@ -177,10 +173,6 @@ namespace TelegramBotBase
                 return;
 
             this.Client.MessageLoop -= Client_MessageLoop;
-
-            //this.Client.Message -= Client_Message;
-            //this.Client.MessageEdit -= Client_MessageEdit;
-            //this.Client.Action -= Client_Action;
 
 
             this.Client.StopReceiving();

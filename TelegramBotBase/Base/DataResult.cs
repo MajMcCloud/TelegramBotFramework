@@ -70,15 +70,6 @@ namespace TelegramBotBase.Base
         }
 
 
-        //public Telegram.Bot.Types.Enums.MessageType Type
-        //{
-        //    get
-        //    {
-        //        return this.RawMessageData?.Message?.Type ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
-        //    }
-        //}
-
-
         public Telegram.Bot.Types.Enums.MessageType Type
         {
             get
@@ -108,22 +99,6 @@ namespace TelegramBotBase.Base
                         this.Photos.FirstOrDefault()?.FileId);
             }
         }
-
-
-        //public DataResult(Telegram.Bot.Args.MessageEventArgs rawdata)
-        //{
-        //    this.RawMessageData = rawdata;
-        //    this.Message = rawdata.Message;
-        //}
-
-        //public DataResult(MessageResult message)
-        //{
-        //    this.RawMessageData = message.RawMessageData;
-        //    this.Message = message.Message;
-
-        //    this.Client = message.Client;
-        //}
-
 
         public DataResult(UpdateResult update)
         {
