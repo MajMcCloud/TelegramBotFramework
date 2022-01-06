@@ -49,17 +49,6 @@ namespace TelegramBotBaseTest.Tests.Datasources
             }
         }
 
-        public override async Task Load(MessageResult message)
-        {
-            
-        }
-
-
-        public override async Task Render(MessageResult message)
-        {
-            
-        }
-
 
     }
 }
