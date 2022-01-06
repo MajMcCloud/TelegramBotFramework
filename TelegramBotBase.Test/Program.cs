@@ -16,9 +16,8 @@ namespace TelegramBotBaseTest
     {
         static void Main(string[] args)
         {
-            //Test: 822283338:AAGmeSX5j65pcO3UKBQ7Ro_nuSaW9LCxwl0
-            //Live: 480896099:AAE6M9WqvwFdBkk-tGKki4rgdOvoVxcHTBQ
-            String APIKey = "822283338:AAGmeSX5j65pcO3UKBQ7Ro_nuSaW9LCxwl0";// "822283338:AAGmeSX5j65pcO3UKBQ7Ro_nuSaW9LCxwl0";
+
+            String APIKey = "";
 
             var bb = BotBaseBuilder
                       .Create()
