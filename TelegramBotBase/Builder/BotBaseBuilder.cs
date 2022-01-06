@@ -29,6 +29,11 @@ namespace TelegramBotBase.Builder
 
         IMessageLoopFactory _messageloopfactory = null;
 
+        private BotBaseBuilder()
+        {
+
+        }
+
         public static IAPIKeySelectionStage Create()
         {
             return new BotBaseBuilder();
@@ -128,6 +133,7 @@ namespace TelegramBotBase.Builder
 
         #endregion
 
+
         #region "Step 3 (Start Form/Factory)" 
 
         public INetworkingSelectionStage WithStartForm(Type startFormClass)
@@ -150,6 +156,7 @@ namespace TelegramBotBase.Builder
         }
 
         #endregion
+
 
         #region "Step 4 (Network Settings)"
 
@@ -195,6 +202,7 @@ namespace TelegramBotBase.Builder
 
         #endregion
 
+
         #region "Step 5 (Bot Commands)"
 
         public ISessionSerializationStage NoCommands()
@@ -225,6 +233,7 @@ namespace TelegramBotBase.Builder
         }
 
         #endregion
+
 
         #region "Step 6 (Serialization)"
 
@@ -260,6 +269,7 @@ namespace TelegramBotBase.Builder
 
         #endregion
 
+
         #region "Step 7 (Language)"
 
         public IBuildingStage DefaultLanguage()
@@ -286,6 +296,7 @@ namespace TelegramBotBase.Builder
         }
 
         #endregion
+
 
         public BotBase Build()
         {
