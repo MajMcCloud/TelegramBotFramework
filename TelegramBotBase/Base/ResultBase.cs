@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
 
 namespace TelegramBotBase.Base
 {
@@ -20,7 +21,7 @@ namespace TelegramBotBase.Base
             }
         }
 
-        public Telegram.Bot.Types.Message Message { get; set; }
+        public virtual Telegram.Bot.Types.Message Message { get; set; }
 
         /// <summary>
         /// Deletes the current message

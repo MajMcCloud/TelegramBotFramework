@@ -46,9 +46,9 @@ namespace TelegramBotBase.Form
                 return InlineKeyboardButton.WithCallbackData(this.Text, id + this.Value);
             }
 
-            var ikb = new InlineKeyboardButton();
+            var ikb = new InlineKeyboardButton(this.Text);
 
-            ikb.Text = this.Text;
+            //ikb.Text = this.Text;
             ikb.Url = this.Url;
 
             return ikb;

@@ -51,10 +51,10 @@ namespace TelegramBotBaseTest.Tests
 
                 default:
 
-                    if (message.RawMessageData == null)
+                    if (message.UpdateData == null)
                         return;
 
-                    this.LastMessage = message.RawMessageData.Message.Text;
+                    this.LastMessage = message.Message.Text;
 
                     break;
             }

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
 {
     public class MessageResult : ResultBase
     {
-        public Telegram.Bot.Args.MessageEventArgs RawMessageData { get; set; }
 
-        public Telegram.Bot.Args.CallbackQueryEventArgs RawCallbackData { get; set; }
+        public Telegram.Bot.Types.Update UpdateData { get; set; }
 
         /// <summary>
         /// Returns the Device/ChatId
@@ -20,8 +21,9 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawMessageData?.Message?.Chat.Id
-                    ?? this.RawCallbackData?.CallbackQuery.Message?.Chat.Id
+                return this.UpdateData?.Message?.Chat?.Id
+                    ?? this.UpdateData?.EditedMessage?.Chat.Id
+                    ?? this.UpdateData?.CallbackQuery.Message?.Chat.Id
                     ?? Device?.DeviceId
                     ?? 0;
             }
@@ -40,8 +42,9 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.Message?.MessageId 
-                    ?? this.RawCallbackData?.CallbackQuery?.Message?.MessageId 
+                return this.UpdateData?.Message?.MessageId
+                    ?? this.Message?.MessageId
+                    ?? this.UpdateData?.CallbackQuery?.Message?.MessageId
                     ?? 0;
             }
         }
@@ -50,7 +53,7 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawMessageData?.Message?.Text ?? "";
+                return this.UpdateData?.Message?.Text ?? "";
             }
         }
 
@@ -58,7 +61,7 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawMessageData?.Message?.Text ?? "";
+                return this.UpdateData?.Message?.Text ?? "";
             }
         }
 
@@ -66,8 +69,19 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawMessageData?.Message?.Type 
-                    ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
+                return Message?.Type ?? Telegram.Bot.Types.Enums.MessageType.Unknown;
+            }
+        }
+
+        public Message Message
+        {
+            get
+            {
+                return this.UpdateData?.Message
+                    ?? this.UpdateData?.EditedMessage
+                    ?? this.UpdateData?.ChannelPost
+                    ?? this.UpdateData?.EditedChannelPost
+                    ?? this.UpdateData?.CallbackQuery?.Message;
             }
         }
 
@@ -78,7 +92,7 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return (this.RawCallbackData != null);
+                return (this.UpdateData.CallbackQuery != null);
             }
         }
 
@@ -133,7 +147,7 @@ namespace TelegramBotBase.Base
         {
             get
             {
-                return this.RawCallbackData?.CallbackQuery?.Data;
+                return this.UpdateData?.CallbackQuery?.Data;
             }
         }
 
@@ -162,14 +176,7 @@ namespace TelegramBotBase.Base
         /// <returns></returns>
         public async Task ConfirmAction(String message = "", bool showAlert = false, String urlToOpen = null)
         {
-            try
-            {
-                await this.Client.TelegramClient.AnswerCallbackQueryAsync(this.RawCallbackData.CallbackQuery.Id, message, showAlert, urlToOpen);
-            }
-            catch
-            {
-
-            }
+            await this.Device.ConfirmAction(this.UpdateData.CallbackQuery.Id, message, showAlert, urlToOpen);
         }
 
         public override async Task DeleteMessage()
@@ -189,16 +196,10 @@ namespace TelegramBotBase.Base
 
         }
 
-        public MessageResult(Telegram.Bot.Args.MessageEventArgs rawdata)
+        public MessageResult(Telegram.Bot.Types.Update update)
         {
-            this.RawMessageData = rawdata;
-            this.Message = rawdata.Message;
-        }
+            this.UpdateData = update;
 
-        public MessageResult(Telegram.Bot.Args.CallbackQueryEventArgs callback)
-        {
-            this.RawCallbackData = callback;
-            this.Message = callback.CallbackQuery.Message;
         }
 
     }

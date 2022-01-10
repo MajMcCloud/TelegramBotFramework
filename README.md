@@ -2,7 +2,7 @@
 
 # .Net Telegram Bot Framework - Context based addon
 
-[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/vpre/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 [![telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://www.t.me/tgbotbase)
 
 
@@ -39,6 +39,7 @@ Thanks !
 ## Index
 - [Introduction](#introduction)
 - [How to Start](#how-to-start)
+- [Quick Start](#quick-start)
 - [Message Handling](#message-handling)
     * [Example #0 - System Calls](#add-some-system-calls-example-0---system-calls)
 
@@ -145,11 +146,21 @@ It needs to be a subclass of "FormBase" you will find in Namespace TelegramBotBa
 
 ```
 
-//Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
+//Prepare the System (New in V5)
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .CustomCommands(a =>
+    {
+        a.Start("Starts the bot")
 
-//Add Systemcommands if you like, you could catch them later
-bb.BotCommands.Add(new BotCommand() { Command = "start", Description = "Starts the bot" });
+    })
+    .NoSerialization()
+    .UseEnglish()
+    .Build();
 
 //Update bot commands to botfather
 bb.UploadBotCommands().Wait();
@@ -231,6 +242,28 @@ var tf = new TestForm();
 await this.NavigateTo(tf);
 ```
 
+## Quick Start:
+
+
+When migrating from a previous version or starting completely new, all these options can be a bit overwhelming.
+For this I added a QuickStart option, directly after the Create call. It just need basic parameters like in earlier versions.
+
+
+```
+
+//Prepare the System (New in V5)
+var bb = BotBaseBuilder
+    .Create()
+    .QuickStart<StartForm>("{YOUR API KEY}")
+    .Build();
+
+//Start your Bot
+bb.Start();
+
+```
+
+
+
 ## Message Handling
 
 All examples are within the test project, so just try it out on your own.
@@ -254,12 +287,24 @@ Below we have 4 options.
 
 
 ```
-BotBase<Start> bb = new BotBase<Start>("{YOUR API KEY}");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<Start>()
+    .NoProxy()
+    .CustomCommands(a =>
+    {
+        a.Start("Starts the bot");
+        a.Add("form1","Opens test form 1" );
+        a.Add("form2", "Opens test form 2" );
+        a.Add("params", "Returns all send parameters as a message." );
 
-bb.BotCommands.Add(new BotCommand() { Command = "start", Description = "Starts the bot" });
-bb.BotCommands.Add(new BotCommand() { Command = "form1", Description = "Opens test form 1" });
-bb.BotCommands.Add(new BotCommand() { Command = "form2", Description = "Opens test form 2" });
-bb.BotCommands.Add(new BotCommand() { Command = "params", Description = "Returns all send parameters as a message." });
+
+    })
+    .NoSerialization()
+    .UseEnglish()
+    .Build();
 
 bb.BotCommand += async (s, en) =>
 {
@@ -965,13 +1010,19 @@ In general you didn't need to do more then, to keep the actual form:
 
 ```
 //Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
-
-//Add Systemcommands if you like, you could catch them later
-bb.SystemCalls.Add("/start");
-
-//Set the statemachine and enable it
-bb.StateMachine = new TelegramBotBase.States.SimpleJSONStateMachine(AppContext.BaseDirectory + "config\\states.json");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .CustomCommands(a =>
+    {
+        a.Start("Starts the bot");
+    })
+    .UseSimpleJSON(AppContext.BaseDirectory + "config\\states.json")
+    .UseEnglish()
+    .Build();
 
 //Start your Bot
 bb.Start();
@@ -984,13 +1035,19 @@ In general you didn't need to do more then, to keep the actual form:
 
 ```
 //Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
-
-//Add Systemcommands if you like, you could catch them later
-bb.SystemCalls.Add("/start");
-
-//Set the statemachine and enable it
-bb.StateMachine = new TelegramBotBase.States.JSONStateMachine(AppContext.BaseDirectory + "config\\states.json");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .CustomCommands(a =>
+    {
+        a.Start("Starts the bot");
+    })
+    .UseJSON(AppContext.BaseDirectory + "config\\states.json")
+    .UseEnglish()
+    .Build();
 
 //Start your Bot
 bb.Start();
@@ -1004,13 +1061,19 @@ In general you didn't need to do more then, to keep the actual form:
 
 ```
 //Prepare the System
-BotBase<StartForm> bb = new BotBase<StartForm>("{YOUR API KEY}");
-
-//Add Systemcommands if you like, you could catch them later
-bb.SystemCalls.Add("/start");
-
-//Set the statemachine and enable it
-bb.StateMachine = new TelegramBotBase.States.XMLStateMachine(AppContext.BaseDirectory + "config\\states.xml");
+var bb = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .CustomCommands(a =>
+    {
+        a.Start("Starts the bot");
+    })
+    .UseXML(AppContext.BaseDirectory + "config\\states.xml")
+    .UseEnglish()
+    .Build();
 
 //Start your Bot
 bb.Start();
