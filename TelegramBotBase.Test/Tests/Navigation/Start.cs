@@ -16,16 +16,9 @@ namespace TelegramBotBaseTest.Tests.Navigation
 
         public Start()
         {
-            this.Closed += Start_Closed;
+
         }
 
-        private async Task Start_Closed(object sender, EventArgs e)
-        {
-            if (msg == null)
-                return;
-
-            await Device.DeleteMessage(msg);
-        }
 
         public override async Task Load(MessageResult message)
         {
@@ -49,12 +42,18 @@ namespace TelegramBotBaseTest.Tests.Navigation
 
                     //Create navigation controller and navigate to it, keep the current form as root form so we can get back to here later
                     var nc = new CustomController(this);
+                    nc.ForceCleanupOnLastPop = true;
 
                     var f1 = new Form1();
 
+                    await nc.PushAsync(f1);
+
                     await NavigateTo(nc);
 
-                    await nc.PushAsync(f1);
+                    if (msg == null)
+                        return;
+
+                    await Device.DeleteMessage(msg);
 
 
                     break;
@@ -66,6 +65,10 @@ namespace TelegramBotBaseTest.Tests.Navigation
 
                     await NavigateTo(mn);
 
+                    if (msg == null)
+                        return;
+
+                    await Device.DeleteMessage(msg);
 
                     break;
             }

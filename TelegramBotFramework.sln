@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29324.140
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase", "TelegramBotBase\TelegramBotBase.csproj", "{0BD16FB9-7ED4-4CCB-83EB-5CEE538E1B6C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBaseTest", "TelegramBotBaseTest\TelegramBotBaseTest.csproj", "{88EC0E02-583D-4B9D-956C-81D63C8CFCFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBaseTest", "TelegramBotBase.Test\TelegramBotBaseTest.csproj", "{88EC0E02-583D-4B9D-956C-81D63C8CFCFA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3856B3FB-63E3-444A-9FF0-34171BE7AC5D}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,6 +17,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommandsBot", "Examples\SystemCommandsBot\SystemCommandsBot.csproj", "{FC484952-3060-4F87-9809-4CD66D6961C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinHiderBot", "Examples\JoinHiderBot\JoinHiderBot.csproj", "{E804B9E5-7ACC-49D3-9253-806766C1D9A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Extensions.Images", "TelegramBotBase.Extensions.Images\TelegramBotBase.Extensions.Images.csproj", "{B5DDFA45-0E01-46A5-B67D-541300CDD606}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +42,10 @@ Global
 		{E804B9E5-7ACC-49D3-9253-806766C1D9A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E804B9E5-7ACC-49D3-9253-806766C1D9A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E804B9E5-7ACC-49D3-9253-806766C1D9A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5DDFA45-0E01-46A5-B67D-541300CDD606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5DDFA45-0E01-46A5-B67D-541300CDD606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5DDFA45-0E01-46A5-B67D-541300CDD606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5DDFA45-0E01-46A5-B67D-541300CDD606}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

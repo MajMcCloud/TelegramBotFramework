@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -140,13 +139,30 @@ namespace TelegramBotBase.Sessions
 
 
         /// <summary>
+        /// Confirm incomming action (i.e. Button click)
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public async Task ConfirmAction(String CallbackQueryId, String message = "", bool showAlert = false, String urlToOpen = null)
+        {
+            try
+            {
+                await this.Client.TelegramClient.AnswerCallbackQueryAsync(CallbackQueryId, message, showAlert, urlToOpen);
+            }
+            catch
+            {
+
+            }
+        }
+
+        /// <summary>
         /// Edits the text message
         /// </summary>
         /// <param name="messageId"></param>
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Markdown)
         {
             InlineKeyboardMarkup markup = buttons;
 
@@ -175,7 +191,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup, ParseMode parseMode = ParseMode.Markdown)
         {
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
@@ -202,7 +218,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(Message message, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> Edit(Message message, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Markdown)
         {
             InlineKeyboardMarkup markup = buttons;
 
@@ -253,7 +269,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(long deviceId, String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(long deviceId, String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -293,7 +309,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             return await Send(this.DeviceId, text, buttons, replyTo, disableNotification, parseMode, MarkdownV2AutoEscape);
         }
@@ -306,7 +322,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -344,7 +360,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -382,7 +398,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendPhoto(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -405,44 +421,6 @@ namespace TelegramBotBase.Sessions
         }
 
         /// <summary>
-        /// Sends an image
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="name"></param>
-        /// <param name="buttons"></param>
-        /// <param name="replyTo"></param>
-        /// <param name="disableNotification"></param>
-        /// <returns></returns>
-        public async Task<Message> SendPhoto(Image image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
-        {
-            using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
-            {
-                InputOnlineFile fts = new InputOnlineFile(fileStream, name);
-
-                return await SendPhoto(fts, caption: caption, buttons, replyTo, disableNotification);
-            }
-        }
-
-        /// <summary>
-        /// Sends an image
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="name"></param>
-        /// <param name="buttons"></param>
-        /// <param name="replyTo"></param>
-        /// <param name="disableNotification"></param>
-        /// <returns></returns>
-        public async Task<Message> SendPhoto(Bitmap image, String name, String caption, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
-        {
-            using (var fileStream = Tools.Images.ToStream(image, ImageFormat.Png))
-            {
-                InputOnlineFile fts = new InputOnlineFile(fileStream, name);
-
-                return await SendPhoto(fts, caption: caption, buttons, replyTo, disableNotification);
-            }
-        }
-
-        /// <summary>
         /// Sends an video
         /// </summary>
         /// <param name="file"></param>
@@ -450,7 +428,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendVideo(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -480,7 +458,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(String url, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Default)
+        public async Task<Message> SendVideo(String url, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
             if (this.ActiveForm == null)
                 return null;
@@ -719,11 +697,24 @@ namespace TelegramBotBase.Sessions
             return null;
         }
 
+        [Obsolete("User BanUser instead.")]
         public virtual async Task KickUser(long userId, DateTime until = default(DateTime))
         {
             try
             {
-                await API(a => a.KickChatMemberAsync(this.DeviceId, userId, until));
+                await API(a => a.BanChatMemberAsync(this.DeviceId, userId, until));
+            }
+            catch
+            {
+
+            }
+        }
+
+        public virtual async Task BanUser(long userId, DateTime until = default(DateTime))
+        {
+            try
+            {
+                await API(a => a.BanChatMemberAsync(this.DeviceId, userId, until));
             }
             catch
             {
@@ -751,7 +742,7 @@ namespace TelegramBotBase.Sessions
         /// <typeparam name="T"></typeparam>
         /// <param name="call"></param>
         /// <returns></returns>
-        public T RAW<T>(Func<Telegram.Bot.TelegramBotClient, T> call)
+        public T RAW<T>(Func<Telegram.Bot.ITelegramBotClient, T> call)
         {
             return call(this.Client.TelegramClient);
         }
@@ -762,7 +753,7 @@ namespace TelegramBotBase.Sessions
         /// <typeparam name="T"></typeparam>
         /// <param name="call"></param>
         /// <returns></returns>
-        public async Task<T> API<T>(Func<Telegram.Bot.TelegramBotClient, Task<T>> call)
+        public async Task<T> API<T>(Func<Telegram.Bot.ITelegramBotClient, Task<T>> call)
         {
             var numberOfTries = 0;
             while (numberOfTries < DeviceSession.MaxNumberOfRetries)
@@ -776,8 +767,8 @@ namespace TelegramBotBase.Sessions
                     if (ex.ErrorCode != 429)
                         throw;
 
-                    if (ex.Parameters != null)
-                        await Task.Delay(ex.Parameters.RetryAfter * 1000);
+                    if (ex.Parameters != null && ex.Parameters.RetryAfter != null)
+                        await Task.Delay(ex.Parameters.RetryAfter.Value * 1000);
 
                     numberOfTries++;
                 }
@@ -790,7 +781,7 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="call"></param>
         /// <returns></returns>
-        public async Task API(Func<Telegram.Bot.TelegramBotClient, Task> call)
+        public async Task API(Func<Telegram.Bot.ITelegramBotClient, Task> call)
         {
             var numberOfTries = 0;
             while (numberOfTries < DeviceSession.MaxNumberOfRetries)
@@ -805,8 +796,8 @@ namespace TelegramBotBase.Sessions
                     if (ex.ErrorCode != 429)
                         throw;
 
-                    if (ex.Parameters != null)
-                        await Task.Delay(ex.Parameters.RetryAfter * 1000);
+                    if (ex.Parameters != null && ex.Parameters.RetryAfter != null)
+                        await Task.Delay(ex.Parameters.RetryAfter.Value * 1000);
 
                     numberOfTries++;
                 }

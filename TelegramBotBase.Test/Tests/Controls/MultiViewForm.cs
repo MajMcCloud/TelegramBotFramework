@@ -48,26 +48,6 @@ namespace TelegramBotBaseTest.Tests.Controls
             }
         }
 
-        public override async Task Load(MessageResult message)
-        {
-            
-
-
-        }
-
-        public override async Task Action(MessageResult message)
-        {
-            
-
-        }
-
-
-        public override async Task Render(MessageResult message)
-        {
-            
-        }
-
-
 
     }
 }
