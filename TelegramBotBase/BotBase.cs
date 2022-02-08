@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
+using TelegramBotBase.Factories.MessageLoops;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
@@ -20,8 +24,7 @@ namespace TelegramBotBase
     /// Bot base class for full Device/Context and Messagehandling
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BotBase<T>
-        where T : FormBase
+    public class BotBase
     {
         public MessageClient Client { get; set; }
 
@@ -33,7 +36,7 @@ namespace TelegramBotBase
         /// <summary>
         /// List of all running/active sessions
         /// </summary>
-        public SessionBase<T> Sessions { get; set; }
+        public SessionBase Sessions { get; set; }
 
         /// <summary>
         /// Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
@@ -65,10 +68,22 @@ namespace TelegramBotBase
         /// </summary>
         public IStateMachine StateMachine { get; set; }
 
+        /// <summary>
+        /// Offers functionality to manage the creation process of the start form.
+        /// </summary>
+        public IStartFormFactory StartFormFactory { get; set; }
 
+        /// <summary>
+        /// Contains the message loop factory, which cares about "message-management."
+        /// </summary>
+        public IMessageLoopFactory MessageLoopFactory { get; set; }
+
+        /// <summary>
+        /// All internal used settings.
+        /// </summary>
         public Dictionary<eSettings, uint> SystemSettings { get; private set; }
 
-        private BotBase()
+        public BotBase()
         {
             this.SystemSettings = new Dictionary<eSettings, uint>();
 
@@ -80,77 +95,11 @@ namespace TelegramBotBase
 
             this.BotCommands = new List<BotCommand>();
 
-            this.Sessions = new SessionBase<T>();
+            this.Sessions = new SessionBase();
             this.Sessions.BotBase = this;
         }
 
-        /// <summary>
-        /// Simple start of your Bot with the APIKey
-        /// </summary>
-        /// <param name="apiKey"></param>
-        public BotBase(String apiKey, bool initClient = true) : this()
-        {
-            this.APIKey = apiKey;
 
-            if (!initClient)
-                return;
-
-            this.Client = new Base.MessageClient(this.APIKey);
-            this.Client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a proxyAdress
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, System.Net.Http.HttpClient proxy) : this(apiKey, false)
-        {
-            this.Client = new Base.MessageClient(this.APIKey, proxy);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a TelegramBotClient instance.
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="client"></param>
-        public BotBase(String apiKey, TelegramBotClient client) : this(apiKey, false)
-        {
-            this.Client = new Base.MessageClient(this.APIKey, client);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a proxyAdress
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="proxyBaseAddress">i.e. https://127.0.0.1:10000</param>
-        public BotBase(String apiKey, String proxyBaseAddress) : this(apiKey, false)
-        {
-            var url = new Uri(proxyBaseAddress);
-
-            this.Client = new Base.MessageClient(this.APIKey, url);
-
-            this.Sessions.Client = this.Client;
-        }
-
-        /// <summary>
-        /// Simple start of your Bot with the APIKey and a proxyAdress
-        /// </summary>
-        /// <param name="apiKey"></param>
-        /// <param name="proxyHost">i.e. 127.0.0.1</param>
-        /// <param name="proxyPort">i.e. 10000</param>
-        public BotBase(String apiKey, String proxyHost, int proxyPort) : this(apiKey, false)
-        {
-            this.Client = new Base.MessageClient(this.APIKey, proxyHost, proxyPort);
-
-            this.Sessions.Client = this.Client;
-        }
 
         /// <summary>
         /// Start your Bot
@@ -160,9 +109,8 @@ namespace TelegramBotBase
             if (this.Client == null)
                 return;
 
-            this.Client.Message += Client_Message;
-            this.Client.MessageEdit += Client_MessageEdit;
-            this.Client.Action += Client_Action;
+            this.Client.MessageLoop += Client_MessageLoop;
+
 
             if (this.StateMachine != null)
             {
@@ -180,7 +128,39 @@ namespace TelegramBotBase
 
             DeviceSession.MaxNumberOfRetries = this.GetSetting(eSettings.MaxNumberOfRetries, 5);
 
-            this.Client.TelegramClient.StartReceiving();
+            this.Client.StartReceiving();
+        }
+
+
+        private async Task Client_MessageLoop(object sender, UpdateResult e)
+        {
+            DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+            if (ds == null)
+            {
+                ds = this.Sessions.StartSession(e.DeviceId).GetAwaiter().GetResult();
+                e.Device = ds;
+                ds.LastMessage = e.RawData.Message;
+
+                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+            }
+
+            var mr = new MessageResult(e.RawData);
+
+            int i = 0;
+
+            //Should formulars get navigated (allow maximum of 10, to dont get loops)
+            do
+            {
+                i++;
+
+                //Reset navigation
+                ds.FormSwitched = false;
+
+                await MessageLoopFactory.MessageLoop(this, ds, e, mr);
+
+                mr.IsFirstHandler = false;
+
+            } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
         }
 
 
@@ -192,10 +172,10 @@ namespace TelegramBotBase
             if (this.Client == null)
                 return;
 
-            this.Client.Message -= Client_Message;
-            this.Client.Action -= Client_Action;
+            this.Client.MessageLoop -= Client_MessageLoop;
 
-            this.Client.TelegramClient.StopReceiving();
+
+            this.Client.StopReceiving();
 
             this.Sessions.SaveSessionStates();
         }
@@ -216,204 +196,7 @@ namespace TelegramBotBase
             }
         }
 
-        private async void Client_Message(object sender, MessageResult e)
-        {
-            if (this.GetSetting(eSettings.SkipAllMessages, false))
-                return;
 
-            try
-            {
-                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
-                e.Device = ds;
-
-                if (this.GetSetting(eSettings.LogAllMessages, false))
-                {
-                    OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
-                }
-
-                ds?.OnMessageReceived(new MessageReceivedEventArgs(e.Message));
-
-                await Client_Loop(sender, e);
-            }
-            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
-            {
-
-            }
-            catch (Exception ex)
-            {
-                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
-                OnException(new SystemExceptionEventArgs(e.Message.Text, ds?.DeviceId ?? -1, ds, ex));
-            }
-        }
-
-
-
-        //private async Task Client_TryMessage(object sender, MessageResult e)
-        //{
-        //    DeviceSession ds = e.Device;
-        //    if (ds == null)
-        //    {
-        //        ds = await this.Sessions.StartSession<T>(e.DeviceId);
-        //        e.Device = ds;
-
-        //        ds.LastMessage = e.Message;
-
-        //        OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
-        //    }
-
-        //    ds.LastAction = DateTime.Now;
-        //    ds.LastMessage = e.Message;
-
-        //    //Is this a bot command ?
-        //    if (e.IsBotCommand && this.BotCommands.Count(a => "/" + a.Command == e.BotCommand) > 0)
-        //    {
-        //        var sce = new BotCommandEventArgs(e.BotCommand, e.BotCommandParameters, e.Message, ds.DeviceId, ds);
-        //        await OnBotCommand(sce);
-
-        //        if (sce.Handled)
-        //            return;
-        //    }
-
-        //    FormBase activeForm = null;
-
-        //    int i = 0;
-
-        //    //Should formulars get navigated (allow maximum of 10, to dont get loops)
-        //    do
-        //    {
-        //        i++;
-
-        //        //Reset navigation
-        //        ds.FormSwitched = false;
-
-        //        activeForm = ds.ActiveForm;
-
-        //        //Pre Loading Event
-        //        await activeForm.PreLoad(e);
-
-        //        //Send Load event to controls
-        //        await activeForm.LoadControls(e);
-
-        //        //Loading Event
-        //        await activeForm.Load(e);
-
-        //        //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document)
-        //        if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Contact | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Document | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Location |
-        //            e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Photo | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Video | e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Audio)
-        //        {
-        //            await activeForm.SentData(new DataResult(e));
-        //        }
-
-        //        //Render Event
-        //        if (!ds.FormSwitched)
-        //        {
-        //            await activeForm.RenderControls(e);
-
-        //            await activeForm.Render(e);
-        //        }
-
-        //        e.IsFirstHandler = false;
-
-        //    } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
-
-
-        //}
-
-        private async Task Client_Loop(object sender, MessageResult e)
-        {
-            DeviceSession ds = e.Device;
-            if (ds == null)
-            {
-                ds = await this.Sessions.StartSession<T>(e.DeviceId);
-                e.Device = ds;
-                ds.LastMessage = e.Message;
-
-                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
-            }
-
-            ds.LastAction = DateTime.Now;
-            ds.LastMessage = e.Message;
-
-            //Is this a bot command ?
-            if (e.IsBotCommand && this.BotCommands.Count(a => "/" + a.Command == e.BotCommand) > 0)
-            {
-                var sce = new BotCommandEventArgs(e.BotCommand, e.BotCommandParameters, e.Message, ds.DeviceId, ds);
-                await OnBotCommand(sce);
-
-                if (sce.Handled)
-                    return;
-            }
-
-            FormBase activeForm = null;
-
-            int i = 0;
-
-            //Should formulars get navigated (allow maximum of 10, to dont get loops)
-            do
-            {
-                i++;
-
-                //Reset navigation
-                ds.FormSwitched = false;
-
-                activeForm = ds.ActiveForm;
-
-                //Pre Loading Event
-                await activeForm.PreLoad(e);
-
-                //Send Load event to controls
-                await activeForm.LoadControls(e);
-
-                //Loading Event
-                await activeForm.Load(e);
-
-                //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document)
-                if (e.MessageType == Telegram.Bot.Types.Enums.MessageType.Contact | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Document | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Location |
-                    e.MessageType == Telegram.Bot.Types.Enums.MessageType.Photo | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Video | e.MessageType == Telegram.Bot.Types.Enums.MessageType.Audio)
-                {
-                    await activeForm.SentData(new DataResult(e));
-                }
-
-                //Action Event
-                if (!ds.FormSwitched && e.IsAction)
-                {
-                    //Send Action event to controls
-                    await activeForm.ActionControls(e);
-
-                    //Send Action event to form itself
-                    await activeForm.Action(e);
-
-                    if (!e.Handled)
-                    {
-                        var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
-                        OnUnhandledCall(uhc);
-
-                        if (uhc.Handled)
-                        {
-                            e.Handled = true;
-                            if (!ds.FormSwitched)
-                            {
-                                break;
-                            }
-                        }
-                    }
-
-                }
-
-                if (!ds.FormSwitched)
-                {
-                    //Render Event
-                    await activeForm.RenderControls(e);
-
-                    await activeForm.Render(e);
-                }
-
-                e.IsFirstHandler = false;
-
-            } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
-
-
-        }
 
         /// <summary>
         /// This will invoke the full message loop for the device even when no "userevent" like message or action has been raised.
@@ -438,7 +221,8 @@ namespace TelegramBotBase
                 DeviceSession ds = this.Sessions.GetSession(DeviceId);
                 e.Device = ds;
 
-                await Client_Loop(this, e);
+                await MessageLoopFactory.MessageLoop(this, ds, new UpdateResult(e.UpdateData, ds), e);
+                //await Client_Loop(this, e);
             }
             catch (Exception ex)
             {
@@ -447,155 +231,16 @@ namespace TelegramBotBase
             }
         }
 
-        private async void Client_MessageEdit(object sender, MessageResult e)
+
+        /// <summary>
+        /// Will get invoke on an unhandled call.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void MessageLoopFactory_UnhandledCall(object sender, UnhandledCallEventArgs e)
         {
-            if (this.GetSetting(eSettings.SkipAllMessages, false))
-                return;
-
-            try
-            {
-                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
-                e.Device = ds;
-
-                if (this.GetSetting(eSettings.LogAllMessages, false))
-                {
-                    OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
-                }
-
-                //Call same, to handle received liked edited
-                ds?.OnMessageReceived(new MessageReceivedEventArgs(e.Message));
-
-                await Client_TryMessageEdit(sender, e);
-            }
-            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
-            {
-
-            }
-            catch (Exception ex)
-            {
-                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
-                OnException(new SystemExceptionEventArgs(e.Message.Text, ds?.DeviceId ?? -1, ds, ex));
-            }
+            OnUnhandledCall(e);
         }
-
-        private async Task Client_TryMessageEdit(object sender, MessageResult e)
-        {
-            DeviceSession ds = e.Device;
-            if (ds == null)
-            {
-                ds = await this.Sessions.StartSession<T>(e.DeviceId);
-                e.Device = ds;
-            }
-
-            ds.LastAction = DateTime.Now;
-            ds.LastMessage = e.Message;
-
-            //Pre Loading Event
-            await ds.ActiveForm.Edited(e);
-
-            //When form has been switched due navigation within the edit method, reopen Client_Message
-            if (ds.FormSwitched)
-            {
-                await Client_Loop(sender, e);
-            }
-
-        }
-
-        private async void Client_Action(object sender, MessageResult e)
-        {
-            try
-            {
-                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
-                e.Device = ds;
-
-                if (this.GetSetting(eSettings.LogAllMessages, false))
-                {
-                    OnMessage(new MessageIncomeEventArgs(e.DeviceId, ds, e));
-                }
-
-                await Client_Loop(sender, e);
-            }
-            catch (Exception ex)
-            {
-                DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
-                OnException(new SystemExceptionEventArgs(e.Message.Text, ds?.DeviceId ?? -1, ds, ex));
-            }
-        }
-
-        //private async void Client_TryAction(object sender, MessageResult e)
-        //{
-        //    DeviceSession ds = e.Device;
-        //    if (ds == null)
-        //    {
-        //        ds = await this.Sessions.StartSession<T>(e.DeviceId);
-        //        e.Device = ds;
-        //    }
-
-        //    ds.LastAction = DateTime.Now;
-        //    ds.LastMessage = e.Message;
-
-        //    FormBase activeForm = null;
-
-        //    int i = 0;
-
-        //    //Should formulars get navigated (allow maximum of 10, to dont get loops)
-        //    do
-        //    {
-        //        i++;
-
-        //        //Reset navigation
-        //        ds.FormSwitched = false;
-
-        //        activeForm = ds.ActiveForm;
-
-        //        //Pre Loading Event
-        //        await activeForm.PreLoad(e);
-
-        //        //Send Load event to controls
-        //        await activeForm.LoadControls(e);
-
-        //        //Loading Event
-        //        await activeForm.Load(e);
-
-        //        //Action Event
-        //        if (!ds.FormSwitched)
-        //        {
-        //            //Send Action event to controls
-        //            await activeForm.ActionControls(e);
-
-        //            //Send Action event to form itself
-        //            await activeForm.Action(e);
-
-        //            if (!e.Handled)
-        //            {
-        //                var uhc = new UnhandledCallEventArgs(e.Message.Text, e.RawData, ds.DeviceId, e.MessageId, e.Message, ds);
-        //                OnUnhandledCall(uhc);
-
-        //                if (uhc.Handled)
-        //                {
-        //                    e.Handled = true;
-        //                    if (!ds.FormSwitched)
-        //                    {
-        //                        break;
-        //                    }
-        //                }
-        //            }
-
-        //        }
-
-        //        //Render Event
-        //        if (!ds.FormSwitched)
-        //        {
-        //            await activeForm.RenderControls(e);
-
-        //            await activeForm.Render(e);
-        //        }
-
-        //        e.IsFirstHandler = false;
-
-        //    } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
-
-        //}
 
         /// <summary>
         /// This method will update all local created bot commands to the botfather.

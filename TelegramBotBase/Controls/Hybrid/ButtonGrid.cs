@@ -75,7 +75,7 @@ namespace TelegramBotBase.Controls.Hybrid
         /// <summary>
         /// Parsemode of the message.
         /// </summary>
-        public ParseMode MessageParseMode { get; set; } = ParseMode.Default;
+        public ParseMode MessageParseMode { get; set; } = ParseMode.Markdown;
 
         /// <summary>
         /// Enables automatic paging of buttons when the amount of rows is exceeding the limits.

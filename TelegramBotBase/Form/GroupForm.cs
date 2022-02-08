@@ -24,12 +24,12 @@ namespace TelegramBotBase.Form
             {
                 case Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded:
 
-                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded, message, message.RawMessageData.Message.NewChatMembers));
+                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded, message, message.Message.NewChatMembers));
 
                     break;
                 case Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft:
 
-                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft, message, message.RawMessageData.Message.LeftChatMember));
+                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft, message, message.Message.LeftChatMember));
 
                     break;
 
