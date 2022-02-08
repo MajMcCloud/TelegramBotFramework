@@ -252,3 +252,8 @@ TelegramBotBase/Archive
 /TelegramBotBase/TelegramBotBase.1.5.2.zip
 /TelegramBotBase/cpush.ps1
 /TelegramBotBase/cpack.ps1
+*.ps1
+*.exe
+*.snupkg
+*.zip
+*.nuspec
