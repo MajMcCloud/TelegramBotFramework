@@ -33,7 +33,9 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        ISessionSerializationStage CustomCommands(Action<List<BotCommand>> action);
+
+        ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action);
+
 
     }
 }

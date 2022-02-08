@@ -23,7 +23,12 @@ namespace TelegramBotBase.Builder
 
         MessageClient _client = null;
 
-        List<BotCommand> _botcommands = new List<BotCommand>();
+        /// <summary>
+        /// Contains different Botcommands for different areas.
+        /// </summary>
+        Dictionary<BotCommandScope, List<BotCommand>> _BotCommandScopes { get; set; } = new Dictionary<BotCommandScope, List<BotCommand>>();
+
+        //List<BotCommand> _botcommands = new List<BotCommand>();
 
         IStateMachine _statemachine = null;
 
@@ -115,6 +120,15 @@ namespace TelegramBotBase.Builder
 
             return this;
         }
+
+
+        public IStartFormSelectionStage MinimalMessageLoop()
+        {
+            _messageloopfactory = new Factories.MessageLoops.MinimalMessageLoop();
+
+            return this;
+        }
+
 
         public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
         {
@@ -212,7 +226,7 @@ namespace TelegramBotBase.Builder
 
         public ISessionSerializationStage OnlyStart()
         {
-            _botcommands.Start("Starts the bot");
+            _BotCommandScopes.Start("Starts the bot");
 
             return this;
 
@@ -220,15 +234,15 @@ namespace TelegramBotBase.Builder
 
         public ISessionSerializationStage DefaultCommands()
         {
-            _botcommands.Start("Starts the bot");
-            _botcommands.Help("Should show you some help");
-            _botcommands.Settings("Should show you some settings");
+            _BotCommandScopes.Start("Starts the bot");
+            _BotCommandScopes.Help("Should show you some help");
+            _BotCommandScopes.Settings("Should show you some settings");
             return this;
         }
 
-        public ISessionSerializationStage CustomCommands(Action<List<BotCommand>> action)
+        public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
         {
-            action?.Invoke(_botcommands);
+            action?.Invoke(_BotCommandScopes);
             return this;
         }
 
@@ -309,7 +323,8 @@ namespace TelegramBotBase.Builder
 
             bb.Sessions.Client = bb.Client;
 
-            bb.BotCommands = _botcommands;
+            bb.BotCommandScopes = _BotCommandScopes;
+            //bb.BotCommands = _botcommands;
 
             bb.StateMachine = _statemachine;
 

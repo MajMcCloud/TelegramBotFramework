@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Text;
 using Telegram.Bot.Types;
 
@@ -12,9 +14,9 @@ namespace TelegramBotBase.Commands
         /// </summary>
         /// <param name="cmds"></param>
         /// <param name="description"></param>
-        public static void Start(this List<BotCommand> cmds, String description)
+        public static void Start(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description, BotCommandScope scope = null)
         {
-            cmds.Add(new BotCommand() { Command = "start", Description = description });
+            Add(cmds, "start", description, scope);
         }
 
         /// <summary>
@@ -22,9 +24,10 @@ namespace TelegramBotBase.Commands
         /// </summary>
         /// <param name="cmds"></param>
         /// <param name="description"></param>
-        public static void Help(this List<BotCommand> cmds, String description)
+
+        public static void Help(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description, BotCommandScope scope = null)
         {
-            cmds.Add(new BotCommand() { Command = "help", Description = description });
+            Add(cmds, "help", description, scope);
         }
 
         /// <summary>
@@ -32,9 +35,37 @@ namespace TelegramBotBase.Commands
         /// </summary>
         /// <param name="cmds"></param>
         /// <param name="description"></param>
-        public static void Settings(this List<BotCommand> cmds, String description)
+
+
+        public static void Settings(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description, BotCommandScope scope = null)
         {
-            cmds.Add(new BotCommand() { Command = "settings", Description = description });
+            Add(cmds, "settings", description, scope);
+        }
+
+
+        /// <summary>
+        /// Adding the command with a description.
+        /// </summary>
+        /// <param name="cmds"></param>
+        /// <param name="command"></param>
+        /// <param name="description"></param>
+        public static void Add(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description, BotCommandScope scope = null)
+        {
+            if (scope == null)
+            {
+                scope = new BotCommandScopeDefault();
+            }
+
+            var item = cmds.FirstOrDefault(a => a.Key.Type == scope.Type);
+
+            if (item.Value != null)
+            {
+                item.Value.Add(new BotCommand() { Command = command, Description = description });
+            }
+            else
+            {
+                cmds.Add(scope, new List<BotCommand> { new BotCommand() { Command = command, Description = description } });
+            }
         }
 
         /// <summary>
@@ -43,9 +74,85 @@ namespace TelegramBotBase.Commands
         /// <param name="cmds"></param>
         /// <param name="command"></param>
         /// <param name="description"></param>
-        public static void Add(this List<BotCommand> cmds, String command, String description)
+        public static void Clear(this Dictionary<BotCommandScope, List<BotCommand>> cmds, BotCommandScope scope = null)
         {
-            cmds.Add(new BotCommand() { Command = command, Description = description });
+            if (scope == null)
+            {
+                scope = new BotCommandScopeDefault();
+            }
+
+            var item = cmds.FirstOrDefault(a => a.Key.Type == scope.Type);
+
+            if (item.Key != null)
+            {
+                cmds[item.Key] = null;
+            }
+            else
+            {
+                cmds[scope] = null;
+            }
+
+
+        }
+
+        /// <summary>
+        /// Adding a group command with a description.
+        /// </summary>
+        /// <param name="cmds"></param>
+        /// <param name="command"></param>
+        /// <param name="description"></param>
+        public static void AddGroupCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description)
+        {
+            Add(cmds, command, description, new BotCommandScopeAllGroupChats());
+        }
+
+        /// <summary>
+        /// Clears all group commands.
+        /// </summary>
+        /// <param name="cmds"></param>
+        public static void ClearGroupCommands(this Dictionary<BotCommandScope, List<BotCommand>> cmds)
+        {
+            Clear(cmds, new BotCommandScopeAllGroupChats());
+        }
+
+        /// <summary>
+        /// Adding group admin command with a description.
+        /// </summary>
+        /// <param name="cmds"></param>
+        /// <param name="command"></param>
+        /// <param name="description"></param>
+        public static void AddGroupAdminCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description)
+        {
+            Add(cmds, command, description, new BotCommandScopeAllChatAdministrators());
+        }
+
+        /// <summary>
+        /// Clears all group admin commands.
+        /// </summary>
+        /// <param name="cmds"></param>
+        public static void ClearGroupAdminCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds)
+        {
+            Clear(cmds, new BotCommandScopeAllChatAdministrators());
+        }
+
+        /// <summary>
+        /// Adding a privat command with a description.
+        /// </summary>
+        /// <param name="cmds"></param>
+        /// <param name="command"></param>
+        /// <param name="description"></param>
+        public static void AddPrivateChatCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description)
+        {
+            Add(cmds, command, description, new BotCommandScopeAllPrivateChats());
+        }
+
+        /// <summary>
+        /// Clears all private commands.
+        /// </summary>
+        /// <param name="cmds"></param>
+        public static void ClearPrivateChatCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds)
+        {
+            Clear(cmds, new BotCommandScopeAllPrivateChats());
         }
     }
 }
