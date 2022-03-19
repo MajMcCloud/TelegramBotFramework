@@ -1,4 +1,5 @@
 ﻿using System;
+using TelegramBotBase.Builder;
 
 namespace JoinHiderBot
 {
@@ -9,7 +10,9 @@ namespace JoinHiderBot
 
             String apiKey = "";
 
-            var bot = new TelegramBotBase.BotBase<forms.Start>(apiKey);
+            var bot = BotBaseBuilder.Create()
+                                    .QuickStart<forms.Start>(apiKey)
+                                    .Build();
 
             bot.Start();
 
