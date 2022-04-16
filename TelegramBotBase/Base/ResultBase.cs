@@ -4,12 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
 {
     public class ResultBase : EventArgs
     {
-        public MessageClient Client { get; set; }
+        public MessageClient Client
+        {
+            get
+            {
+                return Device.ActiveForm.Client;
+            }
+        }
+
+
+        public DeviceSession Device
+        {
+            get;
+            set;
+        }
 
         public virtual long DeviceId { get; set; }
 

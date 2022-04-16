@@ -29,12 +29,6 @@ namespace TelegramBotBase.Base
             }
         }
 
-        public DeviceSession Device
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// The message id
         /// </summary>
