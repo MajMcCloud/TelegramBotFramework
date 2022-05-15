@@ -159,27 +159,35 @@ namespace TelegramBotBase.Base
         /// This will return the current list of bot commands.
         /// </summary>
         /// <returns></returns>
-        public async Task<BotCommand[]> GetBotCommands()
+        public async Task<BotCommand[]> GetBotCommands(BotCommandScope scope = null, String languageCode = null)
         {
-            return await this.TelegramClient.GetMyCommandsAsync();
+            return await this.TelegramClient.GetMyCommandsAsync(scope, languageCode);
         }
+
 
         /// <summary>
         /// This will set your bot commands to the given list.
         /// </summary>
         /// <param name="botcommands"></param>
         /// <returns></returns>
-        public async Task SetBotCommands(List<BotCommand> botcommands)
+        public async Task SetBotCommands(List<BotCommand> botcommands, BotCommandScope scope = null, String languageCode = null)
         {
-            await this.TelegramClient.SetMyCommandsAsync(botcommands);
+            await this.TelegramClient.SetMyCommandsAsync(botcommands, scope, languageCode);
         }
 
-
+        /// <summary>
+        /// This will delete the current list of bot commands.
+        /// </summary>
+        /// <returns></returns>
+        public async Task DeleteBotCommands(BotCommandScope scope = null, String languageCode = null)
+        {
+            await this.TelegramClient.DeleteMyCommandsAsync(scope, languageCode);
+        }
 
 
         #region "Events"
 
-        
+
 
         public event Async.AsyncEventHandler<UpdateResult> MessageLoop
         {
