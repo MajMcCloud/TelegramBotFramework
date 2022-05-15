@@ -324,7 +324,6 @@ namespace TelegramBotBase.Builder
             bb.Sessions.Client = bb.Client;
 
             bb.BotCommandScopes = _BotCommandScopes;
-            //bb.BotCommands = _botcommands;
 
             bb.StateMachine = _statemachine;
 

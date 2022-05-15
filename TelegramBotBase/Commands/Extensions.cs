@@ -14,9 +14,9 @@ namespace TelegramBotBase.Commands
         /// </summary>
         /// <param name="cmds"></param>
         /// <param name="description"></param>
-        public static void Start(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description, BotCommandScope scope = null)
+        public static void Start(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description)
         {
-            Add(cmds, "start", description, scope);
+            Add(cmds, "start", description, null);
         }
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace TelegramBotBase.Commands
         /// <param name="cmds"></param>
         /// <param name="description"></param>
 
-        public static void Help(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description, BotCommandScope scope = null)
+        public static void Help(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description)
         {
-            Add(cmds, "help", description, scope);
+            Add(cmds, "help", description, null);
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace TelegramBotBase.Commands
         /// <param name="description"></param>
 
 
-        public static void Settings(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description, BotCommandScope scope = null)
+        public static void Settings(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description)
         {
-            Add(cmds, "settings", description, scope);
+            Add(cmds, "settings", description, null);
         }
 
 
@@ -53,7 +53,7 @@ namespace TelegramBotBase.Commands
         {
             if (scope == null)
             {
-                scope = new BotCommandScopeDefault();
+                scope = BotCommandScope.Default();
             }
 
             var item = cmds.FirstOrDefault(a => a.Key.Type == scope.Type);
@@ -78,7 +78,7 @@ namespace TelegramBotBase.Commands
         {
             if (scope == null)
             {
-                scope = new BotCommandScopeDefault();
+                scope = BotCommandScope.Default();
             }
 
             var item = cmds.FirstOrDefault(a => a.Key.Type == scope.Type);
@@ -91,8 +91,36 @@ namespace TelegramBotBase.Commands
             {
                 cmds[scope] = null;
             }
+        }
+
+        /// <summary>
+        /// Clears all default commands.
+        /// </summary>
+        /// <param name="cmds"></param>
+        public static void ClearDefaultCommands(this Dictionary<BotCommandScope, List<BotCommand>> cmds)
+        {
+            Clear(cmds, null);
+        }
 
 
+        /// <summary>
+        /// Clears all commands of a specific device.
+        /// </summary>
+        /// <param name="cmds"></param>
+        public static void ClearChatCommands(this Dictionary<BotCommandScope, List<BotCommand>> cmds, long DeviceId)
+        {
+            Clear(cmds, new BotCommandScopeChat() { ChatId = DeviceId });
+        }
+
+        /// <summary>
+        /// Adding a chat command with a description.
+        /// </summary>
+        /// <param name="cmds"></param>
+        /// <param name="command"></param>
+        /// <param name="description"></param>
+        public static void AddChatCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, long DeviceId, String command, String description)
+        {
+            Add(cmds, command, description, new BotCommandScopeChat() { ChatId = DeviceId });
         }
 
         /// <summary>

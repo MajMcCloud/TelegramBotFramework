@@ -41,7 +41,7 @@ namespace TelegramBotBase
         /// <summary>
         /// Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
         /// </summary>
-        public List<BotCommand> BotCommands { get; set; }
+        public Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; set; } = new Dictionary<BotCommandScope, List<BotCommand>>();
 
 
         #region "Events"
@@ -93,7 +93,7 @@ namespace TelegramBotBase
             SetSetting(eSettings.SkipAllMessages, false);
             SetSetting(eSettings.SaveSessionsOnConsoleExit, false);
 
-            this.BotCommands = new List<BotCommand>();
+            this.BotCommandScopes = new Dictionary<BotCommandScope, List<BotCommand>>();
 
             this.Sessions = new SessionBase();
             this.Sessions.BotBase = this;
@@ -247,7 +247,34 @@ namespace TelegramBotBase
         /// </summary>
         public async Task UploadBotCommands()
         {
-            await this.Client.SetBotCommands(this.BotCommands);
+            foreach (var bs in this.BotCommandScopes)
+            {
+                if(bs.Value !=null)
+                {
+                    await this.Client.SetBotCommands(bs.Value, bs.Key);
+                }
+                else
+                {
+                    await this.Client.DeleteBotCommands(bs.Key);
+                }
+                
+            }
+        }
+
+        /// <summary>
+        /// Searching if parameter is a known command in all configured BotCommandScopes.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public bool IsKnownBotCommand(String command)
+        {
+            foreach (var scope in this.BotCommandScopes)
+            {
+                if (scope.Value.Any(a => "/" + a.Command == command))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>

@@ -37,7 +37,7 @@ namespace TelegramBotBase.Factories.MessageLoops
             }
 
             //Is this a bot command ?
-            if (mr.IsFirstHandler && mr.IsBotCommand && Bot.BotCommands.Count(a => "/" + a.Command == mr.BotCommand) > 0)
+            if (mr.IsFirstHandler && mr.IsBotCommand && Bot.IsKnownBotCommand(mr.BotCommand))
             {
                 var sce = new BotCommandEventArgs(mr.BotCommand, mr.BotCommandParameters, mr.Message, session.DeviceId, session);
                 await Bot.OnBotCommand(sce);
