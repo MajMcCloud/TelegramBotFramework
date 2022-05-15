@@ -10,15 +10,6 @@ namespace TelegramBotBase.Base
 {
     public class ResultBase : EventArgs
     {
-        public MessageClient Client
-        {
-            get
-            {
-                return Device.ActiveForm.Client;
-            }
-        }
-
-
         public DeviceSession Device
         {
             get;
@@ -56,7 +47,7 @@ namespace TelegramBotBase.Base
         {
             try
             {
-                await this.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, (messageId == -1 ? this.MessageId : messageId));
+                await Device.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, (messageId == -1 ? this.MessageId : messageId));
             }
             catch
             {

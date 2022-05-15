@@ -84,7 +84,7 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         public Message LastMessage { get; set; }
 
-        private MessageClient Client
+        public MessageClient Client
         {
             get
             {
