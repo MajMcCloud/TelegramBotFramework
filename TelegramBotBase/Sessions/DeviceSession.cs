@@ -453,7 +453,7 @@ namespace TelegramBotBase.Sessions
         /// <summary>
         /// Sends an video
         /// </summary>
-        /// <param name="file"></param>
+        /// <param name="url"></param>
         /// <param name="buttons"></param>
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
@@ -468,6 +468,78 @@ namespace TelegramBotBase.Sessions
             try
             {
                 var t = API(a => a.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Sends an video
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="video"></param>
+        /// <param name="buttons"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> SendVideo(String filename, byte[] video, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            InlineKeyboardMarkup markup = buttons;
+
+            try
+            {
+                MemoryStream ms = new MemoryStream(video);
+
+                InputOnlineFile fts = new InputOnlineFile(ms, filename);
+
+                var t = API(a => a.SendVideoAsync(this.DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+
+                var o = GetOrigin(new StackTrace());
+                OnMessageSent(new MessageSentEventArgs(await t, o));
+
+                return await t;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Sends an local file as video
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="video"></param>
+        /// <param name="buttons"></param>
+        /// <param name="replyTo"></param>
+        /// <param name="disableNotification"></param>
+        /// <returns></returns>
+        public async Task<Message> SendLocalVideo(String filepath, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+        {
+            if (this.ActiveForm == null)
+                return null;
+
+            InlineKeyboardMarkup markup = buttons;
+
+            try
+            {
+                FileStream fs = new FileStream(filepath, FileMode.Open);
+
+                var filename = Path.GetFileName(filepath);
+
+                InputOnlineFile fts = new InputOnlineFile(fs, filename);
+
+                var t = API(a => a.SendVideoAsync(this.DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 OnMessageSent(new MessageSentEventArgs(await t, o));
