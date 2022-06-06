@@ -11,8 +11,11 @@ using TelegramBotBase.Enums;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 
-namespace TelegramBotBase.Factories.MessageLoops
+namespace TelegramBotBase.MessageLoops
 {
+    /// <summary>
+    /// This is a minimal message loop which will react to all update types and just calling the Load method.
+    /// </summary>
     public class MinimalMessageLoop : IMessageLoopFactory
     {
         private static object __evUnhandledCall = new object();

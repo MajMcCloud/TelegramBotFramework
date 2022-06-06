@@ -11,8 +11,11 @@ using TelegramBotBase.Enums;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 
-namespace TelegramBotBase.Factories.MessageLoops
+namespace TelegramBotBase.MessageLoops
 {
+    /// <summary>
+    /// Thats the default message loop which reacts to Message, EditMessage and CallbackQuery.
+    /// </summary>
     public class FormBaseMessageLoop : IMessageLoopFactory
     {
         private static object __evUnhandledCall = new object();

@@ -116,7 +116,7 @@ namespace TelegramBotBase.Builder
 
         public IStartFormSelectionStage DefaultMessageLoop()
         {
-            _messageloopfactory = new Factories.MessageLoops.FormBaseMessageLoop();
+            _messageloopfactory = new MessageLoops.FormBaseMessageLoop();
 
             return this;
         }
@@ -124,7 +124,7 @@ namespace TelegramBotBase.Builder
 
         public IStartFormSelectionStage MinimalMessageLoop()
         {
-            _messageloopfactory = new Factories.MessageLoops.MinimalMessageLoop();
+            _messageloopfactory = new MessageLoops.MinimalMessageLoop();
 
             return this;
         }
