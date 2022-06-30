@@ -8,6 +8,11 @@
 	<Copyright>MIT</Copyright>
 	<IncludeSymbols>true</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<AssemblyVersion>1.0.1</AssemblyVersion>
+	<FileVersion>1.0.1</FileVersion>
+	<Version>1.0.1</Version>
+	<Description>A session serializer for Microsoft SQL Server.
+</Description>
   </PropertyGroup>
 
   <ItemGroup>
