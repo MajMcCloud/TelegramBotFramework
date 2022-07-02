@@ -291,7 +291,8 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -342,7 +343,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -380,7 +381,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -410,7 +411,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendPhotoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -440,7 +441,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendVideoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -470,7 +471,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -505,7 +506,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendVideoAsync(this.DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -542,7 +543,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendVideoAsync(this.DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -619,7 +620,7 @@ namespace TelegramBotBase.Sessions
                 var t = API(a => a.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo));
 
                 var o = GetOrigin(new StackTrace());
-                OnMessageSent(new MessageSentEventArgs(await t, o));
+                await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
             }
@@ -882,7 +883,7 @@ namespace TelegramBotBase.Sessions
         /// <summary>
         /// Eventhandler for sent messages
         /// </summary>
-        public event EventHandler<MessageSentEventArgs> MessageSent
+        public event Base.Async.AsyncEventHandler<MessageSentEventArgs> MessageSent
         {
             add
             {
@@ -895,9 +896,21 @@ namespace TelegramBotBase.Sessions
         }
 
 
-        public void OnMessageSent(MessageSentEventArgs e)
+        public async Task OnMessageSent(MessageSentEventArgs e)
         {
-            (this.__Events[__evMessageSent] as EventHandler<MessageSentEventArgs>)?.Invoke(this, e);
+            if (e.Message == null)
+                return;
+            
+            var handler = this.__Events[__evMessageSent]?.GetInvocationList().Cast<Base.Async.AsyncEventHandler<MessageSentEventArgs>>();
+            if (handler == null)
+                return;
+
+            foreach (var h in handler)
+            {
+                await Base.Async.InvokeAllAsync<MessageSentEventArgs>(h, this, e);
+            }
+
+            //(this.__Events[__evMessageSent] as EventHandler<MessageSentEventArgs>)?.Invoke(this, e);
         }
 
         /// <summary>

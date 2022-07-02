@@ -50,7 +50,7 @@ namespace TelegramBotBase.Controls.Hybrid
         }
 
 
-        private void Device_MessageSent(object sender, MessageSentEventArgs e)
+        private async Task Device_MessageSent(object sender, MessageSentEventArgs e)
         {
             if (e.Origin == null || !e.Origin.IsSubclassOf(typeof(MultiView)))
                 return;

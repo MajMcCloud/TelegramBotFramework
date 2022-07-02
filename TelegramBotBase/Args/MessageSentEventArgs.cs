@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 
 namespace TelegramBotBase.Args
 {
-    public class MessageSentEventArgs
+    public class MessageSentEventArgs : EventArgs
     {
         public int MessageId
         {
