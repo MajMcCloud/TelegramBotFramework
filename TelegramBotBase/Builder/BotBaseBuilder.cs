@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Builder.Interfaces;
 using TelegramBotBase.Commands;
+using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Localizations;
@@ -148,7 +149,7 @@ namespace TelegramBotBase.Builder
         #endregion
 
 
-        #region "Step 3 (Start Form/Factory)" 
+        #region "Step 3 (Start Form/Factory)"
 
         public INetworkingSelectionStage WithStartForm(Type startFormClass)
         {
@@ -160,6 +161,19 @@ namespace TelegramBotBase.Builder
             where T : FormBase, new()
         {
             this._factory = new Factories.DefaultStartFormFactory(typeof(T));
+            return this;
+        }
+
+        public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+        {
+            this._factory = new ServiceProviderStartFormFactory(startFormClass, serviceProvider);
+            return this;
+        }
+
+        public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
+            where T : FormBase
+        {
+            this._factory = new ServiceProviderStartFormFactory<T>(serviceProvider);
             return this;
         }
 
