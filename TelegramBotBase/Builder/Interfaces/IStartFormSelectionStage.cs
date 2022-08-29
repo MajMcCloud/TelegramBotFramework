@@ -26,6 +26,22 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <summary>
         /// Chooses a StartFormFactory which will be use for new sessions.
         /// </summary>
+        /// <param name="startFormClass"></param>
+        /// <param name="serviceProvider"></param>
+        /// <returns></returns>
+        INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider);
+
+        /// <summary>
+        /// Chooses a StartFormFactory which will be use for new sessions.
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider) where T : FormBase;
+
+        /// <summary>
+        /// Chooses a StartFormFactory which will be use for new sessions.
+        /// </summary>
         /// <param name="factory"></param>
         /// <returns></returns>
         INetworkingSelectionStage WithStartFormFactory(IStartFormFactory factory);
