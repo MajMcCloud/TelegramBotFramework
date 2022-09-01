@@ -206,6 +206,11 @@ namespace TelegramBotBase
         {
             var mr = new MessageResult();
 
+            mr.UpdateData = new Update()
+            {
+                Message = new Message()
+            };
+
             await InvokeMessageLoop(DeviceId, mr);
         }
 
