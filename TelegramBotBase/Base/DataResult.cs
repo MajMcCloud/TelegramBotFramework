@@ -108,7 +108,8 @@ namespace TelegramBotBase.Base
 
         public async Task<InputOnlineFile> DownloadDocument()
         {
-            var encryptedContent = new System.IO.MemoryStream(this.Document.FileSize.Value);
+            var encryptedContent = new System.IO.MemoryStream();
+            encryptedContent.SetLength(this.Document.FileSize.Value);
             var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Document.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, this.Document.FileName);
@@ -167,7 +168,8 @@ namespace TelegramBotBase.Base
 
         public async Task<InputOnlineFile> DownloadVideo()
         {
-            var encryptedContent = new System.IO.MemoryStream(this.Video.FileSize.Value);
+            var encryptedContent = new System.IO.MemoryStream();
+            encryptedContent.SetLength(this.Video.FileSize.Value);
             var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Video.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, "");
@@ -184,7 +186,8 @@ namespace TelegramBotBase.Base
 
         public async Task<InputOnlineFile> DownloadAudio()
         {
-            var encryptedContent = new System.IO.MemoryStream(this.Audio.FileSize.Value);
+            var encryptedContent = new System.IO.MemoryStream();
+            encryptedContent.SetLength(this.Audio.FileSize.Value);
             var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(this.Audio.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, "");
@@ -202,7 +205,8 @@ namespace TelegramBotBase.Base
         public async Task<InputOnlineFile> DownloadPhoto(int index)
         {
             var photo = this.Photos[index];
-            var encryptedContent = new System.IO.MemoryStream(photo.FileSize.Value);
+            var encryptedContent = new System.IO.MemoryStream();
+            encryptedContent.SetLength(photo.FileSize.Value);
             var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(photo.FileId, encryptedContent);
 
             return new InputOnlineFile(encryptedContent, "");
