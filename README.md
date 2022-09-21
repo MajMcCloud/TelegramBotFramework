@@ -30,15 +30,14 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 
 ## Index
 
-- [Introduction](#introduction)
-- [How to Start](#how-to-start)
-- [Quick Start](#quick-start)
-- [Message Handling](#message-handling)
-    * [Example #0 - System Calls](#add-some-system-calls-example-0---system-calls)
-    * [Example #1 - Simple text messages](#lets-start-with-text-messages-example-1---simple-test)
-    * [Example #2 - Button test](#now-some-buttons-example-2---button-test)
-    * [Example #3 - Progress Bar control](#now-some-controls-example-3---progress-bar-test)
-    * [Example #4 - Registration Formular](#registration-example-example-4---registration-form-test)
+- [Quick start](#quick-start)
+- [Simplified builder](#simplified-builder)
+- [Features](#features)
+    * [System calls & bot commands](#system-calls--bot-commands)
+    * [Text messages handling](#text-messages)
+    * [Buttons](#buttons)
+    * [Custom controls](#custom-controls)
+    * [Forms advanced](#forms-advanced)
 - [Special Forms](#forms)
     * [AlertDialog](#alert-dialog)
     * [AutoCleanForm](#autocleanform)
@@ -71,12 +70,12 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
         * [IgnoreState](#ignorestate)
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
     * [As of Now](#as-of-now)
-    * [How to use](#how-to-use-)
+    * [Usage](#usage)
 - [Examples](#examples)
 
 ---
 
-## How to start
+## Quick start
 
 First of all, create a new empty dotnet console project and paste some code:
 
@@ -120,7 +119,7 @@ public class StartForm : FormBase
     public override async Task PreLoad(MessageResult message)
     {
     }
-    
+
     // Gets invoked on every Message/Action/Data in this context
     public override async Task Load(MessageResult message)
     {
@@ -132,17 +131,17 @@ public class StartForm : FormBase
     public override async Task Edited(MessageResult message)
     {
     }
-        
+
     // Gets invoked on Button clicks
     public override async Task Action(MessageResult message)
     {
     }
-        
+
     // Gets invoked on Data uploades by the user (of type Photo, Audio, Video, Contact, Location, Document)
     public override async Task SentData(DataResult data)
     {
     }
-        
+
     //Gets invoked on every Message/Action/Data to render Design or Response 
     public override async Task Render(MessageResult message)
     {
@@ -164,7 +163,7 @@ var form = new TestForm();
 await this.NavigateTo(form);
 ```
 
-## Quick Start:
+## Simplified builder
 
 When migrating from a previous version or starting completely new, all these options can be a bit overwhelming.
 There's a function called `QuickStart` that simplifies building a bit.
@@ -177,6 +176,8 @@ var bot = BotBaseBuilder
 
 bot.Start();
 ```
+
+## Features
 
 ### System calls & bot commands
 
@@ -227,11 +228,10 @@ bot.BotCommand += async (s, en) =>
         break;
 
         case "/params":
-        String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+        string m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
         await en.Device.Send("Your parameters are " + m, replyTo: en.Device.LastMessage);
         break;
     }
-
 };
 
 await bot.UploadBotCommands() 
@@ -256,7 +256,7 @@ public class SimpleForm : AutoCleanForm
 
         this.Opened += SimpleForm_Opened;
     }
-    
+
     private async Task SimpleForm_Opened(object sender, EventArgs e)
     {
         await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
@@ -288,7 +288,6 @@ public class SimpleForm : AutoCleanForm
         }
     }
 }
-
 ```
 
 ### Buttons
@@ -369,68 +368,68 @@ public class ProgressTest : AutoCleanForm
     {
         this.DeleteMode = eDeleteMode.OnLeavingForm;
     }
-    
+
     public override async Task Opened()
     {
         await this.Device.Send("Welcome to ProgressTest");
     }
-    
+
     public override async Task Action(MessageResult message)
     {
         var call = message.GetData<CallbackData>();
         await message.ConfirmAction();
-    
+
         if (call == null) return;
-    
+
         TelegramBotBase.Controls.ProgressBar Bar = null;
-    
+
         switch (call.Value)
         {
             case "standard":
                 Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.standard);
                 Bar.Device = this.Device;
                 break;
-        
+
             case "squares":
                 Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squares);
                 Bar.Device = this.Device;
                 break;
-        
+
             case "circles":
                 Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.circles);
                 Bar.Device = this.Device;
                 break;
-        
+
             case "lines":
                 Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.lines);
                 Bar.Device = this.Device;
                 break;
-        
+
             case "squaredlines":
                 Bar = new TelegramBotBase.Controls.ProgressBar(0, 100, TelegramBotBase.Controls.ProgressBar.eProgressStyle.squaredLines);
                 Bar.Device = this.Device;
                 break;
-        
+
             case "start":
                 var sf = new Start();
                 await sf.Init();
                 await this.NavigateTo(sf);
                 return;
-        
+
             default:
                 return;
         }
 
         // Render Progress bar and show some "example" progress
         await Bar.Render();
-    
+
         this.Controls.Add(Bar);
-    
+
         for (int i = 0; i <= 100; i++)
         {
             Bar.Value++;
             await Bar.Render();
-        
+
             Thread.Sleep(250);
         }
     }
@@ -438,12 +437,12 @@ public class ProgressTest : AutoCleanForm
     public override async Task Render(MessageResult message)
     {
         ButtonForm btn = new ButtonForm();
-        
+
         btn.AddButtonRow(new ButtonBase("Standard", new CallbackData("a", "standard").Serialize()), new ButtonBase("Squares", new CallbackData("a", "squares").Serialize()));
         btn.AddButtonRow(new ButtonBase("Circles", new CallbackData("a", "circles").Serialize()), new ButtonBase("Lines", new CallbackData("a", "lines").Serialize()));
         btn.AddButtonRow(new ButtonBase("Squared Line", new CallbackData("a", "squaredlines").Serialize()));
         btn.AddButtonRow(new ButtonBase("Back to start", new CallbackData("a", "start").Serialize()));
-    
+
         await this.Device.Send("Choose your progress bar:", btn);
     }
 
@@ -453,7 +452,7 @@ public class ProgressTest : AutoCleanForm
         {
             await b.Cleanup();
         }
-    
+
         await this.Device.Send("Ciao from ProgressTest");
     }
 }
@@ -474,42 +473,42 @@ Registration forms have never been so easy.
 ```csharp
 public class PerForm : AutoCleanForm
 {
-    public String EMail { get; set; }
-    
-    public String Firstname { get; set; }
-    
-    public String Lastname { get; set; }
-    
+    public string EMail { get; set; }
+
+    public string Firstname { get; set; }
+
+    public string Lastname { get; set; }
+
     public async override Task Load(MessageResult message)
     {
         if (string.IsNullOrWhiteSpace(message.MessageText)) return;
-    
+
         if (this.Firstname == null)
         {
             this.Firstname = message.MessageText;
             return;
         }
-    
+
         if (this.Lastname == null)
         {
             this.Lastname = message.MessageText;
             return;
         }
-    
+
         if (this.EMail == null)
         {
             this.EMail = message.MessageText;
             return;
         }
     }
-    
+
     public async override Task Action(MessageResult message)
     {
         var call = message.GetData<CallbackData>();
         await message.ConfirmAction();
-    
+
         if (call == null) return;
-    
+
         switch (call.Value)
         {
             case "back":
@@ -518,7 +517,7 @@ public class PerForm : AutoCleanForm
                 break;
         }
     }
-    
+
     public async override Task Render(MessageResult message)
     {
         if (this.Firstname == null)
@@ -526,28 +525,28 @@ public class PerForm : AutoCleanForm
             await this.Device.Send("Please sent your firstname:");
             return;
         }
-    
+
         if (this.Lastname == null)
         {
             await this.Device.Send("Please sent your lastname:");
             return;
         }
-    
+
         if (this.EMail == null)
         {
             await this.Device.Send("Please sent your email address:");
             return;
         }
-    
+
         string s = "";
-    
+
         s += "Firstname: " + this.Firstname + "\r\n";
         s += "Lastname: " + this.Lastname + "\r\n";
         s += "E-Mail: " + this.EMail + "\r\n";
-    
+
         ButtonForm bf = new ButtonForm();
         bf.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
-    
+
         await this.Device.Send("Your details:\r\n" + s, bf);
     }
 }
@@ -711,7 +710,7 @@ public class Start : SplitterForm
 
         return true;
     }
-    
+
     public override Task<bool> OpenChannel(MessageResult e)
     {
         return base.OpenChannel(e);
@@ -874,7 +873,7 @@ serialization process.
 public interface IStateMachine
 {
     void SaveFormStates(SaveStatesEventArgs e);
-    
+
     StateContainer LoadFormStates();
 }
 ```
@@ -895,7 +894,8 @@ public interface IStateForm
 
 ### Attributes
 
-If you don't want to implement the `IStateForm` interface, because there are maybe *just* one or two properties you want to
+If you don't want to implement the `IStateForm` interface, because there are maybe *just* one or two properties you want
+to
 keep and restore, use the following attributes.
 
 #### SaveState
@@ -918,7 +918,6 @@ class and it will not get serialized, even if it implements IStateForm or the Sa
 [IgnoreState]
 public class Registration : STForm
 {
-
 }
 ```
 
@@ -942,7 +941,8 @@ details and latest matches.
 
 After the matches, you want to maybe switch to different teams and take a look at their statistics and matches.
 
-At some point, you *just* want to get back to the first team so like on Android you're clicking the "back" button multiple
+At some point, you *just* want to get back to the first team so like on Android you're clicking the "back" button
+multiple
 times.
 
 This can become really complicated, when not having some controller below which handle these "Push/Pop" calls.
@@ -985,8 +985,10 @@ When you want to go back one Form on the stack use `PopAsync`:
 await this.NavigationController.PopAsync();
 ```
 
-**Notice**: *By default the `NavigationController` has `ForceCleanupOnLastPop` enabled, which means that when the stack is
-again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the controller automatically with the root form you
+**Notice**: *By default the `NavigationController` has `ForceCleanupOnLastPop` enabled, which means that when the stack
+is
+again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the controller automatically with the root form
+you
 have given to the constructor at the beginning.*
 
 ## Examples
@@ -1007,11 +1009,3 @@ Will delete Join and Leave messages automatically in groups.
 Example using minimal dotnet console template with EntityFramework and Dependency Injection.
 
 - [Examples/EFCore/](Examples/EFCore/)
-
----
-
-I will add more notes to it soon, so stay tuned.
-
-Warm regards
-
-Florian Dahn
