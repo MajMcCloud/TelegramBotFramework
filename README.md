@@ -8,7 +8,7 @@
 
 **Showcase: [@TGBaseBot](https://t.me/TGBaseBot)**
 
-**Support group: [https://t.me/tgbotbase](https://t.me/tgbotbase)**
+**Support group: [@tgbotbase](https://t.me/tgbotbase)**
 
 **Releases: [GitHub](https://github.com/MajMcCloud/TelegramBotFramework/releases)**
 
@@ -556,8 +556,6 @@ public class PerForm : AutoCleanForm
 [Another case](TelegramBotBase.Test/Tests/Register/PerStep.cs), where every of these 3 inputs gets requested by a
 different forms. Just for
 imagination of the possibilities.
-
----
 
 ## Forms
 
