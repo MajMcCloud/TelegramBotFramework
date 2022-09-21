@@ -553,7 +553,7 @@ public class PerForm : AutoCleanForm
 }
 ```
 
-[Another case](TelegramBotBaseTest/Tests/Register/PerStep.cs), where every of these 3 inputs gets requested by a
+[Another case](TelegramBotBase.Test/Tests/Register/PerStep.cs), where every of these 3 inputs gets requested by a
 different forms. Just for
 imagination of the possibilities.
 
