@@ -995,17 +995,17 @@ have given to the constructor at the beginning.*
 
 You can find all example projects in the "Examples" subfolder.
 
-- [Examples/SystemCommandsBot/](Examples/SystemCommandsBot/)
+- [Examples/SystemCommandsBot](Examples/SystemCommandsBot)
+
+Example using minimal dotnet console template with EntityFramework and Dependency Injection.
+
+- [Examples/EFCoreBot](Examples/EFCoreBot)
 
 Will allow you to run specific system commands or run/kill processes via Bot. Also has a simple authentication mechanism
 with one password.
 
-- [Examples/JoinHiderBot/](Examples/JoinHiderBot/)
+- [Examples/JoinHiderBot](Examples/JoinHiderBot)
 
 Will delete Join and Leave messages automatically in groups.
 
-- [Examples/AsyncFormUpdates/](Examples/AsyncFormUpdates/)
-
-Example using minimal dotnet console template with EntityFramework and Dependency Injection.
-
-- [Examples/EFCore/](Examples/EFCore/)
+- [Examples/AsyncFormUpdates](Examples/AsyncFormUpdates)
