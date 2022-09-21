@@ -71,6 +71,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
     * [As of Now](#as-of-now)
     * [Usage](#usage)
+- [Extensions](#extensions)
 - [Examples](#examples)
 
 ---
@@ -990,6 +991,26 @@ is
 again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the controller automatically with the root form
 you
 have given to the constructor at the beginning.*
+
+## Extensions
+
+### TelegramBotBase.Extensions.Images
+
+Extends the base package with some additional image methods like SendPhoto (using Bitmap)
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images)
+
+[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
+
+### TelegramBotBase.Extensions.Serializer.Database.MSSQL
+
+A session serializer for Microsoft SQL Server.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL)
+
+[https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 
 ## Examples
 
