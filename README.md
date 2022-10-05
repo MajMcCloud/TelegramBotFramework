@@ -1014,17 +1014,19 @@ A session serializer for Microsoft SQL Server.
 
 You can find all example projects in the "Examples" subfolder.
 
+Will allow you to run specific system commands or run/kill processes via Bot. Also has a simple authentication mechanism
+with one password.
+
 - [Examples/SystemCommandsBot](Examples/SystemCommandsBot)
 
 Example using minimal dotnet console template with EntityFramework and Dependency Injection.
 
 - [Examples/EFCoreBot](Examples/EFCoreBot)
 
-Will allow you to run specific system commands or run/kill processes via Bot. Also has a simple authentication mechanism
-with one password.
+Will delete Join and Leave messages automatically in groups.
 
 - [Examples/JoinHiderBot](Examples/JoinHiderBot)
 
-Will delete Join and Leave messages automatically in groups.
+When you want to update forms async without any user interaction (message/action) before. Use the new InvokeMessageLoop method of BotBase.
 
 - [Examples/AsyncFormUpdates](Examples/AsyncFormUpdates)
