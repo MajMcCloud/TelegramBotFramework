@@ -38,7 +38,7 @@ public class ButtonGridPagingForm : AutoCleanForm
             bf.AddButtonRow(new ButtonBase(c.EnglishName, c.EnglishName));
         }
 
-        _mButtons.ButtonsForm = bf;
+        _mButtons.DataSource.ButtonForm = bf;
 
         _mButtons.ButtonClicked += Bg_ButtonClicked;
 

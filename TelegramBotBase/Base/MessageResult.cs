@@ -33,7 +33,7 @@ public class MessageResult : ResultBase
     /// <summary>
     ///     The message id
     /// </summary>
-    public new int MessageId =>
+    public override int MessageId =>
         UpdateData?.Message?.MessageId
         ?? Message?.MessageId
         ?? UpdateData?.CallbackQuery?.Message?.MessageId
@@ -44,6 +44,13 @@ public class MessageResult : ResultBase
     public string MessageText => UpdateData?.Message?.Text ?? "";
 
     public MessageType MessageType => Message?.Type ?? MessageType.Unknown;
+
+    public override Message Message =>
+        UpdateData?.Message
+        ?? UpdateData?.EditedMessage
+        ?? UpdateData?.ChannelPost
+        ?? UpdateData?.EditedChannelPost
+        ?? UpdateData?.CallbackQuery?.Message;
 
     /// <summary>
     ///     Is this an action ? (i.e. button click)

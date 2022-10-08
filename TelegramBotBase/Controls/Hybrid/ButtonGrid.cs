@@ -56,15 +56,6 @@ public class ButtonGrid : ControlBase
     public string ConfirmationText { get; set; } = "";
 
     /// <summary>
-    /// </summary>
-    [Obsolete("This property is obsolete. Please use the DataSource property instead.")]
-    public ButtonForm ButtonsForm
-    {
-        get => DataSource.ButtonForm;
-        set => DataSource = new ButtonFormDataSource(value);
-    }
-
-    /// <summary>
     ///     Data source of the items.
     /// </summary>
     public ButtonFormDataSource DataSource { get; set; }

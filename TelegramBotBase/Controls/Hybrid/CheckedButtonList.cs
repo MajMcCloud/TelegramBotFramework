@@ -55,13 +55,6 @@ public class CheckedButtonList : ControlBase
 
     public string ConfirmationText { get; set; } = "";
 
-    [Obsolete("This property is obsolete. Please use the DataSource property instead.")]
-    public ButtonForm ButtonsForm
-    {
-        get => DataSource.ButtonForm;
-        set => DataSource = new ButtonFormDataSource(value);
-    }
-
     /// <summary>
     ///     Data source of the items.
     /// </summary>
@@ -277,7 +270,7 @@ public class CheckedButtonList : ControlBase
 
             foreach (var c in CheckedRows)
             {
-                lst.Add(ButtonsForm[c][0]);
+                lst.Add(DataSource.ButtonForm[c][0]);
             }
 
             return lst;
@@ -418,7 +411,7 @@ public class CheckedButtonList : ControlBase
 
                 Updated();
 
-                await OnCheckedChanged(new CheckedChangedEventArgs(ButtonsForm[index], index, false));
+                await OnCheckedChanged(new CheckedChangedEventArgs(DataSource.ButtonForm[index], index, false));
             }
             else if (result.MessageText.EndsWith(UncheckedIconLabel))
             {
@@ -435,7 +428,7 @@ public class CheckedButtonList : ControlBase
 
                 Updated();
 
-                await OnCheckedChanged(new CheckedChangedEventArgs(ButtonsForm[index], index, true));
+                await OnCheckedChanged(new CheckedChangedEventArgs(DataSource.ButtonForm[index], index, true));
             }
             //else if (this.EnableSearch)
             //{
@@ -589,7 +582,7 @@ public class CheckedButtonList : ControlBase
 
                             Updated();
 
-                            await OnCheckedChanged(new CheckedChangedEventArgs(ButtonsForm[index], index, true));
+                            await OnCheckedChanged(new CheckedChangedEventArgs(DataSource.ButtonForm[index], index, true));
                         }
 
                         break;
@@ -604,7 +597,7 @@ public class CheckedButtonList : ControlBase
 
                             Updated();
 
-                            await OnCheckedChanged(new CheckedChangedEventArgs(ButtonsForm[index], index, false));
+                            await OnCheckedChanged(new CheckedChangedEventArgs(DataSource.ButtonForm[index], index, false));
                         }
 
                         break;

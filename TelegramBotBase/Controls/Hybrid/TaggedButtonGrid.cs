@@ -63,13 +63,6 @@ public class TaggedButtonGrid : MultiView
 
     public string ConfirmationText { get; set; }
 
-    [Obsolete("This property is obsolete. Please use the DataSource property instead.")]
-    public ButtonForm ButtonsForm
-    {
-        get => DataSource.ButtonForm;
-        set => DataSource = new ButtonFormDataSource(value);
-    }
-
     /// <summary>
     ///     Data source of the items.
     /// </summary>

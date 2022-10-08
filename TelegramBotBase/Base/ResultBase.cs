@@ -12,7 +12,7 @@ public class ResultBase : EventArgs
 
     public virtual long DeviceId { get; set; }
 
-    public int MessageId => Message.MessageId;
+    public virtual int MessageId => Message.MessageId;
 
     public virtual Message Message { get; set; }
 

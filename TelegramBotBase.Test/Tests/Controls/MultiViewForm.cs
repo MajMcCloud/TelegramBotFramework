@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Controls.Hybrid;
+using TelegramBotBase.DataSources;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests.Controls.Subclass;
@@ -26,9 +27,9 @@ public class MultiViewForm : AutoCleanForm
 
         _bg = new ButtonGrid
         {
-            ButtonsForm = new ButtonForm()
+            DataSource = new ButtonFormDataSource()
         };
-        _bg.ButtonsForm.AddButtonRow("Back", "$back$");
+        _bg.DataSource.ButtonForm.AddButtonRow("Back", "$back$");
         _bg.ButtonClicked += Bg_ButtonClicked;
         _bg.KeyboardType = EKeyboardType.ReplyKeyboard;
         AddControl(_bg);

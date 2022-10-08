@@ -32,7 +32,7 @@ public class ButtonGridForm : AutoCleanForm
 
         bf.AddButtonRow(new ButtonBase("Button3", "b3"), new ButtonBase("Button4", "b4"));
 
-        _mButtons.ButtonsForm = bf;
+        _mButtons.DataSource.ButtonForm = bf;
 
         _mButtons.ButtonClicked += Bg_ButtonClicked;
 

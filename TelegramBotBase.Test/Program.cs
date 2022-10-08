@@ -11,7 +11,7 @@ namespace TelegramBotBaseTest;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var apiKey = "";
 
@@ -48,16 +48,14 @@ internal class Program
             Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
         };
 
-        bb.Start();
+        await bb.Start();
 
         Console.WriteLine("Telegram Bot started...");
-
         Console.WriteLine("Press q to quit application.");
-
 
         Console.ReadLine();
 
-        bb.Stop();
+        await bb.Stop();
     }
 
     private static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
