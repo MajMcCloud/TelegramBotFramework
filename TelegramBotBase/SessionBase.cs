@@ -118,25 +118,25 @@ public class SessionBase
     /// <summary>
     ///     Loads the previously saved states from the machine.
     /// </summary>
-    public async void LoadSessionStates()
+    public async Task LoadSessionStates()
     {
         if (BotBase.StateMachine == null)
         {
             return;
         }
 
-        LoadSessionStates(BotBase.StateMachine);
+        await LoadSessionStates(BotBase.StateMachine);
     }
 
 
     /// <summary>
     ///     Loads the previously saved states from the machine.
     /// </summary>
-    public async void LoadSessionStates(IStateMachine statemachine)
+    public async Task LoadSessionStates(IStateMachine statemachine)
     {
         if (statemachine == null)
         {
-            throw new ArgumentNullException("StateMachine",
+            throw new ArgumentNullException(nameof(statemachine),
                                             "No StateMachine defined. Please set one to property BotBase.StateMachine");
         }
 
@@ -230,7 +230,7 @@ public class SessionBase
                 {
                     Values = s.Values
                 };
-                iform.LoadState(ls);
+                await iform.LoadState(ls);
             }
 
             try
@@ -251,11 +251,11 @@ public class SessionBase
     /// <summary>
     ///     Saves all open states into the machine.
     /// </summary>
-    public void SaveSessionStates(IStateMachine statemachine)
+    public async Task SaveSessionStates(IStateMachine statemachine)
     {
         if (statemachine == null)
         {
-            throw new ArgumentNullException("StateMachine",
+            throw new ArgumentNullException(nameof(statemachine),
                                             "No StateMachine defined. Please set one to property BotBase.StateMachine");
         }
 
@@ -299,7 +299,7 @@ public class SessionBase
                 {
                     //Loading Session states
                     var ssea = new SaveStateEventArgs();
-                    iform.SaveState(ssea);
+                    await iform.SaveState(ssea);
 
                     se.Values = ssea.Values;
                 }
@@ -335,7 +335,7 @@ public class SessionBase
     /// <summary>
     ///     Saves all open states into the machine.
     /// </summary>
-    public void SaveSessionStates()
+    public async Task SaveSessionStates()
     {
         if (BotBase.StateMachine == null)
         {
@@ -343,6 +343,6 @@ public class SessionBase
         }
 
 
-        SaveSessionStates(BotBase.StateMachine);
+        await SaveSessionStates(BotBase.StateMachine);
     }
 }

@@ -80,7 +80,7 @@ public class BotBase
     /// <summary>
     ///     Start your Bot
     /// </summary>
-    public void Start()
+    public async Task Start()
     {
         if (Client == null)
         {
@@ -89,16 +89,15 @@ public class BotBase
 
         Client.MessageLoop += Client_MessageLoop;
 
-
         if (StateMachine != null)
         {
-            Sessions.LoadSessionStates(StateMachine);
+            await Sessions.LoadSessionStates(StateMachine);
         }
 
         //Enable auto session saving
         if (GetSetting(ESettings.SaveSessionsOnConsoleExit, false))
         {
-            Console.SetHandler(() => { Sessions.SaveSessionStates(); });
+            Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
         }
 
         DeviceSession.MaxNumberOfRetries = GetSetting(ESettings.MaxNumberOfRetries, 5);
@@ -141,7 +140,7 @@ public class BotBase
     /// <summary>
     ///     Stop your Bot
     /// </summary>
-    public void Stop()
+    public async Task Stop()
     {
         if (Client == null)
         {
@@ -149,11 +148,9 @@ public class BotBase
         }
 
         Client.MessageLoop -= Client_MessageLoop;
-
-
         Client.StopReceiving();
 
-        Sessions.SaveSessionStates();
+        await Sessions.SaveSessionStates();
     }
 
     /// <summary>

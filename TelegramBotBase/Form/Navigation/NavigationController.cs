@@ -69,7 +69,7 @@ public class NavigationController : FormBase, IStateForm
     }
 
 
-    public void LoadState(LoadStateEventArgs e)
+    public async Task LoadState(LoadStateEventArgs e)
     {
         if (e.Get("$controller.history.count") == null)
         {
@@ -144,13 +144,13 @@ public class NavigationController : FormBase, IStateForm
             form.Client = Client;
             form.NavigationController = this;
 
-            form.OnInit(new InitEventArgs());
+            await form.OnInit(new InitEventArgs());
 
             History.Add(form);
         }
     }
 
-    public void SaveState(SaveStateEventArgs e)
+    public Task SaveState(SaveStateEventArgs e)
     {
         e.Set("$controller.history.count", History.Count.ToString());
 
@@ -175,6 +175,8 @@ public class NavigationController : FormBase, IStateForm
 
             i++;
         }
+
+        return Task.CompletedTask;
     }
 
     private async Task NavigationController_Init(object sender, InitEventArgs e)

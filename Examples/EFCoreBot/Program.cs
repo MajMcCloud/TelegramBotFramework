@@ -20,5 +20,5 @@ var bot = BotBaseBuilder.Create()
                         .DefaultLanguage()
                         .Build();
 
-bot.Start();
+await bot.Start();
 await Task.Delay(-1);

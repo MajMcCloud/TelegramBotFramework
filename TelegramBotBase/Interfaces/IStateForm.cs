@@ -1,4 +1,5 @@
-﻿using TelegramBotBase.Args;
+﻿using System.Threading.Tasks;
+using TelegramBotBase.Args;
 
 namespace TelegramBotBase.Interfaces;
 
@@ -7,7 +8,7 @@ namespace TelegramBotBase.Interfaces;
 /// </summary>
 public interface IStateForm
 {
-    void LoadState(LoadStateEventArgs e);
+    Task LoadState(LoadStateEventArgs e);
 
-    void SaveState(SaveStateEventArgs e);
+    Task SaveState(SaveStateEventArgs e);
 }
