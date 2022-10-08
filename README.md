@@ -101,7 +101,7 @@ var bot = BotBaseBuilder
 await bot.UploadBotCommands();
 
 // Start your Bot
-bot.Start();
+await bot.Start();
 ```
 
 The `BotBase` class will manage a lot of things for you, like bot commands, action events and so on.
@@ -174,7 +174,7 @@ var bot = BotBaseBuilder
     .QuickStart<StartForm>("{YOUR API KEY}")
     .Build();
 
-bot.Start();
+await bot.Start();
 ```
 
 ## Features
@@ -236,7 +236,7 @@ bot.BotCommand += async (s, en) =>
 
 await bot.UploadBotCommands() 
 
-bot.Start();
+await bot.Start();
 ```
 
 On every input the user is sending back to the bot, the `Action` event gets raised. So here we could manage to send
@@ -808,7 +808,7 @@ var bot = BotBaseBuilder
     .UseEnglish()
     .Build();
 
-bot.Start();
+await bot.Start();
 ```
 
 #### JSONStateMachine
@@ -831,7 +831,7 @@ var bot = BotBaseBuilder
     .UseEnglish()
     .Build();
 
-bot.Start();
+await bot.Start();
 ```
 
 #### XMLStateMachine
@@ -853,7 +853,7 @@ var bot = BotBaseBuilder
     .UseEnglish()
     .Build();
 
-bot.Start();
+await bot.Start();
 ```
 
 ### Interfaces
