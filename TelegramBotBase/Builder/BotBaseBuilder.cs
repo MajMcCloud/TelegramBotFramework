@@ -41,24 +41,24 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     public BotBase Build()
     {
-        var bb = new BotBase
+        var bot = new BotBase
         {
             ApiKey = _apiKey,
             StartFormFactory = _factory,
             Client = _client
         };
 
-        bb.Sessions.Client = bb.Client;
+        bot.Sessions.Client = bot.Client;
 
-        bb.BotCommandScopes = BotCommandScopes;
+        bot.BotCommandScopes = BotCommandScopes;
 
-        bb.StateMachine = _statemachine;
+        bot.StateMachine = _statemachine;
 
-        bb.MessageLoopFactory = _messageLoopFactory;
+        bot.MessageLoopFactory = _messageLoopFactory;
 
-        bb.MessageLoopFactory.UnhandledCall += bb.MessageLoopFactory_UnhandledCall;
+        bot.MessageLoopFactory.UnhandledCall += bot.MessageLoopFactory_UnhandledCall;
 
-        return bb;
+        return bot;
     }
 
     public static IAPIKeySelectionStage Create()
@@ -75,10 +75,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBuildingStage QuickStart(string apiKey, Type StartForm)
+    public IBuildingStage QuickStart(string apiKey, Type startForm)
     {
         _apiKey = apiKey;
-        _factory = new DefaultStartFormFactory(StartForm);
+        _factory = new DefaultStartFormFactory(startForm);
 
         DefaultMessageLoop();
 
@@ -113,10 +113,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public IBuildingStage QuickStart(string apiKey, IStartFormFactory StartFormFactory)
+    public IBuildingStage QuickStart(string apiKey, IStartFormFactory startFormFactory)
     {
         _apiKey = apiKey;
-        _factory = StartFormFactory;
+        _factory = startFormFactory;
 
         DefaultMessageLoop();
 
@@ -218,7 +218,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             TelegramClient =
             {
                 Timeout = new TimeSpan(0, 1, 0)
-            }
+            },
         };
         return this;
     }

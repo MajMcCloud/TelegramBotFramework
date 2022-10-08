@@ -107,7 +107,7 @@ public class FormBaseMessageLoop : IMessageLoopFactory
     }
 
     /// <summary>
-    ///     Will be called if no form handeled this call
+    ///     Will be called if no form handled this call
     /// </summary>
     public event EventHandler<UnhandledCallEventArgs> UnhandledCall
     {

@@ -108,32 +108,40 @@ public class BotBase
 
     private async Task Client_MessageLoop(object sender, UpdateResult e)
     {
-        var ds = Sessions.GetSession(e.DeviceId);
-        if (ds == null)
+        try
         {
-            ds = Sessions.StartSession(e.DeviceId).GetAwaiter().GetResult();
-            e.Device = ds;
-            ds.LastMessage = e.RawData.Message;
+            var ds = Sessions.GetSession(e.DeviceId);
+            if (ds == null)
+            {
+                ds = await Sessions.StartSession(e.DeviceId);
+                e.Device = ds;
+                ds.LastMessage = e.RawData.Message;
 
-            OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+            }
+
+            var mr = new MessageResult(e.RawData);
+
+            var i = 0;
+
+            //Should formulars get navigated (allow maximum of 10, to dont get loops)
+            do
+            {
+                i++;
+
+                //Reset navigation
+                ds.FormSwitched = false;
+
+                await MessageLoopFactory.MessageLoop(this, ds, e, mr);
+
+                mr.IsFirstHandler = false;
+            } while (ds.FormSwitched && i < GetSetting(ESettings.NavigationMaximum, 10));
         }
-
-        var mr = new MessageResult(e.RawData);
-
-        var i = 0;
-
-        //Should formulars get navigated (allow maximum of 10, to dont get loops)
-        do
+        catch (Exception ex)
         {
-            i++;
-
-            //Reset navigation
-            ds.FormSwitched = false;
-
-            await MessageLoopFactory.MessageLoop(this, ds, e, mr);
-
-            mr.IsFirstHandler = false;
-        } while (ds.FormSwitched && i < GetSetting(ESettings.NavigationMaximum, 10));
+            var ds = Sessions.GetSession(e.DeviceId);
+            OnException(new SystemExceptionEventArgs(e.Message.Text, e.DeviceId, ds, ex));
+        }
     }
 
 
@@ -390,7 +398,7 @@ public class BotBase
     }
 
     /// <summary>
-    ///     Will be called if no form handeled this call
+    ///     Will be called if no form handled this call
     /// </summary>
     public event EventHandler<UnhandledCallEventArgs> UnhandledCall
     {

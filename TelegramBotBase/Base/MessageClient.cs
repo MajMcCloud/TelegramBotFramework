@@ -41,7 +41,6 @@ public class MessageClient
         ApiKey = apiKey;
         TelegramClient = new TelegramBotClient(apiKey, proxy);
 
-
         Prepare();
     }
 
@@ -124,11 +123,9 @@ public class MessageClient
     }
 
 
-    public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        OnMessageLoop(new UpdateResult(update, null));
-
-        return Task.CompletedTask;
+        await OnMessageLoop(new UpdateResult(update, null));
     }
 
     public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
@@ -161,6 +158,7 @@ public class MessageClient
     ///     This will set your bot commands to the given list.
     /// </summary>
     /// <param name="botcommands"></param>
+    /// <param name="languageCode"></param>
     /// <returns></returns>
     public async Task SetBotCommands(List<BotCommand> botcommands, BotCommandScope scope = null,
                                      string languageCode = null)
@@ -186,9 +184,9 @@ public class MessageClient
         remove => Events.RemoveHandler(EvOnMessageLoop, value);
     }
 
-    public void OnMessageLoop(UpdateResult update)
+    public async Task OnMessageLoop(UpdateResult update)
     {
-        (Events[EvOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
+        await (Events[EvOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
     }
 
     #endregion

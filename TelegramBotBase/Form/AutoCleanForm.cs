@@ -219,7 +219,7 @@ public class AutoCleanForm : FormBase
                     var retryAfterSeconds = ex.InnerExceptions
                                               .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
                                               .Max(e => ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
-                    retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
+                    retryAfterTask = Task.Delay(retryAfterSeconds * 1000, cts.Token);
                 }
 
                 //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));

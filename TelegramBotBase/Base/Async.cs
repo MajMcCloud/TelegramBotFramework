@@ -7,7 +7,7 @@ namespace TelegramBotBase.Base;
 
 public static class Async
 {
-    public delegate Task AsyncEventHandler<TEventArgs>(object sender, TEventArgs e) where TEventArgs : EventArgs;
+    public delegate Task AsyncEventHandler<in TEventArgs>(object sender, TEventArgs e) where TEventArgs : EventArgs;
 
     public static IEnumerable<AsyncEventHandler<TEventArgs>> GetHandlers<TEventArgs>(
         this AsyncEventHandler<TEventArgs> handler)
