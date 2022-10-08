@@ -4,15 +4,11 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Sessions;
 
-namespace TelegramBotBase.Interfaces
+namespace TelegramBotBase.Interfaces;
+
+public interface IMessageLoopFactory
 {
-    public interface IMessageLoopFactory
-    {
+    Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult e);
 
-        Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult e);
-
-        event EventHandler<UnhandledCallEventArgs> UnhandledCall;
-
-
-    }
+    event EventHandler<UnhandledCallEventArgs> UnhandledCall;
 }

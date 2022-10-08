@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace TelegramBotBase.Exceptions
+namespace TelegramBotBase.Exceptions;
+
+public class MaximumRowsReachedException : Exception
 {
-    public class MaximumRowsReachedException : Exception
-    {
-        public int Value { get; set; }
+    public int Value { get; set; }
 
-        public int Maximum { get; set; }
+    public int Maximum { get; set; }
 
 
-        public override string Message => $"You have exceeded the maximum of rows by {Value.ToString()} / {Maximum.ToString()}";
-    }
+    public override string Message =>
+        $"You have exceeded the maximum of rows by {Value.ToString()} / {Maximum.ToString()}";
 }

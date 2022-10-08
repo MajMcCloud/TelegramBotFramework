@@ -1,15 +1,13 @@
 ﻿using TelegramBotBase.Base;
 
-namespace TelegramBotBase.Args
+namespace TelegramBotBase.Args;
+
+public class SaveStatesEventArgs
 {
-    public class SaveStatesEventArgs
+    public SaveStatesEventArgs(StateContainer states)
     {
-        public StateContainer States { get; set; }
-
-
-        public SaveStatesEventArgs(StateContainer states)
-        {
-            States = states;
-        }
+        States = states;
     }
+
+    public StateContainer States { get; set; }
 }

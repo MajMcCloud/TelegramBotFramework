@@ -38,7 +38,5 @@ namespace AsyncFormUpdates.forms
 
             await Device.Send($"Your current count is at: {_counter}", bf, disableNotification: true);
         }
-
-
     }
 }

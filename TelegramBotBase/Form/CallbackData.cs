@@ -1,76 +1,67 @@
 ﻿using Newtonsoft.Json;
 
-namespace TelegramBotBase.Form
+namespace TelegramBotBase.Form;
+
+/// <summary>
+///     Base class for serializing buttons and data
+/// </summary>
+public class CallbackData
 {
-    /// <summary>
-    /// Base class for serializing buttons and data
-    /// </summary>
-    public class CallbackData
+    public CallbackData()
     {
-        [JsonProperty("m")]
-        public string Method { get; set; }
+    }
 
-        [JsonProperty("v")]
-        public string Value { get; set; }
+    public CallbackData(string method, string value)
+    {
+        Method = method;
+        Value = value;
+    }
 
+    [JsonProperty("m")] public string Method { get; set; }
 
-        public CallbackData()
+    [JsonProperty("v")] public string Value { get; set; }
+
+    public static string Create(string method, string value)
+    {
+        return new CallbackData(method, value).Serialize();
+    }
+
+    /// <summary>
+    ///     Serializes data to json string
+    /// </summary>
+    /// <returns></returns>
+    public string Serialize()
+    {
+        var s = "";
+        try
         {
-
+            s = JsonConvert.SerializeObject(this);
+        }
+        catch
+        {
         }
 
-        public CallbackData(string method, string value)
+        return s;
+    }
+
+    /// <summary>
+    ///     Deserializes data from json string
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static CallbackData Deserialize(string data)
+    {
+        CallbackData cd = null;
+        try
         {
-            Method = method;
-            Value = value;
+            cd = JsonConvert.DeserializeObject<CallbackData>(data);
+
+            return cd;
+        }
+        catch
+        {
         }
 
-        public static string Create(string method, string value)
-        {
-            return new CallbackData(method, value).Serialize();
-        }
-
-        /// <summary>
-        /// Serializes data to json string
-        /// </summary>
-        /// <returns></returns>
-        public string Serialize()
-        {
-            var s = "";
-            try
-            {
-
-                s = JsonConvert.SerializeObject(this);
-            }
-            catch
-            {
-
-
-            }
-            return s;
-        }
-
-        /// <summary>
-        /// Deserializes data from json string
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static CallbackData Deserialize(string data)
-        {
-            CallbackData cd = null;
-            try
-            {
-                cd = JsonConvert.DeserializeObject<CallbackData>(data);
-
-                return cd;
-            }
-            catch
-            {
-
-            }
-
-            return null;
-        }
-
+        return null;
     }
 }

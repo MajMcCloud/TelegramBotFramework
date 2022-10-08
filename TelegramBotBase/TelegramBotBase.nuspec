@@ -1,27 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
-  <metadata>
-    <id>TelegramBotBase</id>
-    <version>2.1.0</version>
-    <authors>TelegramBotBase</authors>
-    <owners>TelegramBotBase</owners>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="expression">MIT</license>
-    <projectUrl>https://github.com/MajMcCloud/TelegramBotFramework</projectUrl>
-    <description>Package Description</description>
-    <releaseNotes>- moving from .Net Framework 4.7.2 to  .Net Standard 2.1 for the Library and .Net Core 3.0 for the test project!</releaseNotes>
-    <repository url="https://github.com/MajMcCloud/TelegramBotFramework" />
-    <dependencies>
-      <group targetFramework=".NETFramework4.6.1">
-        <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers" />
-        <dependency id="System.Drawing.Common" version="4.6.0" exclude="Build,Analyzers" />
-        <dependency id="Telegram.Bot" version="15.0.0" exclude="Build,Analyzers" />
-      </group>
-      <group targetFramework=".NETStandard2.0">
-        <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers" />
-        <dependency id="System.Drawing.Common" version="4.6.0" exclude="Build,Analyzers" />
-        <dependency id="Telegram.Bot" version="15.0.0" exclude="Build,Analyzers" />
-      </group>
-    </dependencies>
-  </metadata>
+    <metadata>
+        <id>TelegramBotBase</id>
+        <version>2.1.0</version>
+        <authors>TelegramBotBase</authors>
+        <owners>TelegramBotBase</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <license type="expression">MIT</license>
+        <projectUrl>https://github.com/MajMcCloud/TelegramBotFramework</projectUrl>
+        <description>Package Description</description>
+        <releaseNotes>- moving from .Net Framework 4.7.2 to .Net Standard 2.1 for the Library and .Net Core 3.0 for the
+            test project!
+        </releaseNotes>
+        <repository url="https://github.com/MajMcCloud/TelegramBotFramework"/>
+        <dependencies>
+            <group targetFramework=".NETFramework4.6.1">
+                <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers"/>
+                <dependency id="System.Drawing.Common" version="4.6.0" exclude="Build,Analyzers"/>
+                <dependency id="Telegram.Bot" version="15.0.0" exclude="Build,Analyzers"/>
+            </group>
+            <group targetFramework=".NETStandard2.0">
+                <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers"/>
+                <dependency id="System.Drawing.Common" version="4.6.0" exclude="Build,Analyzers"/>
+                <dependency id="Telegram.Bot" version="15.0.0" exclude="Build,Analyzers"/>
+            </group>
+        </dependencies>
+    </metadata>
 </package>

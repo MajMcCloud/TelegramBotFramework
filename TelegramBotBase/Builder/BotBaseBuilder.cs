@@ -13,362 +13,360 @@ using TelegramBotBase.Localizations;
 using TelegramBotBase.MessageLoops;
 using TelegramBotBase.States;
 
-namespace TelegramBotBase.Builder
+namespace TelegramBotBase.Builder;
+
+public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage,
+                              IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage,
+                              ILanguageSelectionStage
 {
-    public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage, ILanguageSelectionStage
+    private string _apiKey;
+
+    private MessageClient _client;
+
+    private IStartFormFactory _factory;
+
+    private IMessageLoopFactory _messageLoopFactory;
+
+    private IStateMachine _statemachine;
+
+    private BotBaseBuilder()
     {
-        private string _apiKey;
-
-        private IStartFormFactory _factory;
-
-        private MessageClient _client;
-
-        /// <summary>
-        /// Contains different Botcommands for different areas.
-        /// </summary>
-        private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; set; } = new Dictionary<BotCommandScope, List<BotCommand>>();
-
-        private IStateMachine _statemachine;
-
-        private IMessageLoopFactory _messageLoopFactory;
-
-        private BotBaseBuilder()
-        {
-
-        }
-
-        public static IAPIKeySelectionStage Create()
-        {
-            return new BotBaseBuilder();
-        }
-
-        #region "Step 1 (Basic Stuff)"
-
-        public IMessageLoopSelectionStage WithAPIKey(string apiKey)
-        {
-            _apiKey = apiKey;
-            return this;
-        }
-
-
-        public IBuildingStage QuickStart(string apiKey, Type StartForm)
-        {
-            _apiKey = apiKey;
-            _factory = new DefaultStartFormFactory(StartForm);
-
-            DefaultMessageLoop();
-
-            NoProxy();
-
-            OnlyStart();
-
-            NoSerialization();
-
-            DefaultLanguage();
-
-            return this;
-        }
-
-
-        public IBuildingStage QuickStart<T>(string apiKey)
-            where T : FormBase
-        {
-            _apiKey = apiKey;
-            _factory = new DefaultStartFormFactory(typeof(T));
-
-            DefaultMessageLoop();
-
-            NoProxy();
-
-            OnlyStart();
-
-            NoSerialization();
-
-            DefaultLanguage();
-
-            return this;
-        }
-
-        public IBuildingStage QuickStart(string apiKey, IStartFormFactory StartFormFactory)
-        {
-            _apiKey = apiKey;
-            _factory = StartFormFactory;
-
-            DefaultMessageLoop();
-
-            NoProxy();
-
-            OnlyStart();
-
-            NoSerialization();
-
-            DefaultLanguage();
-
-            return this;
-        }
-
-        #endregion
-
-
-        #region "Step 2 (Message Loop)"
-
-        public IStartFormSelectionStage DefaultMessageLoop()
-        {
-            _messageLoopFactory = new FormBaseMessageLoop();
-
-            return this;
-        }
-
-
-        public IStartFormSelectionStage MinimalMessageLoop()
-        {
-            _messageLoopFactory = new MinimalMessageLoop();
-
-            return this;
-        }
-
-
-        public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
-        {
-            _messageLoopFactory = messageLoopClass;
-
-            return this;
-        }
-
-        public IStartFormSelectionStage CustomMessageLoop<T>()
-            where T : class, new()
-        {
-            _messageLoopFactory = typeof(T).GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
-
-            return this;
-        }
-
-        #endregion
-
-
-        #region "Step 3 (Start Form/Factory)"
-
-        public INetworkingSelectionStage WithStartForm(Type startFormClass)
-        {
-            _factory = new DefaultStartFormFactory(startFormClass);
-            return this;
-        }
-
-        public INetworkingSelectionStage WithStartForm<T>()
-            where T : FormBase, new()
-        {
-            _factory = new DefaultStartFormFactory(typeof(T));
-            return this;
-        }
-
-        public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
-        {
-            _factory = new ServiceProviderStartFormFactory(startFormClass, serviceProvider);
-            return this;
-        }
-
-        public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
-            where T : FormBase
-        {
-            _factory = new ServiceProviderStartFormFactory<T>(serviceProvider);
-            return this;
-        }
-
-        public INetworkingSelectionStage WithStartFormFactory(IStartFormFactory factory)
-        {
-            _factory = factory;
-            return this;
-        }
-
-        #endregion
-
-
-        #region "Step 4 (Network Settings)"
-
-        public IBotCommandsStage WithProxy(string proxyAddress)
-        {
-            var url = new Uri(proxyAddress);
-            _client = new MessageClient(_apiKey, url)
-            {
-                TelegramClient =
-                {
-                    Timeout = new TimeSpan(0, 1, 0)
-                }
-            };
-            return this;
-        }
-
-
-        public IBotCommandsStage NoProxy()
-        {
-            _client = new MessageClient(_apiKey)
-            {
-                TelegramClient =
-                {
-                    Timeout = new TimeSpan(0, 1, 0)
-                }
-            };
-            return this;
-        }
-
-
-        public IBotCommandsStage WithBotClient(TelegramBotClient tgclient)
-        {
-            _client = new MessageClient(_apiKey, tgclient)
-            {
-                TelegramClient =
-                {
-                    Timeout = new TimeSpan(0, 1, 0)
-                }
-            };
-            return this;
-        }
-
-
-        public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort)
-        {
-            _client = new MessageClient(_apiKey, proxyHost, proxyPort)
-            {
-                TelegramClient =
-                {
-                    Timeout = new TimeSpan(0, 1, 0)
-                }
-            };
-            return this;
-        }
-
-        public IBotCommandsStage WithHttpClient(HttpClient tgclient)
-        {
-            _client = new MessageClient(_apiKey, tgclient)
-            {
-                TelegramClient =
-                {
-                    Timeout = new TimeSpan(0, 1, 0)
-                }
-            };
-            return this;
-        }
-
-
-        #endregion
-
-
-        #region "Step 5 (Bot Commands)"
-
-        public ISessionSerializationStage NoCommands()
-        {
-            return this;
-        }
-
-        public ISessionSerializationStage OnlyStart()
-        {
-            BotCommandScopes.Start("Starts the bot");
-
-            return this;
-
-        }
-
-        public ISessionSerializationStage DefaultCommands()
-        {
-            BotCommandScopes.Start("Starts the bot");
-            BotCommandScopes.Help("Should show you some help");
-            BotCommandScopes.Settings("Should show you some settings");
-            return this;
-        }
-
-        public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
-        {
-            action?.Invoke(BotCommandScopes);
-            return this;
-        }
-
-        #endregion
-
-
-        #region "Step 6 (Serialization)"
-
-        public ILanguageSelectionStage NoSerialization()
-        {
-            return this;
-        }
-
-        public ILanguageSelectionStage UseSerialization(IStateMachine machine)
-        {
-            _statemachine = machine;
-            return this;
-        }
-
-
-        public ILanguageSelectionStage UseJSON(string path)
-        {
-            _statemachine = new JsonStateMachine(path);
-            return this;
-        }
-
-        public ILanguageSelectionStage UseSimpleJSON(string path)
-        {
-            _statemachine = new SimpleJsonStateMachine(path);
-            return this;
-        }
-
-        public ILanguageSelectionStage UseXML(string path)
-        {
-            _statemachine = new XmlStateMachine(path);
-            return this;
-        }
-
-        #endregion
-
-
-        #region "Step 7 (Language)"
-
-        public IBuildingStage DefaultLanguage()
-        {
-            return this;
-        }
-
-        public IBuildingStage UseEnglish()
-        {
-            Default.Language = new English();
-            return this;
-        }
-
-        public IBuildingStage UseGerman()
-        {
-            Default.Language = new German();
-            return this;
-        }
-
-        public IBuildingStage Custom(Localization language)
-        {
-            Default.Language = language;
-            return this;
-        }
-
-        #endregion
-
-
-        public BotBase Build()
-        {
-            var bb = new BotBase
-            {
-                ApiKey = _apiKey,
-                StartFormFactory = _factory,
-                Client = _client
-            };
-
-            bb.Sessions.Client = bb.Client;
-
-            bb.BotCommandScopes = BotCommandScopes;
-
-            bb.StateMachine = _statemachine;
-
-            bb.MessageLoopFactory = _messageLoopFactory;
-
-            bb.MessageLoopFactory.UnhandledCall += bb.MessageLoopFactory_UnhandledCall;
-
-            return bb;
-        }
-
     }
+
+    /// <summary>
+    ///     Contains different Botcommands for different areas.
+    /// </summary>
+    private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; } = new();
+
+
+    public BotBase Build()
+    {
+        var bb = new BotBase
+        {
+            ApiKey = _apiKey,
+            StartFormFactory = _factory,
+            Client = _client
+        };
+
+        bb.Sessions.Client = bb.Client;
+
+        bb.BotCommandScopes = BotCommandScopes;
+
+        bb.StateMachine = _statemachine;
+
+        bb.MessageLoopFactory = _messageLoopFactory;
+
+        bb.MessageLoopFactory.UnhandledCall += bb.MessageLoopFactory_UnhandledCall;
+
+        return bb;
+    }
+
+    public static IAPIKeySelectionStage Create()
+    {
+        return new BotBaseBuilder();
+    }
+
+    #region "Step 1 (Basic Stuff)"
+
+    public IMessageLoopSelectionStage WithAPIKey(string apiKey)
+    {
+        _apiKey = apiKey;
+        return this;
+    }
+
+
+    public IBuildingStage QuickStart(string apiKey, Type StartForm)
+    {
+        _apiKey = apiKey;
+        _factory = new DefaultStartFormFactory(StartForm);
+
+        DefaultMessageLoop();
+
+        NoProxy();
+
+        OnlyStart();
+
+        NoSerialization();
+
+        DefaultLanguage();
+
+        return this;
+    }
+
+
+    public IBuildingStage QuickStart<T>(string apiKey)
+        where T : FormBase
+    {
+        _apiKey = apiKey;
+        _factory = new DefaultStartFormFactory(typeof(T));
+
+        DefaultMessageLoop();
+
+        NoProxy();
+
+        OnlyStart();
+
+        NoSerialization();
+
+        DefaultLanguage();
+
+        return this;
+    }
+
+    public IBuildingStage QuickStart(string apiKey, IStartFormFactory StartFormFactory)
+    {
+        _apiKey = apiKey;
+        _factory = StartFormFactory;
+
+        DefaultMessageLoop();
+
+        NoProxy();
+
+        OnlyStart();
+
+        NoSerialization();
+
+        DefaultLanguage();
+
+        return this;
+    }
+
+    #endregion
+
+
+    #region "Step 2 (Message Loop)"
+
+    public IStartFormSelectionStage DefaultMessageLoop()
+    {
+        _messageLoopFactory = new FormBaseMessageLoop();
+
+        return this;
+    }
+
+
+    public IStartFormSelectionStage MinimalMessageLoop()
+    {
+        _messageLoopFactory = new MinimalMessageLoop();
+
+        return this;
+    }
+
+
+    public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
+    {
+        _messageLoopFactory = messageLoopClass;
+
+        return this;
+    }
+
+    public IStartFormSelectionStage CustomMessageLoop<T>()
+        where T : class, new()
+    {
+        _messageLoopFactory =
+            typeof(T).GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
+
+        return this;
+    }
+
+    #endregion
+
+
+    #region "Step 3 (Start Form/Factory)"
+
+    public INetworkingSelectionStage WithStartForm(Type startFormClass)
+    {
+        _factory = new DefaultStartFormFactory(startFormClass);
+        return this;
+    }
+
+    public INetworkingSelectionStage WithStartForm<T>()
+        where T : FormBase, new()
+    {
+        _factory = new DefaultStartFormFactory(typeof(T));
+        return this;
+    }
+
+    public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+    {
+        _factory = new ServiceProviderStartFormFactory(startFormClass, serviceProvider);
+        return this;
+    }
+
+    public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
+        where T : FormBase
+    {
+        _factory = new ServiceProviderStartFormFactory<T>(serviceProvider);
+        return this;
+    }
+
+    public INetworkingSelectionStage WithStartFormFactory(IStartFormFactory factory)
+    {
+        _factory = factory;
+        return this;
+    }
+
+    #endregion
+
+
+    #region "Step 4 (Network Settings)"
+
+    public IBotCommandsStage WithProxy(string proxyAddress)
+    {
+        var url = new Uri(proxyAddress);
+        _client = new MessageClient(_apiKey, url)
+        {
+            TelegramClient =
+            {
+                Timeout = new TimeSpan(0, 1, 0)
+            }
+        };
+        return this;
+    }
+
+
+    public IBotCommandsStage NoProxy()
+    {
+        _client = new MessageClient(_apiKey)
+        {
+            TelegramClient =
+            {
+                Timeout = new TimeSpan(0, 1, 0)
+            }
+        };
+        return this;
+    }
+
+
+    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient)
+    {
+        _client = new MessageClient(_apiKey, tgclient)
+        {
+            TelegramClient =
+            {
+                Timeout = new TimeSpan(0, 1, 0)
+            }
+        };
+        return this;
+    }
+
+
+    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort)
+    {
+        _client = new MessageClient(_apiKey, proxyHost, proxyPort)
+        {
+            TelegramClient =
+            {
+                Timeout = new TimeSpan(0, 1, 0)
+            }
+        };
+        return this;
+    }
+
+    public IBotCommandsStage WithHttpClient(HttpClient tgclient)
+    {
+        _client = new MessageClient(_apiKey, tgclient)
+        {
+            TelegramClient =
+            {
+                Timeout = new TimeSpan(0, 1, 0)
+            }
+        };
+        return this;
+    }
+
+    #endregion
+
+
+    #region "Step 5 (Bot Commands)"
+
+    public ISessionSerializationStage NoCommands()
+    {
+        return this;
+    }
+
+    public ISessionSerializationStage OnlyStart()
+    {
+        BotCommandScopes.Start("Starts the bot");
+
+        return this;
+    }
+
+    public ISessionSerializationStage DefaultCommands()
+    {
+        BotCommandScopes.Start("Starts the bot");
+        BotCommandScopes.Help("Should show you some help");
+        BotCommandScopes.Settings("Should show you some settings");
+        return this;
+    }
+
+    public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
+    {
+        action?.Invoke(BotCommandScopes);
+        return this;
+    }
+
+    #endregion
+
+
+    #region "Step 6 (Serialization)"
+
+    public ILanguageSelectionStage NoSerialization()
+    {
+        return this;
+    }
+
+    public ILanguageSelectionStage UseSerialization(IStateMachine machine)
+    {
+        _statemachine = machine;
+        return this;
+    }
+
+
+    public ILanguageSelectionStage UseJSON(string path)
+    {
+        _statemachine = new JsonStateMachine(path);
+        return this;
+    }
+
+    public ILanguageSelectionStage UseSimpleJSON(string path)
+    {
+        _statemachine = new SimpleJsonStateMachine(path);
+        return this;
+    }
+
+    public ILanguageSelectionStage UseXML(string path)
+    {
+        _statemachine = new XmlStateMachine(path);
+        return this;
+    }
+
+    #endregion
+
+
+    #region "Step 7 (Language)"
+
+    public IBuildingStage DefaultLanguage()
+    {
+        return this;
+    }
+
+    public IBuildingStage UseEnglish()
+    {
+        Default.Language = new English();
+        return this;
+    }
+
+    public IBuildingStage UseGerman()
+    {
+        Default.Language = new German();
+        return this;
+    }
+
+    public IBuildingStage Custom(Localization language)
+    {
+        Default.Language = language;
+        return this;
+    }
+
+    #endregion
 }

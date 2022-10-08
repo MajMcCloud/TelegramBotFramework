@@ -3,39 +3,35 @@ using SystemCommandsBot.config;
 using SystemCommandsBot.forms;
 using TelegramBotBase.Builder;
 
-namespace SystemCommandsBot
+namespace SystemCommandsBot;
+
+internal class Program
 {
-    internal class Program
+    public static Config BotConfig { get; set; }
+
+
+    private static void Main(string[] args)
     {
-        public static Config BotConfig { get; set; }
+        BotConfig = Config.Load();
 
-
-        private static void Main(string[] args)
+        if (BotConfig.ApiKey == null || BotConfig.ApiKey.Trim() == "")
         {
-
-            BotConfig = Config.Load();
-
-            if (BotConfig.ApiKey == null || BotConfig.ApiKey.Trim() == "")
-            {
-                Console.WriteLine("Config created...");
-                Console.ReadLine();
-                return;
-            }
-
-            var bot = BotBaseBuilder.Create()
-                                    .QuickStart<StartForm>(BotConfig.ApiKey)
-                                    .Build();
-
-            bot.Start();
-
-            Console.WriteLine("Bot started");
-
+            Console.WriteLine("Config created...");
             Console.ReadLine();
-
-
-            bot.Stop();
-
-
+            return;
         }
+
+        var bot = BotBaseBuilder.Create()
+                                .QuickStart<StartForm>(BotConfig.ApiKey)
+                                .Build();
+
+        bot.Start();
+
+        Console.WriteLine("Bot started");
+
+        Console.ReadLine();
+
+
+        bot.Stop();
     }
 }

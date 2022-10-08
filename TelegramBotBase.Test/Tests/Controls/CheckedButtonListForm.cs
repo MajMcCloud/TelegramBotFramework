@@ -6,81 +6,81 @@ using TelegramBotBase.DataSources;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls;
+
+public class CheckedButtonListForm : AutoCleanForm
 {
-    public class CheckedButtonListForm : AutoCleanForm
+    private CheckedButtonList _mButtons;
+
+    public CheckedButtonListForm()
     {
-        private CheckedButtonList _mButtons;
+        DeleteMode = EDeleteMode.OnLeavingForm;
 
-        public CheckedButtonListForm()
+        Init += CheckedButtonListForm_Init;
+    }
+
+    private Task CheckedButtonListForm_Init(object sender, InitEventArgs e)
+    {
+        _mButtons = new CheckedButtonList
         {
-            DeleteMode = EDeleteMode.OnLeavingForm;
+            KeyboardType = EKeyboardType.InlineKeyBoard,
+            EnablePaging = true,
+            HeadLayoutButtonRow = new List<ButtonBase> { new("Back", "back"), new("Switch Keyboard", "switch") },
+            SubHeadLayoutButtonRow = new List<ButtonBase> { new("No checked items", "$") }
+        };
 
-            Init += CheckedButtonListForm_Init;
+        var bf = new ButtonForm();
+
+        for (var i = 0; i < 30; i++)
+        {
+            bf.AddButtonRow($"{i + 1}. Item", i.ToString());
         }
 
-        private Task CheckedButtonListForm_Init(object sender, InitEventArgs e)
+        _mButtons.DataSource = new ButtonFormDataSource(bf);
+
+        _mButtons.ButtonClicked += Bg_ButtonClicked;
+        _mButtons.CheckedChanged += M_Buttons_CheckedChanged;
+
+        AddControl(_mButtons);
+        return Task.CompletedTask;
+    }
+
+    private Task M_Buttons_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        _mButtons.SubHeadLayoutButtonRow = new List<ButtonBase>
+            { new($"{_mButtons.CheckedItems.Count} checked items", "$") };
+        return Task.CompletedTask;
+    }
+
+    private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+    {
+        if (e.Button == null)
         {
-            _mButtons = new CheckedButtonList
-            {
-                KeyboardType = EKeyboardType.InlineKeyBoard,
-                EnablePaging = true,
-                HeadLayoutButtonRow = new List<ButtonBase> { new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch") },
-                SubHeadLayoutButtonRow = new List<ButtonBase> { new ButtonBase("No checked items", "$") }
-            };
-
-            var bf = new ButtonForm();
-
-            for (var i = 0; i < 30; i++)
-            {
-                bf.AddButtonRow($"{i + 1}. Item", i.ToString());
-            }
-
-            _mButtons.DataSource = new ButtonFormDataSource(bf);
-
-            _mButtons.ButtonClicked += Bg_ButtonClicked;
-            _mButtons.CheckedChanged += M_Buttons_CheckedChanged;
-
-            AddControl(_mButtons);
-            return Task.CompletedTask;
+            return;
         }
 
-        private Task M_Buttons_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        switch (e.Button.Value)
         {
-            _mButtons.SubHeadLayoutButtonRow = new List<ButtonBase> { new ButtonBase($"{_mButtons.CheckedItems.Count} checked items", "$") };
-            return Task.CompletedTask;
-        }
+            case "back":
 
-        private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
-        {
-            if (e.Button == null)
-                return;
-
-            switch (e.Button.Value)
-            {
-                case "back":
-
-                    var start = new Menu();
-                    await NavigateTo(start);
-                    break;
+                var start = new Menu();
+                await NavigateTo(start);
+                break;
 
 
-                case "switch":
-                    _mButtons.KeyboardType = _mButtons.KeyboardType switch
-                    {
-                        EKeyboardType.ReplyKeyboard => EKeyboardType.InlineKeyBoard,
-                        EKeyboardType.InlineKeyBoard => EKeyboardType.ReplyKeyboard,
-                        _ => _mButtons.KeyboardType
-                    };
+            case "switch":
+                _mButtons.KeyboardType = _mButtons.KeyboardType switch
+                {
+                    EKeyboardType.ReplyKeyboard => EKeyboardType.InlineKeyBoard,
+                    EKeyboardType.InlineKeyBoard => EKeyboardType.ReplyKeyboard,
+                    _ => _mButtons.KeyboardType
+                };
 
-                    break;
+                break;
 
-                default:
-                    await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
-                    break;
-            }
-
-
+            default:
+                await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
+                break;
         }
     }
 }

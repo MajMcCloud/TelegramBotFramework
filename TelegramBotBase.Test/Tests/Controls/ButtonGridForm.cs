@@ -4,68 +4,66 @@ using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls;
+
+public class ButtonGridForm : AutoCleanForm
 {
-    public class ButtonGridForm : AutoCleanForm
+    private ButtonGrid _mButtons;
+
+    public ButtonGridForm()
     {
-        private ButtonGrid _mButtons;
+        DeleteMode = EDeleteMode.OnLeavingForm;
 
-        public ButtonGridForm()
+        Init += ButtonGridForm_Init;
+    }
+
+    private Task ButtonGridForm_Init(object sender, InitEventArgs e)
+    {
+        _mButtons = new ButtonGrid
         {
-            DeleteMode = EDeleteMode.OnLeavingForm;
+            KeyboardType = EKeyboardType.InlineKeyBoard
+        };
 
-            Init += ButtonGridForm_Init;
+        var bf = new ButtonForm();
+
+        bf.AddButtonRow(new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch"));
+
+        bf.AddButtonRow(new ButtonBase("Button1", "b1"), new ButtonBase("Button2", "b2"));
+
+        bf.AddButtonRow(new ButtonBase("Button3", "b3"), new ButtonBase("Button4", "b4"));
+
+        _mButtons.ButtonsForm = bf;
+
+        _mButtons.ButtonClicked += Bg_ButtonClicked;
+
+        AddControl(_mButtons);
+        return Task.CompletedTask;
+    }
+
+    private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+    {
+        if (e.Button == null)
+        {
+            return;
         }
 
-        private Task ButtonGridForm_Init(object sender, InitEventArgs e)
+        if (e.Button.Value == "back")
         {
-            _mButtons = new ButtonGrid
+            var start = new Menu();
+            await NavigateTo(start);
+        }
+        else if (e.Button.Value == "switch")
+        {
+            _mButtons.KeyboardType = _mButtons.KeyboardType switch
             {
-                KeyboardType = EKeyboardType.InlineKeyBoard
+                EKeyboardType.ReplyKeyboard => EKeyboardType.InlineKeyBoard,
+                EKeyboardType.InlineKeyBoard => EKeyboardType.ReplyKeyboard,
+                _ => _mButtons.KeyboardType
             };
-
-            var bf = new ButtonForm();
-
-            bf.AddButtonRow(new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch"));
-
-            bf.AddButtonRow(new ButtonBase("Button1", "b1"), new ButtonBase("Button2", "b2"));
-
-            bf.AddButtonRow(new ButtonBase("Button3", "b3"), new ButtonBase("Button4", "b4"));
-
-            _mButtons.ButtonsForm = bf;
-
-            _mButtons.ButtonClicked += Bg_ButtonClicked;
-
-            AddControl(_mButtons);
-            return Task.CompletedTask;
         }
-
-        private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+        else
         {
-            if (e.Button == null)
-                return;
-
-            if (e.Button.Value == "back")
-            {
-                var start = new Menu();
-                await NavigateTo(start);
-            }
-            else if (e.Button.Value == "switch")
-            {
-                _mButtons.KeyboardType = _mButtons.KeyboardType switch
-                {
-                    EKeyboardType.ReplyKeyboard => EKeyboardType.InlineKeyBoard,
-                    EKeyboardType.InlineKeyBoard => EKeyboardType.ReplyKeyboard,
-                    _ => _mButtons.KeyboardType
-                };
-            }
-            else
-            {
-
-                await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
-            }
-
-
+            await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
         }
     }
 }

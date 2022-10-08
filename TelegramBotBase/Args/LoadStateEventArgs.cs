@@ -1,55 +1,59 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace TelegramBotBase.Args
+namespace TelegramBotBase.Args;
+
+public class LoadStateEventArgs
 {
-    public class LoadStateEventArgs
+    public LoadStateEventArgs()
     {
-        public Dictionary<string,object> Values { get; set; }
+        Values = new Dictionary<string, object>();
+    }
 
-        public LoadStateEventArgs()
+    public Dictionary<string, object> Values { get; set; }
+
+    public List<string> Keys => Values.Keys.ToList();
+
+    public string Get(string key)
+    {
+        return Values[key].ToString();
+    }
+
+    public int GetInt(string key)
+    {
+        var i = 0;
+        if (int.TryParse(Values[key].ToString(), out i))
         {
-            Values = new Dictionary<string, object>();
+            return i;
         }
 
-        public List<string> Keys => Values.Keys.ToList();
+        return 0;
+    }
 
-        public string Get(string key)
+    public double GetDouble(string key)
+    {
+        double d = 0;
+        if (double.TryParse(Values[key].ToString(), out d))
         {
-            return Values[key].ToString();
+            return d;
         }
 
-        public int GetInt(string key)
-        {
-            var i = 0;
-            if (int.TryParse(Values[key].ToString(), out i))
-                return i;
+        return 0;
+    }
 
-            return 0;
+    public bool GetBool(string key)
+    {
+        var b = false;
+        if (bool.TryParse(Values[key].ToString(), out b))
+        {
+            return b;
         }
 
-        public double GetDouble(string key)
-        {
-            double d = 0;
-            if (double.TryParse(Values[key].ToString(), out d))
-                return d;
+        return false;
+    }
 
-            return 0;
-        }
-
-        public bool GetBool(string key)
-        {
-            var b = false;
-            if (bool.TryParse(Values[key].ToString(), out b))
-                return b;
-
-            return false;
-        }
-
-        public object GetObject(string key)
-        {
-            return Values[key];
-        }
-
+    public object GetObject(string key)
+    {
+        return Values[key];
     }
 }

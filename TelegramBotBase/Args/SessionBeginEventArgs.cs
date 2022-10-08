@@ -1,18 +1,17 @@
 ﻿using System;
 using TelegramBotBase.Sessions;
 
-namespace TelegramBotBase.Base
+namespace TelegramBotBase.Base;
+
+public class SessionBeginEventArgs : EventArgs
 {
-    public class SessionBeginEventArgs : EventArgs
+    public SessionBeginEventArgs(long deviceId, DeviceSession device)
     {
-        public long DeviceId { get; set; }
-
-        public DeviceSession Device { get; set; }
-
-        public SessionBeginEventArgs(long deviceId, DeviceSession device)
-        {
-            this.DeviceId = deviceId;
-            this.Device = device;
-        }
+        DeviceId = deviceId;
+        Device = device;
     }
+
+    public long DeviceId { get; set; }
+
+    public DeviceSession Device { get; set; }
 }

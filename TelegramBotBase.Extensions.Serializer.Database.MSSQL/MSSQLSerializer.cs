@@ -11,19 +11,19 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
 {
     public class MssqlSerializer : IStateMachine
     {
-        public Type FallbackStateForm { get; set; }
-        public string ConnectionString { get; }
-        public string TablePrefix { get; set; }
-
         /// <summary>
-        /// Will initialize the state machine.
+        ///     Will initialize the state machine.
         /// </summary>
         /// <param name="file">Path of the file and name where to save the session details.</param>
-        /// <param name="fallbackStateForm">Type of Form which will be saved instead of Form which has <seealso cref="Attributes.IgnoreState"/> attribute declared. Needs to be subclass of <seealso cref="Form.FormBase"/>.</param>
+        /// <param name="fallbackStateForm">
+        ///     Type of Form which will be saved instead of Form which has
+        ///     <seealso cref="Attributes.IgnoreState" /> attribute declared. Needs to be subclass of
+        ///     <seealso cref="Form.FormBase" />.
+        /// </param>
         /// <param name="overwrite">Declares of the file could be overwritten.</param>
         public MssqlSerializer(string connectionString, string tablePrefix = "tgb_", Type fallbackStateForm = null)
         {
-            this.ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
             TablePrefix = tablePrefix;
 
@@ -35,6 +35,10 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
             }
         }
 
+        public string ConnectionString { get; }
+        public string TablePrefix { get; set; }
+        public Type FallbackStateForm { get; set; }
+
         public StateContainer LoadFormStates()
         {
             var sc = new StateContainer();
@@ -44,7 +48,8 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
                 connection.Open();
 
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT deviceId, deviceTitle, FormUri, QualifiedName FROM " + TablePrefix + "devices_sessions";
+                command.CommandText = "SELECT deviceId, deviceTitle, FormUri, QualifiedName FROM " + TablePrefix +
+                                      "devices_sessions";
 
                 var dataTable = new DataTable();
                 using (var dataAdapter = new SqlDataAdapter(command))
@@ -73,7 +78,8 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
                         }
 
                         var command2 = connection.CreateCommand();
-                        command2.CommandText = "SELECT [key], value, type FROM " + TablePrefix + "devices_sessions_data WHERE deviceId = @deviceId";
+                        command2.CommandText = "SELECT [key], value, type FROM " + TablePrefix +
+                                               "devices_sessions_data WHERE deviceId = @deviceId";
                         command2.Parameters.Add(new SqlParameter("@deviceId", r["deviceId"]));
 
                         var dataTable2 = new DataTable();
@@ -91,11 +97,8 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
                                 se.Values.Add(key, value);
                             }
                         }
-
                     }
-
                 }
-
 
 
                 connection.Close();
@@ -127,13 +130,15 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
                 var sessionCommand = connection.CreateCommand();
                 var dataCommand = connection.CreateCommand();
 
-                sessionCommand.CommandText = "INSERT INTO " + TablePrefix + "devices_sessions (deviceId, deviceTitle, FormUri, QualifiedName) VALUES (@deviceId, @deviceTitle, @FormUri, @QualifiedName)";
+                sessionCommand.CommandText = "INSERT INTO " + TablePrefix +
+                                             "devices_sessions (deviceId, deviceTitle, FormUri, QualifiedName) VALUES (@deviceId, @deviceTitle, @FormUri, @QualifiedName)";
                 sessionCommand.Parameters.Add(new SqlParameter("@deviceId", ""));
                 sessionCommand.Parameters.Add(new SqlParameter("@deviceTitle", ""));
                 sessionCommand.Parameters.Add(new SqlParameter("@FormUri", ""));
                 sessionCommand.Parameters.Add(new SqlParameter("@QualifiedName", ""));
 
-                dataCommand.CommandText = "INSERT INTO " + TablePrefix + "devices_sessions_data (deviceId, [key], value, type) VALUES (@deviceId, @key, @value, @type)";
+                dataCommand.CommandText = "INSERT INTO " + TablePrefix +
+                                          "devices_sessions_data (deviceId, [key], value, type) VALUES (@deviceId, @key, @value, @type)";
                 dataCommand.Parameters.Add(new SqlParameter("@deviceId", ""));
                 dataCommand.Parameters.Add(new SqlParameter("@key", ""));
                 dataCommand.Parameters.Add(new SqlParameter("@value", ""));
@@ -169,13 +174,10 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
                         dataCommand.ExecuteNonQuery();
                     }
-
                 }
 
                 connection.Close();
             }
-
-
         }
     }
 }

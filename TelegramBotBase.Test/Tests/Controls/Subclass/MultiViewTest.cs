@@ -4,59 +4,49 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls.Subclass
+namespace TelegramBotBaseTest.Tests.Controls.Subclass;
+
+public class MultiViewTest : MultiView
 {
-    public class MultiViewTest : MultiView
+    public override Task Action(MessageResult result, string value = null)
     {
-
-
-        public override Task Action(MessageResult result, string value = null)
+        switch (result.RawData)
         {
-            switch (result.RawData)
-            {
-                case "back":
+            case "back":
 
-                    SelectedViewIndex--;
+                SelectedViewIndex--;
 
-                    break;
-                case "next":
+                break;
+            case "next":
 
-                    SelectedViewIndex++;
+                SelectedViewIndex++;
 
-                    break;
-            }
-
-            return Task.CompletedTask;
+                break;
         }
 
-        public override async Task RenderView(RenderViewEventArgs e)
+        return Task.CompletedTask;
+    }
+
+    public override async Task RenderView(RenderViewEventArgs e)
+    {
+        var bf = new ButtonForm();
+        bf.AddButtonRow(new ButtonBase("Back", "back"), new ButtonBase("Next", "next"));
+
+        switch (e.CurrentView)
         {
+            case 0:
+            case 1:
+            case 2:
 
-            var bf = new ButtonForm();
-            bf.AddButtonRow(new ButtonBase("Back", "back"), new ButtonBase("Next", "next"));
+                await Device.Send($"Page {e.CurrentView + 1}", bf);
 
-            switch (e.CurrentView)
-            {
-                case 0:
-                case 1:
-                case 2:
+                break;
 
-                    await Device.Send($"Page {e.CurrentView + 1}", bf);
+            default:
 
-                    break;
+                await Device.Send("Unknown Page", bf);
 
-                default:
-
-                    await Device.Send("Unknown Page", bf);
-
-                    break;
-
-
-            }
-
+                break;
         }
-
-
-
     }
 }

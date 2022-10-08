@@ -4,83 +4,80 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Navigation
+namespace TelegramBotBaseTest.Tests.Navigation;
+
+public class Form1 : FormBase
 {
-    public class Form1 : FormBase
+    private Message _msg;
+
+    public Form1()
     {
-        private Message _msg;
+        Closed += Form1_Closed;
+    }
 
-        public Form1()
+    private async Task Form1_Closed(object sender, EventArgs e)
+    {
+        if (_msg == null)
         {
-            Closed += Form1_Closed;
+            return;
         }
 
-        private async Task Form1_Closed(object sender, EventArgs e)
-        {
-            if (_msg == null)
-                return;
+        await Device.DeleteMessage(_msg);
+    }
 
-            await Device.DeleteMessage(_msg);
+    public override async Task Action(MessageResult message)
+    {
+        if (message.Handled)
+        {
+            return;
         }
 
-        public override async Task Action(MessageResult message)
+        await message.ConfirmAction();
+
+        switch (message.RawData)
         {
-            if (message.Handled)
-                return;
+            case "next":
 
-            await message.ConfirmAction();
+                message.Handled = true;
 
-            switch (message.RawData)
-            {
-                case "next":
+                var f1 = new Form1();
 
-                    message.Handled = true;
-
-                    var f1 = new Form1();
-
-                    await NavigationController.PushAsync(f1);
+                await NavigationController.PushAsync(f1);
 
 
-                    break;
+                break;
 
-                case "previous":
+            case "previous":
 
-                    message.Handled = true;
+                message.Handled = true;
 
-                    //Pop's the current form and move the previous one. The root form will be the Start class.
-                    await NavigationController.PopAsync();
+                //Pop's the current form and move the previous one. The root form will be the Start class.
+                await NavigationController.PopAsync();
 
-                    break;
+                break;
 
-                case "root":
+            case "root":
 
-                    message.Handled = true;
+                message.Handled = true;
 
-                    await NavigationController.PopToRootAsync();
+                await NavigationController.PopToRootAsync();
 
-                    break;
+                break;
+        }
+    }
 
-
-            }
-
-
-
+    public override async Task Render(MessageResult message)
+    {
+        if (_msg != null)
+        {
+            return;
         }
 
-        public override async Task Render(MessageResult message)
-        {
-            if (_msg != null)
-                return;
+        var bf = new ButtonForm();
+        bf.AddButtonRow("Next page", "next");
+        bf.AddButtonRow("Previous page", "previous");
+        bf.AddButtonRow("Back to root", "root");
 
-            var bf = new ButtonForm();
-            bf.AddButtonRow("Next page", "next");
-            bf.AddButtonRow("Previous page", "previous");
-            bf.AddButtonRow("Back to root", "root");
-
-            _msg = await Device.Send($"Choose your options (Count on stack {NavigationController.Index + 1})", bf);
-
-        }
-
-
+        _msg = await Device.Send($"Choose your options (Count on stack {NavigationController.Index + 1})", bf);
     }
 }

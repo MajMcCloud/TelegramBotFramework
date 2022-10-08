@@ -5,50 +5,46 @@ using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests.Controls.Subclass;
 
-namespace TelegramBotBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls;
+
+public class MultiViewForm : AutoCleanForm
 {
-    public class MultiViewForm : AutoCleanForm
+    private ButtonGrid _bg;
+    private MultiViewTest _mvt;
+
+    public MultiViewForm()
     {
-        private MultiViewTest _mvt;
+        DeleteMode = EDeleteMode.OnLeavingForm;
+        Init += MultiViewForm_Init;
+    }
 
-        private ButtonGrid _bg;
+    private Task MultiViewForm_Init(object sender, InitEventArgs e)
+    {
+        _mvt = new MultiViewTest();
 
-        public MultiViewForm()
+        AddControl(_mvt);
+
+        _bg = new ButtonGrid
         {
-            DeleteMode = EDeleteMode.OnLeavingForm;
-            Init += MultiViewForm_Init;
-        }
+            ButtonsForm = new ButtonForm()
+        };
+        _bg.ButtonsForm.AddButtonRow("Back", "$back$");
+        _bg.ButtonClicked += Bg_ButtonClicked;
+        _bg.KeyboardType = EKeyboardType.ReplyKeyboard;
+        AddControl(_bg);
+        return Task.CompletedTask;
+    }
 
-        private Task MultiViewForm_Init(object sender, InitEventArgs e)
+    private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+    {
+        switch (e.Button.Value)
         {
-            _mvt = new MultiViewTest();
+            case "$back$":
 
-            AddControl(_mvt);
+                var mn = new Menu();
+                await NavigateTo(mn);
 
-            _bg = new ButtonGrid
-            {
-                ButtonsForm = new ButtonForm()
-            };
-            _bg.ButtonsForm.AddButtonRow("Back", "$back$");
-            _bg.ButtonClicked += Bg_ButtonClicked;
-            _bg.KeyboardType = EKeyboardType.ReplyKeyboard;
-            AddControl(_bg);
-            return Task.CompletedTask;
+                break;
         }
-
-        private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
-        {
-            switch(e.Button.Value)
-            {
-                case "$back$":
-
-                    var mn = new Menu();
-                    await NavigateTo(mn);
-
-                    break;
-            }
-        }
-
-
     }
 }

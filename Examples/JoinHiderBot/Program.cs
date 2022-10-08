@@ -2,22 +2,20 @@
 using JoinHiderBot.forms;
 using TelegramBotBase.Builder;
 
-namespace JoinHiderBot
+namespace JoinHiderBot;
+
+internal class Program
 {
-    internal class Program
+    private static void Main(string[] args)
     {
-        private static void Main(string[] args)
-        {
+        var apiKey = "";
 
-            var apiKey = "";
+        var bot = BotBaseBuilder.Create()
+                                .QuickStart<Start>(apiKey)
+                                .Build();
 
-            var bot = BotBaseBuilder.Create()
-                                    .QuickStart<Start>(apiKey)
-                                    .Build();
+        bot.Start();
 
-            bot.Start();
-
-            Console.ReadLine();
-        }
+        Console.ReadLine();
     }
 }

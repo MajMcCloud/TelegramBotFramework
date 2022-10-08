@@ -7,109 +7,109 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 
-namespace TelegramBotBase.MessageLoops
+namespace TelegramBotBase.MessageLoops;
+
+/// <summary>
+///     This message loop reacts to all update types.
+/// </summary>
+public class FullMessageLoop : IMessageLoopFactory
 {
-    /// <summary>
-    /// This message loop reacts to all update types.
-    /// </summary>
-    public class FullMessageLoop : IMessageLoopFactory
+    private static readonly object EvUnhandledCall = new();
+
+    private readonly EventHandlerList _events = new();
+
+    public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
     {
-        private static readonly object EvUnhandledCall = new object();
+        var update = ur.RawData;
 
-        private readonly EventHandlerList _events = new EventHandlerList();
 
-        public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
+        //Is this a bot command ?
+        if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
         {
-            var update = ur.RawData;
+            var sce = new BotCommandEventArgs(mr.BotCommand, mr.BotCommandParameters, mr.Message, session.DeviceId,
+                                              session);
+            await bot.OnBotCommand(sce);
 
-
-            //Is this a bot command ?
-            if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
+            if (sce.Handled)
             {
-                var sce = new BotCommandEventArgs(mr.BotCommand, mr.BotCommandParameters, mr.Message, session.DeviceId, session);
-                await bot.OnBotCommand(sce);
-
-                if (sce.Handled)
-                    return;
+                return;
             }
+        }
 
-            mr.Device = session;
+        mr.Device = session;
 
-            var activeForm = session.ActiveForm;
+        var activeForm = session.ActiveForm;
 
-            //Pre Loading Event
-            await activeForm.PreLoad(mr);
+        //Pre Loading Event
+        await activeForm.PreLoad(mr);
 
-            //Send Load event to controls
-            await activeForm.LoadControls(mr);
+        //Send Load event to controls
+        await activeForm.LoadControls(mr);
 
-            //Loading Event
-            await activeForm.Load(mr);
+        //Loading Event
+        await activeForm.Load(mr);
 
 
-            //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document) (Ignore Callback Queries)
-            if (update.Type == UpdateType.Message)
+        //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document) (Ignore Callback Queries)
+        if (update.Type == UpdateType.Message)
+        {
+            if ((mr.MessageType == MessageType.Contact)
+                | (mr.MessageType == MessageType.Document)
+                | (mr.MessageType == MessageType.Location)
+                | (mr.MessageType == MessageType.Photo)
+                | (mr.MessageType == MessageType.Video)
+                | (mr.MessageType == MessageType.Audio))
             {
-                if (mr.MessageType == MessageType.Contact
-                    | mr.MessageType == MessageType.Document
-                    | mr.MessageType == MessageType.Location
-                    | mr.MessageType == MessageType.Photo
-                    | mr.MessageType == MessageType.Video
-                    | mr.MessageType == MessageType.Audio)
-                {
-                    await activeForm.SentData(new DataResult(ur));
-                }
+                await activeForm.SentData(new DataResult(ur));
             }
+        }
 
-            //Action Event
-            if (!session.FormSwitched && mr.IsAction)
+        //Action Event
+        if (!session.FormSwitched && mr.IsAction)
+        {
+            //Send Action event to controls
+            await activeForm.ActionControls(mr);
+
+            //Send Action event to form itself
+            await activeForm.Action(mr);
+
+            if (!mr.Handled)
             {
-                //Send Action event to controls
-                await activeForm.ActionControls(mr);
+                var uhc = new UnhandledCallEventArgs(ur.Message.Text, mr.RawData, session.DeviceId, mr.MessageId,
+                                                     ur.Message, session);
+                OnUnhandledCall(uhc);
 
-                //Send Action event to form itself
-                await activeForm.Action(mr);
-
-                if (!mr.Handled)
+                if (uhc.Handled)
                 {
-                    var uhc = new UnhandledCallEventArgs(ur.Message.Text, mr.RawData, session.DeviceId, mr.MessageId, ur.Message, session);
-                    OnUnhandledCall(uhc);
-
-                    if (uhc.Handled)
+                    mr.Handled = true;
+                    if (!session.FormSwitched)
                     {
-                        mr.Handled = true;
-                        if (!session.FormSwitched)
-                        {
-                            return;
-                        }
+                        return;
                     }
                 }
-
             }
-
-            if (!session.FormSwitched)
-            {
-                //Render Event
-                await activeForm.RenderControls(mr);
-
-                await activeForm.Render(mr);
-            }
-
         }
 
-        /// <summary>
-        /// Will be called if no form handeled this call
-        /// </summary>
-        public event EventHandler<UnhandledCallEventArgs> UnhandledCall
+        if (!session.FormSwitched)
         {
-            add => _events.AddHandler(EvUnhandledCall, value);
-            remove => _events.RemoveHandler(EvUnhandledCall, value);
-        }
+            //Render Event
+            await activeForm.RenderControls(mr);
 
-        public void OnUnhandledCall(UnhandledCallEventArgs e)
-        {
-            (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-
+            await activeForm.Render(mr);
         }
+    }
+
+    /// <summary>
+    ///     Will be called if no form handeled this call
+    /// </summary>
+    public event EventHandler<UnhandledCallEventArgs> UnhandledCall
+    {
+        add => _events.AddHandler(EvUnhandledCall, value);
+        remove => _events.RemoveHandler(EvUnhandledCall, value);
+    }
+
+    public void OnUnhandledCall(UnhandledCallEventArgs e)
+    {
+        (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
     }
 }

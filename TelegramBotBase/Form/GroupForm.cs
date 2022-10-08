@@ -3,73 +3,73 @@ using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 
-namespace TelegramBotBase.Form
+namespace TelegramBotBase.Form;
+
+public class GroupForm : FormBase
 {
-    public class GroupForm : FormBase
+    public override async Task Load(MessageResult message)
     {
-        public override async Task Load(MessageResult message)
+        switch (message.MessageType)
         {
-            switch (message.MessageType)
-            {
-                case MessageType.ChatMembersAdded:
+            case MessageType.ChatMembersAdded:
 
-                    await OnMemberChanges(new MemberChangeEventArgs(MessageType.ChatMembersAdded, message, message.Message.NewChatMembers));
+                await OnMemberChanges(new MemberChangeEventArgs(MessageType.ChatMembersAdded, message,
+                                                                message.Message.NewChatMembers));
 
-                    break;
-                case MessageType.ChatMemberLeft:
+                break;
+            case MessageType.ChatMemberLeft:
 
-                    await OnMemberChanges(new MemberChangeEventArgs(MessageType.ChatMemberLeft, message, message.Message.LeftChatMember));
+                await OnMemberChanges(new MemberChangeEventArgs(MessageType.ChatMemberLeft, message,
+                                                                message.Message.LeftChatMember));
 
-                    break;
+                break;
 
-                case MessageType.ChatPhotoChanged:
-                case MessageType.ChatPhotoDeleted:
-                case MessageType.ChatTitleChanged:
-                case MessageType.MigratedFromGroup:
-                case MessageType.MigratedToSupergroup:
-                case MessageType.MessagePinned:
-                case MessageType.GroupCreated:
-                case MessageType.SupergroupCreated:
-                case MessageType.ChannelCreated:
+            case MessageType.ChatPhotoChanged:
+            case MessageType.ChatPhotoDeleted:
+            case MessageType.ChatTitleChanged:
+            case MessageType.MigratedFromGroup:
+            case MessageType.MigratedToSupergroup:
+            case MessageType.MessagePinned:
+            case MessageType.GroupCreated:
+            case MessageType.SupergroupCreated:
+            case MessageType.ChannelCreated:
 
-                    await OnGroupChanged(new GroupChangedEventArgs(message.MessageType, message));
+                await OnGroupChanged(new GroupChangedEventArgs(message.MessageType, message));
 
-                    break;
+                break;
 
-                default:
+            default:
 
-                    await OnMessage(message);
+                await OnMessage(message);
 
-                    break;
-            }
-
+                break;
         }
+    }
 
-        public override async Task Edited(MessageResult message)
-        {
-            await OnMessageEdit(message);
-        }
+    public override async Task Edited(MessageResult message)
+    {
+        await OnMessageEdit(message);
+    }
 
-        public virtual Task OnMemberChanges(MemberChangeEventArgs e)
-        {
-            return Task.CompletedTask;
-        }
-
-
-        public virtual Task OnGroupChanged(GroupChangedEventArgs e)
-        {
-            return Task.CompletedTask;
-        }
+    public virtual Task OnMemberChanges(MemberChangeEventArgs e)
+    {
+        return Task.CompletedTask;
+    }
 
 
-        public virtual Task OnMessage(MessageResult e)
-        {
-            return Task.CompletedTask;
-        }
+    public virtual Task OnGroupChanged(GroupChangedEventArgs e)
+    {
+        return Task.CompletedTask;
+    }
 
-        public virtual Task OnMessageEdit(MessageResult e)
-        {
-            return Task.CompletedTask;
-        }
+
+    public virtual Task OnMessage(MessageResult e)
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnMessageEdit(MessageResult e)
+    {
+        return Task.CompletedTask;
     }
 }

@@ -3,77 +3,78 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Navigation
+namespace TelegramBotBaseTest.Tests.Navigation;
+
+public class Start : FormBase
 {
-    public class Start : FormBase
+    private Message _msg;
+
+
+    public override Task Load(MessageResult message)
     {
-        private Message _msg;
+        return Task.CompletedTask;
+    }
 
-
-        public override Task Load(MessageResult message)
+    public override async Task Action(MessageResult message)
+    {
+        if (message.Handled)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        public override async Task Action(MessageResult message)
+        await message.ConfirmAction();
+
+        switch (message.RawData)
         {
-            if (message.Handled)
-                return;
+            case "yes":
 
-            await message.ConfirmAction();
+                message.Handled = true;
 
-            switch (message.RawData)
-            {
-                case "yes":
+                //Create navigation controller and navigate to it, keep the current form as root form so we can get back to here later
+                var nc = new CustomController(this);
+                nc.ForceCleanupOnLastPop = true;
 
-                    message.Handled = true;
+                var f1 = new Form1();
 
-                    //Create navigation controller and navigate to it, keep the current form as root form so we can get back to here later
-                    var nc = new CustomController(this);
-                    nc.ForceCleanupOnLastPop = true;
+                await nc.PushAsync(f1);
 
-                    var f1 = new Form1();
+                await NavigateTo(nc);
 
-                    await nc.PushAsync(f1);
+                if (_msg == null)
+                {
+                    return;
+                }
 
-                    await NavigateTo(nc);
-
-                    if (_msg == null)
-                        return;
-
-                    await Device.DeleteMessage(_msg);
+                await Device.DeleteMessage(_msg);
 
 
-                    break;
-                case "no":
+                break;
+            case "no":
 
-                    message.Handled = true;
+                message.Handled = true;
 
-                    var mn = new Menu();
+                var mn = new Menu();
 
-                    await NavigateTo(mn);
+                await NavigateTo(mn);
 
-                    if (_msg == null)
-                        return;
+                if (_msg == null)
+                {
+                    return;
+                }
 
-                    await Device.DeleteMessage(_msg);
+                await Device.DeleteMessage(_msg);
 
-                    break;
-            }
-
+                break;
         }
+    }
 
-        public override async Task Render(MessageResult message)
-        {
-            var bf = new ButtonForm();
+    public override async Task Render(MessageResult message)
+    {
+        var bf = new ButtonForm();
 
-            bf.AddButtonRow("Yes", "yes");
-            bf.AddButtonRow("No", "no");
+        bf.AddButtonRow("Yes", "yes");
+        bf.AddButtonRow("No", "no");
 
-            _msg = await Device.Send("Open controller?", bf);
-
-
-        }
-
+        _msg = await Device.Send("Open controller?", bf);
     }
 }

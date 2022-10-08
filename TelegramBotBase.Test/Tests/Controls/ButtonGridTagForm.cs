@@ -8,68 +8,67 @@ using TelegramBotBase.DataSources;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls
+namespace TelegramBotBaseTest.Tests.Controls;
+
+public class ButtonGridTagForm : AutoCleanForm
 {
-    public class ButtonGridTagForm : AutoCleanForm
+    private TaggedButtonGrid _mButtons;
+
+    public ButtonGridTagForm()
     {
-        private TaggedButtonGrid _mButtons;
+        DeleteMode = EDeleteMode.OnLeavingForm;
 
-        public ButtonGridTagForm()
+        Init += ButtonGridTagForm_Init;
+    }
+
+    private Task ButtonGridTagForm_Init(object sender, InitEventArgs e)
+    {
+        _mButtons = new TaggedButtonGrid
         {
-            DeleteMode = EDeleteMode.OnLeavingForm;
+            KeyboardType = EKeyboardType.ReplyKeyboard,
+            EnablePaging = true,
+            HeadLayoutButtonRow = new List<ButtonBase> { new("Back", "back") }
+        };
 
-            Init += ButtonGridTagForm_Init;
+
+        var countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+
+        var bf = new ButtonForm();
+
+        foreach (var c in countries)
+        {
+            bf.AddButtonRow(new TagButtonBase(c.EnglishName, c.EnglishName, c.Parent.EnglishName));
         }
 
-        private Task ButtonGridTagForm_Init(object sender, InitEventArgs e)
+        _mButtons.Tags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
+        _mButtons.SelectedTags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
+
+        _mButtons.EnableCheckAllTools = true;
+
+        _mButtons.DataSource = new ButtonFormDataSource(bf);
+
+        _mButtons.ButtonClicked += Bg_ButtonClicked;
+
+        AddControl(_mButtons);
+        return Task.CompletedTask;
+    }
+
+    private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+    {
+        if (e.Button == null)
         {
-            _mButtons = new TaggedButtonGrid
-            {
-                KeyboardType = EKeyboardType.ReplyKeyboard,
-                EnablePaging = true,
-                HeadLayoutButtonRow = new List<ButtonBase> { new ButtonBase("Back", "back") }
-            };
-
-
-            var countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
-
-            var bf = new ButtonForm();
-
-            foreach (var c in countries)
-            {
-                bf.AddButtonRow(new TagButtonBase(c.EnglishName, c.EnglishName, c.Parent.EnglishName));
-            }
-
-            _mButtons.Tags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
-            _mButtons.SelectedTags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
-
-            _mButtons.EnableCheckAllTools = true;
-
-            _mButtons.DataSource = new ButtonFormDataSource(bf);
-
-            _mButtons.ButtonClicked += Bg_ButtonClicked;
-
-            AddControl(_mButtons);
-            return Task.CompletedTask;
+            return;
         }
 
-        private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+        switch (e.Button.Value)
         {
-            if (e.Button == null)
+            case "back":
+                var start = new Menu();
+                await NavigateTo(start);
                 return;
-
-            switch (e.Button.Value)
-            {
-
-                case "back":
-                    var start = new Menu();
-                    await NavigateTo(start);
-                    return;
-
-            }
-
-
-            await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
         }
+
+
+        await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
     }
 }

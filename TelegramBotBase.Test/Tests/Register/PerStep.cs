@@ -3,42 +3,39 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests.Register.Steps;
 
-namespace TelegramBotBaseTest.Tests.Register
+namespace TelegramBotBaseTest.Tests.Register;
+
+public class PerStep : AutoCleanForm
 {
-    public class PerStep: AutoCleanForm
+    public override async Task Action(MessageResult message)
     {
+        await message.ConfirmAction();
 
-        public override async Task Action(MessageResult message)
+        switch (message.RawData)
         {
-            await message.ConfirmAction();
+            case "start":
 
-            switch (message.RawData)
-            {
-                case "start":
+                var step1 = new Step1();
 
-                    var step1 = new Step1();
+                await NavigateTo(step1);
 
-                    await NavigateTo(step1);
+                break;
+            case "back":
 
-                    break;
-                case "back":
+                var start = new Start();
 
-                    var start = new Start();
+                await NavigateTo(start);
 
-                    await NavigateTo(start);
-
-                    break;
-
-            }
+                break;
         }
+    }
 
-        public override async Task Render(MessageResult message)
-        {
-            var bf = new ButtonForm();
-            bf.AddButtonRow(new ButtonBase("Goto Step 1", "start"));
-            bf.AddButtonRow(new ButtonBase("Back", "back"));
+    public override async Task Render(MessageResult message)
+    {
+        var bf = new ButtonForm();
+        bf.AddButtonRow(new ButtonBase("Goto Step 1", "start"));
+        bf.AddButtonRow(new ButtonBase("Back", "back"));
 
-            await Device.Send("Register Steps", bf);
-        }
+        await Device.Send("Register Steps", bf);
     }
 }

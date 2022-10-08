@@ -3,36 +3,34 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests.Groups;
 
-namespace TelegramBotBaseTest.Tests
+namespace TelegramBotBaseTest.Tests;
+
+public class Start : SplitterForm
 {
-    public class Start : SplitterForm
+    public override async Task<bool> Open(MessageResult e)
     {
-        public override async Task<bool> Open(MessageResult e)
-        {
-            var st = new Menu();
-            await NavigateTo(st);
+        var st = new Menu();
+        await NavigateTo(st);
 
-            return true;
-        }
+        return true;
+    }
 
 
-        public override async Task<bool> OpenGroup(MessageResult e)
-        {
-            var st = new LinkReplaceTest();
-            await NavigateTo(st);
+    public override async Task<bool> OpenGroup(MessageResult e)
+    {
+        var st = new LinkReplaceTest();
+        await NavigateTo(st);
 
-            return true;
-        }
+        return true;
+    }
 
-        public override Task<bool> OpenChannel(MessageResult e)
-        {
-            return base.OpenChannel(e);
-        }
+    public override Task<bool> OpenChannel(MessageResult e)
+    {
+        return base.OpenChannel(e);
+    }
 
-        public override Task<bool> OpenSupergroup(MessageResult e)
-        {
-            return base.OpenSupergroup(e);
-        }
-
+    public override Task<bool> OpenSupergroup(MessageResult e)
+    {
+        return base.OpenSupergroup(e);
     }
 }

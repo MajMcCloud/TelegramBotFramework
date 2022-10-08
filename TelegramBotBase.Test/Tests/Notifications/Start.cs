@@ -3,59 +3,59 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Notifications
+namespace TelegramBotBaseTest.Tests.Notifications;
+
+public class Start : AutoCleanForm
 {
-    public class Start : AutoCleanForm
+    private bool _sent;
+
+    public Start()
     {
-        private bool _sent;
+        DeleteMode = EDeleteMode.OnLeavingForm;
+    }
 
-        public Start()
+    public override async Task Action(MessageResult message)
+    {
+        if (message.Handled)
         {
-            DeleteMode = EDeleteMode.OnLeavingForm;
+            return;
         }
 
-        public override async Task Action(MessageResult message)
+        switch (message.RawData)
         {
-            if (message.Handled)
-                return;
+            case "alert":
 
-            switch (message.RawData)
-            {
-                case "alert":
+                await message.ConfirmAction("This is an alert.", true);
 
-                    await message.ConfirmAction("This is an alert.", true);
+                break;
+            case "back":
 
-                    break;
-                case "back":
+                var mn = new Menu();
+                await NavigateTo(mn);
 
-                    var mn = new Menu();
-                    await NavigateTo(mn);
+                break;
+            default:
 
-                    break;
-                default:
+                await message.ConfirmAction("This is feedback");
 
-                    await message.ConfirmAction("This is feedback");
+                break;
+        }
+    }
 
-                    break;
-
-            }
-
+    public override async Task Render(MessageResult message)
+    {
+        if (_sent)
+        {
+            return;
         }
 
-        public override async Task Render(MessageResult message)
-        {
-            if (_sent)
-                return;
+        var bf = new ButtonForm();
+        bf.AddButtonRow("Normal feeback", "normal");
+        bf.AddButtonRow("Alert Box", "alert");
+        bf.AddButtonRow("Back", "back");
 
-            var bf = new ButtonForm();
-            bf.AddButtonRow("Normal feeback", "normal");
-            bf.AddButtonRow("Alert Box", "alert");
-            bf.AddButtonRow("Back", "back");
+        await Device.Send("Choose your test", bf);
 
-            await Device.Send("Choose your test", bf);
-
-            _sent = true;
-        }
-
+        _sent = true;
     }
 }

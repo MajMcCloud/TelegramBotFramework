@@ -1,9 +1,8 @@
 ﻿using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Interfaces
+namespace TelegramBotBase.Interfaces;
+
+public interface IStartFormFactory
 {
-    public interface IStartFormFactory
-    {
-        FormBase CreateForm();
-    }
+    FormBase CreateForm();
 }

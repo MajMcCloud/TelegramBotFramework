@@ -46,8 +46,6 @@ namespace AsyncFormUpdates.forms
                 var m = await Device.Send($"Your current count is at: {_counter}", bf, disableNotification: true);
                 _messageId = m.MessageId;
             }
-
         }
-
     }
 }

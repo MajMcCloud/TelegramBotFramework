@@ -1,16 +1,11 @@
-﻿namespace TelegramBotBase.Args
+﻿namespace TelegramBotBase.Args;
+
+public class MessageDeletedEventArgs
 {
-    public class MessageDeletedEventArgs
+    public MessageDeletedEventArgs(int messageId)
     {
-        public int MessageId
-        {
-            get;set;
-        }
-
-        public MessageDeletedEventArgs(int messageId)
-        {
-            MessageId = messageId;
-        }
-
+        MessageId = messageId;
     }
+
+    public int MessageId { get; set; }
 }

@@ -6,133 +6,131 @@ using TelegramBotBase.Controls.Inline;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests
+namespace TelegramBotBaseTest.Tests;
+
+public class ProgressTest : AutoCleanForm
 {
-    public class ProgressTest : AutoCleanForm
+    public ProgressTest()
     {
+        DeleteMode = EDeleteMode.OnLeavingForm;
+        Opened += ProgressTest_Opened;
+        Closed += ProgressTest_Closed;
+    }
 
-        public ProgressTest()
+
+    private async Task ProgressTest_Opened(object sender, EventArgs e)
+    {
+        await Device.Send("Welcome to ProgressTest");
+    }
+
+    public override async Task Action(MessageResult message)
+    {
+        var call = message.GetData<CallbackData>();
+
+        await message.ConfirmAction();
+
+
+        if (call == null)
         {
-            DeleteMode = EDeleteMode.OnLeavingForm;
-            Opened += ProgressTest_Opened;
-            Closed += ProgressTest_Closed;
+            return;
         }
 
+        ProgressBar bar = null;
 
-        private async Task ProgressTest_Opened(object sender, EventArgs e)
+        switch (call.Value)
         {
-            await Device.Send("Welcome to ProgressTest");
-        }
+            case "standard":
 
-        public override async Task Action(MessageResult message)
-        {
-            var call = message.GetData<CallbackData>();
+                bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.standard)
+                {
+                    Device = Device
+                };
 
-            await message.ConfirmAction();
+                break;
 
+            case "squares":
 
-            if (call == null)
+                bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.squares)
+                {
+                    Device = Device
+                };
+
+                break;
+
+            case "circles":
+
+                bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.circles)
+                {
+                    Device = Device
+                };
+
+                break;
+
+            case "lines":
+
+                bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.lines)
+                {
+                    Device = Device
+                };
+
+                break;
+
+            case "squaredlines":
+
+                bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.squaredLines)
+                {
+                    Device = Device
+                };
+
+                break;
+
+            case "start":
+
+                var sf = new Menu();
+
+                await NavigateTo(sf);
+
                 return;
 
-            ProgressBar bar = null;
+            default:
 
-            switch (call.Value)
-            {
-                case "standard":
-
-                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.standard)
-                    {
-                        Device = Device
-                    };
-
-                    break;
-
-                case "squares":
-
-                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.squares)
-                    {
-                        Device = Device
-                    };
-
-                    break;
-
-                case "circles":
-
-                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.circles)
-                    {
-                        Device = Device
-                    };
-
-                    break;
-
-                case "lines":
-
-                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.lines)
-                    {
-                        Device = Device
-                    };
-
-                    break;
-
-                case "squaredlines":
-
-                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.squaredLines)
-                    {
-                        Device = Device
-                    };
-
-                    break;
-
-                case "start":
-
-                    var sf = new Menu();
-
-                    await NavigateTo(sf);
-
-                    return;
-
-                default:
-
-                    return;
-
-            }
+                return;
+        }
 
 
-            //Render Progress bar and show some "example" progress
+        //Render Progress bar and show some "example" progress
+        await bar.Render(message);
+
+        Controls.Add(bar);
+
+        for (var i = 0; i <= 100; i++)
+        {
+            bar.Value++;
             await bar.Render(message);
 
-            Controls.Add(bar);
-
-            for (var i = 0; i <= 100; i++)
-            {
-                bar.Value++;
-                await bar.Render(message);
-
-                Thread.Sleep(250);
-            }
-
-
+            Thread.Sleep(250);
         }
+    }
 
 
-        public override async Task Render(MessageResult message)
-        {
-            var btn = new ButtonForm();
-            btn.AddButtonRow(new ButtonBase("Standard", new CallbackData("a", "standard").Serialize()), new ButtonBase("Squares", new CallbackData("a", "squares").Serialize()));
+    public override async Task Render(MessageResult message)
+    {
+        var btn = new ButtonForm();
+        btn.AddButtonRow(new ButtonBase("Standard", new CallbackData("a", "standard").Serialize()),
+                         new ButtonBase("Squares", new CallbackData("a", "squares").Serialize()));
 
-            btn.AddButtonRow(new ButtonBase("Circles", new CallbackData("a", "circles").Serialize()), new ButtonBase("Lines", new CallbackData("a", "lines").Serialize()));
+        btn.AddButtonRow(new ButtonBase("Circles", new CallbackData("a", "circles").Serialize()),
+                         new ButtonBase("Lines", new CallbackData("a", "lines").Serialize()));
 
-            btn.AddButtonRow(new ButtonBase("Squared Line", new CallbackData("a", "squaredlines").Serialize()));
+        btn.AddButtonRow(new ButtonBase("Squared Line", new CallbackData("a", "squaredlines").Serialize()));
 
-            btn.AddButtonRow(new ButtonBase("Back to start", new CallbackData("a", "start").Serialize()));
+        btn.AddButtonRow(new ButtonBase("Back to start", new CallbackData("a", "start").Serialize()));
 
-            await Device.Send("Choose your progress bar:", btn);
-        }
+        await Device.Send("Choose your progress bar:", btn);
+    }
 
-        private async Task ProgressTest_Closed(object sender, EventArgs e)
-        {
-            await Device.Send("Ciao from ProgressTest");
-        }
-
+    private async Task ProgressTest_Closed(object sender, EventArgs e)
+    {
+        await Device.Send("Ciao from ProgressTest");
     }
 }

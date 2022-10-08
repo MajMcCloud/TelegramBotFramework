@@ -5,32 +5,25 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 
-namespace TelegramBotBase.Args
+namespace TelegramBotBase.Args;
+
+public class MemberChangeEventArgs : EventArgs
 {
-    public class MemberChangeEventArgs : EventArgs
+    public MemberChangeEventArgs()
     {
-        public List<User> Members { get; set; }
-
-        public MessageType Type { get; set; }
-
-        public MessageResult Result { get; set; }
-
-        public MemberChangeEventArgs()
-        {
-            Members = new List<User>();
-
-        }
-
-        public MemberChangeEventArgs(MessageType type, MessageResult result, params User[] members)
-        {
-            Type = type;
-            Result = result;
-            Members = members.ToList();
-        }
-
-
-
-
-
+        Members = new List<User>();
     }
+
+    public MemberChangeEventArgs(MessageType type, MessageResult result, params User[] members)
+    {
+        Type = type;
+        Result = result;
+        Members = members.ToList();
+    }
+
+    public List<User> Members { get; set; }
+
+    public MessageType Type { get; set; }
+
+    public MessageResult Result { get; set; }
 }

@@ -4,90 +4,90 @@ using System.IO;
 using Newtonsoft.Json;
 using SystemCommandsBot.commands;
 
-namespace SystemCommandsBot.config
+namespace SystemCommandsBot.config;
+
+public class Config
 {
-    public class Config
+    public Config()
     {
-        public string Password { get; set; }
+        Commandos = new List<Commando>();
+    }
 
-        public string ApiKey { get; set; }
+    public string Password { get; set; }
 
-        public List<Commando> Commandos { get; set; }
+    public string ApiKey { get; set; }
 
+    public List<Commando> Commandos { get; set; }
 
-        public Config()
+    public void LoadDefaultValues()
+    {
+        ApiKey = "";
+        Commandos.Add(new Commando
         {
-            Commandos = new List<Commando>();
+            Id = 0, Enabled = true, Title = "Test Befehl", ShellCmd = "explorer.exe", Action = "start", MaxInstances = 2
+        });
+    }
+
+
+    public static Config Load()
+    {
+        try
+        {
+            return Load(AppContext.BaseDirectory + "config\\default.cfg");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
 
-        public void LoadDefaultValues()
+        return null;
+    }
+
+
+    public static Config Load(string path)
+    {
+        try
         {
-            ApiKey = "";
-            Commandos.Add(new Commando { Id = 0, Enabled = true, Title = "Test Befehl", ShellCmd = "explorer.exe", Action = "start", MaxInstances = 2 });
+            var cfg = JsonConvert.DeserializeObject<Config>(File.ReadAllText(path));
+            return cfg;
+        }
+        catch (DirectoryNotFoundException)
+        {
+            var di = new DirectoryInfo(path);
+
+            if (!Directory.Exists(di.Parent.FullName))
+            {
+                Directory.CreateDirectory(di.Parent.FullName);
+            }
+
+            var cfg = new Config();
+            cfg.LoadDefaultValues();
+            cfg.Save(path);
+            return cfg;
+        }
+        catch (FileNotFoundException)
+        {
+            var cfg = new Config();
+            cfg.LoadDefaultValues();
+            cfg.Save(path);
+            return cfg;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
 
+        return null;
+    }
 
-        public static Config Load()
+    public void Save(string path)
+    {
+        try
         {
-            try
-            {
-                return Load(AppContext.BaseDirectory + "config\\default.cfg");
-
-                
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return null;
+            File.WriteAllText(path, JsonConvert.SerializeObject(this));
         }
-
-
-        public static Config Load(string path)
+        catch
         {
-            try
-            {
-                var cfg = JsonConvert.DeserializeObject<Config>(File.ReadAllText(path));
-                return cfg;
-            }
-            catch (DirectoryNotFoundException)
-            {
-                var di = new DirectoryInfo(path);
-
-                if (!Directory.Exists(di.Parent.FullName))
-                {
-                    Directory.CreateDirectory(di.Parent.FullName);
-                }
-
-                var cfg = new Config();
-                cfg.LoadDefaultValues();
-                cfg.Save(path);
-                return cfg;
-            }
-            catch (FileNotFoundException)
-            {
-                var cfg = new Config();
-                cfg.LoadDefaultValues();
-                cfg.Save(path);
-                return cfg;
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return null;
-        }
-
-        public void Save(string path)
-        {
-            try
-            {
-                File.WriteAllText(path, JsonConvert.SerializeObject(this));
-            }
-            catch
-            {
-
-            }
         }
     }
 }

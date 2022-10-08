@@ -5,135 +5,133 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Localizations;
 
-namespace TelegramBotBase.Controls.Inline
+namespace TelegramBotBase.Controls.Inline;
+
+public class ToggleButton : ControlBase
 {
-    public class ToggleButton : ControlBase
+    private static readonly object EvToggled = new();
+
+    private readonly EventHandlerList _events = new();
+
+    private bool _renderNecessary = true;
+
+
+    public ToggleButton()
     {
+    }
 
-        public string UncheckedIcon { get; set; } = Default.Language["ToggleButton_OffIcon"];
+    public ToggleButton(string checkedString, string uncheckedString)
+    {
+        CheckedString = checkedString;
+        UncheckedString = uncheckedString;
+    }
 
-        public string CheckedIcon { get; set; } = Default.Language["ToggleButton_OnIcon"];
+    public string UncheckedIcon { get; set; } = Default.Language["ToggleButton_OffIcon"];
 
-        public string CheckedString { get; set; } = Default.Language["ToggleButton_On"];
+    public string CheckedIcon { get; set; } = Default.Language["ToggleButton_OnIcon"];
 
-        public string UncheckedString { get; set; } = Default.Language["ToggleButton_Off"];
+    public string CheckedString { get; set; } = Default.Language["ToggleButton_On"];
 
-        public string ChangedString { get; set; } = Default.Language["ToggleButton_Changed"];
+    public string UncheckedString { get; set; } = Default.Language["ToggleButton_Off"];
 
-        public string Title { get; set; } = Default.Language["ToggleButton_Title"];
+    public string ChangedString { get; set; } = Default.Language["ToggleButton_Changed"];
 
-        public int? MessageId { get; set; }
+    public string Title { get; set; } = Default.Language["ToggleButton_Title"];
 
-        public bool Checked { get; set; }
+    public int? MessageId { get; set; }
 
-        private bool _renderNecessary = true;
+    public bool Checked { get; set; }
 
-        private static readonly object EvToggled = new object();
+    public event EventHandler Toggled
+    {
+        add => _events.AddHandler(EvToggled, value);
+        remove => _events.RemoveHandler(EvToggled, value);
+    }
 
-        private readonly EventHandlerList _events = new EventHandlerList();
+    public void OnToggled(EventArgs e)
+    {
+        (_events[EvToggled] as EventHandler)?.Invoke(this, e);
+    }
 
-
-        public ToggleButton()
+    public override async Task Action(MessageResult result, string value = null)
+    {
+        if (result.Handled)
         {
-
-
+            return;
         }
 
-        public ToggleButton(string checkedString, string uncheckedString)
+        await result.ConfirmAction(ChangedString);
+
+        switch (value ?? "unknown")
         {
-            this.CheckedString = checkedString;
-            this.UncheckedString = uncheckedString;
-        }
+            case "on":
 
-        public event EventHandler Toggled
-        {
-            add => _events.AddHandler(EvToggled, value);
-            remove => _events.RemoveHandler(EvToggled, value);
-        }
-
-        public void OnToggled(EventArgs e)
-        {
-            (_events[EvToggled] as EventHandler)?.Invoke(this, e);
-        }
-
-        public override async Task Action(MessageResult result, string value = null)
-        {
-
-            if (result.Handled)
-                return;
-
-            await result.ConfirmAction(ChangedString);
-
-            switch (value ?? "unknown")
-            {
-                case "on":
-
-                    if (Checked)
-                        return;
-
-                    _renderNecessary = true;
-
-                    Checked = true;
-
-                    OnToggled(EventArgs.Empty);
-
-                    break;
-
-                case "off":
-
-                    if (!Checked)
-                        return;
-
-                    _renderNecessary = true;
-
-                    Checked = false;
-
-                    OnToggled(EventArgs.Empty);
-
-                    break;
-
-                default:
-
-                    _renderNecessary = false;
-
-                    break;
-
-            }
-
-            result.Handled = true;
-
-        }
-
-        public override async Task Render(MessageResult result)
-        {
-            if (!_renderNecessary)
-                return;
-
-            var bf = new ButtonForm(this);
-
-            var bOn = new ButtonBase((Checked ? CheckedIcon : UncheckedIcon) + " " + CheckedString, "on");
-
-            var bOff = new ButtonBase((!Checked ? CheckedIcon : UncheckedIcon) + " " + UncheckedString, "off");
-
-            bf.AddButtonRow(bOn, bOff);
-
-            if (MessageId != null)
-            {
-                var m = await Device.Edit(MessageId.Value, Title, bf);
-            }
-            else
-            {
-                var m = await Device.Send(Title, bf, disableNotification: true);
-                if (m != null)
+                if (Checked)
                 {
-                    MessageId = m.MessageId;
+                    return;
                 }
-            }
 
-            _renderNecessary = false;
+                _renderNecessary = true;
 
+                Checked = true;
 
+                OnToggled(EventArgs.Empty);
+
+                break;
+
+            case "off":
+
+                if (!Checked)
+                {
+                    return;
+                }
+
+                _renderNecessary = true;
+
+                Checked = false;
+
+                OnToggled(EventArgs.Empty);
+
+                break;
+
+            default:
+
+                _renderNecessary = false;
+
+                break;
         }
 
+        result.Handled = true;
+    }
+
+    public override async Task Render(MessageResult result)
+    {
+        if (!_renderNecessary)
+        {
+            return;
+        }
+
+        var bf = new ButtonForm(this);
+
+        var bOn = new ButtonBase((Checked ? CheckedIcon : UncheckedIcon) + " " + CheckedString, "on");
+
+        var bOff = new ButtonBase((!Checked ? CheckedIcon : UncheckedIcon) + " " + UncheckedString, "off");
+
+        bf.AddButtonRow(bOn, bOff);
+
+        if (MessageId != null)
+        {
+            var m = await Device.Edit(MessageId.Value, Title, bf);
+        }
+        else
+        {
+            var m = await Device.Send(Title, bf, disableNotification: true);
+            if (m != null)
+            {
+                MessageId = m.MessageId;
+            }
+        }
+
+        _renderNecessary = false;
     }
 }

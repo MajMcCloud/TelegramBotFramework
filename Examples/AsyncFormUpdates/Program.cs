@@ -15,8 +15,8 @@ namespace AsyncFormUpdates
             var apiKey = "APIKey";
 
             __bot = BotBaseBuilder.Create()
-                                .QuickStart<Start>(apiKey)
-                                .Build();
+                                  .QuickStart<Start>(apiKey)
+                                  .Build();
 
             __bot.Start();
 
@@ -33,17 +33,17 @@ namespace AsyncFormUpdates
 
         private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            
-            foreach(var s in __bot.Sessions.SessionList)
+            foreach (var s in __bot.Sessions.SessionList)
             {
                 //Only for AsyncUpdateForm
-                if (s.Value.ActiveForm.GetType() != typeof(AsyncFormUpdate) && s.Value.ActiveForm.GetType() != typeof(AsyncFormEdit))
+                if (s.Value.ActiveForm.GetType() != typeof(AsyncFormUpdate) &&
+                    s.Value.ActiveForm.GetType() != typeof(AsyncFormEdit))
+                {
                     continue;
+                }
 
                 await __bot.InvokeMessageLoop(s.Key);
             }
-
-
         }
     }
 }

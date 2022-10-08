@@ -7,109 +7,106 @@ using TelegramBotBase.Commands;
 using TelegramBotBase.Enums;
 using TelegramBotBaseTest.Tests;
 
-namespace TelegramBotBaseTest
+namespace TelegramBotBaseTest;
+
+internal class Program
 {
-    internal class Program
+    private static void Main(string[] args)
     {
-        private static void Main(string[] args)
+        var apiKey = "";
+
+        var bb = BotBaseBuilder
+                 .Create()
+                 .WithAPIKey(apiKey)
+                 .DefaultMessageLoop()
+                 .WithStartForm<Start>()
+                 .NoProxy()
+                 .CustomCommands(a =>
+                 {
+                     a.Start("Starts the bot");
+                     a.Add("myid", "Returns my Device ID");
+                     a.Help("Should show you some help");
+                     a.Settings("Should show you some settings");
+                     a.Add("form1", "Opens test form 1");
+                     a.Add("form2", "Opens test form 2");
+                     a.Add("params", "Returns all send parameters as a message.");
+                 })
+                 .NoSerialization()
+                 .UseEnglish()
+                 .Build();
+
+
+        bb.BotCommand += Bb_BotCommand;
+
+        //Update Bot commands to botfather
+        bb.UploadBotCommands().Wait();
+
+        bb.SetSetting(ESettings.LogAllMessages, true);
+
+        bb.Message += (s, en) =>
         {
+            Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
+        };
 
-            var apiKey = "";
+        bb.Start();
 
-            var bb = BotBaseBuilder
-                      .Create()
-                      .WithAPIKey(apiKey)
-                      .DefaultMessageLoop()
-                      .WithStartForm<Start>()
-                      .NoProxy()
-                      .CustomCommands(a =>
-                      {
-                          a.Start("Starts the bot");
-                          a.Add("myid", "Returns my Device ID");
-                          a.Help("Should show you some help");
-                          a.Settings("Should show you some settings");
-                          a.Add("form1", "Opens test form 1");
-                          a.Add("form2", "Opens test form 2");
-                          a.Add("params", "Returns all send parameters as a message.");
-                      })
-                      .NoSerialization()
-                      .UseEnglish()
-                      .Build();
+        Console.WriteLine("Telegram Bot started...");
+
+        Console.WriteLine("Press q to quit application.");
 
 
-            bb.BotCommand += Bb_BotCommand;
+        Console.ReadLine();
 
-            //Update Bot commands to botfather
-            bb.UploadBotCommands().Wait();
+        bb.Stop();
+    }
 
-            bb.SetSetting(ESettings.LogAllMessages, true);
-
-            bb.Message += (s, en) =>
-            {
-                Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
-            };
-
-            bb.Start();
-
-            Console.WriteLine("Telegram Bot started...");
-
-            Console.WriteLine("Press q to quit application.");
-
-
-            Console.ReadLine();
-
-            bb.Stop();
-
-        }
-
-        private static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
+    private static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
+    {
+        switch (en.Command)
         {
-            switch (en.Command)
-            {
-                case "/start":
+            case "/start":
 
 
-                    var start = new Menu();
+                var start = new Menu();
 
-                    await en.Device.ActiveForm.NavigateTo(start);
+                await en.Device.ActiveForm.NavigateTo(start);
 
-                    break;
-                case "/form1":
+                break;
+            case "/form1":
 
-                    var form1 = new TestForm();
+                var form1 = new TestForm();
 
-                    await en.Device.ActiveForm.NavigateTo(form1);
-
-
-                    break;
+                await en.Device.ActiveForm.NavigateTo(form1);
 
 
-                case "/form2":
+                break;
 
-                    var form2 = new TestForm2();
 
-                    await en.Device.ActiveForm.NavigateTo(form2);
+            case "/form2":
 
-                    break;
+                var form2 = new TestForm2();
 
-                case "/myid":
+                await en.Device.ActiveForm.NavigateTo(form2);
 
-                    await en.Device.Send($"Your Device ID is: {en.DeviceId}");
+                break;
 
-                    en.Handled = true;
+            case "/myid":
 
-                    break;
+                await en.Device.Send($"Your Device ID is: {en.DeviceId}");
 
-                case "/params":
+                en.Handled = true;
 
-                    var m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+                break;
 
-                    await en.Device.Send("Your parameters are: " + m, replyTo: en.Device.LastMessageId);
+            case "/params":
 
-                    en.Handled = true;
+                var m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
 
-                    break;
-            }
+                await en.Device.Send("Your parameters are: " + m, replyTo: en.Device.LastMessageId);
+
+                en.Handled = true;
+
+                break;
         }
     }
 }

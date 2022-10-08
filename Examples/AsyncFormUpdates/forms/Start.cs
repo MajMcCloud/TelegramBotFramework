@@ -6,8 +6,6 @@ namespace AsyncFormUpdates.forms
 {
     public class Start : AutoCleanForm
     {
-
-
         public override async Task Action(MessageResult message)
         {
             await message.ConfirmAction();
@@ -30,7 +28,6 @@ namespace AsyncFormUpdates.forms
 
                     break;
             }
-
         }
 
         public override async Task Render(MessageResult message)
@@ -43,6 +40,5 @@ namespace AsyncFormUpdates.forms
 
             await Device.Send("Choose your option", bf);
         }
-
     }
 }

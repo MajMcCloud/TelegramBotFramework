@@ -1,25 +1,21 @@
-﻿namespace SystemCommandsBot.commands
+﻿namespace SystemCommandsBot.commands;
+
+public class Commando
 {
-    public class Commando
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string Title { get; set; }
+    public string Title { get; set; }
 
-        public string ShellCmd { get; set; }
+    public string ShellCmd { get; set; }
 
-        public bool Enabled { get; set; } = true;
+    public bool Enabled { get; set; } = true;
 
-        public string Action { get; set; }
+    public string Action { get; set; }
 
-        public bool UseShell { get; set; } = true;
+    public bool UseShell { get; set; } = true;
 
 
-        public int? MaxInstances { get; set; }
+    public int? MaxInstances { get; set; }
 
-        public string ProcName
-        {
-            get;set;
-        }
-    }
+    public string ProcName { get; set; }
 }

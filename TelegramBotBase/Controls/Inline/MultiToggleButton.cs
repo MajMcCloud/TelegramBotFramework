@@ -6,152 +6,147 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Localizations;
 
-namespace TelegramBotBase.Controls.Inline
+namespace TelegramBotBase.Controls.Inline;
+
+public class MultiToggleButton : ControlBase
 {
-    public class MultiToggleButton : ControlBase
+    private static readonly object EvToggled = new();
+
+    private readonly EventHandlerList _events = new();
+
+    private bool _renderNecessary = true;
+
+
+    public MultiToggleButton()
     {
-        /// <summary>
-        /// This contains the selected icon.
-        /// </summary>
-        public string SelectedIcon { get; set; } = Default.Language["MultiToggleButton_SelectedIcon"];
+        Options = new List<ButtonBase>();
+    }
 
-        /// <summary>
-        /// This will appear on the ConfirmAction message (if not empty)
-        /// </summary>
-        public string ChangedString { get; set; } = Default.Language["MultiToggleButton_Changed"];
+    /// <summary>
+    ///     This contains the selected icon.
+    /// </summary>
+    public string SelectedIcon { get; set; } = Default.Language["MultiToggleButton_SelectedIcon"];
 
-        /// <summary>
-        /// This holds the title of the control.
-        /// </summary>
-        public string Title { get; set; } = Default.Language["MultiToggleButton_Title"];
+    /// <summary>
+    ///     This will appear on the ConfirmAction message (if not empty)
+    /// </summary>
+    public string ChangedString { get; set; } = Default.Language["MultiToggleButton_Changed"];
 
-        public int? MessageId { get; set; }
+    /// <summary>
+    ///     This holds the title of the control.
+    /// </summary>
+    public string Title { get; set; } = Default.Language["MultiToggleButton_Title"];
 
-        private bool _renderNecessary = true;
+    public int? MessageId { get; set; }
 
-        private static readonly object EvToggled = new object();
+    /// <summary>
+    ///     This will hold all options available.
+    /// </summary>
+    public List<ButtonBase> Options { get; set; }
 
-        private readonly EventHandlerList _events = new EventHandlerList();
+    /// <summary>
+    ///     This will set if an empty selection (null) is allowed.
+    /// </summary>
+    public bool AllowEmptySelection { get; set; } = true;
 
-        /// <summary>
-        /// This will hold all options available.
-        /// </summary>
-        public List<ButtonBase> Options { get; set; }
+    public ButtonBase SelectedOption { get; set; }
 
-        /// <summary>
-        /// This will set if an empty selection (null) is allowed.
-        /// </summary>
-        public bool AllowEmptySelection { get; set; } = true;
+    public event EventHandler Toggled
+    {
+        add => _events.AddHandler(EvToggled, value);
+        remove => _events.RemoveHandler(EvToggled, value);
+    }
 
+    public void OnToggled(EventArgs e)
+    {
+        (_events[EvToggled] as EventHandler)?.Invoke(this, e);
+    }
 
-        public MultiToggleButton()
+    public override async Task Action(MessageResult result, string value = null)
+    {
+        if (result.Handled)
         {
-            Options = new List<ButtonBase>();
+            return;
         }
 
-        public event EventHandler Toggled
+        await result.ConfirmAction(ChangedString);
+
+        switch (value ?? "unknown")
         {
-            add => _events.AddHandler(EvToggled, value);
-            remove => _events.RemoveHandler(EvToggled, value);
-        }
+            default:
 
-        public void OnToggled(EventArgs e)
-        {
-            (_events[EvToggled] as EventHandler)?.Invoke(this, e);
-        }
+                var s = value.Split('$');
 
-        public override async Task Action(MessageResult result, string value = null)
-        {
-            if (result.Handled)
-                return;
-
-            await result.ConfirmAction(ChangedString);
-
-            switch (value ?? "unknown")
-            {
-                default:
-
-                    var s = value.Split('$');
-
-                    if (s[0] == "check" && s.Length > 1)
+                if (s[0] == "check" && s.Length > 1)
+                {
+                    var index = 0;
+                    if (!int.TryParse(s[1], out index))
                     {
-                        var index = 0;
-                        if (!int.TryParse(s[1], out index))
-                        {
-                            return;
-                        }
-
-                        if(SelectedOption== null || SelectedOption != Options[index])
-                        {
-                            SelectedOption = Options[index];
-                            OnToggled(EventArgs.Empty);
-                        }
-                        else if(AllowEmptySelection)
-                        {
-                            SelectedOption = null;
-                            OnToggled(EventArgs.Empty);
-                        }
-
-                        _renderNecessary = true;
-
                         return;
                     }
 
+                    if (SelectedOption == null || SelectedOption != Options[index])
+                    {
+                        SelectedOption = Options[index];
+                        OnToggled(EventArgs.Empty);
+                    }
+                    else if (AllowEmptySelection)
+                    {
+                        SelectedOption = null;
+                        OnToggled(EventArgs.Empty);
+                    }
 
-                    _renderNecessary = false;
+                    _renderNecessary = true;
 
-                    break;
-
-            }
-
-            result.Handled = true;
-
-        }
-
-        public override async Task Render(MessageResult result)
-        {
-            if (!_renderNecessary)
-                return;
-
-            var bf = new ButtonForm(this);
-
-            var lst = new List<ButtonBase>();
-            foreach (var o in Options)
-            {
-                var index = Options.IndexOf(o);
-                if (o == SelectedOption)
-                {
-                    lst.Add(new ButtonBase(SelectedIcon + " " + o.Text, "check$" + index));
-                    continue;
+                    return;
                 }
 
-                lst.Add(new ButtonBase(o.Text, "check$" + index));
-            }
 
-            bf.AddButtonRow(lst);
+                _renderNecessary = false;
 
-            if (MessageId != null)
-            {
-                var m = await Device.Edit(MessageId.Value, Title, bf);
-            }
-            else
-            {
-                var m = await Device.Send(Title, bf, disableNotification: true);
-                if (m != null)
-                {
-                    MessageId = m.MessageId;
-                }
-            }
-
-            _renderNecessary = false;
-
-
+                break;
         }
 
-        public ButtonBase SelectedOption
+        result.Handled = true;
+    }
+
+    public override async Task Render(MessageResult result)
+    {
+        if (!_renderNecessary)
         {
-            get; set;
+            return;
         }
 
+        var bf = new ButtonForm(this);
+
+        var lst = new List<ButtonBase>();
+        foreach (var o in Options)
+        {
+            var index = Options.IndexOf(o);
+            if (o == SelectedOption)
+            {
+                lst.Add(new ButtonBase(SelectedIcon + " " + o.Text, "check$" + index));
+                continue;
+            }
+
+            lst.Add(new ButtonBase(o.Text, "check$" + index));
+        }
+
+        bf.AddButtonRow(lst);
+
+        if (MessageId != null)
+        {
+            var m = await Device.Edit(MessageId.Value, Title, bf);
+        }
+        else
+        {
+            var m = await Device.Send(Title, bf, disableNotification: true);
+            if (m != null)
+            {
+                MessageId = m.MessageId;
+            }
+        }
+
+        _renderNecessary = false;
     }
 }

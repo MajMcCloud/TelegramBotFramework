@@ -1,22 +1,21 @@
 ﻿using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 
-namespace TelegramBotBase.Factories
+namespace TelegramBotBase.Factories;
+
+public class LambdaStartFormFactory : IStartFormFactory
 {
-    public class LambdaStartFormFactory : IStartFormFactory
+    public delegate FormBase CreateFormDelegate();
+
+    private readonly CreateFormDelegate _lambda;
+
+    public LambdaStartFormFactory(CreateFormDelegate lambda)
     {
-        public delegate FormBase CreateFormDelegate();
+        _lambda = lambda;
+    }
 
-        private readonly CreateFormDelegate _lambda;
-
-        public LambdaStartFormFactory(CreateFormDelegate lambda)
-        {
-            _lambda = lambda;
-        }
-
-        public FormBase CreateForm()
-        {
-            return _lambda();
-        }
+    public FormBase CreateForm()
+    {
+        return _lambda();
     }
 }
