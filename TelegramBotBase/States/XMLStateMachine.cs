@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Xml;
-using System.Xml.Serialization;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -12,9 +9,9 @@ using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.States
 {
-    public class XMLStateMachine : IStateMachine
+    public class XmlStateMachine : IStateMachine
     {
-        public String FilePath { get; set; }
+        public string FilePath { get; set; }
 
         public bool Overwrite { get; set; }
 
@@ -26,35 +23,30 @@ namespace TelegramBotBase.States
         /// <param name="file">Path of the file and name where to save the session details.</param>
         /// <param name="fallbackStateForm">Type of Form which will be saved instead of Form which has <seealso cref="Attributes.IgnoreState"/> attribute declared. Needs to be subclass of <seealso cref="Form.FormBase"/>.</param>
         /// <param name="overwrite">Declares of the file could be overwritten.</param>
-        public XMLStateMachine(String file, Type fallbackStateForm = null, bool overwrite = true)
+        public XmlStateMachine(string file, Type fallbackStateForm = null, bool overwrite = true)
         {
-            if (file is null)
-            {
-                throw new ArgumentNullException(nameof(file));
-            }
+            FallbackStateForm = fallbackStateForm;
 
-            this.FallbackStateForm = fallbackStateForm;
-
-            if (this.FallbackStateForm != null && !this.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
+            if (FallbackStateForm != null && !FallbackStateForm.IsSubclassOf(typeof(FormBase)))
             {
                 throw new ArgumentException("FallbackStateForm is not a subclass of FormBase");
             }
 
-            this.FilePath = file;
-            this.Overwrite = overwrite;
+            FilePath = file ?? throw new ArgumentNullException(nameof(file));
+            Overwrite = overwrite;
         }
 
         public StateContainer LoadFormStates()
         {
             try
             {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(StateContainer));
+                var serializer = new DataContractSerializer(typeof(StateContainer));
 
                 using (var reader = new StreamReader(FilePath))
                 {
                     using (var xml = new XmlTextReader(reader))
                     {
-                        StateContainer sc = serializer.ReadObject(xml) as StateContainer;
+                        var sc = serializer.ReadObject(xml) as StateContainer;
                         return sc;
                     }
                 }
@@ -69,21 +61,21 @@ namespace TelegramBotBase.States
 
         public void SaveFormStates(SaveStatesEventArgs e)
         {
-            if (System.IO.File.Exists(FilePath))
+            if (File.Exists(FilePath))
             {
-                if (!this.Overwrite)
+                if (!Overwrite)
                 {
                     throw new Exception("File exists already.");
                 }
 
-                System.IO.File.Delete(FilePath);
+                File.Delete(FilePath);
             }
 
             try
             {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(StateContainer));
+                var serializer = new DataContractSerializer(typeof(StateContainer));
 
-                using (var sw = new StreamWriter(this.FilePath))
+                using (var sw = new StreamWriter(FilePath))
                 {
                     using (var writer = new XmlTextWriter(sw))
                     {

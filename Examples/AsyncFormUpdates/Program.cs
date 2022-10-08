@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
+using AsyncFormUpdates.forms;
+using TelegramBotBase;
 using TelegramBotBase.Builder;
 
 namespace AsyncFormUpdates
 {
-    class Program
+    internal class Program
     {
-        static TelegramBotBase.BotBase bot = null;
+        private static BotBase __bot;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            String apiKey = "APIKey";
+            var apiKey = "APIKey";
 
-            bot = BotBaseBuilder.Create()
-                                .QuickStart<forms.Start>(apiKey)
+            __bot = BotBaseBuilder.Create()
+                                .QuickStart<Start>(apiKey)
                                 .Build();
 
-            bot.Start();
+            __bot.Start();
 
             var timer = new Timer(5000);
 
@@ -30,19 +28,19 @@ namespace AsyncFormUpdates
             Console.ReadLine();
 
             timer.Stop();
-            bot.Stop();
+            __bot.Stop();
         }
 
         private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             
-            foreach(var s in bot.Sessions.SessionList)
+            foreach(var s in __bot.Sessions.SessionList)
             {
                 //Only for AsyncUpdateForm
-                if (s.Value.ActiveForm.GetType() != typeof(forms.AsyncFormUpdate) && s.Value.ActiveForm.GetType() != typeof(forms.AsyncFormEdit))
+                if (s.Value.ActiveForm.GetType() != typeof(AsyncFormUpdate) && s.Value.ActiveForm.GetType() != typeof(AsyncFormEdit))
                     continue;
 
-                await bot.InvokeMessageLoop(s.Key);
+                await __bot.InvokeMessageLoop(s.Key);
             }
 
 

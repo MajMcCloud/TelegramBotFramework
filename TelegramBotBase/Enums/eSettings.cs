@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TelegramBotBase.Enums
+﻿namespace TelegramBotBase.Enums
 {
-    public enum eSettings
+    public enum ESettings
     {
         /// <summary>
         /// How often could a form navigate to another (within one user action/call/message)

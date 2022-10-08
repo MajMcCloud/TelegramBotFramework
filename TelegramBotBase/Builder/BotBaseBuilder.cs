@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramBotBase.Base;
@@ -11,29 +10,27 @@ using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Localizations;
+using TelegramBotBase.MessageLoops;
 using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder
 {
     public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage, ILanguageSelectionStage
     {
+        private string _apiKey;
 
-        String _apiKey = null;
+        private IStartFormFactory _factory;
 
-        IStartFormFactory _factory = null;
-
-        MessageClient _client = null;
+        private MessageClient _client;
 
         /// <summary>
         /// Contains different Botcommands for different areas.
         /// </summary>
-        Dictionary<BotCommandScope, List<BotCommand>> _BotCommandScopes { get; set; } = new Dictionary<BotCommandScope, List<BotCommand>>();
+        private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; set; } = new Dictionary<BotCommandScope, List<BotCommand>>();
 
-        //List<BotCommand> _botcommands = new List<BotCommand>();
+        private IStateMachine _statemachine;
 
-        IStateMachine _statemachine = null;
-
-        IMessageLoopFactory _messageloopfactory = null;
+        private IMessageLoopFactory _messageLoopFactory;
 
         private BotBaseBuilder()
         {
@@ -49,15 +46,15 @@ namespace TelegramBotBase.Builder
 
         public IMessageLoopSelectionStage WithAPIKey(string apiKey)
         {
-            this._apiKey = apiKey;
+            _apiKey = apiKey;
             return this;
         }
 
 
         public IBuildingStage QuickStart(string apiKey, Type StartForm)
         {
-            this._apiKey = apiKey;
-            this._factory = new Factories.DefaultStartFormFactory(StartForm);
+            _apiKey = apiKey;
+            _factory = new DefaultStartFormFactory(StartForm);
 
             DefaultMessageLoop();
 
@@ -76,8 +73,8 @@ namespace TelegramBotBase.Builder
         public IBuildingStage QuickStart<T>(string apiKey)
             where T : FormBase
         {
-            this._apiKey = apiKey;
-            this._factory = new Factories.DefaultStartFormFactory(typeof(T));
+            _apiKey = apiKey;
+            _factory = new DefaultStartFormFactory(typeof(T));
 
             DefaultMessageLoop();
 
@@ -94,8 +91,8 @@ namespace TelegramBotBase.Builder
 
         public IBuildingStage QuickStart(string apiKey, IStartFormFactory StartFormFactory)
         {
-            this._apiKey = apiKey;
-            this._factory = StartFormFactory;
+            _apiKey = apiKey;
+            _factory = StartFormFactory;
 
             DefaultMessageLoop();
 
@@ -117,7 +114,7 @@ namespace TelegramBotBase.Builder
 
         public IStartFormSelectionStage DefaultMessageLoop()
         {
-            _messageloopfactory = new MessageLoops.FormBaseMessageLoop();
+            _messageLoopFactory = new FormBaseMessageLoop();
 
             return this;
         }
@@ -125,7 +122,7 @@ namespace TelegramBotBase.Builder
 
         public IStartFormSelectionStage MinimalMessageLoop()
         {
-            _messageloopfactory = new MessageLoops.MinimalMessageLoop();
+            _messageLoopFactory = new MinimalMessageLoop();
 
             return this;
         }
@@ -133,7 +130,7 @@ namespace TelegramBotBase.Builder
 
         public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
         {
-            _messageloopfactory = messageLoopClass;
+            _messageLoopFactory = messageLoopClass;
 
             return this;
         }
@@ -141,7 +138,7 @@ namespace TelegramBotBase.Builder
         public IStartFormSelectionStage CustomMessageLoop<T>()
             where T : class, new()
         {
-            _messageloopfactory = typeof(T).GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
+            _messageLoopFactory = typeof(T).GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
 
             return this;
         }
@@ -153,33 +150,33 @@ namespace TelegramBotBase.Builder
 
         public INetworkingSelectionStage WithStartForm(Type startFormClass)
         {
-            this._factory = new Factories.DefaultStartFormFactory(startFormClass);
+            _factory = new DefaultStartFormFactory(startFormClass);
             return this;
         }
 
         public INetworkingSelectionStage WithStartForm<T>()
             where T : FormBase, new()
         {
-            this._factory = new Factories.DefaultStartFormFactory(typeof(T));
+            _factory = new DefaultStartFormFactory(typeof(T));
             return this;
         }
 
         public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
         {
-            this._factory = new ServiceProviderStartFormFactory(startFormClass, serviceProvider);
+            _factory = new ServiceProviderStartFormFactory(startFormClass, serviceProvider);
             return this;
         }
 
         public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
             where T : FormBase
         {
-            this._factory = new ServiceProviderStartFormFactory<T>(serviceProvider);
+            _factory = new ServiceProviderStartFormFactory<T>(serviceProvider);
             return this;
         }
 
         public INetworkingSelectionStage WithStartFormFactory(IStartFormFactory factory)
         {
-            this._factory = factory;
+            _factory = factory;
             return this;
         }
 
@@ -191,39 +188,64 @@ namespace TelegramBotBase.Builder
         public IBotCommandsStage WithProxy(string proxyAddress)
         {
             var url = new Uri(proxyAddress);
-            _client = new MessageClient(_apiKey, url);
-            _client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
+            _client = new MessageClient(_apiKey, url)
+            {
+                TelegramClient =
+                {
+                    Timeout = new TimeSpan(0, 1, 0)
+                }
+            };
             return this;
         }
 
 
         public IBotCommandsStage NoProxy()
         {
-            _client = new MessageClient(_apiKey);
-            _client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
+            _client = new MessageClient(_apiKey)
+            {
+                TelegramClient =
+                {
+                    Timeout = new TimeSpan(0, 1, 0)
+                }
+            };
             return this;
         }
 
 
         public IBotCommandsStage WithBotClient(TelegramBotClient tgclient)
         {
-            _client = new MessageClient(_apiKey, tgclient);
-            _client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
+            _client = new MessageClient(_apiKey, tgclient)
+            {
+                TelegramClient =
+                {
+                    Timeout = new TimeSpan(0, 1, 0)
+                }
+            };
             return this;
         }
 
 
         public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort)
         {
-            _client = new MessageClient(_apiKey, proxyHost, proxyPort);
-            _client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
+            _client = new MessageClient(_apiKey, proxyHost, proxyPort)
+            {
+                TelegramClient =
+                {
+                    Timeout = new TimeSpan(0, 1, 0)
+                }
+            };
             return this;
         }
 
         public IBotCommandsStage WithHttpClient(HttpClient tgclient)
         {
-            _client = new MessageClient(_apiKey, tgclient);
-            _client.TelegramClient.Timeout = new TimeSpan(0, 1, 0);
+            _client = new MessageClient(_apiKey, tgclient)
+            {
+                TelegramClient =
+                {
+                    Timeout = new TimeSpan(0, 1, 0)
+                }
+            };
             return this;
         }
 
@@ -240,7 +262,7 @@ namespace TelegramBotBase.Builder
 
         public ISessionSerializationStage OnlyStart()
         {
-            _BotCommandScopes.Start("Starts the bot");
+            BotCommandScopes.Start("Starts the bot");
 
             return this;
 
@@ -248,15 +270,15 @@ namespace TelegramBotBase.Builder
 
         public ISessionSerializationStage DefaultCommands()
         {
-            _BotCommandScopes.Start("Starts the bot");
-            _BotCommandScopes.Help("Should show you some help");
-            _BotCommandScopes.Settings("Should show you some settings");
+            BotCommandScopes.Start("Starts the bot");
+            BotCommandScopes.Help("Should show you some help");
+            BotCommandScopes.Settings("Should show you some settings");
             return this;
         }
 
         public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
         {
-            action?.Invoke(_BotCommandScopes);
+            action?.Invoke(BotCommandScopes);
             return this;
         }
 
@@ -272,26 +294,26 @@ namespace TelegramBotBase.Builder
 
         public ILanguageSelectionStage UseSerialization(IStateMachine machine)
         {
-            this._statemachine = machine;
+            _statemachine = machine;
             return this;
         }
 
 
         public ILanguageSelectionStage UseJSON(string path)
         {
-            this._statemachine = new JSONStateMachine(path);
+            _statemachine = new JsonStateMachine(path);
             return this;
         }
 
         public ILanguageSelectionStage UseSimpleJSON(string path)
         {
-            this._statemachine = new SimpleJSONStateMachine(path);
+            _statemachine = new SimpleJsonStateMachine(path);
             return this;
         }
 
         public ILanguageSelectionStage UseXML(string path)
         {
-            this._statemachine = new XMLStateMachine(path);
+            _statemachine = new XmlStateMachine(path);
             return this;
         }
 
@@ -307,19 +329,19 @@ namespace TelegramBotBase.Builder
 
         public IBuildingStage UseEnglish()
         {
-            Localizations.Default.Language = new Localizations.English();
+            Default.Language = new English();
             return this;
         }
 
         public IBuildingStage UseGerman()
         {
-            Localizations.Default.Language = new Localizations.German();
+            Default.Language = new German();
             return this;
         }
 
         public IBuildingStage Custom(Localization language)
         {
-            Localizations.Default.Language = language;
+            Default.Language = language;
             return this;
         }
 
@@ -328,20 +350,20 @@ namespace TelegramBotBase.Builder
 
         public BotBase Build()
         {
-            var bb = new BotBase();
-
-            bb.APIKey = _apiKey;
-            bb.StartFormFactory = _factory;
-
-            bb.Client = _client;
+            var bb = new BotBase
+            {
+                ApiKey = _apiKey,
+                StartFormFactory = _factory,
+                Client = _client
+            };
 
             bb.Sessions.Client = bb.Client;
 
-            bb.BotCommandScopes = _BotCommandScopes;
+            bb.BotCommandScopes = BotCommandScopes;
 
             bb.StateMachine = _statemachine;
 
-            bb.MessageLoopFactory = _messageloopfactory;
+            bb.MessageLoopFactory = _messageLoopFactory;
 
             bb.MessageLoopFactory.UnhandledCall += bb.MessageLoopFactory_UnhandledCall;
 

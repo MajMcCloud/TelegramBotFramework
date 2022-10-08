@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TelegramBotBase.Form
 {
@@ -8,32 +6,26 @@ namespace TelegramBotBase.Form
     {
         public override string Text
         {
-            get
-            {
-                return GetText?.Invoke() ?? m_text;
-            }
-            set
-            {
-                m_text = value;
-            }
+            get => _getText?.Invoke() ?? _mText;
+            set => _mText = value;
         }
 
-        private String m_text = "";
+        private string _mText = "";
 
-        private Func<String> GetText;
+        private Func<string> _getText;
 
-        public DynamicButton(String Text, String Value, String Url = null)
+        public DynamicButton(string text, string value, string url = null)
         {
-            this.Text = Text;
-            this.Value = Value;
-            this.Url = Url;
+            this.Text = text;
+            this.Value = value;
+            this.Url = url;
         }
 
-        public DynamicButton(Func<String> GetText, String Value, String Url = null)
+        public DynamicButton(Func<string> getText, string value, string url = null)
         {
-            this.GetText = GetText;
-            this.Value = Value;
-            this.Url = Url;
+            this._getText = getText;
+            this.Value = value;
+            this.Url = url;
         }
 
 

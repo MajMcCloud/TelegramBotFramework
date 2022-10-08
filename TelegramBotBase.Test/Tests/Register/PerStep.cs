@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
+using TelegramBotBaseTest.Tests.Register.Steps;
 
 namespace TelegramBotBaseTest.Tests.Register
 {
     public class PerStep: AutoCleanForm
     {
 
-        public async override Task Action(MessageResult message)
+        public override async Task Action(MessageResult message)
         {
             await message.ConfirmAction();
 
@@ -19,29 +16,29 @@ namespace TelegramBotBaseTest.Tests.Register
             {
                 case "start":
 
-                    var step1 = new Steps.Step1();
+                    var step1 = new Step1();
 
-                    await this.NavigateTo(step1);
+                    await NavigateTo(step1);
 
                     break;
                 case "back":
 
                     var start = new Start();
 
-                    await this.NavigateTo(start);
+                    await NavigateTo(start);
 
                     break;
 
             }
         }
 
-        public async override Task Render(MessageResult message)
+        public override async Task Render(MessageResult message)
         {
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
             bf.AddButtonRow(new ButtonBase("Goto Step 1", "start"));
             bf.AddButtonRow(new ButtonBase("Back", "back"));
 
-            await this.Device.Send("Register Steps", bf);
+            await Device.Send("Register Steps", bf);
         }
     }
 }

@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Tools
 {
     public static class Conversion
     {
-        public static void CustomConversionChecks(FormBase form, KeyValuePair<string, object> p, System.Reflection.PropertyInfo f)
+        public static void CustomConversionChecks(FormBase form, KeyValuePair<string, object> p, PropertyInfo f)
         {
             //Newtonsoft Int64/Int32 converter issue
-            if (f.PropertyType == typeof(Int32))
+            if (f.PropertyType == typeof(int))
             {
-                int i = 0;
-                if (int.TryParse(p.Value.ToString(), out i))
+                if (int.TryParse(p.Value.ToString(), out var i))
                 {
                     f.SetValue(form, i);
                 }
@@ -21,14 +19,13 @@ namespace TelegramBotBase.Tools
             }
 
             //Newtonsoft Double/Decimal converter issue
-            if (f.PropertyType == typeof(Decimal) | f.PropertyType == typeof(Nullable<Decimal>))
+            if (f.PropertyType == typeof(decimal) | f.PropertyType == typeof(decimal?))
             {
                 decimal d = 0;
                 if (decimal.TryParse(p.Value.ToString(), out d))
                 {
                     f.SetValue(form, d);
                 }
-                return;
             }
 
 

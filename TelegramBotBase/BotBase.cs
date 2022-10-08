@@ -31,7 +31,7 @@ namespace TelegramBotBase
         /// <summary>
         /// Your TelegramBot APIKey
         /// </summary>
-        public String APIKey { get; set; } = "";
+        public string ApiKey { get; set; } = "";
 
         /// <summary>
         /// List of all running/active sessions
@@ -46,19 +46,19 @@ namespace TelegramBotBase
 
         #region "Events"
 
-        private EventHandlerList __Events = new EventHandlerList();
+        private readonly EventHandlerList _events = new EventHandlerList();
 
-        private static object __evSessionBegins = new object();
+        private static readonly object EvSessionBegins = new object();
 
-        private static object __evMessage = new object();
+        private static readonly object EvMessage = new object();
 
         private static object __evSystemCall = new object();
 
         public delegate Task BotCommandEventHandler(object sender, BotCommandEventArgs e);
 
-        private static object __evException = new object();
+        private static readonly object EvException = new object();
 
-        private static object __evUnhandledCall = new object();
+        private static readonly object EvUnhandledCall = new object();
 
         #endregion
 
@@ -81,22 +81,24 @@ namespace TelegramBotBase
         /// <summary>
         /// All internal used settings.
         /// </summary>
-        public Dictionary<eSettings, uint> SystemSettings { get; private set; }
+        public Dictionary<ESettings, uint> SystemSettings { get; private set; }
 
         public BotBase()
         {
-            this.SystemSettings = new Dictionary<eSettings, uint>();
+            SystemSettings = new Dictionary<ESettings, uint>();
 
-            SetSetting(eSettings.MaxNumberOfRetries, 5);
-            SetSetting(eSettings.NavigationMaximum, 10);
-            SetSetting(eSettings.LogAllMessages, false);
-            SetSetting(eSettings.SkipAllMessages, false);
-            SetSetting(eSettings.SaveSessionsOnConsoleExit, false);
+            SetSetting(ESettings.MaxNumberOfRetries, 5);
+            SetSetting(ESettings.NavigationMaximum, 10);
+            SetSetting(ESettings.LogAllMessages, false);
+            SetSetting(ESettings.SkipAllMessages, false);
+            SetSetting(ESettings.SaveSessionsOnConsoleExit, false);
 
-            this.BotCommandScopes = new Dictionary<BotCommandScope, List<BotCommand>>();
+            BotCommandScopes = new Dictionary<BotCommandScope, List<BotCommand>>();
 
-            this.Sessions = new SessionBase();
-            this.Sessions.BotBase = this;
+            Sessions = new SessionBase
+            {
+                BotBase = this
+            };
         }
 
 
@@ -106,38 +108,38 @@ namespace TelegramBotBase
         /// </summary>
         public void Start()
         {
-            if (this.Client == null)
+            if (Client == null)
                 return;
 
-            this.Client.MessageLoop += Client_MessageLoop;
+            Client.MessageLoop += Client_MessageLoop;
 
 
-            if (this.StateMachine != null)
+            if (StateMachine != null)
             {
-                this.Sessions.LoadSessionStates(this.StateMachine);
+                Sessions.LoadSessionStates(StateMachine);
             }
 
             //Enable auto session saving
-            if (this.GetSetting(eSettings.SaveSessionsOnConsoleExit, false))
+            if (GetSetting(ESettings.SaveSessionsOnConsoleExit, false))
             {
-                TelegramBotBase.Tools.Console.SetHandler(() =>
+                Tools.Console.SetHandler(() =>
                 {
-                    this.Sessions.SaveSessionStates();
+                    Sessions.SaveSessionStates();
                 });
             }
 
-            DeviceSession.MaxNumberOfRetries = this.GetSetting(eSettings.MaxNumberOfRetries, 5);
+            DeviceSession.MaxNumberOfRetries = GetSetting(ESettings.MaxNumberOfRetries, 5);
 
-            this.Client.StartReceiving();
+            Client.StartReceiving();
         }
 
 
         private async Task Client_MessageLoop(object sender, UpdateResult e)
         {
-            DeviceSession ds = this.Sessions.GetSession(e.DeviceId);
+            var ds = Sessions.GetSession(e.DeviceId);
             if (ds == null)
             {
-                ds = this.Sessions.StartSession(e.DeviceId).GetAwaiter().GetResult();
+                ds = Sessions.StartSession(e.DeviceId).GetAwaiter().GetResult();
                 e.Device = ds;
                 ds.LastMessage = e.RawData.Message;
 
@@ -146,7 +148,7 @@ namespace TelegramBotBase
 
             var mr = new MessageResult(e.RawData);
 
-            int i = 0;
+            var i = 0;
 
             //Should formulars get navigated (allow maximum of 10, to dont get loops)
             do
@@ -160,7 +162,7 @@ namespace TelegramBotBase
 
                 mr.IsFirstHandler = false;
 
-            } while (ds.FormSwitched && i < this.GetSetting(eSettings.NavigationMaximum, 10));
+            } while (ds.FormSwitched && i < GetSetting(ESettings.NavigationMaximum, 10));
         }
 
 
@@ -169,15 +171,15 @@ namespace TelegramBotBase
         /// </summary>
         public void Stop()
         {
-            if (this.Client == null)
+            if (Client == null)
                 return;
 
-            this.Client.MessageLoop -= Client_MessageLoop;
+            Client.MessageLoop -= Client_MessageLoop;
 
 
-            this.Client.StopReceiving();
+            Client.StopReceiving();
 
-            this.Sessions.SaveSessionStates();
+            Sessions.SaveSessionStates();
         }
 
         /// <summary>
@@ -185,14 +187,14 @@ namespace TelegramBotBase
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SentToAll(String message)
+        public async Task SentToAll(string message)
         {
-            if (this.Client == null)
+            if (Client == null)
                 return;
 
-            foreach (var s in this.Sessions.SessionList)
+            foreach (var s in Sessions.SessionList)
             {
-                await this.Client.TelegramClient.SendTextMessageAsync(s.Key, message);
+                await Client.TelegramClient.SendTextMessageAsync(s.Key, message);
             }
         }
 
@@ -201,29 +203,30 @@ namespace TelegramBotBase
         /// <summary>
         /// This will invoke the full message loop for the device even when no "userevent" like message or action has been raised.
         /// </summary>
-        /// <param name="DeviceId">Contains the device/chat id of the device to update.</param>
-        public async Task InvokeMessageLoop(long DeviceId)
+        /// <param name="deviceId">Contains the device/chat id of the device to update.</param>
+        public async Task InvokeMessageLoop(long deviceId)
         {
-            var mr = new MessageResult();
-
-            mr.UpdateData = new Update()
+            var mr = new MessageResult
             {
-                Message = new Message()
+                UpdateData = new Update()
+                {
+                    Message = new Message()
+                }
             };
 
-            await InvokeMessageLoop(DeviceId, mr);
+            await InvokeMessageLoop(deviceId, mr);
         }
 
         /// <summary>
         /// This will invoke the full message loop for the device even when no "userevent" like message or action has been raised.
         /// </summary>
-        /// <param name="DeviceId">Contains the device/chat id of the device to update.</param>
+        /// <param name="deviceId">Contains the device/chat id of the device to update.</param>
         /// <param name="e"></param>
-        public async Task InvokeMessageLoop(long DeviceId, MessageResult e)
+        public async Task InvokeMessageLoop(long deviceId, MessageResult e)
         {
             try
             {
-                DeviceSession ds = this.Sessions.GetSession(DeviceId);
+                var ds = Sessions.GetSession(deviceId);
                 e.Device = ds;
 
                 await MessageLoopFactory.MessageLoop(this, ds, new UpdateResult(e.UpdateData, ds), e);
@@ -231,8 +234,8 @@ namespace TelegramBotBase
             }
             catch (Exception ex)
             {
-                DeviceSession ds = this.Sessions.GetSession(DeviceId);
-                OnException(new SystemExceptionEventArgs(e.Message.Text, DeviceId, ds, ex));
+                var ds = Sessions.GetSession(deviceId);
+                OnException(new SystemExceptionEventArgs(e.Message.Text, deviceId, ds, ex));
             }
         }
 
@@ -252,17 +255,17 @@ namespace TelegramBotBase
         /// </summary>
         public async Task UploadBotCommands()
         {
-            foreach (var bs in this.BotCommandScopes)
+            foreach (var bs in BotCommandScopes)
             {
                 if(bs.Value !=null)
                 {
-                    await this.Client.SetBotCommands(bs.Value, bs.Key);
+                    await Client.SetBotCommands(bs.Value, bs.Key);
                 }
                 else
                 {
-                    await this.Client.DeleteBotCommands(bs.Key);
+                    await Client.DeleteBotCommands(bs.Key);
                 }
-                
+
             }
         }
 
@@ -271,9 +274,9 @@ namespace TelegramBotBase
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public bool IsKnownBotCommand(String command)
+        public bool IsKnownBotCommand(string command)
         {
-            foreach (var scope in this.BotCommandScopes)
+            foreach (var scope in BotCommandScopes)
             {
                 if (scope.Value.Any(a => "/" + a.Command == command))
                     return true;
@@ -286,20 +289,20 @@ namespace TelegramBotBase
         /// Could set a variety of settings to improve the bot handling.
         /// </summary>
         /// <param name="set"></param>
-        /// <param name="Value"></param>
-        public void SetSetting(eSettings set, uint Value)
+        /// <param name="value"></param>
+        public void SetSetting(ESettings set, uint value)
         {
-            this.SystemSettings[set] = Value;
+            SystemSettings[set] = value;
         }
 
         /// <summary>
         /// Could set a variety of settings to improve the bot handling.
         /// </summary>
         /// <param name="set"></param>
-        /// <param name="Value"></param>
-        public void SetSetting(eSettings set, bool Value)
+        /// <param name="value"></param>
+        public void SetSetting(ESettings set, bool value)
         {
-            this.SystemSettings[set] = (Value ? 1u : 0u);
+            SystemSettings[set] = (value ? 1u : 0u);
         }
 
         /// <summary>
@@ -308,12 +311,12 @@ namespace TelegramBotBase
         /// <param name="set"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public uint GetSetting(eSettings set, uint defaultValue)
+        public uint GetSetting(ESettings set, uint defaultValue)
         {
-            if (!this.SystemSettings.ContainsKey(set))
+            if (!SystemSettings.ContainsKey(set))
                 return defaultValue;
 
-            return this.SystemSettings[set];
+            return SystemSettings[set];
         }
 
         /// <summary>
@@ -322,12 +325,12 @@ namespace TelegramBotBase
         /// <param name="set"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public bool GetSetting(eSettings set, bool defaultValue)
+        public bool GetSetting(ESettings set, bool defaultValue)
         {
-            if (!this.SystemSettings.ContainsKey(set))
+            if (!SystemSettings.ContainsKey(set))
                 return defaultValue;
 
-            return this.SystemSettings[set] == 0u ? false : true;
+            return SystemSettings[set] == 0u ? false : true;
         }
 
         #region "Events"
@@ -338,19 +341,13 @@ namespace TelegramBotBase
 
         public event EventHandler<SessionBeginEventArgs> SessionBegins
         {
-            add
-            {
-                this.__Events.AddHandler(__evSessionBegins, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evSessionBegins, value);
-            }
+            add => _events.AddHandler(EvSessionBegins, value);
+            remove => _events.RemoveHandler(EvSessionBegins, value);
         }
 
         public void OnSessionBegins(SessionBeginEventArgs e)
         {
-            (this.__Events[__evSessionBegins] as EventHandler<SessionBeginEventArgs>)?.Invoke(this, e);
+            (_events[EvSessionBegins] as EventHandler<SessionBeginEventArgs>)?.Invoke(this, e);
 
         }
 
@@ -359,19 +356,13 @@ namespace TelegramBotBase
         /// </summary>
         public event EventHandler<MessageIncomeEventArgs> Message
         {
-            add
-            {
-                this.__Events.AddHandler(__evMessage, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evMessage, value);
-            }
+            add => _events.AddHandler(EvMessage, value);
+            remove => _events.RemoveHandler(EvMessage, value);
         }
 
         public void OnMessage(MessageIncomeEventArgs e)
         {
-            (this.__Events[__evMessage] as EventHandler<MessageIncomeEventArgs>)?.Invoke(this, e);
+            (_events[EvMessage] as EventHandler<MessageIncomeEventArgs>)?.Invoke(this, e);
 
         }
 
@@ -383,7 +374,7 @@ namespace TelegramBotBase
 
         public async Task OnBotCommand(BotCommandEventArgs e)
         {
-            if (this.BotCommand != null)
+            if (BotCommand != null)
                 await BotCommand(this, e);
         }
 
@@ -392,19 +383,13 @@ namespace TelegramBotBase
         /// </summary>
         public event EventHandler<SystemExceptionEventArgs> Exception
         {
-            add
-            {
-                this.__Events.AddHandler(__evException, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evException, value);
-            }
+            add => _events.AddHandler(EvException, value);
+            remove => _events.RemoveHandler(EvException, value);
         }
 
         public void OnException(SystemExceptionEventArgs e)
         {
-            (this.__Events[__evException] as EventHandler<SystemExceptionEventArgs>)?.Invoke(this, e);
+            (_events[EvException] as EventHandler<SystemExceptionEventArgs>)?.Invoke(this, e);
 
         }
 
@@ -413,19 +398,13 @@ namespace TelegramBotBase
         /// </summary>
         public event EventHandler<UnhandledCallEventArgs> UnhandledCall
         {
-            add
-            {
-                this.__Events.AddHandler(__evUnhandledCall, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evUnhandledCall, value);
-            }
+            add => _events.AddHandler(EvUnhandledCall, value);
+            remove => _events.RemoveHandler(EvUnhandledCall, value);
         }
 
         public void OnUnhandledCall(UnhandledCallEventArgs e)
         {
-            (this.__Events[__evUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
+            (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
 
         }
 

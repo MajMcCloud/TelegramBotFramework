@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
@@ -19,7 +18,7 @@ namespace TelegramBotBase.Form
         /// <summary>
         /// The message the users sees.
         /// </summary>
-        public String Message { get; set; }
+        public string Message { get; set; }
 
         /// <summary>
         /// An additional optional value.
@@ -29,26 +28,24 @@ namespace TelegramBotBase.Form
         public ButtonBase[][] Buttons { get; set; }
 
         [Obsolete]
-        public Dictionary<String, FormBase> ButtonForms { get; set; } = new Dictionary<string, FormBase>();
+        public Dictionary<string, FormBase> ButtonForms { get; set; } = new Dictionary<string, FormBase>();
 
-        private EventHandlerList __Events { get; set; } = new EventHandlerList();
-
-        private static object __evButtonClicked { get; } = new object();
+        private static object EvButtonClicked { get; } = new object();
 
         public ArrayPromptDialog()
         {
 
         }
 
-        public ArrayPromptDialog(String Message)
+        public ArrayPromptDialog(string message)
         {
-            this.Message = Message;
+            this.Message = message;
         }
 
-        public ArrayPromptDialog(String Message, params ButtonBase[][] Buttons)
+        public ArrayPromptDialog(string message, params ButtonBase[][] buttons)
         {
-            this.Message = Message;
-            this.Buttons = Buttons;
+            this.Message = message;
+            this.Buttons = buttons;
         }
 
         public override async Task Action(MessageResult message)
@@ -64,59 +61,53 @@ namespace TelegramBotBase.Form
 
             await message.DeleteMessage();
 
-            var buttons = this.Buttons.Aggregate((a, b) => a.Union(b).ToArray()).ToList();
+            var buttons = Buttons.Aggregate((a, b) => a.Union(b).ToArray()).ToList();
 
             if(call==null)
             {
                 return;
             }
 
-            ButtonBase button = buttons.FirstOrDefault(a => a.Value == call.Value);
+            var button = buttons.FirstOrDefault(a => a.Value == call.Value);
 
             if (button == null)
             {
                 return;
             }
 
-            OnButtonClicked(new ButtonClickedEventArgs(button) { Tag = this.Tag });
+            OnButtonClicked(new ButtonClickedEventArgs(button) { Tag = Tag });
 
-            FormBase fb = ButtonForms.ContainsKey(call.Value) ? ButtonForms[call.Value] : null;
+            var fb = ButtonForms.ContainsKey(call.Value) ? ButtonForms[call.Value] : null;
 
             if (fb != null)
             {
-                await this.NavigateTo(fb);
+                await NavigateTo(fb);
             }
         }
 
 
         public override async Task Render(MessageResult message)
         {
-            ButtonForm btn = new ButtonForm();
+            var btn = new ButtonForm();
 
-            foreach(var bl in this.Buttons)
+            foreach(var bl in Buttons)
             {
                 btn.AddButtonRow(bl.Select(a => new ButtonBase(a.Text, CallbackData.Create("action", a.Value))).ToList());
             }
 
-            await this.Device.Send(this.Message, btn);
+            await Device.Send(Message, btn);
         }
 
 
         public event EventHandler<ButtonClickedEventArgs> ButtonClicked
         {
-            add
-            {
-                this.__Events.AddHandler(__evButtonClicked, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evButtonClicked, value);
-            }
+            add => Events.AddHandler(EvButtonClicked, value);
+            remove => Events.RemoveHandler(EvButtonClicked, value);
         }
 
         public void OnButtonClicked(ButtonClickedEventArgs e)
         {
-            (this.__Events[__evButtonClicked] as EventHandler<ButtonClickedEventArgs>)?.Invoke(this, e);
+            (Events[EvButtonClicked] as EventHandler<ButtonClickedEventArgs>)?.Invoke(this, e);
         }
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
@@ -11,24 +7,22 @@ namespace TelegramBotBaseTest.Tests
 {
     public class TestForm : FormBase
     {
-
-
-        String LastMessage { get; set; }
+        private string LastMessage { get; set; }
 
         public TestForm()
         {
-            this.Opened += TestForm_Opened;
-            this.Closed += TestForm_Closed;
+            Opened += TestForm_Opened;
+            Closed += TestForm_Closed;
         }
 
         private async Task TestForm_Opened(object sender, EventArgs e)
         {
-            await this.Device.Send("Welcome to Form 1");
+            await Device.Send("Welcome to Form 1");
         }
 
         private async Task TestForm_Closed(object sender, EventArgs e)
         {
-            await this.Device.Send("Ciao from Form 1");
+            await Device.Send("Ciao from Form 1");
         }
 
 
@@ -45,7 +39,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var tf = new TestForm2();
 
-                    await this.NavigateTo(tf);
+                    await NavigateTo(tf);
 
                     break;
 
@@ -54,7 +48,7 @@ namespace TelegramBotBaseTest.Tests
                     if (message.UpdateData == null)
                         return;
 
-                    this.LastMessage = message.Message.Text;
+                    LastMessage = message.Message.Text;
 
                     break;
             }
@@ -68,7 +62,7 @@ namespace TelegramBotBaseTest.Tests
             if (message.Command == "reply")
             {
 
-                await this.Device.Send("Last message: " + this.LastMessage);
+                await Device.Send("Last message: " + LastMessage);
 
             }
 

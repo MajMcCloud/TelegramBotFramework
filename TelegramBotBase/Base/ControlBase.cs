@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
 {
@@ -11,17 +8,11 @@ namespace TelegramBotBase.Base
     /// </summary>
     public class ControlBase
     {
-        public Sessions.DeviceSession Device { get; set; }
+        public DeviceSession Device { get; set; }
 
-        public int ID { get; set; }
+        public int Id { get; set; }
 
-        public String ControlID
-        {
-            get
-            {
-                return "#c" + this.ID.ToString();
-            }
-        }
+        public string ControlId => "#c" + Id;
 
         /// <summary>
         /// Defines if the control should be rendered and invoked with actions
@@ -37,43 +28,35 @@ namespace TelegramBotBase.Base
 
         }
 
-        public virtual async Task Load(MessageResult result)
+        public virtual Task Load(MessageResult result)
         {
-
-
-            
+            return Task.CompletedTask;
         }
 
-        public virtual async Task Action(MessageResult result, String value = null)
+        public virtual Task Action(MessageResult result, string value = null)
         {
-
-
-            
+            return Task.CompletedTask;
         }
 
 
 
-        public virtual async Task Render(MessageResult result)
+        public virtual Task Render(MessageResult result)
         {
-
-
-
-            
+            return Task.CompletedTask;
         }
 
-        public virtual async Task Hidden(bool FormClose)
+        public virtual Task Hidden(bool formClose)
         {
-
-            
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Will be called on a cleanup.
         /// </summary>
         /// <returns></returns>
-        public virtual async Task Cleanup()
+        public virtual Task Cleanup()
         {
-            
+            return Task.CompletedTask;
         }
 
     }

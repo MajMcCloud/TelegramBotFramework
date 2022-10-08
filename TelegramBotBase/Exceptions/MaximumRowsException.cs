@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TelegramBotBase.Exceptions
 {
@@ -11,12 +9,6 @@ namespace TelegramBotBase.Exceptions
         public int Maximum { get; set; }
 
 
-        public override string Message
-        {
-            get
-            {
-                return $"You have exceeded the maximum of rows by {Value.ToString()} / {Maximum.ToString()}";
-            }
-        }
+        public override string Message => $"You have exceeded the maximum of rows by {Value.ToString()} / {Maximum.ToString()}";
     }
 }

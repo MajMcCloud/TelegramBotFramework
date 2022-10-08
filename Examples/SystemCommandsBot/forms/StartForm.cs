@@ -1,40 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Form;
 
 namespace SystemCommandsBot.forms
 {
-    public class StartForm : TelegramBotBase.Form.FormBase
+    public class StartForm : FormBase
     {
-        public String Password { get; set; }
+        public string Password { get; set; }
 
-        public override async Task Load(MessageResult message)
+        public override Task Load(MessageResult message)
         {
             var inp = message.MessageText;
             if (Program.BotConfig.Password == inp)
             {
-                this.Password = inp;
+                Password = inp;
             }
 
-
+            return Task.CompletedTask;
         }
 
 
         public override async Task Render(MessageResult message)
         {
-            if (this.Password == null || this.Password.Trim() == "")
+            if (Password == null || Password.Trim() == "")
             {
-                await this.Device.Send("Bitte gib dein Passwort an.");
+                await Device.Send("Bitte gib dein Passwort an.");
                 return;
             }
 
 
-            var cmd = new forms.CmdForm();
+            var cmd = new CmdForm();
             cmd.ExpiresAt = DateTime.Now.AddDays(14);
 
-            await this.NavigateTo(cmd);
+            await NavigateTo(cmd);
 
         }
 

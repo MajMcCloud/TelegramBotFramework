@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
-using TelegramBotBase.Tools;
+using TelegramBotBase.Localizations;
 using static TelegramBotBase.Tools.Arrays;
 using static TelegramBotBase.Tools.Time;
 
 namespace TelegramBotBase.Controls.Inline
 {
-    public class CalendarPicker : Base.ControlBase
+    public class CalendarPicker : ControlBase
     {
 
         public DateTime SelectedDate { get; set; }
@@ -27,31 +26,31 @@ namespace TelegramBotBase.Controls.Inline
 
         private int? MessageId { get; set; }
 
-        public String Title { get; set; } = Localizations.Default.Language["CalendarPicker_Title"];
+        public string Title { get; set; } = Default.Language["CalendarPicker_Title"];
 
-        public eMonthPickerMode PickerMode { get; set; }
+        public EMonthPickerMode PickerMode { get; set; }
 
         public bool EnableDayView { get; set; } = true;
 
         public bool EnableMonthView { get; set; } = true;
 
         public bool EnableYearView { get; set; } = true;
-        
+
         public CalendarPicker(CultureInfo culture)
         {
-            this.SelectedDate = DateTime.Today;
-            this.VisibleMonth = DateTime.Today;
-            this.FirstDayOfWeek = DayOfWeek.Monday;
-            this.Culture = culture;
-            this.PickerMode = eMonthPickerMode.day;
+            SelectedDate = DateTime.Today;
+            VisibleMonth = DateTime.Today;
+            FirstDayOfWeek = DayOfWeek.Monday;
+            Culture = culture;
+            PickerMode = EMonthPickerMode.day;
         }
-        
+
         public CalendarPicker() : this(new CultureInfo("en-en")) { }
 
 
 
 
-        public override async Task Action(MessageResult result, String value = null)
+        public override async Task Action(MessageResult result, string value = null)
         {
             await result.ConfirmAction();
 
@@ -59,99 +58,84 @@ namespace TelegramBotBase.Controls.Inline
             {
                 case "$next$":
 
-                    switch (this.PickerMode)
+                    VisibleMonth = PickerMode switch
                     {
-                        case eMonthPickerMode.day:
-                            this.VisibleMonth = this.VisibleMonth.AddMonths(1);
-                            break;
-
-                        case eMonthPickerMode.month:
-                            this.VisibleMonth = this.VisibleMonth.AddYears(1);
-                            break;
-
-                        case eMonthPickerMode.year:
-                            this.VisibleMonth = this.VisibleMonth.AddYears(10);
-                            break;
-                    }
-
+                        EMonthPickerMode.day => VisibleMonth.AddMonths(1),
+                        EMonthPickerMode.month => VisibleMonth.AddYears(1),
+                        EMonthPickerMode.year => VisibleMonth.AddYears(10),
+                        _ => VisibleMonth
+                    };
 
                     break;
                 case "$prev$":
 
-                    switch (this.PickerMode)
+                    VisibleMonth = PickerMode switch
                     {
-                        case eMonthPickerMode.day:
-                            this.VisibleMonth = this.VisibleMonth.AddMonths(-1);
-                            break;
-
-                        case eMonthPickerMode.month:
-                            this.VisibleMonth = this.VisibleMonth.AddYears(-1);
-                            break;
-
-                        case eMonthPickerMode.year:
-                            this.VisibleMonth = this.VisibleMonth.AddYears(-10);
-                            break;
-                    }
+                        EMonthPickerMode.day => VisibleMonth.AddMonths(-1),
+                        EMonthPickerMode.month => VisibleMonth.AddYears(-1),
+                        EMonthPickerMode.year => VisibleMonth.AddYears(-10),
+                        _ => VisibleMonth
+                    };
 
                     break;
 
                 case "$monthtitle$":
 
-                    if (this.EnableMonthView)
+                    if (EnableMonthView)
                     {
-                        this.PickerMode = eMonthPickerMode.month;
+                        PickerMode = EMonthPickerMode.month;
                     }
 
                     break;
 
                 case "$yeartitle$":
 
-                    if (this.EnableYearView)
+                    if (EnableYearView)
                     {
-                        this.PickerMode = eMonthPickerMode.year;
+                        PickerMode = EMonthPickerMode.year;
                     }
 
                     break;
                 case "$yearstitle$":
 
-                    if (this.EnableMonthView)
+                    if (EnableMonthView)
                     {
-                        this.PickerMode = eMonthPickerMode.month;
+                        PickerMode = EMonthPickerMode.month;
                     }
 
-                    this.VisibleMonth = this.SelectedDate;
+                    VisibleMonth = SelectedDate;
 
                     break;
 
                 default:
 
-                    int day = 0;
-                    if (result.RawData.StartsWith("d-") && TryParseDay(result.RawData.Split('-')[1], this.SelectedDate, out day))
+                    var day = 0;
+                    if (result.RawData.StartsWith("d-") && TryParseDay(result.RawData.Split('-')[1], SelectedDate, out day))
                     {
-                        this.SelectedDate = new DateTime(this.VisibleMonth.Year, this.VisibleMonth.Month, day);
+                        SelectedDate = new DateTime(VisibleMonth.Year, VisibleMonth.Month, day);
                     }
 
-                    int month = 0;
+                    var month = 0;
                     if (result.RawData.StartsWith("m-") && TryParseMonth(result.RawData.Split('-')[1], out month))
                     {
-                        this.SelectedDate = new DateTime(this.VisibleMonth.Year, month, 1);
-                        this.VisibleMonth = this.SelectedDate;
+                        SelectedDate = new DateTime(VisibleMonth.Year, month, 1);
+                        VisibleMonth = SelectedDate;
 
-                        if (this.EnableDayView)
+                        if (EnableDayView)
                         {
-                            this.PickerMode = eMonthPickerMode.day;
+                            PickerMode = EMonthPickerMode.day;
                         }
                     }
 
-                    int year = 0;
+                    var year = 0;
                     if (result.RawData.StartsWith("y-") && TryParseYear(result.RawData.Split('-')[1], out year))
                     {
-                        this.SelectedDate = new DateTime(year, SelectedDate.Month, SelectedDate.Day);
-                        this.VisibleMonth = this.SelectedDate;
+                        SelectedDate = new DateTime(year, SelectedDate.Month, SelectedDate.Day);
+                        VisibleMonth = SelectedDate;
 
-                        if (this.EnableMonthView)
+                        if (EnableMonthView)
                         {
-                            this.PickerMode = eMonthPickerMode.month;
+                            PickerMode = EMonthPickerMode.month;
                         }
 
                     }
@@ -170,18 +154,18 @@ namespace TelegramBotBase.Controls.Inline
 
 
 
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
 
-            switch (this.PickerMode)
+            switch (PickerMode)
             {
-                case eMonthPickerMode.day:
+                case EMonthPickerMode.day:
 
-                    var month = this.VisibleMonth;
+                    var month = VisibleMonth;
 
-                    string[] dayNamesNormal = this.Culture.DateTimeFormat.ShortestDayNames;
-                    string[] dayNamesShifted = Shift(dayNamesNormal, (int)this.FirstDayOfWeek);
+                    var dayNamesNormal = Culture.DateTimeFormat.ShortestDayNames;
+                    var dayNamesShifted = Shift(dayNamesNormal, (int)FirstDayOfWeek);
 
-                    bf.AddButtonRow(new ButtonBase(Localizations.Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase(this.Culture.DateTimeFormat.MonthNames[month.Month - 1] + " " + month.Year.ToString(), "$monthtitle$"), new ButtonBase(Localizations.Default.Language["CalendarPicker_NextPage"], "$next$"));
+                    bf.AddButtonRow(new ButtonBase(Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase(Culture.DateTimeFormat.MonthNames[month.Month - 1] + " " + month.Year, "$monthtitle$"), new ButtonBase(Default.Language["CalendarPicker_NextPage"], "$next$"));
 
                     bf.AddButtonRow(dayNamesShifted.Select(a => new ButtonBase(a, a)).ToList());
 
@@ -192,20 +176,20 @@ namespace TelegramBotBase.Controls.Inline
                     var lastDay = firstDay.LastDayOfMonth();
 
                     //Start of Week where first day of month is (left border)
-                    var start = firstDay.StartOfWeek(this.FirstDayOfWeek);
+                    var start = firstDay.StartOfWeek(FirstDayOfWeek);
 
                     //End of week where last day of month is (right border)
-                    var end = lastDay.EndOfWeek(this.FirstDayOfWeek);
+                    var end = lastDay.EndOfWeek(FirstDayOfWeek);
 
-                    for (int i = 0; i <= ((end - start).Days / 7); i++)
+                    for (var i = 0; i <= ((end - start).Days / 7); i++)
                     {
                         var lst = new List<ButtonBase>();
-                        for (int id = 0; id < 7; id++)
+                        for (var id = 0; id < 7; id++)
                         {
                             var d = start.AddDays((i * 7) + id);
                             if (d < firstDay | d > lastDay)
                             {
-                                lst.Add(new ButtonBase("-", "m-" + d.Day.ToString()));
+                                lst.Add(new ButtonBase("-", "m-" + d.Day));
                                 continue;
                             }
 
@@ -216,35 +200,35 @@ namespace TelegramBotBase.Controls.Inline
                                 day = "(" + day + ")";
                             }
 
-                            lst.Add(new ButtonBase((this.SelectedDate == d ? "[" + day + "]" : day), "d-" + d.Day.ToString()));
+                            lst.Add(new ButtonBase((SelectedDate == d ? "[" + day + "]" : day), "d-" + d.Day));
                         }
                         bf.AddButtonRow(lst);
                     }
 
                     break;
 
-                case eMonthPickerMode.month:
+                case EMonthPickerMode.month:
 
-                    bf.AddButtonRow(new ButtonBase(Localizations.Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase(this.VisibleMonth.Year.ToString("0000"), "$yeartitle$"), new ButtonBase(Localizations.Default.Language["CalendarPicker_NextPage"], "$next$"));
+                    bf.AddButtonRow(new ButtonBase(Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase(VisibleMonth.Year.ToString("0000"), "$yeartitle$"), new ButtonBase(Default.Language["CalendarPicker_NextPage"], "$next$"));
 
-                    var months = this.Culture.DateTimeFormat.MonthNames;
+                    var months = Culture.DateTimeFormat.MonthNames;
 
-                    var buttons = months.Select((a, b) => new ButtonBase((b == this.SelectedDate.Month - 1 && this.SelectedDate.Year == this.VisibleMonth.Year ? "[ " + a + " ]" : a), "m-" + (b + 1).ToString()));
+                    var buttons = months.Select((a, b) => new ButtonBase((b == SelectedDate.Month - 1 && SelectedDate.Year == VisibleMonth.Year ? "[ " + a + " ]" : a), "m-" + (b + 1)));
 
-                    bf.AddSplitted(buttons, 2);
+                    bf.AddSplitted(buttons);
 
                     break;
 
-                case eMonthPickerMode.year:
+                case EMonthPickerMode.year:
 
-                    bf.AddButtonRow(new ButtonBase(Localizations.Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase("Year", "$yearstitle$"), new ButtonBase(Localizations.Default.Language["CalendarPicker_NextPage"], "$next$"));
+                    bf.AddButtonRow(new ButtonBase(Default.Language["CalendarPicker_PreviousPage"], "$prev$"), new ButtonBase("Year", "$yearstitle$"), new ButtonBase(Default.Language["CalendarPicker_NextPage"], "$next$"));
 
-                    var starti = Math.Floor(this.VisibleMonth.Year / 10f) * 10;
+                    var starti = Math.Floor(VisibleMonth.Year / 10f) * 10;
 
-                    for (int i = 0; i < 10; i++)
+                    for (var i = 0; i < 10; i++)
                     {
                         var m = starti + (i * 2);
-                        bf.AddButtonRow(new ButtonBase((this.SelectedDate.Year == m ? "[ " + m.ToString() + " ]" : m.ToString()), "y-" + m.ToString()), new ButtonBase((this.SelectedDate.Year == (m + 1) ? "[ " + (m + 1).ToString() + " ]" : (m + 1).ToString()), "y-" + (m + 1).ToString()));
+                        bf.AddButtonRow(new ButtonBase((SelectedDate.Year == m ? "[ " + m + " ]" : m.ToString()), "y-" + m), new ButtonBase((SelectedDate.Year == (m + 1) ? "[ " + (m + 1) + " ]" : (m + 1).ToString()), "y-" + (m + 1)));
                     }
 
                     break;
@@ -252,14 +236,14 @@ namespace TelegramBotBase.Controls.Inline
             }
 
 
-            if (this.MessageId != null)
+            if (MessageId != null)
             {
-                var m = await this.Device.Edit(this.MessageId.Value, this.Title, bf);
+                var m = await Device.Edit(MessageId.Value, Title, bf);
             }
             else
             {
-                var m = await this.Device.Send(this.Title, bf);
-                this.MessageId = m.MessageId;
+                var m = await Device.Send(Title, bf);
+                MessageId = m.MessageId;
             }
         }
 
@@ -268,9 +252,9 @@ namespace TelegramBotBase.Controls.Inline
         public override async Task Cleanup()
         {
 
-            if (this.MessageId != null)
+            if (MessageId != null)
             {
-                await this.Device.DeleteMessage(this.MessageId.Value);
+                await Device.DeleteMessage(MessageId.Value);
             }
 
         }

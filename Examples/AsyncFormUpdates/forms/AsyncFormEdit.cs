@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -11,19 +7,19 @@ namespace AsyncFormUpdates.forms
 {
     public class AsyncFormEdit : FormBase
     {
-        [SaveState]
-        int counter = 0;
+        [SaveState] private int _counter;
 
-        int MessageId = 0;
+        private int _messageId;
 
-        public override async Task Load(MessageResult message)
+        public override Task Load(MessageResult message)
         {
-            counter++;
+            _counter++;
+            return Task.CompletedTask;
         }
 
         public override async Task Action(MessageResult message)
         {
-            await message.ConfirmAction("");
+            await message.ConfirmAction();
 
             switch (message.RawData ?? "")
             {
@@ -41,14 +37,14 @@ namespace AsyncFormUpdates.forms
             var bf = new ButtonForm();
             bf.AddButtonRow("Back", "back");
 
-            if (MessageId != 0)
+            if (_messageId != 0)
             {
-                await Device.Edit(MessageId, $"Your current count is at: {counter}", bf);
+                await Device.Edit(_messageId, $"Your current count is at: {_counter}", bf);
             }
             else
             {
-                var m = await Device.Send($"Your current count is at: {counter}", bf, disableNotification: true);
-                MessageId = m.MessageId;
+                var m = await Device.Send($"Your current count is at: {_counter}", bf, disableNotification: true);
+                _messageId = m.MessageId;
             }
 
         }

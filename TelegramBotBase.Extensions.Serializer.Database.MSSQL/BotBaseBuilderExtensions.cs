@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TelegramBotBase.Builder;
 using TelegramBotBase.Builder.Interfaces;
 
@@ -15,13 +11,13 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
         /// Uses an Microsoft SQL Server Database to save and restore sessions.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="ConnectionString"></param>
+        /// <param name="connectionString"></param>
         /// <param name="tablePrefix"></param>
         /// <param name="fallbackForm"></param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseSQLDatabase(this ISessionSerializationStage builder, String ConnectionString, Type fallbackForm = null, String tablePrefix = "tgb_")
+        public static ILanguageSelectionStage UseSqlDatabase(this ISessionSerializationStage builder, string connectionString, Type fallbackForm = null, string tablePrefix = "tgb_")
         {
-            var serializer = new MSSQLSerializer(ConnectionString, tablePrefix, fallbackForm);
+            var serializer = new MssqlSerializer(connectionString, tablePrefix, fallbackForm);
 
             builder.UseSerialization(serializer);
 
@@ -33,18 +29,18 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
         /// Uses an Microsoft SQL Server Database to save and restore sessions.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="HostOrIP"></param>
-        /// <param name="UserId"></param>
-        /// <param name="Password"></param>
-        /// <param name="DatabaseName"></param>
+        /// <param name="hostOrIP"></param>
+        /// <param name="userId"></param>
+        /// <param name="password"></param>
+        /// <param name="databaseName"></param>
         /// <param name="tablePrefix"></param>
         /// <param name="fallbackForm"></param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseSQLDatabase(this ISessionSerializationStage builder, String HostOrIP, String DatabaseName, String UserId, String Password, Type fallbackForm = null, String tablePrefix = "tgb_")
+        public static ILanguageSelectionStage UseSqlDatabase(this ISessionSerializationStage builder, string hostOrIP, string databaseName, string userId, string password, Type fallbackForm = null, string tablePrefix = "tgb_")
         {
-            var connectionString = $"Server={HostOrIP}; Database={DatabaseName}; User Id={UserId}; Password={Password}; TrustServerCertificate=true;";
+            var connectionString = $"Server={hostOrIP}; Database={databaseName}; User Id={userId}; Password={password}; TrustServerCertificate=true;";
 
-            var serializer = new MSSQLSerializer(connectionString, tablePrefix, fallbackForm);
+            var serializer = new MssqlSerializer(connectionString, tablePrefix, fallbackForm);
 
             builder.UseSerialization(serializer);
 
@@ -55,19 +51,19 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
         /// Uses an Microsoft SQL Server Database with Windows Authentication to save and restore sessions.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="HostOrIP"></param>
-        /// <param name="DatabaseName"></param>
+        /// <param name="hostOrIP"></param>
+        /// <param name="databaseName"></param>
         /// <param name="tablePrefix"></param>
         /// <param name="fallbackForm"></param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseSQLDatabase(this ISessionSerializationStage builder, String HostOrIP, String DatabaseName, bool IntegratedSecurity = true, Type fallbackForm = null, String tablePrefix = "tgb_")
+        public static ILanguageSelectionStage UseSqlDatabase(this ISessionSerializationStage builder, string hostOrIP, string databaseName, bool integratedSecurity = true, Type fallbackForm = null, string tablePrefix = "tgb_")
         {
-            if (!IntegratedSecurity)
+            if (!integratedSecurity)
                 throw new ArgumentOutOfRangeException();
 
-            var connectionString = $"Server={HostOrIP}; Database={DatabaseName}; Integrated Security=true; TrustServerCertificate=true;";
+            var connectionString = $"Server={hostOrIP}; Database={databaseName}; Integrated Security=true; TrustServerCertificate=true;";
 
-            var serializer = new MSSQLSerializer(connectionString, tablePrefix, fallbackForm);
+            var serializer = new MssqlSerializer(connectionString, tablePrefix, fallbackForm);
 
             builder.UseSerialization(serializer);
 

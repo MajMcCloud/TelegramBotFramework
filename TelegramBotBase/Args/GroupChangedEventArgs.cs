@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 
@@ -14,8 +12,8 @@ namespace TelegramBotBase.Args
 
         public GroupChangedEventArgs(MessageType type, MessageResult message)
         {
-            this.Type = type;
-            this.OriginalMessage = message;
+            Type = type;
+            OriginalMessage = message;
         }
 
 

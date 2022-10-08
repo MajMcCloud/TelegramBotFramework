@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -34,13 +33,13 @@ namespace TelegramBotBase.Sessions
         /// <summary>
         /// Username of user or group
         /// </summary>
-        public String ChatTitle { get; set; }
+        public string ChatTitle { get; set; }
 
         /// <summary>
         /// Returns the ChatTitle depending on groups/channels or users
         /// </summary>
         /// <returns></returns>
-        public String GetChatTitle()
+        public string GetChatTitle()
         {
             return LastMessage?.Chat.Title
                 ?? LastMessage?.Chat.Username
@@ -71,70 +70,46 @@ namespace TelegramBotBase.Sessions
         /// <summary>
         /// Returns the ID of the last received message.
         /// </summary>
-        public int LastMessageId
-        {
-            get
-            {
-                return this.LastMessage?.MessageId ?? -1;
-            }
-        }
+        public int LastMessageId => LastMessage?.MessageId ?? -1;
 
         /// <summary>
         /// Returns the last received message.
         /// </summary>
         public Message LastMessage { get; set; }
 
-        public MessageClient Client
-        {
-            get
-            {
-                return this.ActiveForm.Client;
-            }
-        }
+        public MessageClient Client => ActiveForm.Client;
 
         /// <summary>
         /// Returns if the messages is posted within a group.
         /// </summary>
-        public bool IsGroup
-        {
-            get
-            {
-                return this.LastMessage != null && (this.LastMessage.Chat.Type == ChatType.Group | this.LastMessage.Chat.Type == ChatType.Supergroup);
-            }
-        }
+        public bool IsGroup => LastMessage != null && (LastMessage.Chat.Type == ChatType.Group | LastMessage.Chat.Type == ChatType.Supergroup);
 
         /// <summary>
         /// Returns if the messages is posted within a channel.
         /// </summary>
-        public bool IsChannel
-        {
-            get
-            {
-                return this.LastMessage != null && this.LastMessage.Chat.Type == ChatType.Channel;
-            }
-        }
+        public bool IsChannel => LastMessage != null && LastMessage.Chat.Type == ChatType.Channel;
 
-        private EventHandlerList __Events = new EventHandlerList();
+        private readonly EventHandlerList _events = new EventHandlerList();
 
-        private static object __evMessageSent = new object();
-        private static object __evMessageReceived = new object();
-        private static object __evMessageDeleted = new object();
+        private static readonly object EvMessageSent = new object();
+        private static readonly object EvMessageReceived = new object();
+        private static readonly object EvMessageDeleted = new object();
 
         public DeviceSession()
         {
 
         }
 
-        public DeviceSession(long DeviceId)
+        public DeviceSession(long deviceId)
         {
-            this.DeviceId = DeviceId;
+            this.DeviceId = deviceId;
         }
 
-        public DeviceSession(long DeviceId, FormBase StartForm)
+        public DeviceSession(long deviceId, FormBase startForm)
         {
-            this.DeviceId = DeviceId;
-            this.ActiveForm = StartForm;
-            this.ActiveForm.Device = this;
+            this.DeviceId = deviceId;
+            ActiveForm = startForm;
+            ActiveForm.Device = this;
         }
 
 
@@ -143,11 +118,11 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task ConfirmAction(String CallbackQueryId, String message = "", bool showAlert = false, String urlToOpen = null)
+        public async Task ConfirmAction(string callbackQueryId, string message = "", bool showAlert = false, string urlToOpen = null)
         {
             try
             {
-                await this.Client.TelegramClient.AnswerCallbackQueryAsync(CallbackQueryId, message, showAlert, urlToOpen);
+                await Client.TelegramClient.AnswerCallbackQueryAsync(callbackQueryId, message, showAlert, urlToOpen);
             }
             catch
             {
@@ -162,7 +137,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Markdown)
+        public async Task<Message> Edit(int messageId, string text, ButtonForm buttons = null, ParseMode parseMode = ParseMode.Markdown)
         {
             InlineKeyboardMarkup markup = buttons;
 
@@ -173,7 +148,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await API(a => a.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup));
+                return await Api(a => a.EditMessageTextAsync(DeviceId, messageId, text, parseMode, replyMarkup: markup));
             }
             catch
             {
@@ -191,7 +166,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="text"></param>
         /// <param name="buttons"></param>
         /// <returns></returns>
-        public async Task<Message> Edit(int messageId, String text, InlineKeyboardMarkup markup, ParseMode parseMode = ParseMode.Markdown)
+        public async Task<Message> Edit(int messageId, string text, InlineKeyboardMarkup markup, ParseMode parseMode = ParseMode.Markdown)
         {
             if (text.Length > Constants.Telegram.MaxMessageLength)
             {
@@ -200,7 +175,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await API(a => a.EditMessageTextAsync(this.DeviceId, messageId, text, parseMode, replyMarkup: markup));
+                return await Api(a => a.EditMessageTextAsync(DeviceId, messageId, text, parseMode, replyMarkup: markup));
             }
             catch
             {
@@ -229,7 +204,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await API(a => a.EditMessageTextAsync(this.DeviceId, message.MessageId, message.Text, parseMode, replyMarkup: markup));
+                return await Api(a => a.EditMessageTextAsync(DeviceId, message.MessageId, message.Text, parseMode, replyMarkup: markup));
             }
             catch
             {
@@ -251,7 +226,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                return await API(a => a.EditMessageReplyMarkupAsync(this.DeviceId, messageId, bf));
+                return await Api(a => a.EditMessageReplyMarkupAsync(DeviceId, messageId, bf));
             }
             catch
             {
@@ -269,9 +244,9 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(long deviceId, String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(long deviceId, string text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool markdownV2AutoEscape = true)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             InlineKeyboardMarkup markup = buttons;
@@ -281,17 +256,17 @@ namespace TelegramBotBase.Sessions
                 throw new MaxLengthException(text.Length);
             }
 
-            if (parseMode == ParseMode.MarkdownV2 && MarkdownV2AutoEscape)
+            if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
             {
                 text = text.MarkdownV2Escape();
             }
 
             try
             {
-                var t = API(a => a.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
-                
+
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
 
                 return await t;
@@ -310,9 +285,9 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(string text, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool markdownV2AutoEscape = true)
         {
-            return await Send(this.DeviceId, text, buttons, replyTo, disableNotification, parseMode, MarkdownV2AutoEscape);
+            return await Send(DeviceId, text, buttons, replyTo, disableNotification, parseMode, markdownV2AutoEscape);
         }
 
         /// <summary>
@@ -323,9 +298,9 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(string text, InlineKeyboardMarkup markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool markdownV2AutoEscape = true)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             if (text.Length > Constants.Telegram.MaxMessageLength)
@@ -333,14 +308,14 @@ namespace TelegramBotBase.Sessions
                 throw new MaxLengthException(text.Length);
             }
 
-            if (parseMode == ParseMode.MarkdownV2 && MarkdownV2AutoEscape)
+            if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
             {
                 text = text.MarkdownV2Escape();
             }
 
             try
             {
-                var t = API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendTextMessageAsync(DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -361,9 +336,9 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> Send(String text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool MarkdownV2AutoEscape = true)
+        public async Task<Message> Send(string text, ReplyMarkupBase markup, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, bool markdownV2AutoEscape = true)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             if (text.Length > Constants.Telegram.MaxMessageLength)
@@ -371,14 +346,14 @@ namespace TelegramBotBase.Sessions
                 throw new MaxLengthException(text.Length);
             }
 
-            if (parseMode == ParseMode.MarkdownV2 && MarkdownV2AutoEscape)
+            if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
             {
                 text = text.MarkdownV2Escape();
             }
 
             try
             {
-                var t = API(a => a.SendTextMessageAsync(this.DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendTextMessageAsync(DeviceId, text, parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -399,16 +374,16 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendPhoto(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+        public async Task<Message> SendPhoto(InputOnlineFile file, string caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             InlineKeyboardMarkup markup = buttons;
 
             try
             {
-                var t = API(a => a.SendPhotoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendPhotoAsync(DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -429,16 +404,16 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(InputOnlineFile file, String caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+        public async Task<Message> SendVideo(InputOnlineFile file, string caption = null, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             InlineKeyboardMarkup markup = buttons;
 
             try
             {
-                var t = API(a => a.SendVideoAsync(this.DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendVideoAsync(DeviceId, file, caption: caption, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -459,16 +434,16 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(String url, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+        public async Task<Message> SendVideo(string url, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             InlineKeyboardMarkup markup = buttons;
 
             try
             {
-                var t = API(a => a.SendVideoAsync(this.DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendVideoAsync(DeviceId, new InputOnlineFile(url), parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -490,20 +465,20 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendVideo(String filename, byte[] video, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+        public async Task<Message> SendVideo(string filename, byte[] video, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             InlineKeyboardMarkup markup = buttons;
 
             try
             {
-                MemoryStream ms = new MemoryStream(video);
+                var ms = new MemoryStream(video);
 
-                InputOnlineFile fts = new InputOnlineFile(ms, filename);
+                var fts = new InputOnlineFile(ms, filename);
 
-                var t = API(a => a.SendVideoAsync(this.DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendVideoAsync(DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -525,22 +500,22 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendLocalVideo(String filepath, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+        public async Task<Message> SendLocalVideo(string filepath, ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
         {
-            if (this.ActiveForm == null)
+            if (ActiveForm == null)
                 return null;
 
             InlineKeyboardMarkup markup = buttons;
 
             try
             {
-                FileStream fs = new FileStream(filepath, FileMode.Open);
+                var fs = new FileStream(filepath, FileMode.Open);
 
                 var filename = Path.GetFileName(filepath);
 
-                InputOnlineFile fts = new InputOnlineFile(fs, filename);
+                var fts = new InputOnlineFile(fs, filename);
 
-                var t = API(a => a.SendVideoAsync(this.DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
+                var t = Api(a => a.SendVideoAsync(DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo, replyMarkup: markup, disableNotification: disableNotification));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -563,11 +538,11 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendDocument(String filename, byte[] document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendDocument(string filename, byte[] document, string caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
-            MemoryStream ms = new MemoryStream(document);
+            var ms = new MemoryStream(document);
 
-            InputOnlineFile fts = new InputOnlineFile(ms, filename);
+            var fts = new InputOnlineFile(ms, filename);
 
             return await SendDocument(fts, caption, buttons, replyTo, disableNotification);
         }
@@ -583,7 +558,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendTextFile(String filename, String textcontent, Encoding encoding = null, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendTextFile(string filename, string textcontent, Encoding encoding = null, string caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             encoding = encoding ?? Encoding.UTF8;
 
@@ -607,7 +582,7 @@ namespace TelegramBotBase.Sessions
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public async Task<Message> SendDocument(InputOnlineFile document, String caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
+        public async Task<Message> SendDocument(InputOnlineFile document, string caption = "", ButtonForm buttons = null, int replyTo = 0, bool disableNotification = false)
         {
             InlineKeyboardMarkup markup = null;
             if (buttons != null)
@@ -617,7 +592,7 @@ namespace TelegramBotBase.Sessions
 
             try
             {
-                var t = API(a => a.SendDocumentAsync(this.DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo));
+                var t = Api(a => a.SendDocumentAsync(DeviceId, document, caption, replyMarkup: markup, disableNotification: disableNotification, replyToMessageId: replyTo));
 
                 var o = GetOrigin(new StackTrace());
                 await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -637,7 +612,7 @@ namespace TelegramBotBase.Sessions
         /// <returns></returns>
         public async Task SetAction(ChatAction action)
         {
-            await API(a => a.SendChatActionAsync(this.DeviceId, action));
+            await Api(a => a.SendChatActionAsync(DeviceId, action));
         }
 
         /// <summary>
@@ -645,13 +620,15 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="buttonText"></param>
         /// <param name="requestMessage"></param>
-        /// <param name="OneTimeOnly"></param>
+        /// <param name="oneTimeOnly"></param>
         /// <returns></returns>
-        public async Task<Message> RequestContact(String buttonText = "Send your contact", String requestMessage = "Give me your phone number!", bool OneTimeOnly = true)
+        public async Task<Message> RequestContact(string buttonText = "Send your contact", string requestMessage = "Give me your phone number!", bool oneTimeOnly = true)
         {
-            var rck = new ReplyKeyboardMarkup(KeyboardButton.WithRequestContact(buttonText));
-            rck.OneTimeKeyboard = OneTimeOnly;
-            return await API(a => a.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rck));
+            var rck = new ReplyKeyboardMarkup(KeyboardButton.WithRequestContact(buttonText))
+            {
+                OneTimeKeyboard = oneTimeOnly
+            };
+            return await Api(a => a.SendTextMessageAsync(DeviceId, requestMessage, replyMarkup: rck));
         }
 
         /// <summary>
@@ -659,24 +636,26 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="buttonText"></param>
         /// <param name="requestMessage"></param>
-        /// <param name="OneTimeOnly"></param>
+        /// <param name="oneTimeOnly"></param>
         /// <returns></returns>
-        public async Task<Message> RequestLocation(String buttonText = "Send your location", String requestMessage = "Give me your location!", bool OneTimeOnly = true)
+        public async Task<Message> RequestLocation(string buttonText = "Send your location", string requestMessage = "Give me your location!", bool oneTimeOnly = true)
         {
-            var rcl = new ReplyKeyboardMarkup(KeyboardButton.WithRequestLocation(buttonText));
-            rcl.OneTimeKeyboard = OneTimeOnly;
-            return await API(a => a.SendTextMessageAsync(this.DeviceId, requestMessage, replyMarkup: rcl));
+            var rcl = new ReplyKeyboardMarkup(KeyboardButton.WithRequestLocation(buttonText))
+            {
+                OneTimeKeyboard = oneTimeOnly
+            };
+            return await Api(a => a.SendTextMessageAsync(DeviceId, requestMessage, replyMarkup: rcl));
         }
 
-        public async Task<Message> HideReplyKeyboard(String closedMsg = "Closed", bool autoDeleteResponse = true)
+        public async Task<Message> HideReplyKeyboard(string closedMsg = "Closed", bool autoDeleteResponse = true)
         {
             try
             {
-                var m = await this.Send(closedMsg, new ReplyKeyboardRemove());
+                var m = await Send(closedMsg, new ReplyKeyboardRemove());
 
                 if (autoDeleteResponse && m != null)
                 {
-                    await this.DeleteMessage(m);
+                    await DeleteMessage(m);
                 }
 
                 return m;
@@ -696,7 +675,7 @@ namespace TelegramBotBase.Sessions
         public virtual async Task<bool> DeleteMessage(int messageId = -1)
         {
 
-            await RAW(a => a.DeleteMessageAsync(this.DeviceId, messageId));
+            await Raw(a => a.DeleteMessageAsync(DeviceId, messageId));
 
             OnMessageDeleted(new MessageDeletedEventArgs(messageId));
 
@@ -718,7 +697,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await API(a => a.SetChatPermissionsAsync(this.DeviceId, permissions));
+                await Api(a => a.SetChatPermissionsAsync(DeviceId, permissions));
             }
             catch
             {
@@ -728,7 +707,7 @@ namespace TelegramBotBase.Sessions
 
         private Type GetOrigin(StackTrace stackTrace)
         {
-            for (int i = 0; i < stackTrace.FrameCount; i++)
+            for (var i = 0; i < stackTrace.FrameCount; i++)
             {
                 var methodBase = stackTrace.GetFrame(i).GetMethod();
 
@@ -749,7 +728,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await API(a => a.RestrictChatMemberAsync(this.DeviceId, userId, permissions, until));
+                await Api(a => a.RestrictChatMemberAsync(DeviceId, userId, permissions, until));
             }
             catch
             {
@@ -761,7 +740,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                return await API(a => a.GetChatMemberAsync(this.DeviceId, userId));
+                return await Api(a => a.GetChatMemberAsync(DeviceId, userId));
             }
             catch
             {
@@ -775,7 +754,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await API(a => a.BanChatMemberAsync(this.DeviceId, userId, until));
+                await Api(a => a.BanChatMemberAsync(DeviceId, userId, until));
             }
             catch
             {
@@ -787,7 +766,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await API(a => a.BanChatMemberAsync(this.DeviceId, userId, until));
+                await Api(a => a.BanChatMemberAsync(DeviceId, userId, until));
             }
             catch
             {
@@ -799,7 +778,7 @@ namespace TelegramBotBase.Sessions
         {
             try
             {
-                await API(a => a.UnbanChatMemberAsync(this.DeviceId, userId));
+                await Api(a => a.UnbanChatMemberAsync(DeviceId, userId));
             }
             catch
             {
@@ -815,9 +794,9 @@ namespace TelegramBotBase.Sessions
         /// <typeparam name="T"></typeparam>
         /// <param name="call"></param>
         /// <returns></returns>
-        public T RAW<T>(Func<Telegram.Bot.ITelegramBotClient, T> call)
+        public T Raw<T>(Func<ITelegramBotClient, T> call)
         {
-            return call(this.Client.TelegramClient);
+            return call(Client.TelegramClient);
         }
 
         /// <summary>
@@ -826,10 +805,10 @@ namespace TelegramBotBase.Sessions
         /// <typeparam name="T"></typeparam>
         /// <param name="call"></param>
         /// <returns></returns>
-        public async Task<T> API<T>(Func<Telegram.Bot.ITelegramBotClient, Task<T>> call)
+        public async Task<T> Api<T>(Func<ITelegramBotClient, Task<T>> call)
         {
             var numberOfTries = 0;
-            while (numberOfTries < DeviceSession.MaxNumberOfRetries)
+            while (numberOfTries < MaxNumberOfRetries)
             {
                 try
                 {
@@ -854,10 +833,10 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         /// <param name="call"></param>
         /// <returns></returns>
-        public async Task API(Func<Telegram.Bot.ITelegramBotClient, Task> call)
+        public async Task Api(Func<ITelegramBotClient, Task> call)
         {
             var numberOfTries = 0;
-            while (numberOfTries < DeviceSession.MaxNumberOfRetries)
+            while (numberOfTries < MaxNumberOfRetries)
             {
                 try
                 {
@@ -883,16 +862,10 @@ namespace TelegramBotBase.Sessions
         /// <summary>
         /// Eventhandler for sent messages
         /// </summary>
-        public event Base.Async.AsyncEventHandler<MessageSentEventArgs> MessageSent
+        public event Async.AsyncEventHandler<MessageSentEventArgs> MessageSent
         {
-            add
-            {
-                this.__Events.AddHandler(__evMessageSent, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evMessageSent, value);
-            }
+            add => _events.AddHandler(EvMessageSent, value);
+            remove => _events.RemoveHandler(EvMessageSent, value);
         }
 
 
@@ -900,14 +873,14 @@ namespace TelegramBotBase.Sessions
         {
             if (e.Message == null)
                 return;
-            
-            var handler = this.__Events[__evMessageSent]?.GetInvocationList().Cast<Base.Async.AsyncEventHandler<MessageSentEventArgs>>();
+
+            var handler = _events[EvMessageSent]?.GetInvocationList().Cast<Async.AsyncEventHandler<MessageSentEventArgs>>();
             if (handler == null)
                 return;
 
             foreach (var h in handler)
             {
-                await Base.Async.InvokeAllAsync<MessageSentEventArgs>(h, this, e);
+                await h.InvokeAllAsync(this, e);
             }
 
             //(this.__Events[__evMessageSent] as EventHandler<MessageSentEventArgs>)?.Invoke(this, e);
@@ -918,20 +891,14 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         public event EventHandler<MessageReceivedEventArgs> MessageReceived
         {
-            add
-            {
-                this.__Events.AddHandler(__evMessageReceived, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evMessageReceived, value);
-            }
+            add => _events.AddHandler(EvMessageReceived, value);
+            remove => _events.RemoveHandler(EvMessageReceived, value);
         }
 
 
         public void OnMessageReceived(MessageReceivedEventArgs e)
         {
-            (this.__Events[__evMessageReceived] as EventHandler<MessageReceivedEventArgs>)?.Invoke(this, e);
+            (_events[EvMessageReceived] as EventHandler<MessageReceivedEventArgs>)?.Invoke(this, e);
         }
 
         /// <summary>
@@ -939,20 +906,14 @@ namespace TelegramBotBase.Sessions
         /// </summary>
         public event EventHandler<MessageDeletedEventArgs> MessageDeleted
         {
-            add
-            {
-                this.__Events.AddHandler(__evMessageDeleted, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evMessageDeleted, value);
-            }
+            add => _events.AddHandler(EvMessageDeleted, value);
+            remove => _events.RemoveHandler(EvMessageDeleted, value);
         }
 
 
         public void OnMessageDeleted(MessageDeletedEventArgs e)
         {
-            (this.__Events[__evMessageDeleted] as EventHandler<MessageDeletedEventArgs>)?.Invoke(this, e);
+            (_events[EvMessageDeleted] as EventHandler<MessageDeletedEventArgs>)?.Invoke(this, e);
         }
 
         #endregion
@@ -960,7 +921,7 @@ namespace TelegramBotBase.Sessions
         #region "Static"
 
         /// <summary>
-        /// Indicates the maximum number of times a request that received error 
+        /// Indicates the maximum number of times a request that received error
         /// 429 will be sent again after a timeout until it receives code 200 or an error code not equal to 429.
         /// </summary>
         public static uint MaxNumberOfRetries { get; set; }

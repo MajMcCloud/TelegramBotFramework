@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
@@ -18,15 +16,9 @@ namespace TelegramBotBase.Base
 
         public virtual long DeviceId { get; set; }
 
-        public int MessageId
-        {
-            get
-            {
-                return this.Message.MessageId;
-            }
-        }
+        public int MessageId => Message.MessageId;
 
-        public virtual Telegram.Bot.Types.Message Message { get; set; }
+        public virtual Message Message { get; set; }
 
         /// <summary>
         /// Deletes the current message
@@ -35,7 +27,7 @@ namespace TelegramBotBase.Base
         /// <returns></returns>
         public virtual async Task DeleteMessage()
         {
-            await DeleteMessage(this.MessageId);
+            await DeleteMessage(MessageId);
         }
 
         /// <summary>
@@ -47,7 +39,7 @@ namespace TelegramBotBase.Base
         {
             try
             {
-                await Device.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, (messageId == -1 ? this.MessageId : messageId));
+                await Device.Client.TelegramClient.DeleteMessageAsync(DeviceId, (messageId == -1 ? MessageId : messageId));
             }
             catch
             {

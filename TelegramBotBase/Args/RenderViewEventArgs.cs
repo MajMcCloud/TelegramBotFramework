@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TelegramBotBase.Args
 {
@@ -9,10 +7,10 @@ namespace TelegramBotBase.Args
         public int CurrentView { get; set; }
 
 
-        public RenderViewEventArgs(int ViewIndex)
+        public RenderViewEventArgs(int viewIndex)
         {
 
-            CurrentView = ViewIndex;
+            CurrentView = viewIndex;
         }
 
 

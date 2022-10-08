@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -11,18 +7,18 @@ namespace AsyncFormUpdates.forms
 {
     public class AsyncFormUpdate : AutoCleanForm
     {
-        [SaveState]
-        int counter = 0;
+        [SaveState] private int _counter;
 
 
-        public override async Task Load(MessageResult message)
+        public override Task Load(MessageResult message)
         {
-            counter++;
+            _counter++;
+            return Task.CompletedTask;
         }
 
         public override async Task Action(MessageResult message)
         {
-            await message.ConfirmAction("");
+            await message.ConfirmAction();
 
             switch (message.RawData ?? "")
             {
@@ -40,7 +36,7 @@ namespace AsyncFormUpdates.forms
             var bf = new ButtonForm();
             bf.AddButtonRow("Back", "back");
 
-            await Device.Send($"Your current count is at: {counter}", bf, disableNotification: true);
+            await Device.Send($"Your current count is at: {_counter}", bf, disableNotification: true);
         }
 
 

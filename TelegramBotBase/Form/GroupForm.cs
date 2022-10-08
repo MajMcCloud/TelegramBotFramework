@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 
@@ -10,38 +7,30 @@ namespace TelegramBotBase.Form
 {
     public class GroupForm : FormBase
     {
-
-
-        public GroupForm()
-        {
-
-
-        }
-
         public override async Task Load(MessageResult message)
         {
             switch (message.MessageType)
             {
-                case Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded:
+                case MessageType.ChatMembersAdded:
 
-                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded, message, message.Message.NewChatMembers));
-
-                    break;
-                case Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft:
-
-                    await OnMemberChanges(new MemberChangeEventArgs(Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft, message, message.Message.LeftChatMember));
+                    await OnMemberChanges(new MemberChangeEventArgs(MessageType.ChatMembersAdded, message, message.Message.NewChatMembers));
 
                     break;
+                case MessageType.ChatMemberLeft:
 
-                case Telegram.Bot.Types.Enums.MessageType.ChatPhotoChanged:
-                case Telegram.Bot.Types.Enums.MessageType.ChatPhotoDeleted:
-                case Telegram.Bot.Types.Enums.MessageType.ChatTitleChanged:
-                case Telegram.Bot.Types.Enums.MessageType.MigratedFromGroup:
-                case Telegram.Bot.Types.Enums.MessageType.MigratedToSupergroup:
-                case Telegram.Bot.Types.Enums.MessageType.MessagePinned:
-                case Telegram.Bot.Types.Enums.MessageType.GroupCreated:
-                case Telegram.Bot.Types.Enums.MessageType.SupergroupCreated:
-                case Telegram.Bot.Types.Enums.MessageType.ChannelCreated:
+                    await OnMemberChanges(new MemberChangeEventArgs(MessageType.ChatMemberLeft, message, message.Message.LeftChatMember));
+
+                    break;
+
+                case MessageType.ChatPhotoChanged:
+                case MessageType.ChatPhotoDeleted:
+                case MessageType.ChatTitleChanged:
+                case MessageType.MigratedFromGroup:
+                case MessageType.MigratedToSupergroup:
+                case MessageType.MessagePinned:
+                case MessageType.GroupCreated:
+                case MessageType.SupergroupCreated:
+                case MessageType.ChannelCreated:
 
                     await OnGroupChanged(new GroupChangedEventArgs(message.MessageType, message));
 
@@ -61,26 +50,26 @@ namespace TelegramBotBase.Form
             await OnMessageEdit(message);
         }
 
-        public virtual async Task OnMemberChanges(MemberChangeEventArgs e)
+        public virtual Task OnMemberChanges(MemberChangeEventArgs e)
         {
-
+            return Task.CompletedTask;
         }
 
 
-        public virtual async Task OnGroupChanged(GroupChangedEventArgs e)
+        public virtual Task OnGroupChanged(GroupChangedEventArgs e)
         {
-
+            return Task.CompletedTask;
         }
 
 
-        public virtual async Task OnMessage(MessageResult e)
+        public virtual Task OnMessage(MessageResult e)
         {
-
+            return Task.CompletedTask;
         }
 
-        public virtual async Task OnMessageEdit(MessageResult e)
+        public virtual Task OnMessageEdit(MessageResult e)
         {
-
+            return Task.CompletedTask;
         }
     }
 }

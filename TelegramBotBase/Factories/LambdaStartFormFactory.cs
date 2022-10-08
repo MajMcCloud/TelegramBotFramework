@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TelegramBotBase.Form;
+﻿using TelegramBotBase.Form;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Factories
 {
-    public class LambdaStartFormFactory : Interfaces.IStartFormFactory
+    public class LambdaStartFormFactory : IStartFormFactory
     {
         public delegate FormBase CreateFormDelegate();
 

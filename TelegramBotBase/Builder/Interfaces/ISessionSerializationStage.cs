@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TelegramBotBase.Interfaces;
+﻿using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Builder.Interfaces
 {
@@ -27,7 +24,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        ILanguageSelectionStage UseJSON(String path);
+        ILanguageSelectionStage UseJSON(string path);
 
 
         /// <summary>
@@ -35,7 +32,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        ILanguageSelectionStage UseSimpleJSON(String path);
+        ILanguageSelectionStage UseSimpleJSON(string path);
 
 
         /// <summary>
@@ -43,7 +40,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        ILanguageSelectionStage UseXML(String path);
+        ILanguageSelectionStage UseXML(string path);
 
     }
 }

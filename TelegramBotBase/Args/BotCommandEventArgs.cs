@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBotBase.Sessions;
 
@@ -13,9 +10,9 @@ namespace TelegramBotBase.Args
     /// </summary>
     public class BotCommandEventArgs : EventArgs
     {
-        public String Command { get; set; }
+        public string Command { get; set; }
 
-        public List<String> Parameters { get; set; }
+        public List<string> Parameters { get; set; }
 
         public long DeviceId { get; set; }
 
@@ -32,13 +29,13 @@ namespace TelegramBotBase.Args
 
         }
 
-        public BotCommandEventArgs(String Command, List<String> Parameters, Message Message, long DeviceId, DeviceSession Device)
+        public BotCommandEventArgs(string command, List<string> parameters, Message message, long deviceId, DeviceSession device)
         {
-            this.Command = Command;
-            this.Parameters = Parameters;
-            this.OriginalMessage = Message;
-            this.DeviceId = DeviceId;
-            this.Device = Device;
+            this.Command = command;
+            this.Parameters = parameters;
+            OriginalMessage = message;
+            this.DeviceId = deviceId;
+            this.Device = device;
         }
 
     }

@@ -1,17 +1,19 @@
 ﻿using System;
+using SystemCommandsBot.config;
+using SystemCommandsBot.forms;
 using TelegramBotBase.Builder;
 
 namespace SystemCommandsBot
 {
-    class Program
+    internal class Program
     {
-        public static config.Config BotConfig { get; set; }
+        public static Config BotConfig { get; set; }
 
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
 
-            BotConfig = config.Config.load();
+            BotConfig = Config.Load();
 
             if (BotConfig.ApiKey == null || BotConfig.ApiKey.Trim() == "")
             {
@@ -21,7 +23,7 @@ namespace SystemCommandsBot
             }
 
             var bot = BotBaseBuilder.Create()
-                                    .QuickStart<forms.StartForm>(BotConfig.ApiKey)
+                                    .QuickStart<StartForm>(BotConfig.ApiKey)
                                     .Build();
 
             bot.Start();

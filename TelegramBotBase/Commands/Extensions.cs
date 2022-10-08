@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Telegram.Bot.Types;
 
 namespace TelegramBotBase.Commands
@@ -15,7 +12,7 @@ namespace TelegramBotBase.Commands
         /// <param name="cmds"></param>
         /// <param name="command"></param>
         /// <param name="description"></param>
-        public static void Add(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description, BotCommandScope scope = null)
+        public static void Add(this Dictionary<BotCommandScope, List<BotCommand>> cmds, string command, string description, BotCommandScope scope = null)
         {
             if (scope == null)
             {
@@ -26,11 +23,11 @@ namespace TelegramBotBase.Commands
 
             if (item.Value != null)
             {
-                item.Value.Add(new BotCommand() { Command = command, Description = description });
+                item.Value.Add(new BotCommand { Command = command, Description = description });
             }
             else
             {
-                cmds.Add(scope, new List<BotCommand> { new BotCommand() { Command = command, Description = description } });
+                cmds.Add(scope, new List<BotCommand> { new BotCommand { Command = command, Description = description } });
             }
         }
 
@@ -64,33 +61,33 @@ namespace TelegramBotBase.Commands
         /// </summary>
         /// <param name="cmds"></param>
         /// <param name="description"></param>
-        public static void Start(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description) => Add(cmds, "start", description, null);
+        public static void Start(this Dictionary<BotCommandScope, List<BotCommand>> cmds, string description) => Add(cmds, "start", description);
 
         /// <summary>
         /// Adding the default /help command with a description.
         /// </summary>
         /// <param name="cmds"></param>
         /// <param name="description"></param>
-        public static void Help(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description) => Add(cmds, "help", description, null);
+        public static void Help(this Dictionary<BotCommandScope, List<BotCommand>> cmds, string description) => Add(cmds, "help", description);
 
         /// <summary>
         /// Adding the default /settings command with a description.
         /// </summary>
         /// <param name="cmds"></param>
         /// <param name="description"></param>
-        public static void Settings(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String description) => Add(cmds, "settings", description, null);
+        public static void Settings(this Dictionary<BotCommandScope, List<BotCommand>> cmds, string description) => Add(cmds, "settings", description);
 
         /// <summary>
         /// Clears all default commands.
         /// </summary>
         /// <param name="cmds"></param>
-        public static void ClearDefaultCommands(this Dictionary<BotCommandScope, List<BotCommand>> cmds) => Clear(cmds, null);
+        public static void ClearDefaultCommands(this Dictionary<BotCommandScope, List<BotCommand>> cmds) => Clear(cmds);
 
         /// <summary>
         /// Clears all commands of a specific device.
         /// </summary>
         /// <param name="cmds"></param>
-        public static void ClearChatCommands(this Dictionary<BotCommandScope, List<BotCommand>> cmds, long DeviceId) => Clear(cmds, new BotCommandScopeChat() { ChatId = DeviceId });
+        public static void ClearChatCommands(this Dictionary<BotCommandScope, List<BotCommand>> cmds, long deviceId) => Clear(cmds, new BotCommandScopeChat { ChatId = deviceId });
 
         /// <summary>
         /// Adding a chat command with a description.
@@ -98,7 +95,7 @@ namespace TelegramBotBase.Commands
         /// <param name="cmds"></param>
         /// <param name="command"></param>
         /// <param name="description"></param>
-        public static void AddChatCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, long DeviceId, String command, String description) => Add(cmds, command, description, new BotCommandScopeChat() { ChatId = DeviceId });
+        public static void AddChatCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, long deviceId, string command, string description) => Add(cmds, command, description, new BotCommandScopeChat { ChatId = deviceId });
 
         /// <summary>
         /// Adding a group command with a description.
@@ -106,7 +103,7 @@ namespace TelegramBotBase.Commands
         /// <param name="cmds"></param>
         /// <param name="command"></param>
         /// <param name="description"></param>
-        public static void AddGroupCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description) => Add(cmds, command, description, new BotCommandScopeAllGroupChats());
+        public static void AddGroupCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, string command, string description) => Add(cmds, command, description, new BotCommandScopeAllGroupChats());
 
         /// <summary>
         /// Clears all group commands.
@@ -120,7 +117,7 @@ namespace TelegramBotBase.Commands
         /// <param name="cmds"></param>
         /// <param name="command"></param>
         /// <param name="description"></param>
-        public static void AddGroupAdminCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description) => Add(cmds, command, description, new BotCommandScopeAllChatAdministrators());
+        public static void AddGroupAdminCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, string command, string description) => Add(cmds, command, description, new BotCommandScopeAllChatAdministrators());
 
         /// <summary>
         /// Clears all group admin commands.
@@ -134,7 +131,7 @@ namespace TelegramBotBase.Commands
         /// <param name="cmds"></param>
         /// <param name="command"></param>
         /// <param name="description"></param>
-        public static void AddPrivateChatCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, String command, String description) => Add(cmds, command, description, new BotCommandScopeAllPrivateChats());
+        public static void AddPrivateChatCommand(this Dictionary<BotCommandScope, List<BotCommand>> cmds, string command, string description) => Add(cmds, command, description, new BotCommandScopeAllPrivateChats());
 
         /// <summary>
         /// Clears all private commands.

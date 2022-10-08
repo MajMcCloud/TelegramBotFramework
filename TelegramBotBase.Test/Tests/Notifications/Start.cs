@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Notifications
 {
     public class Start : AutoCleanForm
     {
-        bool sent = false;
+        private bool _sent;
 
         public Start()
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            DeleteMode = EDeleteMode.OnLeavingForm;
         }
 
         public override async Task Action(MessageResult message)
@@ -46,7 +44,7 @@ namespace TelegramBotBaseTest.Tests.Notifications
 
         public override async Task Render(MessageResult message)
         {
-            if (sent)
+            if (_sent)
                 return;
 
             var bf = new ButtonForm();
@@ -56,7 +54,7 @@ namespace TelegramBotBaseTest.Tests.Notifications
 
             await Device.Send("Choose your test", bf);
 
-            sent = true;
+            _sent = true;
         }
 
     }

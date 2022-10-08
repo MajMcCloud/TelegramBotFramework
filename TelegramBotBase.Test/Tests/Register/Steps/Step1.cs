@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -15,35 +11,38 @@ namespace TelegramBotBaseTest.Tests.Register.Steps
 
         public Step1()
         {
-            this.Init += Step1_Init;
+            Init += Step1_Init;
         }
 
-        private async Task Step1_Init(object sender, InitEventArgs e)
+        private Task Step1_Init(object sender, InitEventArgs e)
         {
-            this.UserData = new Data();
+            UserData = new Data();
+            return Task.CompletedTask;
         }
 
 
-        public async override Task Load(MessageResult message)
+        public override Task Load(MessageResult message)
         {
             if (message.Handled)
-                return;
+                return Task.CompletedTask;
 
             if (message.MessageText.Trim() == "")
-                return;
+                return Task.CompletedTask;
 
-            if (this.UserData.Firstname == null)
+            if (UserData.Firstname == null)
             {
-                this.UserData.Firstname = message.MessageText;
-                return;
+                UserData.Firstname = message.MessageText;
+                return Task.CompletedTask;
             }
+
+            return Task.CompletedTask;
         }
 
-        public async override Task Render(MessageResult message)
+        public override async Task Render(MessageResult message)
         {
-            if (this.UserData.Firstname == null)
+            if (UserData.Firstname == null)
             {
-                await this.Device.Send("Please sent your firstname:");
+                await Device.Send("Please sent your firstname:");
                 return;
             }
 
@@ -51,9 +50,9 @@ namespace TelegramBotBaseTest.Tests.Register.Steps
 
             var step2 = new Step2();
 
-            step2.UserData = this.UserData;
+            step2.UserData = UserData;
 
-            await this.NavigateTo(step2);
+            await NavigateTo(step2);
         }
 
     }

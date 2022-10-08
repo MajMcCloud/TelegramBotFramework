@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TelegramBotBase.Form
@@ -17,12 +15,12 @@ namespace TelegramBotBase.Form
         /// </summary>
         public async Task CloseForm()
         {
-            await this.CloseControls();
+            await CloseControls();
 
-            await this.OnClosed(new EventArgs());
+            await OnClosed(EventArgs.Empty);
 
 
-            await this.ParentForm?.ReturnFromModal(this);
+            await ParentForm?.ReturnFromModal(this);
         }
     }
 }

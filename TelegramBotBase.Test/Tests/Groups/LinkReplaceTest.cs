@@ -1,37 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Groups
 {
-    public class LinkReplaceTest : TelegramBotBase.Form.GroupForm
+    public class LinkReplaceTest : GroupForm
     {
-
-        Dictionary<long, int> Counter { get; set; } = new Dictionary<long, int>();
+        private Dictionary<long, int> Counter { get; set; } = new Dictionary<long, int>();
 
         private const int Maximum = 3;
 
 
         public LinkReplaceTest()
         {
-            this.Opened += LinkReplaceTest_Opened;
+            Opened += LinkReplaceTest_Opened;
         }
 
         private async Task LinkReplaceTest_Opened(object sender, EventArgs e)
         {
 
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
 
             bf.AddButtonRow(new ButtonBase("Open GroupChange Test", "groupchange"));
             bf.AddButtonRow(new ButtonBase("Open WelcomeUser Test", "welcomeuser"));
             bf.AddButtonRow(new ButtonBase("Open LinkReplace Test", "linkreplace"));
 
-            await this.Device.Send("LinkReplaceTest started, click to switch", bf);
+            await Device.Send("LinkReplaceTest started, click to switch", bf);
 
         }
 
@@ -51,21 +50,21 @@ namespace TelegramBotBaseTest.Tests.Groups
 
                     var gc = new GroupChange();
 
-                    await this.NavigateTo(gc);
+                    await NavigateTo(gc);
 
                     break;
                 case "welcomeuser":
 
                     var wu = new WelcomeUser();
 
-                    await this.NavigateTo(wu);
+                    await NavigateTo(wu);
 
                     break;
                 case "linkreplace":
 
                     var lr = new LinkReplaceTest();
 
-                    await this.NavigateTo(lr);
+                    await NavigateTo(lr);
 
                     break;
             }
@@ -86,23 +85,25 @@ namespace TelegramBotBaseTest.Tests.Groups
             var u = await Device.GetChatUser(from);
 
             //Don't kick Admins or Creators
-            if (u.Status == Telegram.Bot.Types.Enums.ChatMemberStatus.Administrator | u.Status == Telegram.Bot.Types.Enums.ChatMemberStatus.Creator)
+            if (u.Status == ChatMemberStatus.Administrator | u.Status == ChatMemberStatus.Creator)
             {
-                await this.Device.Send("You won't get kicked,...not this time.");
+                await Device.Send("You won't get kicked,...not this time.");
                 return;
             }
 
             await e.Device.DeleteMessage(e.MessageId);
 
-            var cp = new ChatPermissions();
-            cp.CanAddWebPagePreviews = false;
-            cp.CanChangeInfo = false;
-            cp.CanInviteUsers = false;
-            cp.CanPinMessages = false;
-            cp.CanSendMediaMessages = false;
-            cp.CanSendMessages = false;
-            cp.CanSendOtherMessages = false;
-            cp.CanSendPolls = false;
+            var cp = new ChatPermissions
+            {
+                CanAddWebPagePreviews = false,
+                CanChangeInfo = false,
+                CanInviteUsers = false,
+                CanPinMessages = false,
+                CanSendMediaMessages = false,
+                CanSendMessages = false,
+                CanSendOtherMessages = false,
+                CanSendPolls = false
+            };
 
             //Collect user "mistakes" with sending url, after 3 he gets kicked out.
             if (Counter.ContainsKey(from))
@@ -147,12 +148,12 @@ namespace TelegramBotBaseTest.Tests.Groups
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private bool HasLinks(String str)
+        private bool HasLinks(string str)
         {
             var tmp = str;
 
             var pattern = @"^(http|https|ftp|)\://|[a-zA-Z0-9\-\.]+\.[a-zA-Z](:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*[^\.\,\)\(\s]$";
-            Regex r = new Regex(pattern);
+            var r = new Regex(pattern);
 
             var matches = r.Matches(tmp);
 

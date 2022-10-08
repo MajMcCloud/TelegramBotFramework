@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TelegramBotBase.Enums
+﻿namespace TelegramBotBase.Enums
 {
-    public enum eKeyboardType
+    public enum EKeyboardType
     {
         /// <summary>
         /// Uses a ReplyKeyboardMarkup

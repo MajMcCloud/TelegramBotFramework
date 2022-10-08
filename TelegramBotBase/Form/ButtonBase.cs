@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBotBase.Form
@@ -14,22 +9,22 @@ namespace TelegramBotBase.Form
     /// </summary>
     public class ButtonBase
     {
-        public virtual String Text { get; set; }
+        public virtual string Text { get; set; }
 
-        public String Value { get; set; }
+        public string Value { get; set; }
 
-        public String Url { get; set; }
+        public string Url { get; set; }
 
         public ButtonBase()
         {
 
         }
 
-        public ButtonBase(String Text, String Value, String Url = null)
+        public ButtonBase(string text, string value, string url = null)
         {
-            this.Text = Text;
-            this.Value = Value;
-            this.Url = Url;
+            this.Text = text;
+            this.Value = value;
+            this.Url = url;
         }
 
 
@@ -40,16 +35,17 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public virtual InlineKeyboardButton ToInlineButton(ButtonForm form)
         {
-            String id = (form.DependencyControl != null ? form.DependencyControl.ControlID + "_" : "");
-            if (this.Url == null)
+            var id = (form.DependencyControl != null ? form.DependencyControl.ControlId + "_" : "");
+            if (Url == null)
             {
-                return InlineKeyboardButton.WithCallbackData(this.Text, id + this.Value);
+                return InlineKeyboardButton.WithCallbackData(Text, id + Value);
             }
 
-            var ikb = new InlineKeyboardButton(this.Text);
-
-            //ikb.Text = this.Text;
-            ikb.Url = this.Url;
+            var ikb = new InlineKeyboardButton(Text)
+            {
+                //ikb.Text = this.Text;
+                Url = Url
+            };
 
             return ikb;
 
@@ -63,7 +59,7 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public virtual KeyboardButton ToKeyboardButton(ButtonForm form)
         {
-            return new KeyboardButton(this.Text);
+            return new KeyboardButton(Text);
         }
 
     }

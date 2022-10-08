@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests
@@ -13,15 +11,15 @@ namespace TelegramBotBaseTest.Tests
 
         public SimpleForm()
         {
-            this.DeleteSide = TelegramBotBase.Enums.eDeleteSide.Both;
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            DeleteSide = EDeleteSide.Both;
+            DeleteMode = EDeleteMode.OnLeavingForm;
 
-            this.Opened += SimpleForm_Opened;
+            Opened += SimpleForm_Opened;
         }
 
         private async Task SimpleForm_Opened(object sender, EventArgs e)
         {
-            await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
+            await Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
         }
 
         public override async Task Load(MessageResult message)
@@ -36,13 +34,13 @@ namespace TelegramBotBaseTest.Tests
                 case "hi":
 
                     //Send him a simple message
-                    await this.Device.Send("Hello you there !");
+                    await Device.Send("Hello you there !");
                     break;
 
                 case "maybe":
 
                     //Send him a simple message and reply to the one of himself
-                    await this.Device.Send("Maybe what?", replyTo: messageId);
+                    await Device.Send("Maybe what?", replyTo: messageId);
 
                     break;
 
@@ -50,14 +48,14 @@ namespace TelegramBotBaseTest.Tests
                 case "ciao":
 
                     //Send him a simple message
-                    await this.Device.Send("Ok, take care !");
+                    await Device.Send("Ok, take care !");
                     break;
 
                 case "back":
 
                     var st = new Menu();
 
-                    await this.NavigateTo(st);
+                    await NavigateTo(st);
 
                     break;
             }

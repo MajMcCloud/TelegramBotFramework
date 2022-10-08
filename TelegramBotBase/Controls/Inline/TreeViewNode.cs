@@ -1,35 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TelegramBotBase.Controls.Inline
 {
     public class TreeViewNode
     {
-        public String Text { get; set; }
+        public string Text { get; set; }
 
-        public String Value { get; set; }
+        public string Value { get; set; }
 
-        public String Url { get; set; }
+        public string Url { get; set; }
 
         public List<TreeViewNode> ChildNodes { get; set; } = new List<TreeViewNode>();
 
         public TreeViewNode ParentNode { get; set; }
 
-        public TreeViewNode(String Text, String Value)
+        public TreeViewNode(string text, string value)
         {
-            this.Text = Text;
-            this.Value = Value;
+            this.Text = text;
+            this.Value = value;
         }
 
-        public TreeViewNode(String Text, String Value, String Url) : this(Text, Value)
+        public TreeViewNode(string text, string value, string url) : this(text, value)
         {
-            this.Url = Url;
+            this.Url = url;
         }
 
-        public TreeViewNode(String Text, String Value, params TreeViewNode[] childnodes) : this(Text, Value)
+        public TreeViewNode(string text, string value, params TreeViewNode[] childnodes) : this(text, value)
         {
             foreach(var c in childnodes)
             {
@@ -44,14 +41,14 @@ namespace TelegramBotBase.Controls.Inline
             ChildNodes.Add(node);
         }
 
-        public TreeViewNode FindNodeByValue(String Value)
+        public TreeViewNode FindNodeByValue(string value)
         {
-            return this.ChildNodes.FirstOrDefault(a => a.Value == Value);
+            return ChildNodes.FirstOrDefault(a => a.Value == value);
         }
 
-        public String GetPath()
+        public string GetPath()
         {
-            String s = "\\" + this.Value;
+            var s = "\\" + Value;
             var p = this;
             while (p.ParentNode != null)
             {

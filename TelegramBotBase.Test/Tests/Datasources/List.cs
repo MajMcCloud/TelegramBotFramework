@@ -1,42 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using TelegramBotBase.Base;
+﻿using System.Threading.Tasks;
+using TelegramBotBase.Args;
 using TelegramBotBase.Controls.Hybrid;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Datasources
 {
     public class List : FormBase
     {
-        ButtonGrid __buttons = null;
+        private ButtonGrid _buttons;
 
         public List()
         {
-            this.Init += List_Init;
+            Init += List_Init;
         }
 
-        private async Task List_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
+        private Task List_Init(object sender, InitEventArgs e)
         {
 
-            __buttons = new ButtonGrid();
+            _buttons = new ButtonGrid
+            {
+                EnablePaging = true,
+                EnableSearch = false
+            };
 
-            __buttons.EnablePaging = true;
-            __buttons.EnableSearch = false;
-            __buttons.ButtonClicked += __buttons_ButtonClicked;
-            __buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-            __buttons.DeleteReplyMessage = true;
+            _buttons.ButtonClicked += __buttons_ButtonClicked;
+            _buttons.KeyboardType = EKeyboardType.ReplyKeyboard;
+            _buttons.DeleteReplyMessage = true;
 
-            __buttons.HeadLayoutButtonRow = new ButtonRow(new ButtonBase("Back", "back"));
+            _buttons.HeadLayoutButtonRow = new ButtonRow(new ButtonBase("Back", "back"));
 
             var cds = new CustomDataSource();
-            __buttons.DataSource = cds;
+            _buttons.DataSource = cds;
 
-            AddControl(__buttons);
+            AddControl(_buttons);
+            return Task.CompletedTask;
         }
 
-        private async Task __buttons_ButtonClicked(object sender, TelegramBotBase.Args.ButtonClickedEventArgs e)
+        private async Task __buttons_ButtonClicked(object sender, ButtonClickedEventArgs e)
         {
             switch(e.Button.Value)
             {

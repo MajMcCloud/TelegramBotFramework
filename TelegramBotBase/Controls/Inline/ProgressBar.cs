@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
 
@@ -10,9 +7,9 @@ namespace TelegramBotBase.Controls.Inline
     /// <summary>
     /// A simple control for show and managing progress.
     /// </summary>
-    public class ProgressBar : Base.ControlBase
+    public class ProgressBar : ControlBase
     {
-        public enum eProgressStyle
+        public enum EProgressStyle
         {
             standard = 0,
             squares = 1,
@@ -22,104 +19,78 @@ namespace TelegramBotBase.Controls.Inline
             custom = 10
         }
 
-        public eProgressStyle ProgressStyle
+        public EProgressStyle ProgressStyle
         {
-            get
-            {
-                return m_eStyle;
-            }
+            get => _mEStyle;
             set
             {
-                m_eStyle = value;
+                _mEStyle = value;
                 LoadStyle();
             }
         }
 
-        private eProgressStyle m_eStyle = eProgressStyle.standard;
+        private EProgressStyle _mEStyle = EProgressStyle.standard;
 
 
         public int Value
         {
-            get
-            {
-                return this.m_iValue;
-            }
+            get => _mIValue;
             set
             {
-                if (value > this.Max)
+                if (value > Max)
                 {
                     return;
                 }
 
-                if (this.m_iValue != value)
+                if (_mIValue != value)
                 {
-                    this.RenderNecessary = true;
+                    RenderNecessary = true;
                 }
-                this.m_iValue = value;
+                _mIValue = value;
             }
         }
 
-        private int m_iValue = 0;
+        private int _mIValue;
 
         public int Max
         {
-            get
-            {
-                return this.m_iMax;
-            }
+            get => _mIMax;
             set
             {
-                if (this.m_iMax != value)
+                if (_mIMax != value)
                 {
-                    this.RenderNecessary = true;
+                    RenderNecessary = true;
                 }
-                this.m_iMax = value;
+                _mIMax = value;
             }
         }
 
-        private int m_iMax = 100;
+        private int _mIMax = 100;
 
         public int? MessageId { get; set; }
 
-        private bool RenderNecessary { get; set; } = false;
+        private bool RenderNecessary { get; set; }
 
         public int Steps
         {
             get
             {
-                switch (this.ProgressStyle)
+                return ProgressStyle switch
                 {
-                    case eProgressStyle.standard:
-
-                        return 1;
-
-                    case eProgressStyle.squares:
-
-                        return 10;
-
-                    case eProgressStyle.circles:
-
-                        return 10;
-
-                    case eProgressStyle.lines:
-
-                        return 5;
-
-                    case eProgressStyle.squaredLines:
-
-                        return 5;
-
-                    default:
-
-                        return 1;
-                }
+                    EProgressStyle.standard => 1,
+                    EProgressStyle.squares => 10,
+                    EProgressStyle.circles => 10,
+                    EProgressStyle.lines => 5,
+                    EProgressStyle.squaredLines => 5,
+                    _ => 1
+                };
             }
         }
 
         /// <summary>
         /// Filled block (reached percentage)
         /// </summary>
-        public String BlockChar
+        public string BlockChar
         {
             get; set;
         }
@@ -127,7 +98,7 @@ namespace TelegramBotBase.Controls.Inline
         /// <summary>
         /// Unfilled block (not reached yet)
         /// </summary>
-        public String EmptyBlockChar
+        public string EmptyBlockChar
         {
             get; set;
         }
@@ -135,7 +106,7 @@ namespace TelegramBotBase.Controls.Inline
         /// <summary>
         /// String at the beginning of the progress bar
         /// </summary>
-        public String StartChar
+        public string StartChar
         {
             get; set;
         }
@@ -143,133 +114,133 @@ namespace TelegramBotBase.Controls.Inline
         /// <summary>
         /// String at the end of the progress bar
         /// </summary>
-        public String EndChar
+        public string EndChar
         {
             get; set;
         }
 
         public ProgressBar()
         {
-            this.ProgressStyle = eProgressStyle.standard;
+            ProgressStyle = EProgressStyle.standard;
 
-            this.Value = 0;
-            this.Max = 100;
+            Value = 0;
+            Max = 100;
 
-            this.RenderNecessary = true;
+            RenderNecessary = true;
         }
 
-        public ProgressBar(int Value, int Max, eProgressStyle Style)
+        public ProgressBar(int value, int max, EProgressStyle style)
         {
-            this.Value = Value;
-            this.Max = Max;
-            this.ProgressStyle = Style;
+            this.Value = value;
+            this.Max = max;
+            ProgressStyle = style;
 
-            this.RenderNecessary = true;
+            RenderNecessary = true;
         }
 
         public override async Task Cleanup()
         {
-            if (this.MessageId == null || this.MessageId == -1)
+            if (MessageId == null || MessageId == -1)
                 return;
 
 
-            await this.Device.DeleteMessage(this.MessageId.Value);
+            await Device.DeleteMessage(MessageId.Value);
         }
 
         public void LoadStyle()
         {
-            this.StartChar = "";
-            this.EndChar = "";
+            StartChar = "";
+            EndChar = "";
 
-            switch (this.ProgressStyle)
+            switch (ProgressStyle)
             {
-                case eProgressStyle.circles:
+                case EProgressStyle.circles:
 
-                    this.BlockChar = "⚫️ ";
-                    this.EmptyBlockChar = "⚪️ ";
-
-                    break;
-                case eProgressStyle.squares:
-
-                    this.BlockChar = "⬛️ ";
-                    this.EmptyBlockChar = "⬜️ ";
+                    BlockChar = "⚫️ ";
+                    EmptyBlockChar = "⚪️ ";
 
                     break;
-                case eProgressStyle.lines:
+                case EProgressStyle.squares:
 
-                    this.BlockChar = "█";
-                    this.EmptyBlockChar = "▁";
-
-                    break;
-                case eProgressStyle.squaredLines:
-
-                    this.BlockChar = "▇";
-                    this.EmptyBlockChar = "—";
-
-                    this.StartChar = "[";
-                    this.EndChar = "]";
+                    BlockChar = "⬛️ ";
+                    EmptyBlockChar = "⬜️ ";
 
                     break;
-                case eProgressStyle.standard:
-                case eProgressStyle.custom:
+                case EProgressStyle.lines:
 
-                    this.BlockChar = "";
-                    this.EmptyBlockChar = "";
+                    BlockChar = "█";
+                    EmptyBlockChar = "▁";
+
+                    break;
+                case EProgressStyle.squaredLines:
+
+                    BlockChar = "▇";
+                    EmptyBlockChar = "—";
+
+                    StartChar = "[";
+                    EndChar = "]";
+
+                    break;
+                case EProgressStyle.standard:
+                case EProgressStyle.custom:
+
+                    BlockChar = "";
+                    EmptyBlockChar = "";
 
                     break;
             }
 
         }
 
-        public async override Task Render(MessageResult result)
+        public override async Task Render(MessageResult result)
         {
-            if (!this.RenderNecessary)
+            if (!RenderNecessary)
             {
                 return;
             }
 
-            if (this.Device == null)
+            if (Device == null)
             {
                 return;
             }
 
-            String message = "";
-            int blocks = 0;
-            int maxBlocks = 0;
+            var message = "";
+            var blocks = 0;
+            var maxBlocks = 0;
 
-            switch (this.ProgressStyle)
+            switch (ProgressStyle)
             {
-                case eProgressStyle.standard:
+                case EProgressStyle.standard:
 
-                    message = this.Value.ToString("0") + "%";
+                    message = Value.ToString("0") + "%";
 
                     break;
 
-                case eProgressStyle.squares:
-                case eProgressStyle.circles:
-                case eProgressStyle.lines:
-                case eProgressStyle.squaredLines:
-                case eProgressStyle.custom:
+                case EProgressStyle.squares:
+                case EProgressStyle.circles:
+                case EProgressStyle.lines:
+                case EProgressStyle.squaredLines:
+                case EProgressStyle.custom:
 
-                    blocks = (int)Math.Floor((decimal)this.Value / this.Steps);
+                    blocks = (int)Math.Floor((decimal)Value / Steps);
 
-                    maxBlocks = (this.Max / this.Steps);
+                    maxBlocks = (Max / Steps);
 
-                    message += this.StartChar;
+                    message += StartChar;
 
-                    for (int i = 0; i < blocks; i++)
+                    for (var i = 0; i < blocks; i++)
                     {
-                        message += this.BlockChar;
+                        message += BlockChar;
                     }
 
-                    for (int i = 0; i < (maxBlocks - blocks); i++)
+                    for (var i = 0; i < (maxBlocks - blocks); i++)
                     {
-                        message += this.EmptyBlockChar;
+                        message += EmptyBlockChar;
                     }
 
-                    message += this.EndChar;
+                    message += EndChar;
 
-                    message += " " + this.Value.ToString("0") + "%";
+                    message += " " + Value.ToString("0") + "%";
 
                     break;
 
@@ -278,18 +249,18 @@ namespace TelegramBotBase.Controls.Inline
                     return;
             }
 
-            if (this.MessageId == null)
+            if (MessageId == null)
             {
-                var m = await this.Device.Send(message);
+                var m = await Device.Send(message);
 
-                this.MessageId = m.MessageId;
+                MessageId = m.MessageId;
             }
             else
             {
-                await this.Device.Edit(this.MessageId.Value, message);
+                await Device.Edit(MessageId.Value, message);
             }
 
-            this.RenderNecessary = false;
+            RenderNecessary = false;
         }
 
     }

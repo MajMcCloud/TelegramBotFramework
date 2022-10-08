@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Interfaces
 {
-    interface IDeviceSession
+    internal interface IDeviceSession
     {
         /// <summary>
         /// Device or chat id
@@ -15,7 +13,7 @@ namespace TelegramBotBase.Interfaces
         /// <summary>
         /// Username of user or group
         /// </summary>
-        String ChatTitle { get; set; }
+        string ChatTitle { get; set; }
 
 
         /// <summary>

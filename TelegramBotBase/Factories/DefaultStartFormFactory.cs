@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TelegramBotBase.Form;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Factories
 {
-    public class DefaultStartFormFactory : Interfaces.IStartFormFactory
+    public class DefaultStartFormFactory : IStartFormFactory
     {
         private readonly Type _startFormClass;
 

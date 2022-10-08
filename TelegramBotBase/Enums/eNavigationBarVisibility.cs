@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TelegramBotBase.Enums
+﻿namespace TelegramBotBase.Enums
 {
-    public enum eNavigationBarVisibility
+    public enum ENavigationBarVisibility
     {
         /// <summary>
         /// Shows it depending on the amount of items.

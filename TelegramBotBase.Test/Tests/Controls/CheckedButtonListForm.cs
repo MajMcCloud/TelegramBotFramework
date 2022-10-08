@@ -1,56 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
-using TelegramBotBase.Controls;
 using TelegramBotBase.Controls.Hybrid;
+using TelegramBotBase.DataSources;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Controls
 {
     public class CheckedButtonListForm : AutoCleanForm
     {
-
-        CheckedButtonList m_Buttons = null;
+        private CheckedButtonList _mButtons;
 
         public CheckedButtonListForm()
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            DeleteMode = EDeleteMode.OnLeavingForm;
 
-            this.Init += CheckedButtonListForm_Init;
+            Init += CheckedButtonListForm_Init;
         }
 
-        private async Task CheckedButtonListForm_Init(object sender, InitEventArgs e)
+        private Task CheckedButtonListForm_Init(object sender, InitEventArgs e)
         {
-            m_Buttons = new CheckedButtonList();
+            _mButtons = new CheckedButtonList
+            {
+                KeyboardType = EKeyboardType.InlineKeyBoard,
+                EnablePaging = true,
+                HeadLayoutButtonRow = new List<ButtonBase> { new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch") },
+                SubHeadLayoutButtonRow = new List<ButtonBase> { new ButtonBase("No checked items", "$") }
+            };
 
-            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-            m_Buttons.EnablePaging = true;
+            var bf = new ButtonForm();
 
-            m_Buttons.HeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch") };
-
-            m_Buttons.SubHeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase("No checked items", "$") };
-
-            ButtonForm bf = new ButtonForm();
-
-            for (int i = 0; i < 30; i++)
+            for (var i = 0; i < 30; i++)
             {
                 bf.AddButtonRow($"{i + 1}. Item", i.ToString());
             }
 
-            m_Buttons.DataSource = new TelegramBotBase.Datasources.ButtonFormDataSource(bf);
+            _mButtons.DataSource = new ButtonFormDataSource(bf);
 
-            m_Buttons.ButtonClicked += Bg_ButtonClicked;
-            m_Buttons.CheckedChanged += M_Buttons_CheckedChanged;
+            _mButtons.ButtonClicked += Bg_ButtonClicked;
+            _mButtons.CheckedChanged += M_Buttons_CheckedChanged;
 
-            this.AddControl(m_Buttons);
+            AddControl(_mButtons);
+            return Task.CompletedTask;
         }
 
-        private async Task M_Buttons_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        private Task M_Buttons_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            m_Buttons.SubHeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase($"{m_Buttons.CheckedItems.Count} checked items", "$") };
+            _mButtons.SubHeadLayoutButtonRow = new List<ButtonBase> { new ButtonBase($"{_mButtons.CheckedItems.Count} checked items", "$") };
+            return Task.CompletedTask;
         }
 
         private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
@@ -68,16 +66,12 @@ namespace TelegramBotBaseTest.Tests.Controls
 
 
                 case "switch":
-                    switch (m_Buttons.KeyboardType)
+                    _mButtons.KeyboardType = _mButtons.KeyboardType switch
                     {
-                        case TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard:
-                            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-                            break;
-                        case TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard:
-                            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-                            break;
-                    }
-
+                        EKeyboardType.ReplyKeyboard => EKeyboardType.InlineKeyBoard,
+                        EKeyboardType.InlineKeyBoard => EKeyboardType.ReplyKeyboard,
+                        _ => _mButtons.KeyboardType
+                    };
 
                     break;
 

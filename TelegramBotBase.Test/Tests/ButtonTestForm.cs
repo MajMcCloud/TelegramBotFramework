@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -13,12 +10,12 @@ namespace TelegramBotBaseTest.Tests
 
         public ButtonTestForm()
         {
-            this.Opened += ButtonTestForm_Opened;
+            Opened += ButtonTestForm_Opened;
         }
 
         private async Task ButtonTestForm_Opened(object sender, EventArgs e)
         {
-            await this.Device.Send("Hello world! (Click 'back' to get back to Start)");
+            await Device.Send("Hello world! (Click 'back' to get back to Start)");
         }
 
         public override async Task Action(MessageResult message)
@@ -38,25 +35,25 @@ namespace TelegramBotBaseTest.Tests
             {
                 case "button1":
 
-                    await this.Device.Send("Button 1 pressed");
+                    await Device.Send("Button 1 pressed");
 
                     break;
 
                 case "button2":
 
-                    await this.Device.Send("Button 2 pressed");
+                    await Device.Send("Button 2 pressed");
 
                     break;
 
                 case "button3":
 
-                    await this.Device.Send("Button 3 pressed");
+                    await Device.Send("Button 3 pressed");
 
                     break;
 
                 case "button4":
 
-                    await this.Device.Send("Button 4 pressed");
+                    await Device.Send("Button 4 pressed");
 
                     break;
 
@@ -64,7 +61,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var st = new Menu();
 
-                    await this.NavigateTo(st);
+                    await NavigateTo(st);
 
                     break;
 
@@ -82,7 +79,7 @@ namespace TelegramBotBaseTest.Tests
         public override async Task Render(MessageResult message)
         {
 
-            ButtonForm btn = new ButtonForm();
+            var btn = new ButtonForm();
 
             btn.AddButtonRow(new ButtonBase("Button 1", new CallbackData("a", "button1").Serialize()), new ButtonBase("Button 2", new CallbackData("a", "button2").Serialize()));
 
@@ -92,7 +89,7 @@ namespace TelegramBotBaseTest.Tests
 
             btn.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
 
-            await this.Device.Send("Click a button", btn);
+            await Device.Send("Click a button", btn);
 
 
         }

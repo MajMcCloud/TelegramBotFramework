@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Form;
 
@@ -12,13 +10,13 @@ namespace JoinHiderBot.forms
 
         public override async Task OnMemberChanges(MemberChangeEventArgs e)
         {
-            if (e.Type != Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded && e.Type != Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft)
+            if (e.Type != MessageType.ChatMembersAdded && e.Type != MessageType.ChatMemberLeft)
                 return;
 
 
             var m = e.Result.Message;
 
-            await this.Device.DeleteMessage(m);
+            await Device.DeleteMessage(m);
         }
 
     }

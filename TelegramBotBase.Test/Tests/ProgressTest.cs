@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Controls.Inline;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests
@@ -15,15 +13,15 @@ namespace TelegramBotBaseTest.Tests
 
         public ProgressTest()
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
-            this.Opened += ProgressTest_Opened;
-            this.Closed += ProgressTest_Closed;
+            DeleteMode = EDeleteMode.OnLeavingForm;
+            Opened += ProgressTest_Opened;
+            Closed += ProgressTest_Closed;
         }
 
 
         private async Task ProgressTest_Opened(object sender, EventArgs e)
         {
-            await this.Device.Send("Welcome to ProgressTest");
+            await Device.Send("Welcome to ProgressTest");
         }
 
         public override async Task Action(MessageResult message)
@@ -36,42 +34,52 @@ namespace TelegramBotBaseTest.Tests
             if (call == null)
                 return;
 
-            ProgressBar Bar = null;
+            ProgressBar bar = null;
 
             switch (call.Value)
             {
                 case "standard":
 
-                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.standard);
-                    Bar.Device = this.Device;
+                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.standard)
+                    {
+                        Device = Device
+                    };
 
                     break;
 
                 case "squares":
 
-                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.squares);
-                    Bar.Device = this.Device;
+                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.squares)
+                    {
+                        Device = Device
+                    };
 
                     break;
 
                 case "circles":
 
-                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.circles);
-                    Bar.Device = this.Device;
+                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.circles)
+                    {
+                        Device = Device
+                    };
 
                     break;
 
                 case "lines":
 
-                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.lines);
-                    Bar.Device = this.Device;
+                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.lines)
+                    {
+                        Device = Device
+                    };
 
                     break;
 
                 case "squaredlines":
 
-                    Bar = new ProgressBar(0, 100, ProgressBar.eProgressStyle.squaredLines);
-                    Bar.Device = this.Device;
+                    bar = new ProgressBar(0, 100, ProgressBar.EProgressStyle.squaredLines)
+                    {
+                        Device = Device
+                    };
 
                     break;
 
@@ -79,7 +87,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var sf = new Menu();
 
-                    await this.NavigateTo(sf);
+                    await NavigateTo(sf);
 
                     return;
 
@@ -91,14 +99,14 @@ namespace TelegramBotBaseTest.Tests
 
 
             //Render Progress bar and show some "example" progress
-            await Bar.Render(message);
+            await bar.Render(message);
 
-            this.Controls.Add(Bar);
+            Controls.Add(bar);
 
-            for (int i = 0; i <= 100; i++)
+            for (var i = 0; i <= 100; i++)
             {
-                Bar.Value++;
-                await Bar.Render(message);
+                bar.Value++;
+                await bar.Render(message);
 
                 Thread.Sleep(250);
             }
@@ -109,7 +117,7 @@ namespace TelegramBotBaseTest.Tests
 
         public override async Task Render(MessageResult message)
         {
-            ButtonForm btn = new ButtonForm();
+            var btn = new ButtonForm();
             btn.AddButtonRow(new ButtonBase("Standard", new CallbackData("a", "standard").Serialize()), new ButtonBase("Squares", new CallbackData("a", "squares").Serialize()));
 
             btn.AddButtonRow(new ButtonBase("Circles", new CallbackData("a", "circles").Serialize()), new ButtonBase("Lines", new CallbackData("a", "lines").Serialize()));
@@ -118,12 +126,12 @@ namespace TelegramBotBaseTest.Tests
 
             btn.AddButtonRow(new ButtonBase("Back to start", new CallbackData("a", "start").Serialize()));
 
-            await this.Device.Send("Choose your progress bar:", btn);
+            await Device.Send("Choose your progress bar:", btn);
         }
 
         private async Task ProgressTest_Closed(object sender, EventArgs e)
         {
-            await this.Device.Send("Ciao from ProgressTest");
+            await Device.Send("Ciao from ProgressTest");
         }
 
     }

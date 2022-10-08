@@ -1,34 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Args;
-using TelegramBotBase.Controls;
 using TelegramBotBase.Controls.Hybrid;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Controls
 {
     public class ButtonGridForm : AutoCleanForm
     {
-
-        ButtonGrid m_Buttons = null;
+        private ButtonGrid _mButtons;
 
         public ButtonGridForm()
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            DeleteMode = EDeleteMode.OnLeavingForm;
 
-            this.Init += ButtonGridForm_Init;
+            Init += ButtonGridForm_Init;
         }
 
-        private async Task ButtonGridForm_Init(object sender, InitEventArgs e)
+        private Task ButtonGridForm_Init(object sender, InitEventArgs e)
         {
-            m_Buttons = new ButtonGrid();
+            _mButtons = new ButtonGrid
+            {
+                KeyboardType = EKeyboardType.InlineKeyBoard
+            };
 
-            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
 
             bf.AddButtonRow(new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch"));
 
@@ -36,13 +32,12 @@ namespace TelegramBotBaseTest.Tests.Controls
 
             bf.AddButtonRow(new ButtonBase("Button3", "b3"), new ButtonBase("Button4", "b4"));
 
-            m_Buttons.ButtonsForm = bf;
+            _mButtons.ButtonsForm = bf;
 
-            m_Buttons.ButtonClicked += Bg_ButtonClicked;
+            _mButtons.ButtonClicked += Bg_ButtonClicked;
 
-            this.AddControl(m_Buttons);
-
-
+            AddControl(_mButtons);
+            return Task.CompletedTask;
         }
 
         private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
@@ -53,26 +48,21 @@ namespace TelegramBotBaseTest.Tests.Controls
             if (e.Button.Value == "back")
             {
                 var start = new Menu();
-                await this.NavigateTo(start);
+                await NavigateTo(start);
             }
             else if (e.Button.Value == "switch")
             {
-                switch (m_Buttons.KeyboardType)
+                _mButtons.KeyboardType = _mButtons.KeyboardType switch
                 {
-                    case TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard:
-                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-                        break;
-                    case TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard:
-                        m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-                        break;
-                }
-
-
+                    EKeyboardType.ReplyKeyboard => EKeyboardType.InlineKeyBoard,
+                    EKeyboardType.InlineKeyBoard => EKeyboardType.ReplyKeyboard,
+                    _ => _mButtons.KeyboardType
+                };
             }
             else
             {
 
-                await this.Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
+                await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
             }
 
 

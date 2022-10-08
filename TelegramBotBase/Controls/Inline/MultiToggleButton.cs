@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
+using TelegramBotBase.Localizations;
 
 namespace TelegramBotBase.Controls.Inline
 {
@@ -14,25 +13,25 @@ namespace TelegramBotBase.Controls.Inline
         /// <summary>
         /// This contains the selected icon.
         /// </summary>
-        public String SelectedIcon { get; set; } = Localizations.Default.Language["MultiToggleButton_SelectedIcon"];
+        public string SelectedIcon { get; set; } = Default.Language["MultiToggleButton_SelectedIcon"];
 
         /// <summary>
         /// This will appear on the ConfirmAction message (if not empty)
         /// </summary>
-        public String ChangedString { get; set; } = Localizations.Default.Language["MultiToggleButton_Changed"];
+        public string ChangedString { get; set; } = Default.Language["MultiToggleButton_Changed"];
 
         /// <summary>
         /// This holds the title of the control.
         /// </summary>
-        public String Title { get; set; } = Localizations.Default.Language["MultiToggleButton_Title"];
+        public string Title { get; set; } = Default.Language["MultiToggleButton_Title"];
 
         public int? MessageId { get; set; }
 
-        private bool RenderNecessary = true;
+        private bool _renderNecessary = true;
 
-        private static readonly object __evToggled = new object();
+        private static readonly object EvToggled = new object();
 
-        private readonly EventHandlerList Events = new EventHandlerList();
+        private readonly EventHandlerList _events = new EventHandlerList();
 
         /// <summary>
         /// This will hold all options available.
@@ -52,27 +51,21 @@ namespace TelegramBotBase.Controls.Inline
 
         public event EventHandler Toggled
         {
-            add
-            {
-                this.Events.AddHandler(__evToggled, value);
-            }
-            remove
-            {
-                this.Events.RemoveHandler(__evToggled, value);
-            }
+            add => _events.AddHandler(EvToggled, value);
+            remove => _events.RemoveHandler(EvToggled, value);
         }
 
         public void OnToggled(EventArgs e)
         {
-            (this.Events[__evToggled] as EventHandler)?.Invoke(this, e);
+            (_events[EvToggled] as EventHandler)?.Invoke(this, e);
         }
 
-        public override async Task Action(MessageResult result, String value = null)
+        public override async Task Action(MessageResult result, string value = null)
         {
             if (result.Handled)
                 return;
 
-            await result.ConfirmAction(this.ChangedString);
+            await result.ConfirmAction(ChangedString);
 
             switch (value ?? "unknown")
             {
@@ -82,30 +75,30 @@ namespace TelegramBotBase.Controls.Inline
 
                     if (s[0] == "check" && s.Length > 1)
                     {
-                        int index = 0;
+                        var index = 0;
                         if (!int.TryParse(s[1], out index))
                         {
                             return;
                         }
 
-                        if(SelectedOption== null || SelectedOption != this.Options[index])
+                        if(SelectedOption== null || SelectedOption != Options[index])
                         {
-                            this.SelectedOption = this.Options[index];
-                            OnToggled(new EventArgs());
+                            SelectedOption = Options[index];
+                            OnToggled(EventArgs.Empty);
                         }
-                        else if(this.AllowEmptySelection)
+                        else if(AllowEmptySelection)
                         {
-                            this.SelectedOption = null;
-                            OnToggled(new EventArgs());
+                            SelectedOption = null;
+                            OnToggled(EventArgs.Empty);
                         }
 
-                        RenderNecessary = true;
+                        _renderNecessary = true;
 
                         return;
                     }
 
 
-                    RenderNecessary = false;
+                    _renderNecessary = false;
 
                     break;
 
@@ -117,16 +110,16 @@ namespace TelegramBotBase.Controls.Inline
 
         public override async Task Render(MessageResult result)
         {
-            if (!RenderNecessary)
+            if (!_renderNecessary)
                 return;
 
             var bf = new ButtonForm(this);
 
             var lst = new List<ButtonBase>();
-            foreach (var o in this.Options)
+            foreach (var o in Options)
             {
-                var index = this.Options.IndexOf(o);
-                if (o == this.SelectedOption)
+                var index = Options.IndexOf(o);
+                if (o == SelectedOption)
                 {
                     lst.Add(new ButtonBase(SelectedIcon + " " + o.Text, "check$" + index));
                     continue;
@@ -137,20 +130,20 @@ namespace TelegramBotBase.Controls.Inline
 
             bf.AddButtonRow(lst);
 
-            if (this.MessageId != null)
+            if (MessageId != null)
             {
-                var m = await this.Device.Edit(this.MessageId.Value, this.Title, bf);
+                var m = await Device.Edit(MessageId.Value, Title, bf);
             }
             else
             {
-                var m = await this.Device.Send(this.Title, bf, disableNotification: true);
+                var m = await Device.Send(Title, bf, disableNotification: true);
                 if (m != null)
                 {
-                    this.MessageId = m.MessageId;
+                    MessageId = m.MessageId;
                 }
             }
 
-            this.RenderNecessary = false;
+            _renderNecessary = false;
 
 
         }

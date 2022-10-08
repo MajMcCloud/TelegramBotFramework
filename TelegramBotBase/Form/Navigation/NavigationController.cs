@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Tools;
 
 namespace TelegramBotBase.Form.Navigation
 {
@@ -33,15 +34,15 @@ namespace TelegramBotBase.Form.Navigation
             Index = -1;
             ForceCleanupOnLastPop = true;
 
-            this.Init += NavigationController_Init;
-            this.Opened += NavigationController_Opened;
-            this.Closed += NavigationController_Closed;
+            Init += NavigationController_Init;
+            Opened += NavigationController_Opened;
+            Closed += NavigationController_Closed;
         }
 
         public NavigationController(FormBase startForm, params FormBase[] forms) : this()
         {
-            this.Client = startForm.Client;
-            this.Device = startForm.Device;
+            Client = startForm.Client;
+            Device = startForm.Device;
             startForm.NavigationController = this;
 
             History.Add(startForm);
@@ -54,7 +55,7 @@ namespace TelegramBotBase.Form.Navigation
             }
         }
 
-        private async Task NavigationController_Init(object sender, Args.InitEventArgs e)
+        private async Task NavigationController_Init(object sender, InitEventArgs e)
         {
             if (CurrentForm == null)
                 return;
@@ -97,21 +98,21 @@ namespace TelegramBotBase.Form.Navigation
 
             Device.FormSwitched = true;
 
-            await form.OnClosed(new EventArgs());
+            await form.OnClosed(EventArgs.Empty);
 
             //Leave NavigationController and move to the last one
             if (ForceCleanupOnLastPop && History.Count == 1)
             {
-                var last_form = History[0];
-                last_form.NavigationController = null;
-                await this.NavigateTo(last_form);
+                var lastForm = History[0];
+                lastForm.NavigationController = null;
+                await NavigateTo(lastForm);
                 return;
             }
 
             if (History.Count > 0)
             {
                 form = History[Index];
-                await form.OnOpened(new EventArgs());
+                await form.OnOpened(EventArgs.Empty);
             }
         }
 
@@ -134,11 +135,11 @@ namespace TelegramBotBase.Form.Navigation
         /// <returns></returns>
         public virtual async Task PushAsync(FormBase form, params object[] args)
         {
-            form.Client = this.Client;
-            form.Device = this.Device;
+            form.Client = Client;
+            form.Device = Device;
             form.NavigationController = this;
 
-            this.History.Add(form);
+            History.Add(form);
             Index++;
 
             Device.FormSwitched = true;
@@ -148,7 +149,7 @@ namespace TelegramBotBase.Form.Navigation
 
             await form.OnInit(new InitEventArgs(args));
 
-            await form.OnOpened(new EventArgs());
+            await form.OnOpened(EventArgs.Empty);
         }
 
         /// <summary>
@@ -172,10 +173,10 @@ namespace TelegramBotBase.Form.Navigation
         {
             get
             {
-                if (this.History.Count == 0)
+                if (History.Count == 0)
                     return null;
 
-                return this.History[Index];
+                return History[Index];
             }
         }
 
@@ -191,12 +192,12 @@ namespace TelegramBotBase.Form.Navigation
                 return;
 
 
-            int historyCount = e.GetInt("$controller.history.count");
+            var historyCount = e.GetInt("$controller.history.count");
 
-            for (int i = 0; i < historyCount; i++)
+            for (var i = 0; i < historyCount; i++)
             {
 
-                var c = e.GetObject($"$controller.history[{i}]") as Dictionary<String, object>;
+                var c = e.GetObject($"$controller.history[{i}]") as Dictionary<string, object>;
 
 
 
@@ -205,23 +206,21 @@ namespace TelegramBotBase.Form.Navigation
                 if (qname == null)
                     continue;
 
-                Type t = Type.GetType(qname.ToString());
+                var t = Type.GetType(qname);
                 if (t == null || !t.IsSubclassOf(typeof(FormBase)))
                 {
                     continue;
                 }
 
-                var form = t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
-
                 //No default constructor, fallback
-                if (form == null)
+                if (t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) is not FormBase form)
                 {
                     continue;
                 }
 
                 var properties = c.Where(a => a.Key.StartsWith("$"));
 
-                var fields = form.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
+                var fields = form.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
 
                 foreach (var p in properties)
                 {
@@ -243,10 +242,10 @@ namespace TelegramBotBase.Form.Navigation
 
                         f.SetValue(form, p.Value);
                     }
-                    catch (ArgumentException ex)
+                    catch (ArgumentException)
                     {
 
-                        Tools.Conversion.CustomConversionChecks(form, p, f);
+                        Conversion.CustomConversionChecks(form, p, f);
 
                     }
                     catch
@@ -255,13 +254,13 @@ namespace TelegramBotBase.Form.Navigation
                     }
                 }
 
-                form.Device = this.Device;
-                form.Client = this.Client;
+                form.Device = Device;
+                form.Client = Client;
                 form.NavigationController = this;
 
                 form.OnInit(new InitEventArgs());
 
-                this.History.Add(form);
+                History.Add(form);
             }
 
         }
@@ -270,12 +269,12 @@ namespace TelegramBotBase.Form.Navigation
         {
             e.Set("$controller.history.count", History.Count.ToString());
 
-            int i = 0;
+            var i = 0;
             foreach (var form in History)
             {
-                var fields = form.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
+                var fields = form.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
 
-                var dt = new Dictionary<String, object>();
+                var dt = new Dictionary<string, object>();
                 foreach (var f in fields)
                 {
                     var val = f.GetValue(form);

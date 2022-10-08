@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -13,33 +9,30 @@ namespace TelegramBotBase.Controls.Hybrid
     /// <summary>
     /// This Control is for having a basic form content switching control.
     /// </summary>
-    public abstract class MultiView : Base.ControlBase
+    public abstract class MultiView : ControlBase
     {
         /// <summary>
         /// Index of the current View.
         /// </summary>
         public int SelectedViewIndex
         {
-            get
-            {
-                return m_iSelectedViewIndex;
-            }
+            get => _mISelectedViewIndex;
             set
             {
-                m_iSelectedViewIndex = value;
+                _mISelectedViewIndex = value;
 
                 //Already rendered? Re-Render
-                if (_Rendered)
+                if (_rendered)
                     ForceRender().Wait();
             }
         }
 
-        private int m_iSelectedViewIndex = 0;
+        private int _mISelectedViewIndex;
 
         /// <summary>
         /// Hold if the View has been rendered already.
         /// </summary>
-        private bool _Rendered = false;
+        private bool _rendered;
 
         private List<int> Messages { get; set; }
 
@@ -50,12 +43,13 @@ namespace TelegramBotBase.Controls.Hybrid
         }
 
 
-        private async Task Device_MessageSent(object sender, MessageSentEventArgs e)
+        private Task Device_MessageSent(object sender, MessageSentEventArgs e)
         {
             if (e.Origin == null || !e.Origin.IsSubclassOf(typeof(MultiView)))
-                return;
+                return Task.CompletedTask;
 
-            this.Messages.Add(e.MessageId);
+            Messages.Add(e.MessageId);
+            return Task.CompletedTask;
         }
 
         public override void Init()
@@ -63,23 +57,24 @@ namespace TelegramBotBase.Controls.Hybrid
             Device.MessageSent += Device_MessageSent;
         }
 
-        public override async Task Load(MessageResult result)
+        public override Task Load(MessageResult result)
         {
-            _Rendered = false;
+            _rendered = false;
+            return Task.CompletedTask;
         }
 
 
         public override async Task Render(MessageResult result)
         {
             //When already rendered, skip rendering
-            if (_Rendered)
+            if (_rendered)
                 return;
 
             await CleanUpView();
 
-            await RenderView(new RenderViewEventArgs(this.SelectedViewIndex));
+            await RenderView(new RenderViewEventArgs(SelectedViewIndex));
 
-            _Rendered = true;
+            _rendered = true;
         }
 
 
@@ -87,25 +82,24 @@ namespace TelegramBotBase.Controls.Hybrid
         /// Will get invoked on rendering the current controls view.
         /// </summary>
         /// <param name="e"></param>
-        public virtual async Task RenderView(RenderViewEventArgs e)
+        public virtual Task RenderView(RenderViewEventArgs e)
         {
-
-
+            return Task.CompletedTask;
         }
 
-        async Task CleanUpView()
+        private async Task CleanUpView()
         {
 
             var tasks = new List<Task>();
 
-            foreach (var msg in this.Messages)
+            foreach (var msg in Messages)
             {
-                tasks.Add(this.Device.DeleteMessage(msg));
+                tasks.Add(Device.DeleteMessage(msg));
             }
 
             await Task.WhenAll(tasks);
 
-            this.Messages.Clear();
+            Messages.Clear();
 
         }
 
@@ -116,9 +110,9 @@ namespace TelegramBotBase.Controls.Hybrid
         {
             await CleanUpView();
 
-            await RenderView(new RenderViewEventArgs(this.SelectedViewIndex));
+            await RenderView(new RenderViewEventArgs(SelectedViewIndex));
 
-            _Rendered = true;
+            _rendered = true;
         }
 
         public override async Task Cleanup()

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
@@ -11,6 +9,8 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
+using TelegramBotBase.Tools;
+
 namespace TelegramBotBase
 {
     /// <summary>
@@ -37,7 +37,7 @@ namespace TelegramBotBase
 
         public SessionBase()
         {
-            this.SessionList = new Dictionary<long, DeviceSession>();
+            SessionList = new Dictionary<long, DeviceSession>();
         }
 
         /// <summary>
@@ -47,14 +47,8 @@ namespace TelegramBotBase
         /// <returns></returns>
         public DeviceSession this[long key]
         {
-            get
-            {
-                return this.SessionList[key];
-            }
-            set
-            {
-                this.SessionList[key] = value;
-            }
+            get => SessionList[key];
+            set => SessionList[key] = value;
         }
 
         /// <summary>
@@ -64,7 +58,7 @@ namespace TelegramBotBase
         /// <returns></returns>
         public DeviceSession GetSession(long deviceId)
         {
-            DeviceSession ds = this.SessionList.FirstOrDefault(a => a.Key == deviceId).Value ?? null;
+            var ds = SessionList.FirstOrDefault(a => a.Key == deviceId).Value ?? null;
             return ds;
         }
 
@@ -77,16 +71,15 @@ namespace TelegramBotBase
         public async Task<DeviceSession> StartSession(long deviceId)
         {
             var start = BotBase.StartFormFactory.CreateForm();
-            //T start = typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { }) as T;
 
-            start.Client = this.Client;
+            start.Client = Client;
 
-            DeviceSession ds = new Sessions.DeviceSession(deviceId, start);
+            var ds = new DeviceSession(deviceId, start);
 
             start.Device = ds;
             await start.OnInit(new InitEventArgs());
 
-            await start.OnOpened(new EventArgs());
+            await start.OnOpened(EventArgs.Empty);
 
             this[deviceId] = ds;
             return ds;
@@ -101,7 +94,7 @@ namespace TelegramBotBase
             var d = this[deviceId];
             if (d != null)
             {
-                this.SessionList.Remove(deviceId);
+                SessionList.Remove(deviceId);
 
             }
         }
@@ -112,7 +105,7 @@ namespace TelegramBotBase
         /// <returns></returns>
         public List<DeviceSession> GetUserSessions()
         {
-            return this.SessionList.Where(a => a.Key > 0).Select(a => a.Value).ToList();
+            return SessionList.Where(a => a.Key > 0).Select(a => a.Value).ToList();
         }
 
         /// <summary>
@@ -121,7 +114,7 @@ namespace TelegramBotBase
         /// <returns></returns>
         public List<DeviceSession> GetGroupSessions()
         {
-            return this.SessionList.Where(a => a.Key < 0).Select(a => a.Value).ToList();
+            return SessionList.Where(a => a.Key < 0).Select(a => a.Value).ToList();
         }
 
         /// <summary>
@@ -152,20 +145,18 @@ namespace TelegramBotBase
 
             foreach (var s in container.States)
             {
-                Type t = Type.GetType(s.QualifiedName);
+                var t = Type.GetType(s.QualifiedName);
                 if (t == null || !t.IsSubclassOf(typeof(FormBase)))
                 {
                     continue;
                 }
 
                 //Key already existing
-                if (this.SessionList.ContainsKey(s.DeviceId))
+                if (SessionList.ContainsKey(s.DeviceId))
                     continue;
 
-                var form = t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
-
                 //No default constructor, fallback
-                if (form == null)
+                if (!(t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) is FormBase form))
                 {
                     if (!statemachine.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
                         continue;
@@ -182,7 +173,7 @@ namespace TelegramBotBase
                 if (s.Values != null && s.Values.Count > 0)
                 {
                     var properties = s.Values.Where(a => a.Key.StartsWith("$"));
-                    var fields = form.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
+                    var fields = form.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
 
                     foreach (var p in properties)
                     {
@@ -204,10 +195,10 @@ namespace TelegramBotBase
 
                             f.SetValue(form, p.Value);
                         }
-                        catch (ArgumentException ex)
+                        catch (ArgumentException)
                         {
 
-                            Tools.Conversion.CustomConversionChecks(form, p, f);
+                            Conversion.CustomConversionChecks(form, p, f);
 
                         }
                         catch
@@ -218,18 +209,20 @@ namespace TelegramBotBase
                 }
 
                 form.Client = Client;
-                var device = new DeviceSession(s.DeviceId, form);
+                var device = new DeviceSession(s.DeviceId, form)
+                {
+                    ChatTitle = s.ChatTitle
+                };
 
-                device.ChatTitle = s.ChatTitle;
-
-                this.SessionList.Add(s.DeviceId, device);
+                SessionList.Add(s.DeviceId, device);
 
                 //Is Subclass of IStateForm
-                var iform = form as IStateForm;
-                if (iform != null)
+                if (form is IStateForm iform)
                 {
-                    var ls = new LoadStateEventArgs();
-                    ls.Values = s.Values;
+                    var ls = new LoadStateEventArgs
+                    {
+                        Values = s.Values
+                    };
                     iform.LoadState(ls);
                 }
 
@@ -237,12 +230,12 @@ namespace TelegramBotBase
                 {
                     await form.OnInit(new InitEventArgs());
 
-                    await form.OnOpened(new EventArgs());
+                    await form.OnOpened(EventArgs.Empty);
                 }
                 catch
                 {
                     //Skip on exception
-                    this.SessionList.Remove(s.DeviceId);
+                    SessionList.Remove(s.DeviceId);
                 }
             }
 
@@ -263,7 +256,7 @@ namespace TelegramBotBase
 
             var states = new List<StateEntry>();
 
-            foreach (var s in this.SessionList)
+            foreach (var s in SessionList)
             {
                 if (s.Value == null)
                 {
@@ -274,11 +267,13 @@ namespace TelegramBotBase
 
                 try
                 {
-                    var se = new StateEntry();
-                    se.DeviceId = s.Key;
-                    se.ChatTitle = s.Value.GetChatTitle();
-                    se.FormUri = form.GetType().FullName;
-                    se.QualifiedName = form.GetType().AssemblyQualifiedName;
+                    var se = new StateEntry
+                    {
+                        DeviceId = s.Key,
+                        ChatTitle = s.Value.GetChatTitle(),
+                        FormUri = form.GetType().FullName,
+                        QualifiedName = form.GetType().AssemblyQualifiedName
+                    };
 
                     //Skip classes where IgnoreState attribute is existing
                     if (form.GetType().GetCustomAttributes(typeof(IgnoreState), true).Length != 0)
@@ -295,18 +290,17 @@ namespace TelegramBotBase
                     }
 
                     //Is Subclass of IStateForm
-                    var iform = form as IStateForm;
-                    if (iform != null)
+                    if (form is IStateForm iform)
                     {
                         //Loading Session states
-                        SaveStateEventArgs ssea = new SaveStateEventArgs();
+                        var ssea = new SaveStateEventArgs();
                         iform.SaveState(ssea);
 
                         se.Values = ssea.Values;
                     }
 
                     //Search for public properties with SaveState attribute
-                    var fields = form.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
+                    var fields = form.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
 
                     foreach (var f in fields)
                     {
@@ -320,12 +314,13 @@ namespace TelegramBotBase
                 catch
                 {
                     //Continue on error (skip this form)
-                    continue;
                 }
             }
 
-            var sc = new StateContainer();
-            sc.States = states;
+            var sc = new StateContainer
+            {
+                States = states
+            };
 
             statemachine.SaveFormStates(new SaveStatesEventArgs(sc));
         }
@@ -335,11 +330,11 @@ namespace TelegramBotBase
         /// </summary>
         public void SaveSessionStates()
         {
-            if (this.BotBase.StateMachine == null)
+            if (BotBase.StateMachine == null)
                 return;
 
 
-            this.SaveSessionStates(this.BotBase.StateMachine);
+            SaveSessionStates(BotBase.StateMachine);
         }
     }
 }

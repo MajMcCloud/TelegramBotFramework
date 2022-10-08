@@ -1,36 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 
-namespace TelegramBotBase.Datasources
+namespace TelegramBotBase.DataSources
 {
-    public class ButtonFormDataSource : Interfaces.IDataSource<ButtonRow>
+    public class ButtonFormDataSource : IDataSource<ButtonRow>
     {
         public virtual ButtonForm ButtonForm
         {
-            get
-            {
-                return __buttonform;
-            }
-            set
-            {
-                __buttonform = value;
-            }
+            get => _buttonform;
+            set => _buttonform = value;
         }
 
-        private ButtonForm __buttonform = null;
+        private ButtonForm _buttonform;
 
         public ButtonFormDataSource()
         {
-            __buttonform = new ButtonForm();
+            _buttonform = new ButtonForm();
         }
 
         public ButtonFormDataSource(ButtonForm bf)
         {
-            __buttonform = bf;
+            _buttonform = bf;
         }
 
 
@@ -71,9 +64,9 @@ namespace TelegramBotBase.Datasources
             return ButtonForm.ToArray();
         }
 
-        public virtual ButtonForm PickItems(int start, int count, String filter = null)
+        public virtual ButtonForm PickItems(int start, int count, string filter = null)
         {
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
             ButtonForm dataForm = null;
 
             if (filter == null)
@@ -85,9 +78,9 @@ namespace TelegramBotBase.Datasources
                 dataForm = ButtonForm.FilterDuplicate(filter, true);
             }
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                int it = start + i;
+                var it = start + i;
 
                 if (it > dataForm.Rows - 1)
                     break;
@@ -98,7 +91,7 @@ namespace TelegramBotBase.Datasources
             return bf;
         }
 
-        public virtual ButtonForm PickAllItems(String filter = null)
+        public virtual ButtonForm PickAllItems(string filter = null)
         {
             if (filter == null)
                 return ButtonForm.Duplicate();
@@ -107,7 +100,7 @@ namespace TelegramBotBase.Datasources
             return ButtonForm.FilterDuplicate(filter, true);
         }
 
-        public virtual Tuple<ButtonRow, int> FindRow(String text, bool useText = true)
+        public virtual Tuple<ButtonRow, int> FindRow(string text, bool useText = true)
         {
             return ButtonForm.FindRow(text, useText);
         }
@@ -117,7 +110,7 @@ namespace TelegramBotBase.Datasources
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public virtual int CalculateMax(String filter = null)
+        public virtual int CalculateMax(string filter = null)
         {
             return PickAllItems(filter).Rows;
         }

@@ -1,42 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace TelegramBotBase.Args
 {
     public class LoadStateEventArgs
     {
-        public Dictionary<String,object> Values { get; set; }
+        public Dictionary<string,object> Values { get; set; }
 
         public LoadStateEventArgs()
         {
             Values = new Dictionary<string, object>();
         }
 
-        public List<String> Keys
-        {
-            get
-            {
-                return Values.Keys.ToList();
-            }
-        }
+        public List<string> Keys => Values.Keys.ToList();
 
-        public String Get(String key)
+        public string Get(string key)
         {
             return Values[key].ToString();
         }
 
-        public int GetInt(String key)
+        public int GetInt(string key)
         {
-            int i = 0;
+            var i = 0;
             if (int.TryParse(Values[key].ToString(), out i))
                 return i;
 
             return 0;
         }
 
-        public double GetDouble(String key)
+        public double GetDouble(string key)
         {
             double d = 0;
             if (double.TryParse(Values[key].ToString(), out d))
@@ -45,16 +37,16 @@ namespace TelegramBotBase.Args
             return 0;
         }
 
-        public bool GetBool(String key)
+        public bool GetBool(string key)
         {
-            bool b = false;
+            var b = false;
             if (bool.TryParse(Values[key].ToString(), out b))
                 return b;
 
             return false;
         }
 
-        public object GetObject(String key)
+        public object GetObject(string key)
         {
             return Values[key];
         }

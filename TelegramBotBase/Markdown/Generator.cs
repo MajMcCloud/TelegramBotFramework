@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Telegram.Bot.Types.Enums;
 
 namespace TelegramBotBase.Markdown
@@ -22,16 +17,14 @@ namespace TelegramBotBase.Markdown
         /// <param name="title"></param>
         /// <param name="tooltip"></param>
         /// <returns></returns>
-        public static String Link(this String url, String title = null, String tooltip = null)
+        public static string Link(this string url, string title = null, string tooltip = null)
         {
-            switch (OutputMode)
+            return OutputMode switch
             {
-                case ParseMode.Markdown:
-                    return "[" + (title ?? url) + "](" + url + " " + (tooltip ?? "") + ")";
-                case ParseMode.Html:
-                    return $"<a href=\"{url}\" title=\"{tooltip ?? ""}\">{title ?? ""}</b>";
-            }
-            return url;
+                ParseMode.Markdown => "[" + (title ?? url) + "](" + url + " " + (tooltip ?? "") + ")",
+                ParseMode.Html => $"<a href=\"{url}\" title=\"{tooltip ?? ""}\">{title ?? ""}</b>",
+                _ => url
+            };
         }
 
         /// <summary>
@@ -40,9 +33,9 @@ namespace TelegramBotBase.Markdown
         /// <param name="userId"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public static String MentionUser(this int userId, String title = null)
+        public static string MentionUser(this int userId, string title = null)
         {
-            return Link("tg://user?id=" + userId.ToString(), title);
+            return Link("tg://user?id=" + userId, title);
         }
 
         /// <summary>
@@ -51,7 +44,7 @@ namespace TelegramBotBase.Markdown
         /// <param name="userId"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public static String MentionUser(this String username, String title = null)
+        public static string MentionUser(this string username, string title = null)
         {
             return Link("tg://user?id=" + username, title);
         }
@@ -61,16 +54,14 @@ namespace TelegramBotBase.Markdown
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static String Bold(this String text)
+        public static string Bold(this string text)
         {
-            switch (OutputMode)
+            return OutputMode switch
             {
-                case ParseMode.Markdown:
-                    return "*" + text + "*";
-                case ParseMode.Html:
-                    return "<b>" + text + "</b>";
-            }
-            return text;
+                ParseMode.Markdown => "*" + text + "*",
+                ParseMode.Html => "<b>" + text + "</b>",
+                _ => text
+            };
         }
 
         /// <summary>
@@ -78,16 +69,14 @@ namespace TelegramBotBase.Markdown
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static String Strikesthrough(this String text)
+        public static string Strikesthrough(this string text)
         {
-            switch (OutputMode)
+            return OutputMode switch
             {
-                case ParseMode.Markdown:
-                    return "~" + text + "~";
-                case ParseMode.Html:
-                    return "<s>" + text + "</s>";
-            }
-            return text;
+                ParseMode.Markdown => "~" + text + "~",
+                ParseMode.Html => "<s>" + text + "</s>",
+                _ => text
+            };
         }
 
         /// <summary>
@@ -95,16 +84,14 @@ namespace TelegramBotBase.Markdown
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static String Italic(this String text)
+        public static string Italic(this string text)
         {
-            switch (OutputMode)
+            return OutputMode switch
             {
-                case ParseMode.Markdown:
-                    return "_" + text + "_";
-                case ParseMode.Html:
-                    return "<i>" + text + "</i>";
-            }
-            return text;
+                ParseMode.Markdown => "_" + text + "_",
+                ParseMode.Html => "<i>" + text + "</i>",
+                _ => text
+            };
         }
 
         /// <summary>
@@ -112,16 +99,14 @@ namespace TelegramBotBase.Markdown
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static String Underline(this String text)
+        public static string Underline(this string text)
         {
-            switch (OutputMode)
+            return OutputMode switch
             {
-                case ParseMode.Markdown:
-                    return "__" + text + "__";
-                case ParseMode.Html:
-                    return "<u>" + text + "</u>";
-            }
-            return text;
+                ParseMode.Markdown => "__" + text + "__",
+                ParseMode.Html => "<u>" + text + "</u>",
+                _ => text
+            };
         }
 
         /// <summary>
@@ -129,16 +114,14 @@ namespace TelegramBotBase.Markdown
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static String Monospace(this String text)
+        public static string Monospace(this string text)
         {
-            switch (OutputMode)
+            return OutputMode switch
             {
-                case ParseMode.Markdown:
-                    return "`" + text + "`";
-                case ParseMode.Html:
-                    return "<code>" + text + "</code>";
-            }
-            return text;
+                ParseMode.Markdown => "`" + text + "`",
+                ParseMode.Html => "<code>" + text + "</code>",
+                _ => text
+            };
         }
 
         /// <summary>
@@ -146,16 +129,14 @@ namespace TelegramBotBase.Markdown
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static String MultiMonospace(this String text)
+        public static string MultiMonospace(this string text)
         {
-            switch (OutputMode)
+            return OutputMode switch
             {
-                case ParseMode.Markdown:
-                    return "```" + text + "```";
-                case ParseMode.Html:
-                    return "<pre>" + text + "</pre>";
-            }
-            return text;
+                ParseMode.Markdown => "```" + text + "```",
+                ParseMode.Html => "<pre>" + text + "</pre>",
+                _ => text
+            };
         }
 
         /// <summary>
@@ -163,14 +144,14 @@ namespace TelegramBotBase.Markdown
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static String MarkdownV2Escape(this String text, params char[] toKeep)
+        public static string MarkdownV2Escape(this string text, params char[] toKeep)
         {
-            char[] toEscape = new char[] { '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!' };
+            var toEscape = new[] { '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!' };
 
             return text.EscapeAll(toEscape.Where(a => !toKeep.Contains(a)).Select(a => a.ToString()).ToArray());
         }
 
-        public static string EscapeAll(this string seed, String[] chars, char escapeCharacter = '\\')
+        public static string EscapeAll(this string seed, string[] chars, char escapeCharacter = '\\')
         {
             return chars.Aggregate(seed, (str, cItem) => str.Replace(cItem, escapeCharacter + cItem));
         }

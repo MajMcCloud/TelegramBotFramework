@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TelegramBotBase.Base;
-using TelegramBotBase.Sessions;
+﻿using TelegramBotBase.Base;
 
 namespace TelegramBotBase.Args
 {
@@ -14,7 +9,7 @@ namespace TelegramBotBase.Args
 
         public SaveStatesEventArgs(StateContainer states)
         {
-            this.States = states;
+            States = states;
         }
     }
 }

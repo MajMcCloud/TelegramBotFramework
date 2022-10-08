@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Args
@@ -10,7 +6,7 @@ namespace TelegramBotBase.Args
     public class SystemExceptionEventArgs : EventArgs
     {
 
-        public String Command { get; set; }
+        public string Command { get; set; }
 
         public long DeviceId { get; set; }
 
@@ -24,12 +20,12 @@ namespace TelegramBotBase.Args
 
         }
 
-        public SystemExceptionEventArgs(String Command, long DeviceId, DeviceSession Device, Exception error)
+        public SystemExceptionEventArgs(string command, long deviceId, DeviceSession device, Exception error)
         {
-            this.Command = Command;
-            this.DeviceId = DeviceId;
-            this.Device = Device;
-            this.Error = error;
+            this.Command = command;
+            this.DeviceId = deviceId;
+            this.Device = device;
+            Error = error;
         }
     }
 

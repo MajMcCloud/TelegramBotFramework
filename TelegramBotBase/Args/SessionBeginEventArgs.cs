@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
@@ -13,10 +9,10 @@ namespace TelegramBotBase.Base
 
         public DeviceSession Device { get; set; }
 
-        public SessionBeginEventArgs(long DeviceId, DeviceSession Device)
+        public SessionBeginEventArgs(long deviceId, DeviceSession device)
         {
-            this.DeviceId = DeviceId;
-            this.Device = Device;
+            this.DeviceId = deviceId;
+            this.Device = device;
         }
     }
 }

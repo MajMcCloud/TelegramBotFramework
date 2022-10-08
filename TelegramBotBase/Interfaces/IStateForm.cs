@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TelegramBotBase.Args;
-using TelegramBotBase.Base;
+﻿using TelegramBotBase.Args;
 
 namespace TelegramBotBase.Interfaces
 {

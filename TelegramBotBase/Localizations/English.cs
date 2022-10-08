@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TelegramBotBase.Localizations
+﻿namespace TelegramBotBase.Localizations
 {
     public class English : Localization
     {
-        public English() : base()
+        public English()
         {
             Values["Language"] = "English";
             Values["ButtonGrid_Title"] = "Menu";

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
@@ -14,7 +10,7 @@ namespace AsyncFormUpdates.forms
 
         public override async Task Action(MessageResult message)
         {
-            await message.ConfirmAction("");
+            await message.ConfirmAction();
 
             switch (message.RawData ?? "")
             {

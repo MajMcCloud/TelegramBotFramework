@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
-
 
 namespace TelegramBotBase.Form
 {
@@ -23,14 +19,14 @@ namespace TelegramBotBase.Form
         public override async Task Load(MessageResult message)
         {
 
-            if (message.Message.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Channel)
+            if (message.Message.Chat.Type == ChatType.Channel)
             {
                 if (await OpenChannel(message))
                 {
                     return;
                 }
             }
-            if (message.Message.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Supergroup)
+            if (message.Message.Chat.Type == ChatType.Supergroup)
             {
                 if (await OpenSupergroup(message))
                 {
@@ -41,7 +37,7 @@ namespace TelegramBotBase.Form
                     return;
                 }
             }
-            if (message.Message.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Group)
+            if (message.Message.Chat.Type == ChatType.Group)
             {
                 if (await OpenGroup(message))
                 {
@@ -53,24 +49,24 @@ namespace TelegramBotBase.Form
         }
 
 
-        public virtual async Task<bool> OpenSupergroup(MessageResult e)
+        public virtual Task<bool> OpenSupergroup(MessageResult e)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        public virtual async Task<bool> OpenChannel(MessageResult e)
+        public virtual Task<bool> OpenChannel(MessageResult e)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        public virtual async Task<bool> Open(MessageResult e)
+        public virtual Task<bool> Open(MessageResult e)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        public virtual async Task<bool> OpenGroup(MessageResult e)
+        public virtual Task<bool> OpenGroup(MessageResult e)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
 

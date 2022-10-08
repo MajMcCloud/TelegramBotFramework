@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace TelegramBotBase.Form
 {
@@ -14,10 +8,10 @@ namespace TelegramBotBase.Form
     public class CallbackData
     {
         [JsonProperty("m")]
-        public String Method { get; set; }
+        public string Method { get; set; }
 
         [JsonProperty("v")]
-        public String Value { get; set; }
+        public string Value { get; set; }
 
 
         public CallbackData()
@@ -25,13 +19,13 @@ namespace TelegramBotBase.Form
 
         }
 
-        public CallbackData(String method, String value)
+        public CallbackData(string method, string value)
         {
-            this.Method = method;
-            this.Value = value;
+            Method = method;
+            Value = value;
         }
 
-        public static String Create(String method, String value)
+        public static string Create(string method, string value)
         {
             return new CallbackData(method, value).Serialize();
         }
@@ -40,13 +34,13 @@ namespace TelegramBotBase.Form
         /// Serializes data to json string
         /// </summary>
         /// <returns></returns>
-        public String Serialize()
+        public string Serialize()
         {
-            String s = "";
+            var s = "";
             try
             {
 
-                s = Newtonsoft.Json.JsonConvert.SerializeObject(this);
+                s = JsonConvert.SerializeObject(this);
             }
             catch
             {
@@ -61,12 +55,12 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static CallbackData Deserialize(String data)
+        public static CallbackData Deserialize(string data)
         {
             CallbackData cd = null;
             try
             {
-                cd = Newtonsoft.Json.JsonConvert.DeserializeObject<CallbackData>(data);
+                cd = JsonConvert.DeserializeObject<CallbackData>(data);
 
                 return cd;
             }

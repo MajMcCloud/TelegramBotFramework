@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Form;
 
@@ -29,21 +25,21 @@ namespace TelegramBotBase.Args
 
         public ButtonClickedEventArgs(ButtonBase button)
         {
-            this.Button = button;
-            this.Index = -1;
+            Button = button;
+            Index = -1;
         }
 
-        public ButtonClickedEventArgs(ButtonBase button, int Index)
+        public ButtonClickedEventArgs(ButtonBase button, int index)
         {
-            this.Button = button;
-            this.Index = Index;
+            Button = button;
+            this.Index = index;
         }
 
-        public ButtonClickedEventArgs(ButtonBase button, int Index, ButtonRow row)
+        public ButtonClickedEventArgs(ButtonBase button, int index, ButtonRow row)
         {
-            this.Button = button;
-            this.Index = Index;
-            this.Row = row;
+            Button = button;
+            this.Index = index;
+            Row = row;
         }
     }
 }

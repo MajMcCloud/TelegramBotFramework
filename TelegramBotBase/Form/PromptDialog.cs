@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
+using TelegramBotBase.Localizations;
 
 namespace TelegramBotBase.Form
 {
@@ -18,25 +16,23 @@ namespace TelegramBotBase.Form
         /// <summary>
         /// The message the users sees.
         /// </summary>
-        public String Message { get; set; }
+        public string Message { get; set; }
 
         /// <summary>
         /// The returned text value by the user.
         /// </summary>
-        public String Value { get; set; }
+        public string Value { get; set; }
 
         /// <summary>
         /// An additional optional value.
         /// </summary>
         public object Tag { get; set; }
 
-        private EventHandlerList __Events { get; set; } = new EventHandlerList();
-
-        private static object __evCompleted { get; } = new object();
+        private static object EvCompleted { get; } = new object();
 
         public bool ShowBackButton { get; set; } = false;
 
-        public String BackLabel { get; set; } = Localizations.Default.Language["PromptDialog_Back"];
+        public string BackLabel { get; set; } = Default.Language["PromptDialog_Back"];
 
         /// <summary>
         /// Contains the RAW received message.
@@ -48,12 +44,12 @@ namespace TelegramBotBase.Form
 
         }
 
-        public PromptDialog(String Message)
+        public PromptDialog(string message)
         {
-            this.Message = Message;
+            this.Message = message;
         }
 
-        public async override Task Load(MessageResult message)
+        public override async Task Load(MessageResult message)
         {
             if (message.Handled)
                 return;
@@ -61,16 +57,16 @@ namespace TelegramBotBase.Form
             if (!message.IsFirstHandler)
                 return;
 
-            if (this.ShowBackButton && message.MessageText == BackLabel)
+            if (ShowBackButton && message.MessageText == BackLabel)
             {
-                await this.CloseForm();
+                await CloseForm();
 
                 return;
             }
 
-            if (this.Value == null)
+            if (Value == null)
             {
-                this.Value = message.MessageText;
+                Value = message.MessageText;
 
                 ReceivedMessage = message.Message;
             }
@@ -81,44 +77,38 @@ namespace TelegramBotBase.Form
         public override async Task Render(MessageResult message)
         {
 
-            if (this.Value == null)
+            if (Value == null)
             {
-                if (this.ShowBackButton)
+                if (ShowBackButton)
                 {
-                    ButtonForm bf = new ButtonForm();
+                    var bf = new ButtonForm();
                     bf.AddButtonRow(new ButtonBase(BackLabel, "back"));
-                    await this.Device.Send(this.Message, (ReplyMarkupBase)bf);
+                    await Device.Send(Message, (ReplyMarkupBase)bf);
                     return;
                 }
 
-                await this.Device.Send(this.Message);
+                await Device.Send(Message);
                 return;
             }
 
 
             message.Handled = true;
 
-            OnCompleted(new PromptDialogCompletedEventArgs() { Tag = this.Tag, Value = this.Value });
+            OnCompleted(new PromptDialogCompletedEventArgs { Tag = Tag, Value = Value });
 
-            await this.CloseForm();
+            await CloseForm();
         }
 
 
         public event EventHandler<PromptDialogCompletedEventArgs> Completed
         {
-            add
-            {
-                this.__Events.AddHandler(__evCompleted, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evCompleted, value);
-            }
+            add => Events.AddHandler(EvCompleted, value);
+            remove => Events.RemoveHandler(EvCompleted, value);
         }
 
         public void OnCompleted(PromptDialogCompletedEventArgs e)
         {
-            (this.__Events[__evCompleted] as EventHandler<PromptDialogCompletedEventArgs>)?.Invoke(this, e);
+            (Events[EvCompleted] as EventHandler<PromptDialogCompletedEventArgs>)?.Invoke(this, e);
         }
 
     }

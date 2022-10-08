@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TelegramBotBase.Controls.Hybrid;
-using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Args
 {
     public class CheckedChangedEventArgs : EventArgs
     {
         /// <summary>
-        /// Contains the index of the row where the button is inside. 
+        /// Contains the index of the row where the button is inside.
         /// Contains -1 when it is a layout button or not found.
         /// </summary>
         public int Index { get; set; }
@@ -32,11 +29,11 @@ namespace TelegramBotBase.Args
 
         }
 
-        public CheckedChangedEventArgs(ButtonRow row, int Index, bool Checked)
+        public CheckedChangedEventArgs(ButtonRow row, int index, bool @checked)
         {
-            this.Row = row;
-            this.Index = Index;
-            this.Checked = Checked;
+            Row = row;
+            this.Index = index;
+            this.Checked = @checked;
         }
 
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
+using Newtonsoft.Json;
 using TelegramBotBase.Controls.Hybrid;
-using TelegramBotBase.Datasources;
+using TelegramBotBase.DataSources;
 using TelegramBotBase.Form;
 
 namespace TelegramBotBaseTest.Tests.Datasources
@@ -13,28 +13,28 @@ namespace TelegramBotBaseTest.Tests.Datasources
     public class CustomDataSource : ButtonFormDataSource
     {
 
-        public List<String> Countries = new List<string>() { "Country 1", "Country 2", "Country 3" };
+        public List<string> Countries = new List<string> { "Country 1", "Country 2", "Country 3" };
 
         public CustomDataSource()
         {
-            loadData();
+            LoadData();
         }
 
         /// <summary>
         /// This method has the example purpose of creating and loading some example data.
         /// When using a database you do not need this kind of method.
         /// </summary>
-        private void loadData()
+        private void LoadData()
         {
             //Exists data source? Read it
             if (File.Exists(AppContext.BaseDirectory + "countries.json"))
             {
                 try
                 {
-                    var List = Newtonsoft.Json.JsonConvert.DeserializeObject<List<String>>(File.ReadAllText("countries.json"));
+                    var list = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText("countries.json"));
 
 
-                    Countries = List;
+                    Countries = list;
                 }
                 catch
                 {
@@ -52,7 +52,7 @@ namespace TelegramBotBaseTest.Tests.Datasources
 
                 Countries = countries;
 
-                var tmp = Newtonsoft.Json.JsonConvert.SerializeObject(countries);
+                var tmp = JsonConvert.SerializeObject(countries);
 
                 File.WriteAllText( AppContext.BaseDirectory + "countries.json", tmp);
             }
@@ -76,7 +76,7 @@ namespace TelegramBotBaseTest.Tests.Datasources
         {
             var items = Countries.Skip(start).Take(count);
 
-            List<ButtonRow> lst = new List<ButtonRow>();
+            var lst = new List<ButtonRow>();
             foreach (var c in items)
             {
                 lst.Add(Render(c));
@@ -87,7 +87,7 @@ namespace TelegramBotBaseTest.Tests.Datasources
 
         public override List<ButtonRow> AllItems()
         {
-            List<ButtonRow> lst = new List<ButtonRow>();
+            var lst = new List<ButtonRow>();
             foreach (var c in Countries)
             {
                 lst.Add(Render(c));
@@ -97,9 +97,9 @@ namespace TelegramBotBaseTest.Tests.Datasources
 
         public override ButtonForm PickItems(int start, int count, string filter = null)
         {
-            List<ButtonRow> rows = ItemRange(start, count);
+            var rows = ItemRange(start, count);
 
-            ButtonForm lst = new ButtonForm();
+            var lst = new ButtonForm();
             foreach (var c in rows)
             {
                 lst.AddButtonRow(c);
@@ -109,9 +109,9 @@ namespace TelegramBotBaseTest.Tests.Datasources
 
         public override ButtonForm PickAllItems(string filter = null)
         {
-            List<ButtonRow> rows = AllItems();
+            var rows = AllItems();
 
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
 
             bf.AddButtonRows(rows);
 
@@ -128,36 +128,16 @@ namespace TelegramBotBaseTest.Tests.Datasources
 
         public override ButtonRow Render(object data)
         {
-            var s = data as String;
-            if (s == null)
+            if (!(data is string s))
                 return new ButtonRow(new ButtonBase("Empty", "zero"));
 
             return new ButtonRow(new ButtonBase(s, s));
         }
 
-        public override int Count
-        {
-            get
-            {
-                return Countries.Count;
-            }
-        }
+        public override int Count => Countries.Count;
 
-        public override int ColumnCount
-        {
-            get
-            {
-                return 1;
-            }
-        }
+        public override int ColumnCount => 1;
 
-        public override int RowCount
-        {
-            get
-            {
-                return this.Count;
-            }
-        }
-
+        public override int RowCount => Count;
     }
 }

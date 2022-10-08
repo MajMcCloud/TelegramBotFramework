@@ -1,27 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
-using TelegramBotBase;
-using TelegramBotBase.Form;
-using TelegramBotBaseTest.Tests;
-using TelegramBotBase.Commands;
+using TelegramBotBase.Args;
 using TelegramBotBase.Builder;
+using TelegramBotBase.Commands;
+using TelegramBotBase.Enums;
+using TelegramBotBaseTest.Tests;
 
 namespace TelegramBotBaseTest
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
 
-            String APIKey = "";
+            var apiKey = "";
 
             var bb = BotBaseBuilder
                       .Create()
-                      .WithAPIKey(APIKey)
+                      .WithAPIKey(apiKey)
                       .DefaultMessageLoop()
                       .WithStartForm<Start>()
                       .NoProxy()
@@ -45,7 +42,7 @@ namespace TelegramBotBaseTest
             //Update Bot commands to botfather
             bb.UploadBotCommands().Wait();
 
-            bb.SetSetting(TelegramBotBase.Enums.eSettings.LogAllMessages, true);
+            bb.SetSetting(ESettings.LogAllMessages, true);
 
             bb.Message += (s, en) =>
             {
@@ -65,7 +62,7 @@ namespace TelegramBotBaseTest
 
         }
 
-        private static async Task Bb_BotCommand(object sender, TelegramBotBase.Args.BotCommandEventArgs en)
+        private static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
         {
             switch (en.Command)
             {
@@ -105,7 +102,7 @@ namespace TelegramBotBaseTest
 
                 case "/params":
 
-                    String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+                    var m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
 
                     await en.Device.Send("Your parameters are: " + m, replyTo: en.Device.LastMessageId);
 

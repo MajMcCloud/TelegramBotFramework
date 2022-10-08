@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -27,7 +26,7 @@ namespace TelegramBotBase.Form
         /// <summary>
         /// has this formular already been disposed ?
         /// </summary>
-        public bool IsDisposed { get; set; } = false;
+        public bool IsDisposed { get; set; }
 
         public List<ControlBase> Controls { get; set; }
 
@@ -35,33 +34,33 @@ namespace TelegramBotBase.Form
         public EventHandlerList Events = new EventHandlerList();
 
 
-        private static object __evInit = new object();
+        private static readonly object EvInit = new object();
 
-        private static object __evOpened = new object();
+        private static readonly object EvOpened = new object();
 
-        private static object __evClosed = new object();
+        private static readonly object EvClosed = new object();
 
 
         public FormBase()
         {
-            this.Controls = new List<Base.ControlBase>();
+            Controls = new List<ControlBase>();
         }
 
-        public FormBase(MessageClient Client) : this()
+        public FormBase(MessageClient client) : this()
         {
-            this.Client = Client;
+            this.Client = client;
         }
 
 
         public async Task OnInit(InitEventArgs e)
         {
-            var handler = this.Events[__evInit]?.GetInvocationList().Cast<AsyncEventHandler<InitEventArgs>>();
+            var handler = Events[EvInit]?.GetInvocationList().Cast<AsyncEventHandler<InitEventArgs>>();
             if (handler == null)
                 return;
 
             foreach (var h in handler)
             {
-                await Async.InvokeAllAsync<InitEventArgs>(h, this, e);
+                await h.InvokeAllAsync(this, e);
             }
         }
 
@@ -70,27 +69,21 @@ namespace TelegramBotBase.Form
         ///// </summary>
         public event AsyncEventHandler<InitEventArgs> Init
         {
-            add
-            {
-                this.Events.AddHandler(__evInit, value);
-            }
-            remove
-            {
-                this.Events.RemoveHandler(__evInit, value);
-            }
+            add => Events.AddHandler(EvInit, value);
+            remove => Events.RemoveHandler(EvInit, value);
         }
 
 
 
         public async Task OnOpened(EventArgs e)
         {
-            var handler = this.Events[__evOpened]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
+            var handler = Events[EvOpened]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
             if (handler == null)
                 return;
 
             foreach (var h in handler)
             {
-                await Async.InvokeAllAsync<EventArgs>(h, this, e);
+                await h.InvokeAllAsync(this, e);
             }
         }
 
@@ -100,27 +93,21 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public event AsyncEventHandler<EventArgs> Opened
         {
-            add
-            {
-                this.Events.AddHandler(__evOpened, value);
-            }
-            remove
-            {
-                this.Events.RemoveHandler(__evOpened, value);
-            }
+            add => Events.AddHandler(EvOpened, value);
+            remove => Events.RemoveHandler(EvOpened, value);
         }
 
         
 
         public async Task OnClosed(EventArgs e)
         {
-            var handler = this.Events[__evClosed]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
+            var handler = Events[EvClosed]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
             if (handler == null)
                 return;
 
             foreach (var h in handler)
             {
-                await Async.InvokeAllAsync<EventArgs>(h, this, e);
+                await h.InvokeAllAsync(this, e);
             }
         }
 
@@ -131,14 +118,8 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public event AsyncEventHandler<EventArgs> Closed
         {
-            add
-            {
-                this.Events.AddHandler(__evClosed, value);
-            }
-            remove
-            {
-                this.Events.RemoveHandler(__evClosed, value);
-            }
+            add => Events.AddHandler(EvClosed, value);
+            remove => Events.RemoveHandler(EvClosed, value);
         }
 
         /// <summary>
@@ -146,9 +127,9 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual async Task ReturnFromModal(ModalDialog modal)
+        public virtual Task ReturnFromModal(ModalDialog modal)
         {
-
+            return Task.CompletedTask;
         }
 
 
@@ -156,17 +137,19 @@ namespace TelegramBotBase.Form
         /// Pre to form close, cleanup all controls
         /// </summary>
         /// <returns></returns>
-        public async Task CloseControls()
+        public Task CloseControls()
         {
-            foreach (var b in this.Controls)
+            foreach (var b in Controls)
             {
                 b.Cleanup().Wait();
             }
+
+            return Task.CompletedTask;
         }
 
-        public virtual async Task PreLoad(MessageResult message)
+        public virtual Task PreLoad(MessageResult message)
         {
-
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -179,7 +162,7 @@ namespace TelegramBotBase.Form
             //Looking for the control by id, if not listened, raise event for all
             if (message.RawData?.StartsWith("#c") ?? false)
             {
-                var c = this.Controls.FirstOrDefault(a => a.ControlID == message.RawData.Split('_')[0]);
+                var c = Controls.FirstOrDefault(a => a.ControlId == message.RawData.Split('_')[0]);
                 if (c != null)
                 {
                     await c.Load(message);
@@ -187,7 +170,7 @@ namespace TelegramBotBase.Form
                 }
             }
 
-            foreach (var b in this.Controls)
+            foreach (var b in Controls)
             {
                 if (!b.Enabled)
                     continue;
@@ -201,9 +184,9 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual async Task Load(MessageResult message)
+        public virtual Task Load(MessageResult message)
         {
-
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -211,9 +194,9 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual async Task Edited(MessageResult message)
+        public virtual Task Edited(MessageResult message)
         {
-
+            return Task.CompletedTask;
         }
 
 
@@ -227,7 +210,7 @@ namespace TelegramBotBase.Form
             //Looking for the control by id, if not listened, raise event for all
             if (message.RawData.StartsWith("#c"))
             {
-                var c = this.Controls.FirstOrDefault(a => a.ControlID == message.RawData.Split('_')[0]);
+                var c = Controls.FirstOrDefault(a => a.ControlId == message.RawData.Split('_')[0]);
                 if (c != null)
                 {
                     await c.Action(message, message.RawData.Split('_')[1]);
@@ -235,7 +218,7 @@ namespace TelegramBotBase.Form
                 }
             }
 
-            foreach (var b in this.Controls)
+            foreach (var b in Controls)
             {
                 if (!b.Enabled)
                     continue;
@@ -252,9 +235,9 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual async Task Action(MessageResult message)
+        public virtual Task Action(MessageResult message)
         {
-
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -262,9 +245,9 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual async Task SentData(DataResult message)
+        public virtual Task SentData(DataResult message)
         {
-
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -274,7 +257,7 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public virtual async Task RenderControls(MessageResult message)
         {
-            foreach (var b in this.Controls)
+            foreach (var b in Controls)
             {
                 if (!b.Enabled)
                     continue;
@@ -288,9 +271,9 @@ namespace TelegramBotBase.Form
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual async Task Render(MessageResult message)
+        public virtual Task Render(MessageResult message)
         {
-
+            return Task.CompletedTask;
         }
 
 
@@ -302,7 +285,7 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public virtual async Task NavigateTo(FormBase newForm, params object[] args)
         {
-            DeviceSession ds = this.Device;
+            var ds = Device;
             if (ds == null)
                 return;
 
@@ -311,11 +294,11 @@ namespace TelegramBotBase.Form
             ds.PreviousForm = ds.ActiveForm;
 
             ds.ActiveForm = newForm;
-            newForm.Client = this.Client;
+            newForm.Client = Client;
             newForm.Device = ds;
 
             //Notify prior to close
-            foreach (var b in this.Controls)
+            foreach (var b in Controls)
             {
                 if (!b.Enabled)
                     continue;
@@ -323,13 +306,13 @@ namespace TelegramBotBase.Form
                 await b.Hidden(true);
             }
 
-            this.CloseControls().Wait();
+            CloseControls().Wait();
 
-            await this.OnClosed(new EventArgs());
+            await OnClosed(EventArgs.Empty);
 
             await newForm.OnInit(new InitEventArgs(args));
 
-            await newForm.OnOpened(new EventArgs());
+            await newForm.OnOpened(EventArgs.Empty);
         }
 
         /// <summary>
@@ -339,7 +322,7 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public virtual async Task OpenModal(ModalDialog newForm, params object[] args)
         {
-            DeviceSession ds = this.Device;
+            var ds = Device;
             if (ds == null)
                 return;
 
@@ -359,7 +342,7 @@ namespace TelegramBotBase.Form
                 await CloseModal(newForm, parentForm);
             };
 
-            foreach (var b in this.Controls)
+            foreach (var b in Controls)
             {
                 if (!b.Enabled)
                     continue;
@@ -369,14 +352,14 @@ namespace TelegramBotBase.Form
 
             await newForm.OnInit(new InitEventArgs(args));
 
-            await newForm.OnOpened(new EventArgs());
+            await newForm.OnOpened(EventArgs.Empty);
         }
 
-        public async Task CloseModal(ModalDialog modalForm, FormBase oldForm)
+        public Task CloseModal(ModalDialog modalForm, FormBase oldForm)
         {
-            DeviceSession ds = this.Device;
+            var ds = Device;
             if (ds == null)
-                return;
+                return Task.CompletedTask;
 
             if (modalForm == null)
                 throw new Exception("No modal form");
@@ -386,6 +369,7 @@ namespace TelegramBotBase.Form
             ds.PreviousForm = ds.ActiveForm;
 
             ds.ActiveForm = oldForm;
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -395,12 +379,12 @@ namespace TelegramBotBase.Form
         public void AddControl(ControlBase control)
         {
             //Duplicate check
-            if (this.Controls.Contains(control))
+            if (Controls.Contains(control))
                 throw new ArgumentException("Control has been already added.");
 
-            control.ID = this.Controls.Count + 1;
-            control.Device = this.Device;
-            this.Controls.Add(control);
+            control.Id = Controls.Count + 1;
+            control.Device = Device;
+            Controls.Add(control);
 
             control.Init();
         }
@@ -411,12 +395,12 @@ namespace TelegramBotBase.Form
         /// <param name="control"></param>
         public void RemoveControl(ControlBase control)
         {
-            if (!this.Controls.Contains(control))
+            if (!Controls.Contains(control))
                 return;
 
             control.Cleanup().Wait();
 
-            this.Controls.Remove(control);
+            Controls.Remove(control);
         }
 
         /// <summary>
@@ -424,11 +408,11 @@ namespace TelegramBotBase.Form
         /// </summary>
         public void RemoveAllControls()
         {
-            foreach(var c in this.Controls)
+            foreach(var c in Controls)
             {
                 c.Cleanup().Wait();
 
-                this.Controls.Remove(c);
+                Controls.Remove(c);
             }
         }
 
@@ -437,9 +421,9 @@ namespace TelegramBotBase.Form
         /// </summary>
         public void Dispose()
         {
-            this.Client = null;
-            this.Device = null;
-            this.IsDisposed = true;
+            Client = null;
+            Device = null;
+            IsDisposed = true;
         }
     }
 }

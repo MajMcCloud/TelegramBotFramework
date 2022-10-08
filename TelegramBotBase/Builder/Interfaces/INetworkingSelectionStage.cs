@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using Telegram.Bot;
 
 namespace TelegramBotBase.Builder.Interfaces
@@ -14,7 +11,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="proxyAddress"></param>
         /// <returns></returns>
-        IBotCommandsStage WithProxy(String proxyAddress);
+        IBotCommandsStage WithProxy(string proxyAddress);
 
         /// <summary>
         /// Do not choose a proxy as network configuration.
@@ -37,7 +34,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <param name="proxyHost"></param>
         /// <param name="Port"></param>
         /// <returns></returns>
-        IBotCommandsStage WithHostAndPort(String proxyHost, int Port);
+        IBotCommandsStage WithHostAndPort(string proxyHost, int Port);
 
         /// <summary>
         /// Uses a custom http client.

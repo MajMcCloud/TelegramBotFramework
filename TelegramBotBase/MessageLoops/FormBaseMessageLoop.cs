@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
-using TelegramBotBase.Enums;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 
@@ -18,32 +14,27 @@ namespace TelegramBotBase.MessageLoops
     /// </summary>
     public class FormBaseMessageLoop : IMessageLoopFactory
     {
-        private static object __evUnhandledCall = new object();
+        private static readonly object EvUnhandledCall = new object();
 
-        private EventHandlerList __Events = new EventHandlerList();
+        private readonly EventHandlerList _events = new EventHandlerList();
 
-        public FormBaseMessageLoop()
-        {
-
-        }
-
-        public async Task MessageLoop(BotBase Bot, DeviceSession session, UpdateResult ur, MessageResult mr)
+        public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
         {
             var update = ur.RawData;
 
 
-            if (update.Type != Telegram.Bot.Types.Enums.UpdateType.Message
-             && update.Type != Telegram.Bot.Types.Enums.UpdateType.EditedMessage
-             && update.Type != Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+            if (update.Type != UpdateType.Message
+             && update.Type != UpdateType.EditedMessage
+             && update.Type != UpdateType.CallbackQuery)
             {
                 return;
             }
 
             //Is this a bot command ?
-            if (mr.IsFirstHandler && mr.IsBotCommand && Bot.IsKnownBotCommand(mr.BotCommand))
+            if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
             {
                 var sce = new BotCommandEventArgs(mr.BotCommand, mr.BotCommandParameters, mr.Message, session.DeviceId, session);
-                await Bot.OnBotCommand(sce);
+                await bot.OnBotCommand(sce);
 
                 if (sce.Handled)
                     return;
@@ -64,14 +55,14 @@ namespace TelegramBotBase.MessageLoops
 
 
             //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document) (Ignore Callback Queries)
-            if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
+            if (update.Type == UpdateType.Message)
             {
-                if (mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Contact
-                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Document
-                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Location
-                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Photo
-                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Video
-                    | mr.MessageType == Telegram.Bot.Types.Enums.MessageType.Audio)
+                if (mr.MessageType == MessageType.Contact
+                    | mr.MessageType == MessageType.Document
+                    | mr.MessageType == MessageType.Location
+                    | mr.MessageType == MessageType.Photo
+                    | mr.MessageType == MessageType.Video
+                    | mr.MessageType == MessageType.Audio)
                 {
                     await activeForm.SentData(new DataResult(ur));
                 }
@@ -118,19 +109,13 @@ namespace TelegramBotBase.MessageLoops
         /// </summary>
         public event EventHandler<UnhandledCallEventArgs> UnhandledCall
         {
-            add
-            {
-                this.__Events.AddHandler(__evUnhandledCall, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evUnhandledCall, value);
-            }
+            add => _events.AddHandler(EvUnhandledCall, value);
+            remove => _events.RemoveHandler(EvUnhandledCall, value);
         }
 
         public void OnUnhandledCall(UnhandledCallEventArgs e)
         {
-            (this.__Events[__evUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
+            (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
 
         }
     }

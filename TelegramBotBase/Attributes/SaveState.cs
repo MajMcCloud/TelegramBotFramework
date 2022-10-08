@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TelegramBotBase.Attributes
 {
@@ -9,7 +7,7 @@ namespace TelegramBotBase.Attributes
     /// </summary>
     public class SaveState : Attribute
     {
-        public String Key { get; set; }
+        public string Key { get; set; }
 
     }
 }

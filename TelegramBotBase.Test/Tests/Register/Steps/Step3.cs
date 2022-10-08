@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
@@ -12,22 +8,24 @@ namespace TelegramBotBaseTest.Tests.Register.Steps
     {
         public Data UserData { get; set; }
 
-        public async override Task Load(MessageResult message)
+        public override Task Load(MessageResult message)
         {
             if (message.Handled)
-                return;
+                return Task.CompletedTask;
 
             if (message.MessageText.Trim() == "")
-                return;
+                return Task.CompletedTask;
 
-            if (this.UserData.EMail == null)
+            if (UserData.EMail == null)
             {
-                this.UserData.EMail = message.MessageText;
-                return;
+                UserData.EMail = message.MessageText;
+                return Task.CompletedTask;
             }
+
+            return Task.CompletedTask;
         }
 
-        public async override Task Action(MessageResult message)
+        public override async Task Action(MessageResult message)
         {
             await message.ConfirmAction();
 
@@ -37,7 +35,7 @@ namespace TelegramBotBaseTest.Tests.Register.Steps
 
                     var start = new Start();
 
-                    await this.NavigateTo(start);
+                    await NavigateTo(start);
 
                     break;
 
@@ -45,26 +43,26 @@ namespace TelegramBotBaseTest.Tests.Register.Steps
 
         }
 
-        public async override Task Render(MessageResult message)
+        public override async Task Render(MessageResult message)
         {
-            if (this.UserData.EMail == null)
+            if (UserData.EMail == null)
             {
-                await this.Device.Send("Please sent your email:");
+                await Device.Send("Please sent your email:");
                 return;
             }
 
             message.Handled = true;
 
-            String s = "";
+            var s = "";
 
-            s += "Firstname: " + this.UserData.Firstname + "\r\n";
-            s += "Lastname: " + this.UserData.Lastname + "\r\n";
-            s += "E-Mail: " + this.UserData.EMail + "\r\n";
+            s += "Firstname: " + UserData.Firstname + "\r\n";
+            s += "Lastname: " + UserData.Lastname + "\r\n";
+            s += "E-Mail: " + UserData.EMail + "\r\n";
 
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
             bf.AddButtonRow(new ButtonBase("Back", "back"));
 
-            await this.Device.Send("Your details:\r\n" + s, bf);
+            await Device.Send("Your details:\r\n" + s, bf);
         }
 
     }

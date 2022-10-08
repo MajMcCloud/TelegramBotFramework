@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace TelegramBotBase.Base
 {
-    public partial class StateContainer
+    public class StateContainer
     {
         public List<StateEntry> States { get; set; }
 
@@ -27,7 +25,7 @@ namespace TelegramBotBase.Base
 
         public StateContainer()
         {
-            this.States = new List<StateEntry>();
+            States = new List<StateEntry>();
         }
 
     }

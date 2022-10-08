@@ -1,36 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using Newtonsoft.Json;
+using SystemCommandsBot.commands;
 
 namespace SystemCommandsBot.config
 {
     public class Config
     {
-        public String Password { get; set; }
+        public string Password { get; set; }
 
-        public String ApiKey { get; set; }
+        public string ApiKey { get; set; }
 
-        public List<commands.Commando> Commandos { get; set; }
+        public List<Commando> Commandos { get; set; }
 
 
         public Config()
         {
-            this.Commandos = new List<commands.Commando>();
+            Commandos = new List<Commando>();
         }
 
-        public void loadDefaultValues()
+        public void LoadDefaultValues()
         {
-            this.ApiKey = "";
-            this.Commandos.Add(new commands.Commando() { ID = 0, Enabled = true, Title = "Test Befehl", ShellCmd = "explorer.exe", Action = "start", MaxInstances = 2 });
+            ApiKey = "";
+            Commandos.Add(new Commando { Id = 0, Enabled = true, Title = "Test Befehl", ShellCmd = "explorer.exe", Action = "start", MaxInstances = 2 });
         }
 
 
-        public static Config load()
+        public static Config Load()
         {
             try
             {
-                return load(AppContext.BaseDirectory + "config\\default.cfg");
+                return Load(AppContext.BaseDirectory + "config\\default.cfg");
 
                 
             }
@@ -42,16 +43,16 @@ namespace SystemCommandsBot.config
         }
 
 
-        public static Config load(String path)
+        public static Config Load(string path)
         {
             try
             {
-                var cfg = Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(File.ReadAllText(path)) as Config;
+                var cfg = JsonConvert.DeserializeObject<Config>(File.ReadAllText(path));
                 return cfg;
             }
-            catch (DirectoryNotFoundException ex)
+            catch (DirectoryNotFoundException)
             {
-                DirectoryInfo di = new DirectoryInfo(path);
+                var di = new DirectoryInfo(path);
 
                 if (!Directory.Exists(di.Parent.FullName))
                 {
@@ -59,15 +60,15 @@ namespace SystemCommandsBot.config
                 }
 
                 var cfg = new Config();
-                cfg.loadDefaultValues();
-                cfg.save(path);
+                cfg.LoadDefaultValues();
+                cfg.Save(path);
                 return cfg;
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 var cfg = new Config();
-                cfg.loadDefaultValues();
-                cfg.save(path);
+                cfg.LoadDefaultValues();
+                cfg.Save(path);
                 return cfg;
             }
             catch(Exception ex)
@@ -77,11 +78,11 @@ namespace SystemCommandsBot.config
             return null;
         }
 
-        public void save(String path)
+        public void Save(string path)
         {
             try
             {
-                File.WriteAllText(path, Newtonsoft.Json.JsonConvert.SerializeObject(this));
+                File.WriteAllText(path, JsonConvert.SerializeObject(this));
             }
             catch
             {

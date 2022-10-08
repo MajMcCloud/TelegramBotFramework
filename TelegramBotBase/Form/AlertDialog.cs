@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TelegramBotBase.Attributes;
-using TelegramBotBase.Base;
+﻿using TelegramBotBase.Attributes;
 
 namespace TelegramBotBase.Form
 {
@@ -15,12 +8,12 @@ namespace TelegramBotBase.Form
     [IgnoreState]
     public class AlertDialog : ConfirmDialog
     {
-        public String ButtonText { get; set; }
+        public string ButtonText { get; set; }
 
-        public AlertDialog(String Message, String ButtonText) : base(Message)
+        public AlertDialog(string message, string buttonText) : base(message)
         {
-            this.Buttons.Add(new ButtonBase(ButtonText, "ok"));
-            this.ButtonText = ButtonText;
+            Buttons.Add(new ButtonBase(buttonText, "ok"));
+            this.ButtonText = buttonText;
 
         }
 

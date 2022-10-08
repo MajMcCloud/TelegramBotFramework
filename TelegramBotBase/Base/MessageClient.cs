@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Telegram.Bot.Exceptions;
 using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Types;
 
 namespace TelegramBotBase.Base
 {
@@ -22,13 +19,13 @@ namespace TelegramBotBase.Base
     {
 
 
-        public String APIKey { get; set; }
+        public string ApiKey { get; set; }
 
         public ITelegramBotClient TelegramClient { get; set; }
 
-        private EventHandlerList __Events { get; set; } = new EventHandlerList();
+        private EventHandlerList Events { get; set; } = new EventHandlerList();
 
-        private static object __evOnMessageLoop = new object();
+        private static readonly object EvOnMessageLoop = new object();
 
         private static object __evOnMessage = new object();
 
@@ -36,21 +33,21 @@ namespace TelegramBotBase.Base
 
         private static object __evCallbackQuery = new object();
 
-        CancellationTokenSource __cancellationTokenSource;
+        private CancellationTokenSource _cancellationTokenSource;
 
 
-        public MessageClient(String APIKey)
+        public MessageClient(string apiKey)
         {
-            this.APIKey = APIKey;
-            this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey);
+            this.ApiKey = apiKey;
+            TelegramClient = new TelegramBotClient(apiKey);
 
             Prepare();
         }
 
-        public MessageClient(String APIKey, HttpClient proxy)
+        public MessageClient(string apiKey, HttpClient proxy)
         {
-            this.APIKey = APIKey;
-            this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey, proxy);
+            this.ApiKey = apiKey;
+            TelegramClient = new TelegramBotClient(apiKey, proxy);
 
 
             Prepare();
@@ -58,9 +55,9 @@ namespace TelegramBotBase.Base
 
 
 
-        public MessageClient(String APIKey, Uri proxyUrl, NetworkCredential credential = null)
+        public MessageClient(string apiKey, Uri proxyUrl, NetworkCredential credential = null)
         {
-            this.APIKey = APIKey;
+            this.ApiKey = apiKey;
 
             var proxy = new WebProxy(proxyUrl)
             {
@@ -71,7 +68,7 @@ namespace TelegramBotBase.Base
                 new HttpClientHandler { Proxy = proxy, UseProxy = true }
             );
 
-            this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey, httpClient);
+            TelegramClient = new TelegramBotClient(apiKey, httpClient);
 
             Prepare();
         }
@@ -79,12 +76,12 @@ namespace TelegramBotBase.Base
         /// <summary>
         /// Initializes the client with a proxy
         /// </summary>
-        /// <param name="APIKey"></param>
+        /// <param name="apiKey"></param>
         /// <param name="proxyHost">i.e. 127.0.0.1</param>
         /// <param name="proxyPort">i.e. 10000</param>
-        public MessageClient(String APIKey, String proxyHost, int proxyPort)
+        public MessageClient(string apiKey, string proxyHost, int proxyPort)
         {
-            this.APIKey = APIKey;
+            this.ApiKey = apiKey;
 
             var proxy = new WebProxy(proxyHost, proxyPort);
 
@@ -92,17 +89,17 @@ namespace TelegramBotBase.Base
                 new HttpClientHandler { Proxy = proxy, UseProxy = true }
             );
 
-            this.TelegramClient = new Telegram.Bot.TelegramBotClient(APIKey, httpClient);
+            TelegramClient = new TelegramBotClient(apiKey, httpClient);
 
             Prepare();
         }
 
 
 
-        public MessageClient(String APIKey, Telegram.Bot.TelegramBotClient Client)
+        public MessageClient(string apiKey, TelegramBotClient client)
         {
-            this.APIKey = APIKey;
-            this.TelegramClient = Client;
+            this.ApiKey = apiKey;
+            TelegramClient = client;
 
             Prepare();
         }
@@ -110,7 +107,7 @@ namespace TelegramBotBase.Base
 
         public void Prepare()
         {
-            this.TelegramClient.Timeout = new TimeSpan(0, 0, 30);
+            TelegramClient.Timeout = new TimeSpan(0, 0, 30);
 
         }
 
@@ -118,19 +115,16 @@ namespace TelegramBotBase.Base
 
         public void StartReceiving()
         {
-            __cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource = new CancellationTokenSource();
 
-            var receiverOptions = new ReceiverOptions
-            {
-                AllowedUpdates = { } // receive all update types
-            };
+            var receiverOptions = new ReceiverOptions();
 
-            this.TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, __cancellationTokenSource.Token);
+            TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, _cancellationTokenSource.Token);
         }
 
         public void StopReceiving()
         {
-            __cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Cancel();
         }
 
 
@@ -143,9 +137,9 @@ namespace TelegramBotBase.Base
 
         public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            if (exception is ApiRequestException exAPI)
+            if (exception is ApiRequestException exApi)
             {
-                Console.WriteLine($"Telegram API Error:\n[{exAPI.ErrorCode}]\n{exAPI.Message}");
+                Console.WriteLine($"Telegram API Error:\n[{exApi.ErrorCode}]\n{exApi.Message}");
             }
             else
             {
@@ -159,9 +153,9 @@ namespace TelegramBotBase.Base
         /// This will return the current list of bot commands.
         /// </summary>
         /// <returns></returns>
-        public async Task<BotCommand[]> GetBotCommands(BotCommandScope scope = null, String languageCode = null)
+        public async Task<BotCommand[]> GetBotCommands(BotCommandScope scope = null, string languageCode = null)
         {
-            return await this.TelegramClient.GetMyCommandsAsync(scope, languageCode);
+            return await TelegramClient.GetMyCommandsAsync(scope, languageCode);
         }
 
 
@@ -170,18 +164,18 @@ namespace TelegramBotBase.Base
         /// </summary>
         /// <param name="botcommands"></param>
         /// <returns></returns>
-        public async Task SetBotCommands(List<BotCommand> botcommands, BotCommandScope scope = null, String languageCode = null)
+        public async Task SetBotCommands(List<BotCommand> botcommands, BotCommandScope scope = null, string languageCode = null)
         {
-            await this.TelegramClient.SetMyCommandsAsync(botcommands, scope, languageCode);
+            await TelegramClient.SetMyCommandsAsync(botcommands, scope, languageCode);
         }
 
         /// <summary>
         /// This will delete the current list of bot commands.
         /// </summary>
         /// <returns></returns>
-        public async Task DeleteBotCommands(BotCommandScope scope = null, String languageCode = null)
+        public async Task DeleteBotCommands(BotCommandScope scope = null, string languageCode = null)
         {
-            await this.TelegramClient.DeleteMyCommandsAsync(scope, languageCode);
+            await TelegramClient.DeleteMyCommandsAsync(scope, languageCode);
         }
 
 
@@ -191,19 +185,13 @@ namespace TelegramBotBase.Base
 
         public event Async.AsyncEventHandler<UpdateResult> MessageLoop
         {
-            add
-            {
-                this.__Events.AddHandler(__evOnMessageLoop, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evOnMessageLoop, value);
-            }
+            add => Events.AddHandler(EvOnMessageLoop, value);
+            remove => Events.RemoveHandler(EvOnMessageLoop, value);
         }
 
         public void OnMessageLoop(UpdateResult update)
         {
-            (this.__Events[__evOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
+            (Events[EvOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
         }
 
 

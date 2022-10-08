@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
@@ -10,38 +6,39 @@ namespace TelegramBotBaseTest.Tests.Register
 {
     public class PerForm : AutoCleanForm
     {
-        public String EMail { get; set; }
+        public string EMail { get; set; }
 
-        public String Firstname { get; set; }
+        public string Firstname { get; set; }
 
-        public String Lastname { get; set; }
+        public string Lastname { get; set; }
 
-        public async override Task Load(MessageResult message)
+        public override Task Load(MessageResult message)
         {
             if (message.MessageText.Trim() == "")
-                return;
+                return Task.CompletedTask;
 
-            if (this.Firstname == null)
+            if (Firstname == null)
             {
-                this.Firstname = message.MessageText;
-                return;
+                Firstname = message.MessageText;
+                return Task.CompletedTask;
             }
 
-            if (this.Lastname == null)
+            if (Lastname == null)
             {
-                this.Lastname = message.MessageText;
-                return;
+                Lastname = message.MessageText;
+                return Task.CompletedTask;
             }
 
-            if (this.EMail == null)
+            if (EMail == null)
             {
-                this.EMail = message.MessageText;
-                return;
+                EMail = message.MessageText;
+                return Task.CompletedTask;
             }
 
+            return Task.CompletedTask;
         }
 
-        public async override Task Action(MessageResult message)
+        public override async Task Action(MessageResult message)
         {
             var call = message.GetData<CallbackData>();
 
@@ -56,7 +53,7 @@ namespace TelegramBotBaseTest.Tests.Register
 
                     var start = new Start();
 
-                    await this.NavigateTo(start);
+                    await NavigateTo(start);
 
                     break;
 
@@ -65,37 +62,37 @@ namespace TelegramBotBaseTest.Tests.Register
 
         }
 
-        public async override Task Render(MessageResult message)
+        public override async Task Render(MessageResult message)
         {
-            if (this.Firstname == null)
+            if (Firstname == null)
             {
-                await this.Device.Send("Please sent your firstname:");
+                await Device.Send("Please sent your firstname:");
                 return;
             }
 
-            if (this.Lastname == null)
+            if (Lastname == null)
             {
-                await this.Device.Send("Please sent your lastname:");
+                await Device.Send("Please sent your lastname:");
                 return;
             }
 
-            if (this.EMail == null)
+            if (EMail == null)
             {
-                await this.Device.Send("Please sent your email address:");
+                await Device.Send("Please sent your email address:");
                 return;
             }
 
 
-            String s = "";
+            var s = "";
 
-            s += "Firstname: " + this.Firstname + "\r\n";
-            s += "Lastname: " + this.Lastname + "\r\n";
-            s += "E-Mail: " + this.EMail + "\r\n";
+            s += "Firstname: " + Firstname + "\r\n";
+            s += "Lastname: " + Lastname + "\r\n";
+            s += "E-Mail: " + EMail + "\r\n";
 
-            ButtonForm bf = new ButtonForm();
+            var bf = new ButtonForm();
             bf.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
 
-            await this.Device.Send("Your details:\r\n" + s, bf);
+            await Device.Send("Your details:\r\n" + s, bf);
         }
 
 

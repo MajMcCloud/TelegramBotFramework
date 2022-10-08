@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
@@ -10,12 +6,7 @@ namespace TelegramBotBaseTest.Tests.Register
 {
     public class Start : AutoCleanForm
     {
-        public Start()
-        {
-
-        }
-
-        public async override Task Action(MessageResult message)
+        public override async Task Action(MessageResult message)
         {
             var call = message.GetData<CallbackData>();
 
@@ -31,21 +22,21 @@ namespace TelegramBotBaseTest.Tests.Register
 
                     var form = new PerForm();
 
-                    await this.NavigateTo(form);
+                    await NavigateTo(form);
 
                     break;
                 case "step":
 
                     var step = new PerStep();
 
-                    await this.NavigateTo(step);
+                    await NavigateTo(step);
 
                     break;
                 case "backtodashboard":
 
-                    var start = new Tests.Menu();
+                    var start = new Menu();
 
-                    await this.NavigateTo(start);
+                    await NavigateTo(start);
 
                     break;
             }
@@ -53,16 +44,16 @@ namespace TelegramBotBaseTest.Tests.Register
 
         }
 
-        public async override Task Render(MessageResult message)
+        public override async Task Render(MessageResult message)
         {
 
-            ButtonForm btn = new ButtonForm();
+            var btn = new ButtonForm();
 
             btn.AddButtonRow(new ButtonBase("#4.1 Per Form", new CallbackData("a", "form").Serialize()));
             btn.AddButtonRow(new ButtonBase("#4.2 Per Step", new CallbackData("a", "step").Serialize()));
             btn.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "backtodashboard").Serialize()));
 
-            await this.Device.Send("Choose your test:", btn);
+            await Device.Send("Choose your test:", btn);
 
 
         }

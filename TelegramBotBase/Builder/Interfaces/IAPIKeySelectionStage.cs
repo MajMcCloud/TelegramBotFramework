@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 
@@ -13,7 +11,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="apiKey"></param>
         /// <returns></returns>
-        IMessageLoopSelectionStage WithAPIKey(String apiKey);
+        IMessageLoopSelectionStage WithAPIKey(string apiKey);
 
 
         /// <summary>
@@ -23,7 +21,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <param name="apiKey"></param>
         /// <param name="StartForm"></param>
         /// <returns></returns>
-        IBuildingStage QuickStart(String apiKey, Type StartForm);
+        IBuildingStage QuickStart(string apiKey, Type StartForm);
 
         /// <summary>
         /// Quick and easy way to create a BotBase instance.
@@ -31,7 +29,7 @@ namespace TelegramBotBase.Builder.Interfaces
         /// </summary>
         /// <param name="apiKey"></param>
         /// <returns></returns>
-        IBuildingStage QuickStart<T>(String apiKey) where T : FormBase;
+        IBuildingStage QuickStart<T>(string apiKey) where T : FormBase;
 
         /// <summary>
         /// Quick and easy way to create a BotBase instance.
@@ -40,6 +38,6 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <param name="apiKey"></param>
         /// <param name="StartFormFactory"></param>
         /// <returns></returns>
-        IBuildingStage QuickStart(String apiKey, IStartFormFactory StartFormFactory);
+        IBuildingStage QuickStart(string apiKey, IStartFormFactory StartFormFactory);
     }
 }

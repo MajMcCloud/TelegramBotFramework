@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TelegramBotBase.Enums
+﻿namespace TelegramBotBase.Enums
 {
-    public enum eMonthPickerMode
+    public enum EMonthPickerMode
     {
         /// <summary>
         /// Shows the calendar with day picker mode

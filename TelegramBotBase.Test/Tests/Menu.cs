@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 using TelegramBotBaseTest.Tests.Controls;
+using TelegramBotBaseTest.Tests.Datasources;
+using TelegramBotBaseTest.Tests.Groups;
 
 namespace TelegramBotBaseTest.Tests
 {
@@ -13,18 +13,18 @@ namespace TelegramBotBaseTest.Tests
     {
         public Menu()
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            DeleteMode = EDeleteMode.OnLeavingForm;
         }
 
         public override async Task Load(MessageResult message)
         {
 
 
-            if (message.Message.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Group | message.Message.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Supergroup)
+            if (message.Message.Chat.Type == ChatType.Group | message.Message.Chat.Type == ChatType.Supergroup)
             {
-                var sf = new TelegramBotBaseTest.Tests.Groups.WelcomeUser();
+                var sf = new WelcomeUser();
 
-                await this.NavigateTo(sf);
+                await NavigateTo(sf);
             }
 
 
@@ -49,7 +49,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var sf = new SimpleForm();
 
-                    await this.NavigateTo(sf);
+                    await NavigateTo(sf);
 
                     break;
 
@@ -57,7 +57,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var bf = new ButtonTestForm();
 
-                    await this.NavigateTo(bf);
+                    await NavigateTo(bf);
 
                     break;
 
@@ -65,7 +65,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var pf = new ProgressTest();
 
-                    await this.NavigateTo(pf);
+                    await NavigateTo(pf);
 
                     break;
 
@@ -73,7 +73,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var reg = new Register.Start();
 
-                    await this.NavigateTo(reg);
+                    await NavigateTo(reg);
 
                     break;
 
@@ -81,7 +81,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var form1 = new TestForm();
 
-                    await this.NavigateTo(form1);
+                    await NavigateTo(form1);
 
                     break;
 
@@ -89,7 +89,7 @@ namespace TelegramBotBaseTest.Tests
 
                     var form2 = new TestForm2();
 
-                    await this.NavigateTo(form2);
+                    await NavigateTo(form2);
 
                     break;
 
@@ -97,71 +97,71 @@ namespace TelegramBotBaseTest.Tests
 
                     var data = new DataForm();
 
-                    await this.NavigateTo(data);
+                    await NavigateTo(data);
 
                     break;
 
                 case "calendar":
 
-                    var calendar = new Controls.CalendarPickerForm();
+                    var calendar = new CalendarPickerForm();
 
-                    await this.NavigateTo(calendar);
+                    await NavigateTo(calendar);
 
                     break;
 
                 case "month":
 
-                    var month = new Controls.MonthPickerForm();
+                    var month = new MonthPickerForm();
 
-                    await this.NavigateTo(month);
+                    await NavigateTo(month);
 
                     break;
 
                 case "treeview":
 
-                    var tree = new Controls.TreeViewForms();
+                    var tree = new TreeViewForms();
 
-                    await this.NavigateTo(tree);
+                    await NavigateTo(tree);
 
                     break;
 
                 case "togglebuttons":
 
-                    var tb = new Controls.ToggleButtons();
+                    var tb = new ToggleButtons();
 
-                    await this.NavigateTo(tb);
+                    await NavigateTo(tb);
 
                     break;
 
                 case "multitogglebuttons":
 
-                    var mtb = new Controls.MultiToggleButtons();
+                    var mtb = new MultiToggleButtons();
 
-                    await this.NavigateTo(mtb);
+                    await NavigateTo(mtb);
 
                     break;
 
                 case "buttongrid":
 
-                    var bg = new Controls.ButtonGridForm();
+                    var bg = new ButtonGridForm();
 
-                    await this.NavigateTo(bg);
+                    await NavigateTo(bg);
 
                     break;
 
                 case "buttongridfilter":
 
-                    var bg2 = new Controls.ButtonGridPagingForm();
+                    var bg2 = new ButtonGridPagingForm();
 
-                    await this.NavigateTo(bg2);
+                    await NavigateTo(bg2);
 
                     break;
 
                 case "buttongridtags":
 
-                    var bg3 = new Controls.ButtonGridTagForm();
+                    var bg3 = new ButtonGridTagForm();
 
-                    await this.NavigateTo(bg3);
+                    await NavigateTo(bg3);
 
                     break;
 
@@ -194,7 +194,7 @@ namespace TelegramBotBaseTest.Tests
 
                 case "dynamicbuttongrid":
 
-                    var dg = new Datasources.List();
+                    var dg = new List();
 
                     await NavigateTo(dg);
 
@@ -220,7 +220,7 @@ namespace TelegramBotBaseTest.Tests
         public override async Task Render(MessageResult message)
         {
 
-            ButtonForm btn = new ButtonForm();
+            var btn = new ButtonForm();
 
             btn.AddButtonRow(new ButtonBase("#1 Simple Text", new CallbackData("a", "text").Serialize()), new ButtonBase("#2 Button Test", new CallbackData("a", "buttons").Serialize()));
             btn.AddButtonRow(new ButtonBase("#3 Progress Bar", new CallbackData("a", "progress").Serialize()));
@@ -256,7 +256,7 @@ namespace TelegramBotBaseTest.Tests
 
             btn.AddButtonRow(new ButtonBase("#19 Notifications", new CallbackData("a", "notifications").Serialize()));
 
-            await this.Device.Send("Choose your test:", btn);
+            await Device.Send("Choose your test:", btn);
         }
 
 

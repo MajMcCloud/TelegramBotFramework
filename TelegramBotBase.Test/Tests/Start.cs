@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
+using TelegramBotBaseTest.Tests.Groups;
 
 namespace TelegramBotBaseTest.Tests
 {
@@ -12,7 +10,7 @@ namespace TelegramBotBaseTest.Tests
         public override async Task<bool> Open(MessageResult e)
         {
             var st = new Menu();
-            await this.NavigateTo(st);
+            await NavigateTo(st);
 
             return true;
         }
@@ -20,8 +18,8 @@ namespace TelegramBotBaseTest.Tests
 
         public override async Task<bool> OpenGroup(MessageResult e)
         {
-            var st = new Groups.LinkReplaceTest();
-            await this.NavigateTo(st);
+            var st = new LinkReplaceTest();
+            await NavigateTo(st);
 
             return true;
         }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBotBase.Form
 {
@@ -12,18 +7,18 @@ namespace TelegramBotBase.Form
     /// </summary>
     public class TagButtonBase : ButtonBase
     {
-        public String Tag { get; set; }
+        public string Tag { get; set; }
 
         public TagButtonBase()
         {
 
         }
 
-        public TagButtonBase(String Text, String Value, String Tag)
+        public TagButtonBase(string text, string value, string tag)
         {
-            this.Text = Text;
-            this.Value = Value;
-            this.Tag = Tag;
+            this.Text = text;
+            this.Value = value;
+            this.Tag = tag;
         }
 
 
@@ -34,9 +29,9 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public override InlineKeyboardButton ToInlineButton(ButtonForm form)
         {
-            String id = (form.DependencyControl != null ? form.DependencyControl.ControlID + "_" : "");
+            var id = (form.DependencyControl != null ? form.DependencyControl.ControlId + "_" : "");
 
-            return InlineKeyboardButton.WithCallbackData(this.Text, id + this.Value);
+            return InlineKeyboardButton.WithCallbackData(Text, id + Value);
 
         }
 
@@ -48,7 +43,7 @@ namespace TelegramBotBase.Form
         /// <returns></returns>
         public override KeyboardButton ToKeyboardButton(ButtonForm form)
         {
-            return new KeyboardButton(this.Text);
+            return new KeyboardButton(Text);
         }
 
     }
