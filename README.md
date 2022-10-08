@@ -91,8 +91,7 @@ var bot = BotBaseBuilder
     .NoProxy()
     .CustomCommands(a =>
     {
-        a.Start("Starts the bot")
-
+        a.Start("Starts the bot");
     })
     .NoSerialization()
     .UseEnglish()
@@ -206,9 +205,9 @@ var bot = BotBaseBuilder
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
-        a.Add("form1","Opens test form 1" );
-        a.Add("form2", "Opens test form 2" );
-        a.Add("params", "Returns all send parameters as a message." );
+        a.Add("form1","Opens test form 1");
+        a.Add("form2", "Opens test form 2");
+        a.Add("params", "Returns all send parameters as a message.");
     })
     .NoSerialization()
     .UseEnglish()
@@ -219,19 +218,19 @@ bot.BotCommand += async (s, en) =>
     switch (en.Command)
     {
         case "/form1":
-        var form1 = new TestForm();
-        await en.Device.ActiveForm.NavigateTo(form1);
-        break;
+            var form1 = new TestForm();
+            await en.Device.ActiveForm.NavigateTo(form1);
+            break;
 
         case "/form2":
-        var form2 = new TestForm2();
-        await en.Device.ActiveForm.NavigateTo(form2);
-        break;
+            var form2 = new TestForm2();
+            await en.Device.ActiveForm.NavigateTo(form2);
+            break;
 
         case "/params":
-        string m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
-        await en.Device.Send("Your parameters are " + m, replyTo: en.Device.LastMessage);
-        break;
+            string m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+            await en.Device.Send("Your parameters are " + m, replyTo: en.Device.LastMessage);
+            break;
     }
 };
 
@@ -1027,6 +1026,7 @@ Will delete Join and Leave messages automatically in groups.
 
 - [Examples/JoinHiderBot](Examples/JoinHiderBot)
 
-When you want to update forms async without any user interaction (message/action) before. Use the new InvokeMessageLoop method of BotBase.
+When you want to update forms async without any user interaction (message/action) before. Use the new InvokeMessageLoop
+method of BotBase.
 
 - [Examples/AsyncFormUpdates](Examples/AsyncFormUpdates)
