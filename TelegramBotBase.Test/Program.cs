@@ -14,7 +14,7 @@ namespace TelegramBotBaseTest
 {
     class Program
     {
-        static void Main(string[] args)
+        static async void Main(string[] args)
         {
 
             String APIKey = "";
@@ -43,7 +43,7 @@ namespace TelegramBotBaseTest
             bb.BotCommand += Bb_BotCommand;
 
             //Update Bot commands to botfather
-            bb.UploadBotCommands().Wait();
+            await bb.UploadBotCommands();
 
             bb.SetSetting(TelegramBotBase.Enums.eSettings.LogAllMessages, true);
 
