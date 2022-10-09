@@ -14,14 +14,14 @@ using TelegramBotBase.Sessions;
 namespace TelegramBotBase
 {
     /// <summary>
-    /// Base class for managing all active sessions
+    /// Class for managing all active sessions
     /// </summary>
-    public class SessionBase
+    public sealed class SessionManager
     {
         /// <summary>
         /// The Basic message client.
         /// </summary>
-        public MessageClient Client { get; set; }
+        public MessageClient Client => BotBase.Client;
 
         /// <summary>
         /// A list of all active sessions.
@@ -32,29 +32,13 @@ namespace TelegramBotBase
         /// <summary>
         /// Reference to the Main BotBase instance for later use.
         /// </summary>
-        public BotBase BotBase { get; set; }
+        public BotBase BotBase { get; }
 
 
-        public SessionBase()
+        public SessionManager(BotBase botBase)
         {
-            this.SessionList = new Dictionary<long, DeviceSession>();
-        }
-
-        /// <summary>
-        /// Get device session from Device/ChatId
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public DeviceSession this[long key]
-        {
-            get
-            {
-                return this.SessionList[key];
-            }
-            set
-            {
-                this.SessionList[key] = value;
-            }
+            BotBase = botBase;
+            SessionList = new Dictionary<long, DeviceSession>();
         }
 
         /// <summary>
@@ -64,7 +48,7 @@ namespace TelegramBotBase
         /// <returns></returns>
         public DeviceSession GetSession(long deviceId)
         {
-            DeviceSession ds = this.SessionList.FirstOrDefault(a => a.Key == deviceId).Value ?? null;
+            var ds = SessionList.FirstOrDefault(a => a.Key == deviceId).Value ?? null;
             return ds;
         }
 
@@ -77,7 +61,6 @@ namespace TelegramBotBase
         public async Task<DeviceSession> StartSession(long deviceId)
         {
             var start = BotBase.StartFormFactory.CreateForm();
-            //T start = typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { }) as T;
 
             start.Client = this.Client;
 
@@ -88,7 +71,7 @@ namespace TelegramBotBase
 
             await start.OnOpened(new EventArgs());
 
-            this[deviceId] = ds;
+            SessionList[deviceId] = ds;
             return ds;
         }
 
@@ -98,12 +81,8 @@ namespace TelegramBotBase
         /// <param name="deviceId"></param>
         public void EndSession(long deviceId)
         {
-            var d = this[deviceId];
-            if (d != null)
-            {
-                this.SessionList.Remove(deviceId);
-
-            }
+            var d = SessionList[deviceId];
+            if (d != null) SessionList.Remove(deviceId);
         }
 
         /// <summary>
@@ -112,7 +91,7 @@ namespace TelegramBotBase
         /// <returns></returns>
         public List<DeviceSession> GetUserSessions()
         {
-            return this.SessionList.Where(a => a.Key > 0).Select(a => a.Value).ToList();
+            return SessionList.Where(a => a.Key > 0).Select(a => a.Value).ToList();
         }
 
         /// <summary>
@@ -121,27 +100,27 @@ namespace TelegramBotBase
         /// <returns></returns>
         public List<DeviceSession> GetGroupSessions()
         {
-            return this.SessionList.Where(a => a.Key < 0).Select(a => a.Value).ToList();
+            return SessionList.Where(a => a.Key < 0).Select(a => a.Value).ToList();
         }
 
         /// <summary>
         /// Loads the previously saved states from the machine.
         /// </summary>
-        public async void LoadSessionStates()
+        public async Task LoadSessionStates()
         {
             if (BotBase.StateMachine == null)
             {
                 return;
             }
 
-            LoadSessionStates(BotBase.StateMachine);
+            await LoadSessionStates(BotBase.StateMachine);
         }
 
 
         /// <summary>
         /// Loads the previously saved states from the machine.
         /// </summary>
-        public async void LoadSessionStates(IStateMachine statemachine)
+        public async Task LoadSessionStates(IStateMachine statemachine)
         {
             if (statemachine == null)
             {
@@ -159,7 +138,7 @@ namespace TelegramBotBase
                 }
 
                 //Key already existing
-                if (this.SessionList.ContainsKey(s.DeviceId))
+                if (SessionList.ContainsKey(s.DeviceId))
                     continue;
 
                 var form = t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
@@ -222,7 +201,7 @@ namespace TelegramBotBase
 
                 device.ChatTitle = s.ChatTitle;
 
-                this.SessionList.Add(s.DeviceId, device);
+                SessionList.Add(s.DeviceId, device);
 
                 //Is Subclass of IStateForm
                 var iform = form as IStateForm;
@@ -242,7 +221,7 @@ namespace TelegramBotBase
                 catch
                 {
                     //Skip on exception
-                    this.SessionList.Remove(s.DeviceId);
+                    SessionList.Remove(s.DeviceId);
                 }
             }
 
@@ -254,7 +233,7 @@ namespace TelegramBotBase
         /// <summary>
         /// Saves all open states into the machine.
         /// </summary>
-        public void SaveSessionStates(IStateMachine statemachine)
+        public async Task SaveSessionStates(IStateMachine statemachine)
         {
             if (statemachine == null)
             {
@@ -263,7 +242,7 @@ namespace TelegramBotBase
 
             var states = new List<StateEntry>();
 
-            foreach (var s in this.SessionList)
+            foreach (var s in SessionList)
             {
                 if (s.Value == null)
                 {
@@ -333,13 +312,13 @@ namespace TelegramBotBase
         /// <summary>
         /// Saves all open states into the machine.
         /// </summary>
-        public void SaveSessionStates()
+        public async Task SaveSessionStates()
         {
-            if (this.BotBase.StateMachine == null)
+            if (BotBase.StateMachine == null)
                 return;
 
 
-            this.SaveSessionStates(this.BotBase.StateMachine);
+            await SaveSessionStates(BotBase.StateMachine);
         }
     }
 }
