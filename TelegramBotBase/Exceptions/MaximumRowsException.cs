@@ -2,7 +2,7 @@
 
 namespace TelegramBotBase.Exceptions;
 
-public class MaximumRowsReachedException : Exception
+public sealed class MaximumRowsReachedException : Exception
 {
     public int Value { get; set; }
 
@@ -10,5 +10,5 @@ public class MaximumRowsReachedException : Exception
 
 
     public override string Message =>
-        $"You have exceeded the maximum of rows by {Value.ToString()} / {Maximum.ToString()}";
+        $"You have exceeded the maximum of rows by {Value}/{Maximum}";
 }

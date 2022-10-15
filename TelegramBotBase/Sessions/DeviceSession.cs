@@ -155,7 +155,7 @@ public class DeviceSession : IDeviceSession
 
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
-            throw new MaxLengthException(text.Length);
+            throw new MessageTooLongException(text.Length);
         }
 
         try
@@ -183,7 +183,7 @@ public class DeviceSession : IDeviceSession
     {
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
-            throw new MaxLengthException(text.Length);
+            throw new MessageTooLongException(text.Length);
         }
 
         try
@@ -213,7 +213,7 @@ public class DeviceSession : IDeviceSession
 
         if (message.Text.Length > Constants.Telegram.MaxMessageLength)
         {
-            throw new MaxLengthException(message.Text.Length);
+            throw new MessageTooLongException(message.Text.Length);
         }
 
         try
@@ -270,7 +270,7 @@ public class DeviceSession : IDeviceSession
 
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
-            throw new MaxLengthException(text.Length);
+            throw new MessageTooLongException(text.Length);
         }
 
         if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
@@ -329,7 +329,7 @@ public class DeviceSession : IDeviceSession
 
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
-            throw new MaxLengthException(text.Length);
+            throw new MessageTooLongException(text.Length);
         }
 
         if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
@@ -372,7 +372,7 @@ public class DeviceSession : IDeviceSession
 
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
-            throw new MaxLengthException(text.Length);
+            throw new MessageTooLongException(text.Length);
         }
 
         if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
