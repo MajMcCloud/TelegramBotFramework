@@ -27,7 +27,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     private IMessageLoopFactory _messageLoopFactory;
 
-    private IStateMachine _statemachine;
+    private IStateMachine _stateMachine;
 
     private BotBaseBuilder()
     {
@@ -41,18 +41,13 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     public BotBase Build()
     {
-        var bot = new BotBase
+        var bot = new BotBase(_apiKey, _client)
         {
-            ApiKey = _apiKey,
             StartFormFactory = _factory,
-            Client = _client
+            BotCommandScopes = BotCommandScopes,
+            StateMachine = _stateMachine,
+            MessageLoopFactory = _messageLoopFactory
         };
-
-        bot.BotCommandScopes = BotCommandScopes;
-
-        bot.StateMachine = _statemachine;
-
-        bot.MessageLoopFactory = _messageLoopFactory;
 
         bot.MessageLoopFactory.UnhandledCall += bot.MessageLoopFactory_UnhandledCall;
 
@@ -315,26 +310,26 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     public ILanguageSelectionStage UseSerialization(IStateMachine machine)
     {
-        _statemachine = machine;
+        _stateMachine = machine;
         return this;
     }
 
 
     public ILanguageSelectionStage UseJSON(string path)
     {
-        _statemachine = new JsonStateMachine(path);
+        _stateMachine = new JsonStateMachine(path);
         return this;
     }
 
     public ILanguageSelectionStage UseSimpleJSON(string path)
     {
-        _statemachine = new SimpleJsonStateMachine(path);
+        _stateMachine = new SimpleJsonStateMachine(path);
         return this;
     }
 
     public ILanguageSelectionStage UseXML(string path)
     {
-        _statemachine = new XmlStateMachine(path);
+        _stateMachine = new XmlStateMachine(path);
         return this;
     }
 

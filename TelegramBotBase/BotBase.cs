@@ -15,13 +15,16 @@ using Console = TelegramBotBase.Tools.Console;
 namespace TelegramBotBase;
 
 /// <summary>
-///     Bot base class for full Device/Context and Messagehandling
+///     Bot base class for full Device/Context and message handling
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public sealed class BotBase
 {
-    internal BotBase()
+    internal BotBase(string apiKey, MessageClient client)
     {
+        ApiKey = apiKey;
+        Client = client;
+
         SystemSettings = new Dictionary<ESettings, uint>();
 
         SetSetting(ESettings.MaxNumberOfRetries, 5);
@@ -35,38 +38,38 @@ public sealed class BotBase
         Sessions = new SessionManager(this);
     }
 
-    public MessageClient Client { get; set; }
+    public MessageClient Client { get; }
 
     /// <summary>
     ///     Your TelegramBot APIKey
     /// </summary>
-    public string ApiKey { get; set; } = "";
+    public string ApiKey { get; }
 
     /// <summary>
     ///     List of all running/active sessions
     /// </summary>
-    public SessionManager Sessions { get; set; }
+    public SessionManager Sessions { get; }
 
     /// <summary>
     ///     Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
     /// </summary>
-    public Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; set; } = new();
+    public Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; internal set; }
 
 
     /// <summary>
     ///     Enable the SessionState (you need to implement on call forms the IStateForm interface)
     /// </summary>
-    public IStateMachine StateMachine { get; set; }
+    public IStateMachine StateMachine { get; internal set; }
 
     /// <summary>
     ///     Offers functionality to manage the creation process of the start form.
     /// </summary>
-    public IStartFormFactory StartFormFactory { get; set; }
+    public IStartFormFactory StartFormFactory { get; internal set; }
 
     /// <summary>
     ///     Contains the message loop factory, which cares about "message-management."
     /// </summary>
-    public IMessageLoopFactory MessageLoopFactory { get; set; }
+    public IMessageLoopFactory MessageLoopFactory { get; internal set; }
 
     /// <summary>
     ///     All internal used settings.
@@ -210,7 +213,6 @@ public sealed class BotBase
             e.Device = ds;
 
             await MessageLoopFactory.MessageLoop(this, ds, new UpdateResult(e.UpdateData, ds), e);
-            //await Client_Loop(this, e);
         }
         catch (Exception ex)
         {
@@ -315,7 +317,7 @@ public sealed class BotBase
             return defaultValue;
         }
 
-        return SystemSettings[set] == 0u ? false : true;
+        return SystemSettings[set] != 0u;
     }
 
 

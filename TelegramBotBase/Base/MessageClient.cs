@@ -94,7 +94,7 @@ public class MessageClient
     }
 
 
-    public string ApiKey { get; set; }
+    public string ApiKey { get; }
 
     public ITelegramBotClient TelegramClient { get; set; }
 
