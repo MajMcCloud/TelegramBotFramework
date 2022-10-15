@@ -5,19 +5,18 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Builder;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Enums;
-using TelegramBotBaseTest.Tests;
+using TelegramBotBase.Example.Tests;
 
-namespace TelegramBotBaseTest;
+namespace TelegramBotBase.Example;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
-        var apiKey = "";
-
-        var bb = BotBaseBuilder
+        var bot = BotBaseBuilder
                  .Create()
-                 .WithAPIKey(apiKey)
+                 .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
+                             throw new Exception("API_KEY is not set"))
                  .DefaultMessageLoop()
                  .WithStartForm<Start>()
                  .NoProxy()
@@ -36,26 +35,26 @@ internal class Program
                  .Build();
 
 
-        bb.BotCommand += Bb_BotCommand;
+        bot.BotCommand += Bb_BotCommand;
 
         //Update Bot commands to botfather
-        bb.UploadBotCommands().Wait();
+        bot.UploadBotCommands().Wait();
 
-        bb.SetSetting(ESettings.LogAllMessages, true);
+        bot.SetSetting(ESettings.LogAllMessages, true);
 
-        bb.Message += (s, en) =>
+        bot.Message += (s, en) =>
         {
             Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
         };
 
-        await bb.Start();
+        await bot.Start();
 
         Console.WriteLine("Telegram Bot started...");
         Console.WriteLine("Press q to quit application.");
 
         Console.ReadLine();
 
-        await bb.Stop();
+        await bot.Stop();
     }
 
     private static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)

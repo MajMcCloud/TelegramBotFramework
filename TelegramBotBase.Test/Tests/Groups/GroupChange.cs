@@ -4,7 +4,7 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Groups;
+namespace TelegramBotBase.Example.Tests.Groups;
 
 public class GroupChange : GroupForm
 {

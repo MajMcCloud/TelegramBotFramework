@@ -3,10 +3,10 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.DataSources;
 using TelegramBotBase.Enums;
+using TelegramBotBase.Example.Tests.Controls.Subclass;
 using TelegramBotBase.Form;
-using TelegramBotBaseTest.Tests.Controls.Subclass;
 
-namespace TelegramBotBaseTest.Tests.Controls;
+namespace TelegramBotBase.Example.Tests.Controls;
 
 public class MultiViewForm : AutoCleanForm
 {

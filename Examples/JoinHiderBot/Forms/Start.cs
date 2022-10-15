@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
-using TelegramBotBase.Base;
+﻿using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace JoinHiderBot.forms;
+namespace JoinHiderBot.Forms;
 
 public class Start : SplitterForm
 {

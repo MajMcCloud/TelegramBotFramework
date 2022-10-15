@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace SystemCommandsBot.forms;
+namespace SystemCommandsBot.Forms;
 
 public class StartForm : FormBase
 {

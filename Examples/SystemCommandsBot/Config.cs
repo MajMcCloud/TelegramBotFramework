@@ -1,30 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
-using SystemCommandsBot.commands;
+﻿using Newtonsoft.Json;
 
-namespace SystemCommandsBot.config;
+namespace SystemCommandsBot;
 
 public class Config
 {
     public Config()
     {
-        Commandos = new List<Commando>();
+        Commands = new List<Command>();
     }
 
     public string Password { get; set; }
 
     public string ApiKey { get; set; }
 
-    public List<Commando> Commandos { get; set; }
+    public List<Command> Commands { get; set; }
 
     public void LoadDefaultValues()
     {
         ApiKey = "";
-        Commandos.Add(new Commando
+        Commands.Add(new Command
         {
-            Id = 0, Enabled = true, Title = "Test Befehl", ShellCmd = "explorer.exe", Action = "start", MaxInstances = 2
+            Id = 0, Enabled = true, Title = "Test Befehl", ShellCmd = "explorer.exe", Action = "start",
+            MaxInstances = 2
         });
     }
 

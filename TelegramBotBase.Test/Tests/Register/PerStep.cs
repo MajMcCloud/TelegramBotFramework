@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Example.Tests.Register.Steps;
 using TelegramBotBase.Form;
-using TelegramBotBaseTest.Tests.Register.Steps;
 
-namespace TelegramBotBaseTest.Tests.Register;
+namespace TelegramBotBase.Example.Tests.Register;
 
 public class PerStep : AutoCleanForm
 {

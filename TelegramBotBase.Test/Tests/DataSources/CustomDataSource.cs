@@ -8,7 +8,7 @@ using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.DataSources;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.DataSources;
+namespace TelegramBotBase.Example.Tests.DataSources;
 
 public class CustomDataSource : ButtonFormDataSource
 {

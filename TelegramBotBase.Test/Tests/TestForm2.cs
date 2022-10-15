@@ -6,7 +6,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Extensions.Images;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests;
+namespace TelegramBotBase.Example.Tests;
 
 public class TestForm2 : FormBase
 {

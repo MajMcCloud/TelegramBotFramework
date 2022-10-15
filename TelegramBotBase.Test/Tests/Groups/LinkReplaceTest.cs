@@ -7,7 +7,7 @@ using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Groups;
+namespace TelegramBotBase.Example.Tests.Groups;
 
 public class LinkReplaceTest : GroupForm
 {
@@ -121,7 +121,7 @@ public class LinkReplaceTest : GroupForm
 
         if (Counter[from] >= 3)
         {
-            await e.Device.KickUser(from);
+            await e.Device.BanUser(from);
 
             await e.Device.Send(e.Message.From.FirstName + " " + e.Message.From.LastName +
                                 " has been removed from the group");

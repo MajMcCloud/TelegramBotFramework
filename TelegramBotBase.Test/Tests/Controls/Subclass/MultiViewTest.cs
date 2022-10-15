@@ -4,7 +4,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls.Subclass;
+namespace TelegramBotBase.Example.Tests.Controls.Subclass;
 
 public class MultiViewTest : MultiView
 {

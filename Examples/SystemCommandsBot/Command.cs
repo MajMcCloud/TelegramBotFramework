@@ -1,6 +1,6 @@
-﻿namespace SystemCommandsBot.commands;
+﻿namespace SystemCommandsBot;
 
-public class Commando
+public class Command
 {
     public int Id { get; set; }
 

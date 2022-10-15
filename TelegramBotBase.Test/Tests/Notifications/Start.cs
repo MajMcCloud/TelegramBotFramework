@@ -3,7 +3,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Notifications;
+namespace TelegramBotBase.Example.Tests.Notifications;
 
 public class Start : AutoCleanForm
 {

@@ -6,7 +6,7 @@ using TelegramBotBase.Controls.Inline;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests;
+namespace TelegramBotBase.Example.Tests;
 
 public class ProgressTest : AutoCleanForm
 {

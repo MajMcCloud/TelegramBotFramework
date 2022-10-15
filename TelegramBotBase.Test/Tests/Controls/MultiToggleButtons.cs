@@ -7,7 +7,7 @@ using TelegramBotBase.Controls.Inline;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls;
+namespace TelegramBotBase.Example.Tests.Controls;
 
 public class MultiToggleButtons : AutoCleanForm
 {

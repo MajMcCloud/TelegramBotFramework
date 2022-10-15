@@ -1,6 +1,6 @@
 ﻿using System;
-using SystemCommandsBot.config;
-using SystemCommandsBot.forms;
+using System.Threading.Tasks;
+using SystemCommandsBot.Forms;
 using TelegramBotBase.Builder;
 
 namespace SystemCommandsBot;
@@ -9,8 +9,7 @@ internal class Program
 {
     public static Config BotConfig { get; set; }
 
-
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         BotConfig = Config.Load();
 
@@ -25,13 +24,12 @@ internal class Program
                                 .QuickStart<StartForm>(BotConfig.ApiKey)
                                 .Build();
 
-        bot.Start();
+        await bot.Start();
 
         Console.WriteLine("Bot started");
-
         Console.ReadLine();
 
 
-        bot.Stop();
+        await bot.Stop();
     }
 }

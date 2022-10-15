@@ -7,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests;
+namespace TelegramBotBase.Example.Tests;
 
 public class DataForm : AutoCleanForm
 {

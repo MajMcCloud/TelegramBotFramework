@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using Telegram.Bot.Types.Enums;
+﻿using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Form;
 
-namespace JoinHiderBot.forms;
+namespace JoinHiderBot.Forms;
 
 public class GroupManageForm : GroupForm
 {

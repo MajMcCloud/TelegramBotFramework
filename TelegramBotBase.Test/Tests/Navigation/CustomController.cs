@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Form;
 using TelegramBotBase.Form.Navigation;
 
-namespace TelegramBotBaseTest.Tests.Navigation;
+namespace TelegramBotBase.Example.Tests.Navigation;
 
 internal class CustomController : NavigationController
 {

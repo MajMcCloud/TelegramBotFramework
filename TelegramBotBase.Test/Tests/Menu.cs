@@ -2,12 +2,12 @@
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
+using TelegramBotBase.Example.Tests.Controls;
+using TelegramBotBase.Example.Tests.DataSources;
+using TelegramBotBase.Example.Tests.Groups;
 using TelegramBotBase.Form;
-using TelegramBotBaseTest.Tests.Controls;
-using TelegramBotBaseTest.Tests.DataSources;
-using TelegramBotBaseTest.Tests.Groups;
 
-namespace TelegramBotBaseTest.Tests;
+namespace TelegramBotBase.Example.Tests;
 
 public class Menu : AutoCleanForm
 {

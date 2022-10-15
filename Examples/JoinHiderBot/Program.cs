@@ -1,20 +1,18 @@
-﻿using System;
-using JoinHiderBot.forms;
+﻿using JoinHiderBot.Forms;
 using TelegramBotBase.Builder;
 
 namespace JoinHiderBot;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
-        var apiKey = "";
-
         var bot = BotBaseBuilder.Create()
-                                .QuickStart<Start>(apiKey)
+                                .QuickStart<Start>(Environment.GetEnvironmentVariable("API_KEY") ??
+                                                   throw new Exception("API_KEY is not set"))
                                 .Build();
 
-        bot.Start();
+        await bot.Start();
 
         Console.ReadLine();
     }

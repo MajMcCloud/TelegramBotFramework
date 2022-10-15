@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Example.Tests.Groups;
 using TelegramBotBase.Form;
-using TelegramBotBaseTest.Tests.Groups;
 
-namespace TelegramBotBaseTest.Tests;
+namespace TelegramBotBase.Example.Tests;
 
 public class Start : SplitterForm
 {

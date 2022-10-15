@@ -4,7 +4,7 @@ using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.DataSources;
+namespace TelegramBotBase.Example.Tests.DataSources;
 
 public class List : FormBase
 {

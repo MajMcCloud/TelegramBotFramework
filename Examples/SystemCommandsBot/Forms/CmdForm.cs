@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace SystemCommandsBot.forms;
+namespace SystemCommandsBot.Forms;
 
 public class CmdForm : AutoCleanForm
 {
@@ -30,7 +30,7 @@ public class CmdForm : AutoCleanForm
             return;
         }
 
-        var cmd = Program.BotConfig.Commandos.Where(a => a.Enabled && a.Id == id).FirstOrDefault();
+        var cmd = Program.BotConfig.Commands.Where(a => a.Enabled && a.Id == id).FirstOrDefault();
         if (cmd == null)
         {
             await Device.Send("Cmd nicht verfügbar.");
@@ -145,7 +145,7 @@ public class CmdForm : AutoCleanForm
     {
         if (MessageId == null)
         {
-            var buttons = Program.BotConfig.Commandos.Where(a => a.Enabled)
+            var buttons = Program.BotConfig.Commands.Where(a => a.Enabled)
                                  .Select(a => new ButtonBase(a.Title, a.Id.ToString()));
 
             var bf = new ButtonForm();

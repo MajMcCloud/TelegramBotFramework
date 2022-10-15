@@ -2,7 +2,7 @@
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Register;
+namespace TelegramBotBase.Example.Tests.Register;
 
 public class Start : AutoCleanForm
 {

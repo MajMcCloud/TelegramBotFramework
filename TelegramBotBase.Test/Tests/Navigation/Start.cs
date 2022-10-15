@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Navigation;
+namespace TelegramBotBase.Example.Tests.Navigation;
 
 public class Start : FormBase
 {

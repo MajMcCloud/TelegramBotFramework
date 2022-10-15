@@ -1,4 +1,4 @@
-﻿namespace TelegramBotBaseTest.Tests.Register.Steps;
+﻿namespace TelegramBotBase.Example.Tests.Register.Steps;
 
 public class Data
 {
