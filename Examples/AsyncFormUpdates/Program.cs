@@ -1,8 +1,8 @@
-﻿using System;
-using System.Timers;
+﻿using System.Timers;
 using AsyncFormUpdates.forms;
 using TelegramBotBase;
 using TelegramBotBase.Builder;
+using Timer = System.Timers.Timer;
 
 namespace AsyncFormUpdates
 {
@@ -10,7 +10,7 @@ namespace AsyncFormUpdates
     {
         private static BotBase __bot;
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var apiKey = "APIKey";
 
@@ -18,7 +18,7 @@ namespace AsyncFormUpdates
                                   .QuickStart<Start>(apiKey)
                                   .Build();
 
-            __bot.Start();
+            await __bot.Start();
 
             var timer = new Timer(5000);
 
@@ -28,7 +28,7 @@ namespace AsyncFormUpdates
             Console.ReadLine();
 
             timer.Stop();
-            __bot.Stop();
+            await __bot.Stop();
         }
 
         private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)

@@ -18,9 +18,9 @@ namespace TelegramBotBase;
 ///     Bot base class for full Device/Context and Messagehandling
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class BotBase
+public sealed class BotBase
 {
-    public BotBase()
+    internal BotBase()
     {
         SystemSettings = new Dictionary<ESettings, uint>();
 
@@ -32,10 +32,7 @@ public class BotBase
 
         BotCommandScopes = new Dictionary<BotCommandScope, List<BotCommand>>();
 
-        Sessions = new SessionBase
-        {
-            BotBase = this
-        };
+        Sessions = new SessionManager(this);
     }
 
     public MessageClient Client { get; set; }
@@ -48,7 +45,7 @@ public class BotBase
     /// <summary>
     ///     List of all running/active sessions
     /// </summary>
-    public SessionBase Sessions { get; set; }
+    public SessionManager Sessions { get; set; }
 
     /// <summary>
     ///     Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
@@ -94,9 +91,10 @@ public class BotBase
             await Sessions.LoadSessionStates(StateMachine);
         }
 
-        //Enable auto session saving
+        // Enable auto session saving
         if (GetSetting(ESettings.SaveSessionsOnConsoleExit, false))
         {
+            // should be waited until finish
             Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
         }
 
@@ -329,8 +327,6 @@ public class BotBase
 
     private static readonly object EvMessage = new();
 
-    private static object __evSystemCall = new();
-
     public delegate Task BotCommandEventHandler(object sender, BotCommandEventArgs e);
 
     private static readonly object EvException = new();
@@ -356,7 +352,7 @@ public class BotBase
     }
 
     /// <summary>
-    ///     Will be called on incomming message
+    ///     Will be called on incoming message
     /// </summary>
     public event EventHandler<MessageIncomeEventArgs> Message
     {

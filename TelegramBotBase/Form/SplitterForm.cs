@@ -5,7 +5,7 @@ using TelegramBotBase.Base;
 namespace TelegramBotBase.Form;
 
 /// <summary>
-///     This is used to split incomming requests depending on the chat type.
+///     This is used to split incoming requests depending on the chat type.
 /// </summary>
 public class SplitterForm : FormBase
 {

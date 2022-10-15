@@ -39,7 +39,7 @@ public class ButtonFormDataSource : IDataSource<ButtonRow>
 
 
     /// <summary>
-    ///     Returns the amount of rows exisiting.
+    ///     Returns the amount of rows existing.
     /// </summary>
     /// <returns></returns>
     public virtual int Count => ButtonForm.Count;

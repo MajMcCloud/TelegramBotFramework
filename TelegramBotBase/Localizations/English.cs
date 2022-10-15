@@ -25,10 +25,10 @@ public class English : Localization
         Values["ToggleButton_OnIcon"] = "⚫";
         Values["ToggleButton_OffIcon"] = "⚪";
         Values["ToggleButton_Title"] = "Toggle";
-        Values["ToggleButton_Changed"] = "Choosen";
+        Values["ToggleButton_Changed"] = "Chosen";
         Values["MultiToggleButton_SelectedIcon"] = "✅";
         Values["MultiToggleButton_Title"] = "Multi-Toggle";
-        Values["MultiToggleButton_Changed"] = "Choosen";
+        Values["MultiToggleButton_Changed"] = "Chosen";
         Values["PromptDialog_Back"] = "Back";
         Values["ToggleButton_Changed"] = "Setting changed";
     }

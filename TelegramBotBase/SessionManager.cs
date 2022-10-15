@@ -16,17 +16,18 @@ namespace TelegramBotBase;
 /// <summary>
 ///     Base class for managing all active sessions
 /// </summary>
-public class SessionBase
+public class SessionManager
 {
-    public SessionBase()
+    public SessionManager(BotBase botBase)
     {
+        BotBase = botBase;
         SessionList = new Dictionary<long, DeviceSession>();
     }
 
     /// <summary>
     ///     The Basic message client.
     /// </summary>
-    public MessageClient Client { get; set; }
+    public MessageClient Client => BotBase.Client;
 
     /// <summary>
     ///     A list of all active sessions.
@@ -37,18 +38,7 @@ public class SessionBase
     /// <summary>
     ///     Reference to the Main BotBase instance for later use.
     /// </summary>
-    public BotBase BotBase { get; set; }
-
-    /// <summary>
-    ///     Get device session from Device/ChatId
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public DeviceSession this[long key]
-    {
-        get => SessionList[key];
-        set => SessionList[key] = value;
-    }
+    public BotBase BotBase { get; }
 
     /// <summary>
     ///     Get device session from Device/ChatId
@@ -80,7 +70,7 @@ public class SessionBase
 
         await start.OnOpened(EventArgs.Empty);
 
-        this[deviceId] = ds;
+        SessionList[deviceId] = ds;
         return ds;
     }
 
@@ -90,7 +80,7 @@ public class SessionBase
     /// <param name="deviceId"></param>
     public void EndSession(long deviceId)
     {
-        var d = this[deviceId];
+        var d = SessionList[deviceId];
         if (d != null)
         {
             SessionList.Remove(deviceId);

@@ -48,8 +48,6 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             Client = _client
         };
 
-        bot.Sessions.Client = bot.Client;
-
         bot.BotCommandScopes = BotCommandScopes;
 
         bot.StateMachine = _statemachine;
