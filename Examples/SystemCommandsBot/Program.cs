@@ -1,4 +1,5 @@
 ﻿using System;
+using TelegramBotBase.Builder;
 
 namespace SystemCommandsBot
 {
@@ -19,7 +20,9 @@ namespace SystemCommandsBot
                 return;
             }
 
-            var bot = new TelegramBotBase.BotBase<forms.StartForm>(BotConfig.ApiKey);
+            var bot = BotBaseBuilder.Create()
+                                    .QuickStart<forms.StartForm>(BotConfig.ApiKey)
+                                    .Build();
 
             bot.Start();
 

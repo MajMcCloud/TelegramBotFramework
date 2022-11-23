@@ -4,18 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using TelegramBotBase.Builder;
 
 namespace AsyncFormUpdates
 {
     class Program
     {
-        static TelegramBotBase.BotBase<forms.Start> bot = null;
+        static TelegramBotBase.BotBase bot = null;
 
         static void Main(string[] args)
         {
             String apiKey = "APIKey";
 
-            bot = new TelegramBotBase.BotBase<forms.Start>(apiKey);
+            bot = BotBaseBuilder.Create()
+                                .QuickStart<forms.Start>(apiKey)
+                                .Build();
 
             bot.Start();
 

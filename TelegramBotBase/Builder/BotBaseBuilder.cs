@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Builder.Interfaces;
 using TelegramBotBase.Commands;
+using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Localizations;
@@ -23,7 +24,12 @@ namespace TelegramBotBase.Builder
 
         MessageClient _client = null;
 
-        List<BotCommand> _botcommands = new List<BotCommand>();
+        /// <summary>
+        /// Contains different Botcommands for different areas.
+        /// </summary>
+        Dictionary<BotCommandScope, List<BotCommand>> _BotCommandScopes { get; set; } = new Dictionary<BotCommandScope, List<BotCommand>>();
+
+        //List<BotCommand> _botcommands = new List<BotCommand>();
 
         IStateMachine _statemachine = null;
 
@@ -111,10 +117,19 @@ namespace TelegramBotBase.Builder
 
         public IStartFormSelectionStage DefaultMessageLoop()
         {
-            _messageloopfactory = new Factories.MessageLoops.FormBaseMessageLoop();
+            _messageloopfactory = new MessageLoops.FormBaseMessageLoop();
 
             return this;
         }
+
+
+        public IStartFormSelectionStage MinimalMessageLoop()
+        {
+            _messageloopfactory = new MessageLoops.MinimalMessageLoop();
+
+            return this;
+        }
+
 
         public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
         {
@@ -134,7 +149,7 @@ namespace TelegramBotBase.Builder
         #endregion
 
 
-        #region "Step 3 (Start Form/Factory)" 
+        #region "Step 3 (Start Form/Factory)"
 
         public INetworkingSelectionStage WithStartForm(Type startFormClass)
         {
@@ -146,6 +161,19 @@ namespace TelegramBotBase.Builder
             where T : FormBase, new()
         {
             this._factory = new Factories.DefaultStartFormFactory(typeof(T));
+            return this;
+        }
+
+        public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+        {
+            this._factory = new ServiceProviderStartFormFactory(startFormClass, serviceProvider);
+            return this;
+        }
+
+        public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
+            where T : FormBase
+        {
+            this._factory = new ServiceProviderStartFormFactory<T>(serviceProvider);
             return this;
         }
 
@@ -212,7 +240,7 @@ namespace TelegramBotBase.Builder
 
         public ISessionSerializationStage OnlyStart()
         {
-            _botcommands.Start("Starts the bot");
+            _BotCommandScopes.Start("Starts the bot");
 
             return this;
 
@@ -220,15 +248,15 @@ namespace TelegramBotBase.Builder
 
         public ISessionSerializationStage DefaultCommands()
         {
-            _botcommands.Start("Starts the bot");
-            _botcommands.Help("Should show you some help");
-            _botcommands.Settings("Should show you some settings");
+            _BotCommandScopes.Start("Starts the bot");
+            _BotCommandScopes.Help("Should show you some help");
+            _BotCommandScopes.Settings("Should show you some settings");
             return this;
         }
 
-        public ISessionSerializationStage CustomCommands(Action<List<BotCommand>> action)
+        public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
         {
-            action?.Invoke(_botcommands);
+            action?.Invoke(_BotCommandScopes);
             return this;
         }
 
@@ -307,9 +335,7 @@ namespace TelegramBotBase.Builder
 
             bb.Client = _client;
 
-            bb.Sessions.Client = bb.Client;
-
-            bb.BotCommands = _botcommands;
+            bb.BotCommandScopes = _BotCommandScopes;
 
             bb.StateMachine = _statemachine;
 

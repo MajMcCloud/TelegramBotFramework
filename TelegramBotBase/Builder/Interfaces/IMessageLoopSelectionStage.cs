@@ -16,6 +16,14 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <returns></returns>
         IStartFormSelectionStage DefaultMessageLoop();
 
+
+        /// <summary>
+        /// Chooses a minimalistic message loop, which catches all update types and only calls the Load function.
+        /// </summary>
+        /// <returns></returns>
+        IStartFormSelectionStage MinimalMessageLoop();
+
+
         /// <summary>
         /// Chooses a custom message loop.
         /// </summary>

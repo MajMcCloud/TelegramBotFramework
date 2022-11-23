@@ -14,11 +14,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{BFA71E3F-31C0-4FC1-A320-4DCF704768C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommandsBot", "Examples\SystemCommandsBot\SystemCommandsBot.csproj", "{FC484952-3060-4F87-9809-4CD66D6961C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemCommandsBot", "Examples\SystemCommandsBot\SystemCommandsBot.csproj", "{FC484952-3060-4F87-9809-4CD66D6961C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinHiderBot", "Examples\JoinHiderBot\JoinHiderBot.csproj", "{E804B9E5-7ACC-49D3-9253-806766C1D9A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoinHiderBot", "Examples\JoinHiderBot\JoinHiderBot.csproj", "{E804B9E5-7ACC-49D3-9253-806766C1D9A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Extensions.Images", "TelegramBotBase.Extensions.Images\TelegramBotBase.Extensions.Images.csproj", "{B5DDFA45-0E01-46A5-B67D-541300CDD606}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase.Extensions.Images", "TelegramBotBase.Extensions.Images\TelegramBotBase.Extensions.Images.csproj", "{B5DDFA45-0E01-46A5-B67D-541300CDD606}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncFormUpdates", "Examples\AsyncFormUpdates\AsyncFormUpdates.csproj", "{673A56F5-6110-4AED-A68D-562FD6ED3EA6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{E3193182-6FDA-4FA3-AD26-A487291E7681}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase.Extensions.Serializer.Database.MSSQL", "TelegramBotBase.Extensions.Serializer.Database.MSSQL\TelegramBotBase.Extensions.Serializer.Database.MSSQL.csproj", "{889B170E-32E9-4F26-BB04-8D06EA367857}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreBot", "Examples\EFCoreBot\EFCoreBot.csproj", "{261BED47-0404-4A9A-86FC-047DE42A7D25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +54,18 @@ Global
 		{B5DDFA45-0E01-46A5-B67D-541300CDD606}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5DDFA45-0E01-46A5-B67D-541300CDD606}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5DDFA45-0E01-46A5-B67D-541300CDD606}.Release|Any CPU.Build.0 = Release|Any CPU
+		{673A56F5-6110-4AED-A68D-562FD6ED3EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{673A56F5-6110-4AED-A68D-562FD6ED3EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{673A56F5-6110-4AED-A68D-562FD6ED3EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{673A56F5-6110-4AED-A68D-562FD6ED3EA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{889B170E-32E9-4F26-BB04-8D06EA367857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{889B170E-32E9-4F26-BB04-8D06EA367857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{889B170E-32E9-4F26-BB04-8D06EA367857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{889B170E-32E9-4F26-BB04-8D06EA367857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{261BED47-0404-4A9A-86FC-047DE42A7D25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{261BED47-0404-4A9A-86FC-047DE42A7D25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{261BED47-0404-4A9A-86FC-047DE42A7D25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{261BED47-0404-4A9A-86FC-047DE42A7D25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +73,10 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FC484952-3060-4F87-9809-4CD66D6961C0} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 		{E804B9E5-7ACC-49D3-9253-806766C1D9A5} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
+		{B5DDFA45-0E01-46A5-B67D-541300CDD606} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
+		{673A56F5-6110-4AED-A68D-562FD6ED3EA6} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
+		{889B170E-32E9-4F26-BB04-8D06EA367857} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
+		{261BED47-0404-4A9A-86FC-047DE42A7D25} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59CB40E1-9FA7-4867-A56F-4F418286F057}

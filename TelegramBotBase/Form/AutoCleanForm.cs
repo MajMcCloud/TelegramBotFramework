@@ -67,7 +67,7 @@ namespace TelegramBotBase.Form
             this.OldMessages.Add(e.Message.MessageId);
         }
 
-        private void Device_MessageSent(object sender, MessageSentEventArgs e)
+        private async Task Device_MessageSent(object sender, MessageSentEventArgs e)
         {
             if (this.DeleteSide == eDeleteSide.UserOnly)
                 return;

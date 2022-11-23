@@ -29,12 +29,6 @@ namespace TelegramBotBase.Base
             }
         }
 
-        public DeviceSession Device
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// The message id
         /// </summary>
@@ -170,7 +164,7 @@ namespace TelegramBotBase.Base
         }
 
         /// <summary>
-        /// Confirm incomming action (i.e. Button click)
+        /// Confirm incoming action (i.e. Button click)
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>

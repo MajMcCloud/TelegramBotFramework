@@ -55,9 +55,6 @@ namespace TelegramBotBase.Form
 
         public async Task OnInit(InitEventArgs e)
         {
-            if (this.Events[__evInit] == null)
-                return;
-
             var handler = this.Events[__evInit]?.GetInvocationList().Cast<AsyncEventHandler<InitEventArgs>>();
             if (handler == null)
                 return;
@@ -87,9 +84,6 @@ namespace TelegramBotBase.Form
 
         public async Task OnOpened(EventArgs e)
         {
-            if (this.Events[__evOpened] == null)
-                return;
-
             var handler = this.Events[__evOpened]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
             if (handler == null)
                 return;
@@ -120,9 +114,6 @@ namespace TelegramBotBase.Form
 
         public async Task OnClosed(EventArgs e)
         {
-            if (this.Events[__evClosed] == null)
-                return;
-
             var handler = this.Events[__evClosed]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
             if (handler == null)
                 return;

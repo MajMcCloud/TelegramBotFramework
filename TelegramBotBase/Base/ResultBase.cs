@@ -4,12 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Base
 {
     public class ResultBase : EventArgs
     {
-        public MessageClient Client { get; set; }
+        public DeviceSession Device
+        {
+            get;
+            set;
+        }
 
         public virtual long DeviceId { get; set; }
 
@@ -42,7 +47,7 @@ namespace TelegramBotBase.Base
         {
             try
             {
-                await this.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, (messageId == -1 ? this.MessageId : messageId));
+                await Device.Client.TelegramClient.DeleteMessageAsync(this.DeviceId, (messageId == -1 ? this.MessageId : messageId));
             }
             catch
             {
