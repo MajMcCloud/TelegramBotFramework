@@ -77,6 +77,7 @@ namespace TelegramBotBase.Form
 
             return null;
         }
-
+        
+        public static implicit operator string(CallbackData callbackData) => callbackData.Serialize();
     }
 }
