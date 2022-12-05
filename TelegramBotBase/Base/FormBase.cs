@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -17,7 +16,6 @@ namespace TelegramBotBase.Form
     /// </summary>
     public class FormBase : IDisposable
     {
-
         public NavigationController NavigationController { get; set; }
 
         public DeviceSession Device { get; set; }
@@ -432,14 +430,29 @@ namespace TelegramBotBase.Form
             }
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed)
+            {
+                return;
+            }
+            
+            if (disposing)
+            {
+                this.Client = null;
+                this.Device = null;                
+            }
+            
+            this.IsDisposed = true;
+        }
+        
         /// <summary>
         /// Cleanup
         /// </summary>
         public void Dispose()
         {
-            this.Client = null;
-            this.Device = null;
-            this.IsDisposed = true;
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
