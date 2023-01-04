@@ -108,9 +108,11 @@ The `BotBase` class will manage a lot of things for you, like bot commands, acti
 `StartForm` is your first form which every user will get internally redirected to, *just like a start page*.
 It needs to be a subclass of `FormBase` you will find in namespace `TelegramBotBase.Base`
 
-Every `Form` has some events which will get raised at specific times. On every form you are able to get notes about
+Every `Form` has some events which will get raised at specific times.
+In every form, you are able to get notes about
 the *Remote Device*,
-like ChatId and other stuff your carrying. From there you build up your bots:
+like ChatId and other stuff your carrying.
+From there you build up your bots:
 
 ```csharp
 public class StartForm : FormBase
@@ -182,7 +184,7 @@ await bot.Start();
 ### System calls & bot commands
 
 Using BotFather you can add *Commands* to your bot. The user will see them as popups in a dialog.
-Before start (and later for sure) you could add them to your BotBase.
+Before starting (and later, for sure), you could add them to your BotBase.
 If the message contains a command, a special *event handler* will get raised.
 
 Below we have 4 commands.
@@ -357,7 +359,7 @@ public class ButtonTestForm : AutoCleanForm
 
 ### Custom controls
 
-There are a bunch of ready to use controls. For example, progress bar.
+There is a bunch of ready to use controls. For example, progress bar.
 
 <img src=".github/images/example3.PNG" />
 
@@ -552,7 +554,7 @@ public class PerForm : AutoCleanForm
 }
 ```
 
-[Another case](TelegramBotBase.Test/Tests/Register/PerStep.cs), where every of these 3 inputs gets requested by a
+[Another case](TelegramBotBase.Test/Tests/Register/PerStep.cs), where every of these 3 inputs gets requested by 
 different forms. Just for
 imagination of the possibilities.
 
@@ -594,7 +596,7 @@ await this.NavigateTo(ad);
 
 ### AutoCleanForm
 
-Just try it by youself.
+Just try it by yourself.
 
 ### Prompt Dialog
 
@@ -679,7 +681,7 @@ await this.NavigateTo(cd);
 
 ## Groups
 
-For groups, there are multiple different tools which helps to work with and allows bot also to manage
+For groups, there are multiple different tools which help to work with and allows bot also to manage
 "Single-User" chats and group chats.
 
 ### Splitter Form
@@ -780,9 +782,9 @@ public class GroupForm : FormBase
 
 ## Statemachine and Sessions
 
-Depending on the use-cases and the overall structure of a Telegram Bot it is essential to have some kind of session
+Depending on the use-cases and the overall structure of a Telegram Bot, it is essential to have some kind of session
 serialization or state machine to keep the user context after bot restarts (i.e. due to updates) or crashes.
-For this we have some structures which fits into the current environment.
+For this, we have some structures which fit into the current environment.
 
 ### Statemachines
 
@@ -813,8 +815,8 @@ await bot.Start();
 
 #### JSONStateMachine
 
-Is easy to use too, but works for complex datatypes, because it saves there namespaces and additional type info
-into the JSON file too.
+It is easy to use too, but it works for complex datatypes, because it saves their namespaces and additional type info
+into the JSON file.
 
 ```csharp
 var bot = BotBaseBuilder
@@ -836,7 +838,7 @@ await bot.Start();
 
 #### XMLStateMachine
 
-The last one, should work like the others.
+The last one should work like the others.
 
 ```csharp
 var bot = BotBaseBuilder
@@ -898,7 +900,7 @@ keep and restore, use the following attributes.
 
 #### SaveState
 
-This will let the engine know, that you want too keep and restore this field automatically. Unlike the IStateForm
+This will let the engine know that you want to keep and restore this field automatically. Unlike the IStateForm
 methods, you have no option to manipulate data.
 
 ```csharp
@@ -908,9 +910,9 @@ public long UserId { get; set; }
 
 #### IgnoreState
 
-Due to the fact that Attribute implementation and interaction is optional, you want to let the engine maybe know, that
+Due to the fact that Attribute implementation and interaction is optional, you want to let the engine maybe know that
 you don't want to keep a specific form. So it should get *lost*. This attribute will help you here, add it to the form
-class and it will not get serialized, even if it implements IStateForm or the SaveState attributes.
+class, and it will not get serialized, even if it implements IStateForm or the SaveState attributes.
 
 ```csharp
 [IgnoreState]
@@ -931,21 +933,20 @@ var f = new FormBase();
 await this.NavigateTo(f);
 ```
 
-Depending on the model and structure of your bot it can make sense, to have more linear navigation instead of *cross*
-navigation.
+Depending on the model and structure of your bot, it can make sense, to have more linear navigation instead of *cross*-navigation.
 
-For example, you have a bot which shows a list of football teams. And when clicking on it you want to open the team
-details and latest matches.
+For example, you have a bot which shows a list of football teams. And when clicking on it, you want to open the team
+details and the latest matches.
 
 After the matches, you want to maybe switch to different teams and take a look at their statistics and matches.
 
-At some point, you *just* want to get back to the first team so like on Android you're clicking the "back" button
+At some point, you *just* want to get back to the first team, so like on Android you're clicking the "back" button
 multiple
 times.
 
 This can become really complicated, when not having some controller below which handle these "Push/Pop" calls.
 
-Thats why we hace a NavigationController class which manages these situations and the stack.
+That's why we have a NavigationController class which manages these situations and the stack.
 
 ### Usage
 
@@ -955,7 +956,7 @@ navigation.
 You will use the current FormBase instance as a root class within the constructor, so you can later come back to this
 one.
 
-**Tip**: *You can add also a completely new instance of i.e. a main menu form here to get back to it then. So you are
+**Tip**: *You can also add a completely new instance of i.e. a main menu form here to get back to it then. So you are
 free to choose.*
 
 We are using the same `FormBase` instance as above.
