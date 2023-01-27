@@ -134,6 +134,9 @@ namespace TelegramBotBase.Form.Navigation
         /// <returns></returns>
         public virtual async Task PushAsync(FormBase form, params object[] args)
         {
+            //Leave current form (needed for AutoCleanForm to work properly)
+            await CurrentForm.OnClosed(new EventArgs());
+
             form.Client = this.Client;
             form.Device = this.Device;
             form.NavigationController = this;
