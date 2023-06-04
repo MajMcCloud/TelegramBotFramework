@@ -11,132 +11,143 @@ using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 
-namespace TelegramBotBase.Form
+namespace TelegramBotBase.Form;
+
+/// <summary>
+///     A form which cleans up old messages sent within
+/// </summary>
+public class AutoCleanForm : FormBase
 {
-    /// <summary>
-    /// A form which cleans up old messages sent within
-    /// </summary>
-    public class AutoCleanForm : FormBase
+    public AutoCleanForm()
     {
-        [SaveState]
-        public List<int> OldMessages { get; set; }
+        OldMessages = new List<int>();
+        DeleteMode = EDeleteMode.OnEveryCall;
+        DeleteSide = EDeleteSide.BotOnly;
 
-        [SaveState]
-        public eDeleteMode DeleteMode { get; set; }
+        Init += AutoCleanForm_Init;
 
-        [SaveState]
-        public eDeleteSide DeleteSide { get; set; }
+        Closed += AutoCleanForm_Closed;
+    }
 
+    [SaveState] public List<int> OldMessages { get; set; }
 
+    [SaveState] public EDeleteMode DeleteMode { get; set; }
 
-        public AutoCleanForm()
+    [SaveState] public EDeleteSide DeleteSide { get; set; }
+
+    private Task AutoCleanForm_Init(object sender, InitEventArgs e)
+    {
+        if (Device == null)
         {
-            this.OldMessages = new List<int>();
-            this.DeleteMode = eDeleteMode.OnEveryCall;
-            this.DeleteSide = eDeleteSide.BotOnly;
-
-            this.Init += AutoCleanForm_Init;
-
-            this.Closed += AutoCleanForm_Closed;
-
+            return Task.CompletedTask;
         }
 
-        private async Task AutoCleanForm_Init(object sender, InitEventArgs e)
+        Device.MessageSent += Device_MessageSent;
+
+        Device.MessageReceived += Device_MessageReceived;
+
+        Device.MessageDeleted += Device_MessageDeleted;
+        return Task.CompletedTask;
+    }
+
+    private void Device_MessageDeleted(object sender, MessageDeletedEventArgs e)
+    {
+        if (OldMessages.Contains(e.MessageId))
         {
-            if (this.Device == null)
-                return;
+            OldMessages.Remove(e.MessageId);
+        }
+    }
 
-            this.Device.MessageSent += Device_MessageSent;
-
-            this.Device.MessageReceived += Device_MessageReceived;
-
-            this.Device.MessageDeleted += Device_MessageDeleted;
+    private void Device_MessageReceived(object sender, MessageReceivedEventArgs e)
+    {
+        if (DeleteSide == EDeleteSide.BotOnly)
+        {
+            return;
         }
 
-        private void Device_MessageDeleted(object sender, MessageDeletedEventArgs e)
+        OldMessages.Add(e.Message.MessageId);
+    }
+
+    private Task Device_MessageSent(object sender, MessageSentEventArgs e)
+    {
+        if (DeleteSide == EDeleteSide.UserOnly)
         {
-            if (OldMessages.Contains(e.MessageId))
-                OldMessages.Remove(e.MessageId);
+            return Task.CompletedTask;
         }
 
-        private void Device_MessageReceived(object sender, MessageReceivedEventArgs e)
-        {
-            if (this.DeleteSide == eDeleteSide.BotOnly)
-                return;
+        OldMessages.Add(e.Message.MessageId);
+        return Task.CompletedTask;
+    }
 
-            this.OldMessages.Add(e.Message.MessageId);
+    public override async Task PreLoad(MessageResult message)
+    {
+        if (DeleteMode != EDeleteMode.OnEveryCall)
+        {
+            return;
         }
 
-        private async Task Device_MessageSent(object sender, MessageSentEventArgs e)
-        {
-            if (this.DeleteSide == eDeleteSide.UserOnly)
-                return;
+        await MessageCleanup();
+    }
 
-            this.OldMessages.Add(e.Message.MessageId);
+    /// <summary>
+    ///     Adds a message to this of removable ones
+    /// </summary>
+    /// <param name="Id"></param>
+    public void AddMessage(Message m)
+    {
+        OldMessages.Add(m.MessageId);
+    }
+
+
+    /// <summary>
+    ///     Adds a message to this of removable ones
+    /// </summary>
+    /// <param name="Id"></param>
+    public void AddMessage(int messageId)
+    {
+        OldMessages.Add(messageId);
+    }
+
+    /// <summary>
+    ///     Keeps the message by removing it from the list
+    /// </summary>
+    /// <param name="id"></param>
+    public void LeaveMessage(int id)
+    {
+        OldMessages.Remove(id);
+    }
+
+    /// <summary>
+    ///     Keeps the last sent message
+    /// </summary>
+    public void LeaveLastMessage()
+    {
+        if (OldMessages.Count == 0)
+        {
+            return;
         }
 
-        public override async Task PreLoad(MessageResult message)
-        {
-            if (this.DeleteMode != eDeleteMode.OnEveryCall)
-                return;
+        OldMessages.RemoveAt(OldMessages.Count - 1);
+    }
 
-            await MessageCleanup();
+    private Task AutoCleanForm_Closed(object sender, EventArgs e)
+    {
+        if (DeleteMode != EDeleteMode.OnLeavingForm)
+        {
+            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Adds a message to this of removable ones
-        /// </summary>
-        /// <param name="Id"></param>
-        public void AddMessage(Message m)
-        {
-            this.OldMessages.Add(m.MessageId);
-        }
+        MessageCleanup().Wait();
+        return Task.CompletedTask;
+    }
 
-
-        /// <summary>
-        /// Adds a message to this of removable ones
-        /// </summary>
-        /// <param name="Id"></param>
-        public void AddMessage(int messageId)
-        {
-            this.OldMessages.Add(messageId);
-        }
-
-        /// <summary>
-        /// Keeps the message by removing it from the list
-        /// </summary>
-        /// <param name="Id"></param>
-        public void LeaveMessage(int Id)
-        {
-            this.OldMessages.Remove(Id);
-        }
-
-        /// <summary>
-        /// Keeps the last sent message
-        /// </summary>
-        public void LeaveLastMessage()
-        {
-            if (this.OldMessages.Count == 0)
-                return;
-
-            this.OldMessages.RemoveAt(this.OldMessages.Count - 1);
-        }
-
-        private async Task AutoCleanForm_Closed(object sender, EventArgs e)
-        {
-            if (this.DeleteMode != eDeleteMode.OnLeavingForm)
-                return;
-
-            MessageCleanup().Wait();
-        }
-
-        /// <summary>
-        /// Cleans up all remembered messages.
-        /// </summary>
-        /// <returns></returns>
-        public async Task MessageCleanup()
-        {
-            var oldMessages = OldMessages.AsEnumerable();
+    /// <summary>
+    ///     Cleans up all remembered messages.
+    /// </summary>
+    /// <returns></returns>
+    public async Task MessageCleanup()
+    {
+        var oldMessages = OldMessages.AsEnumerable();
 
 #if !NETSTANDARD2_0
             while (oldMessages.Any())
@@ -167,7 +178,7 @@ namespace TelegramBotBase.Form
 
                     var retryAfterSeconds = ex.InnerExceptions
                         .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
-                        .Max(e => (int?)((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
+                        .Max(e => ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
                     retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
                 }
 
@@ -178,51 +189,51 @@ namespace TelegramBotBase.Form
                     await retryAfterTask;
             }
 #else
-            while (oldMessages.Any())
+        while (oldMessages.Any())
+        {
+            using (var cts = new CancellationTokenSource())
             {
-                using (var cts = new CancellationTokenSource())
+                var deletedMessages = new ConcurrentBag<int>();
+                var parallelQuery = OldMessages.AsParallel()
+                                               .WithCancellation(cts.Token);
+                Task retryAfterTask = null;
+                try
                 {
-                    var deletedMessages = new ConcurrentBag<int>();
-                    var parallelQuery = OldMessages.AsParallel()
-                                                    .WithCancellation(cts.Token);
-                    Task retryAfterTask = null;
-                    try
+                    parallelQuery.ForAll(i =>
                     {
-                        parallelQuery.ForAll(i =>
+                        try
                         {
-                            try
-                            {
-                                Device.DeleteMessage(i).GetAwaiter().GetResult();
-                                deletedMessages.Add(i);
-                            }
-                            catch (ApiRequestException req) when (req.ErrorCode == 400)
-                            {
-                                deletedMessages.Add(i);
-                            }
-                        });
-                    }
-                    catch (AggregateException ex)
-                    {
-                        cts.Cancel();
+                            Device.DeleteMessage(i).GetAwaiter().GetResult();
+                            deletedMessages.Add(i);
+                        }
+                        catch (ApiRequestException req) when (req.ErrorCode == 400)
+                        {
+                            deletedMessages.Add(i);
+                        }
+                    });
+                }
+                catch (AggregateException ex)
+                {
+                    cts.Cancel();
 
-                        var retryAfterSeconds = ex.InnerExceptions
-                            .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
-                            .Max(e => (int?)((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
-                        retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
-                    }
+                    var retryAfterSeconds = ex.InnerExceptions
+                                              .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
+                                              .Max(e => ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
+                    retryAfterTask = Task.Delay(retryAfterSeconds * 1000, cts.Token);
+                }
 
-                    //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
-
-                    oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
-                    if (retryAfterTask != null)
-                        await retryAfterTask;
+                //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
+                oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
+                if (retryAfterTask != null)
+                {
+                    await retryAfterTask;
                 }
             }
+        }
 
 
 #endif
 
-            OldMessages.Clear();
-        }
+        OldMessages.Clear();
     }
 }

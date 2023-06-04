@@ -1,60 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Register.Steps
+namespace TelegramBotBase.Example.Tests.Register.Steps;
+
+public class Step1 : AutoCleanForm
 {
-    public class Step1 : AutoCleanForm
+    public Step1()
     {
-        public Data UserData { get; set; }
+        Init += Step1_Init;
+    }
 
-        public Step1()
+    public Data UserData { get; set; }
+
+    private Task Step1_Init(object sender, InitEventArgs e)
+    {
+        UserData = new Data();
+        return Task.CompletedTask;
+    }
+
+
+    public override Task Load(MessageResult message)
+    {
+        if (message.Handled)
         {
-            this.Init += Step1_Init;
+            return Task.CompletedTask;
         }
 
-        private async Task Step1_Init(object sender, InitEventArgs e)
+        if (message.MessageText.Trim() == "")
         {
-            this.UserData = new Data();
+            return Task.CompletedTask;
         }
 
-
-        public async override Task Load(MessageResult message)
+        if (UserData.Firstname == null)
         {
-            if (message.Handled)
-                return;
-
-            if (message.MessageText.Trim() == "")
-                return;
-
-            if (this.UserData.Firstname == null)
-            {
-                this.UserData.Firstname = message.MessageText;
-                return;
-            }
+            UserData.Firstname = message.MessageText;
+            return Task.CompletedTask;
         }
 
-        public async override Task Render(MessageResult message)
+        return Task.CompletedTask;
+    }
+
+    public override async Task Render(MessageResult message)
+    {
+        if (UserData.Firstname == null)
         {
-            if (this.UserData.Firstname == null)
-            {
-                await this.Device.Send("Please sent your firstname:");
-                return;
-            }
-
-            message.Handled = true;
-
-            var step2 = new Step2();
-
-            step2.UserData = this.UserData;
-
-            await this.NavigateTo(step2);
+            await Device.Send("Please sent your firstname:");
+            return;
         }
 
+        message.Handled = true;
+
+        var step2 = new Step2();
+
+        step2.UserData = UserData;
+
+        await NavigateTo(step2);
     }
 }

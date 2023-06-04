@@ -1,40 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Example.Tests.Groups;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests
+namespace TelegramBotBase.Example.Tests;
+
+public class Start : SplitterForm
 {
-    public class Start : SplitterForm
+    public override async Task<bool> Open(MessageResult e)
     {
-        public override async Task<bool> Open(MessageResult e)
-        {
-            var st = new Menu();
-            await this.NavigateTo(st);
+        var st = new Menu();
+        await NavigateTo(st);
 
-            return true;
-        }
+        return true;
+    }
 
 
-        public override async Task<bool> OpenGroup(MessageResult e)
-        {
-            var st = new Groups.LinkReplaceTest();
-            await this.NavigateTo(st);
+    public override async Task<bool> OpenGroup(MessageResult e)
+    {
+        var st = new LinkReplaceTest();
+        await NavigateTo(st);
 
-            return true;
-        }
+        return true;
+    }
 
-        public override Task<bool> OpenChannel(MessageResult e)
-        {
-            return base.OpenChannel(e);
-        }
+    public override Task<bool> OpenChannel(MessageResult e)
+    {
+        return base.OpenChannel(e);
+    }
 
-        public override Task<bool> OpenSupergroup(MessageResult e)
-        {
-            return base.OpenSupergroup(e);
-        }
-
+    public override Task<bool> OpenSupergroup(MessageResult e)
+    {
+        return base.OpenSupergroup(e);
     }
 }

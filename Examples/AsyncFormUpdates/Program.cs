@@ -1,51 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using System.Timers;
+using AsyncFormUpdates.Forms;
+using TelegramBotBase;
 using TelegramBotBase.Builder;
+using Timer = System.Timers.Timer;
 
-namespace AsyncFormUpdates
+namespace AsyncFormUpdates;
+
+internal class Program
 {
-    class Program
+    private static BotBase __bot;
+
+    private static async Task Main(string[] args)
     {
-        static TelegramBotBase.BotBase bot = null;
+        __bot = BotBaseBuilder.Create()
+                              .QuickStart<Start>(Environment.GetEnvironmentVariable("API_KEY") ??
+                                                 throw new Exception("API_KEY is not set"))
+                              .Build();
 
-        static void Main(string[] args)
+        await __bot.Start();
+
+        var timer = new Timer(5000);
+
+        timer.Elapsed += Timer_Elapsed;
+        timer.Start();
+
+        Console.ReadLine();
+
+        timer.Stop();
+        await __bot.Stop();
+    }
+
+    private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
+    {
+        foreach (var s in __bot.Sessions.SessionList)
         {
-            String apiKey = "APIKey";
-
-            bot = BotBaseBuilder.Create()
-                                .QuickStart<forms.Start>(apiKey)
-                                .Build();
-
-            bot.Start();
-
-            var timer = new Timer(5000);
-
-            timer.Elapsed += Timer_Elapsed;
-            timer.Start();
-
-            Console.ReadLine();
-
-            timer.Stop();
-            bot.Stop();
-        }
-
-        private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            
-            foreach(var s in bot.Sessions.SessionList)
+            //Only for AsyncUpdateForm
+            if (s.Value.ActiveForm.GetType() != typeof(AsyncFormUpdate) &&
+                s.Value.ActiveForm.GetType() != typeof(AsyncFormEdit))
             {
-                //Only for AsyncUpdateForm
-                if (s.Value.ActiveForm.GetType() != typeof(forms.AsyncFormUpdate) && s.Value.ActiveForm.GetType() != typeof(forms.AsyncFormEdit))
-                    continue;
-
-                await bot.InvokeMessageLoop(s.Key);
+                continue;
             }
 
-
+            await __bot.InvokeMessageLoop(s.Key);
         }
     }
 }

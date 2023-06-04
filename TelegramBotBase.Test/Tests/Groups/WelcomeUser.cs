@@ -1,92 +1,82 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
+using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
-using TelegramBotBase.Args;
 
-namespace TelegramBotBaseTest.Tests.Groups
+namespace TelegramBotBase.Example.Tests.Groups;
+
+public class WelcomeUser : GroupForm
 {
-    public class WelcomeUser : TelegramBotBase.Form.GroupForm
+    public WelcomeUser()
     {
+        Opened += WelcomeUser_Opened;
+    }
 
-        public WelcomeUser()
+
+    private async Task WelcomeUser_Opened(object sender, EventArgs e)
+    {
+        var bf = new ButtonForm();
+
+        bf.AddButtonRow(new ButtonBase("Open GroupChange Test", "groupchange"));
+        bf.AddButtonRow(new ButtonBase("Open WelcomeUser Test", "welcomeuser"));
+        bf.AddButtonRow(new ButtonBase("Open LinkReplace Test", "linkreplace"));
+
+        await Device.Send("WelcomeUser started, click to switch", bf);
+    }
+
+    public override async Task Action(MessageResult message)
+    {
+        if (message.Handled)
         {
-            this.Opened += WelcomeUser_Opened;
+            return;
         }
 
+        var bn = message.RawData;
 
-        private async Task WelcomeUser_Opened(object sender, EventArgs e)
+        await message.ConfirmAction();
+        message.Handled = true;
+
+        switch (bn)
         {
+            case "groupchange":
 
-            ButtonForm bf = new ButtonForm();
+                var gc = new GroupChange();
 
-            bf.AddButtonRow(new ButtonBase("Open GroupChange Test", "groupchange"));
-            bf.AddButtonRow(new ButtonBase("Open WelcomeUser Test", "welcomeuser"));
-            bf.AddButtonRow(new ButtonBase("Open LinkReplace Test", "linkreplace"));
+                await NavigateTo(gc);
 
-            await this.Device.Send("WelcomeUser started, click to switch", bf);
+                break;
+            case "welcomeuser":
 
+                var wu = new WelcomeUser();
+
+                await NavigateTo(wu);
+
+                break;
+            case "linkreplace":
+
+                var lr = new LinkReplaceTest();
+
+                await NavigateTo(lr);
+
+                break;
         }
+    }
 
-        public override async Task Action(MessageResult message)
+    public override async Task OnMemberChanges(MemberChangeEventArgs e)
+    {
+        if (e.Type == MessageType.ChatMembersAdded)
         {
-            if (message.Handled)
-                return;
-
-            var bn = message.RawData;
-
-            await message.ConfirmAction();
-            message.Handled = true;
-
-            switch (bn)
-            {
-                case "groupchange":
-
-                    var gc = new GroupChange();
-
-                    await this.NavigateTo(gc);
-
-                    break;
-                case "welcomeuser":
-
-                    var wu = new WelcomeUser();
-
-                    await this.NavigateTo(wu);
-
-                    break;
-                case "linkreplace":
-
-                    var lr = new LinkReplaceTest();
-
-                    await this.NavigateTo(lr);
-
-                    break;
-            }
-
+            await Device.Send("Welcome you new members!\r\n\r\n" + e.Members.Select(a => a.FirstName + " " + a.LastName)
+                                                                    .Aggregate((a, b) => a + "\r\n" + b));
         }
-
-        public override async Task OnMemberChanges(MemberChangeEventArgs e)
+        else if (e.Type == MessageType.ChatMemberLeft)
         {
-
-            if (e.Type == Telegram.Bot.Types.Enums.MessageType.ChatMembersAdded)
-            {
-
-                await this.Device.Send("Welcome you new members!\r\n\r\n" + e.Members.Select(a => a.FirstName + " " + a.LastName).Aggregate((a, b) => a + "\r\n" + b));
-
-            }
-            else if (e.Type == Telegram.Bot.Types.Enums.MessageType.ChatMemberLeft)
-            {
-                await this.Device.Send(e.Members.Select(a => a.FirstName + " " + a.LastName).Aggregate((a, b) => a + " and " + b) + " has left the group");
-
-            }
-
+            await Device.Send(
+                e.Members.Select(a => a.FirstName + " " + a.LastName).Aggregate((a, b) => a + " and " + b) +
+                " has left the group");
         }
-
-
-
-
     }
 }

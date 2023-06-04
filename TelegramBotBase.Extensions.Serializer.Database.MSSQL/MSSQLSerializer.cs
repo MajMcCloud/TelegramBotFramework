@@ -1,44 +1,43 @@
-﻿using TelegramBotBase.Interfaces;
-using TelegramBotBase.Builder.Interfaces;
-using System;
-using TelegramBotBase.Base;
-using TelegramBotBase.Args;
-using TelegramBotBase.Form;
-using Microsoft.Data.SqlClient;
+﻿using System;
 using System.Data;
+using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using TelegramBotBase.Args;
+using TelegramBotBase.Base;
+using TelegramBotBase.Form;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
 {
-    public class MSSQLSerializer : IStateMachine
+    public class MssqlSerializer : IStateMachine
     {
-        public Type FallbackStateForm { get; set; }
-        public string ConnectionString { get; }
-        public String TablePrefix { get; set; }
-
         /// <summary>
-        /// Will initialize the state machine.
+        ///     Will initialize the state machine.
         /// </summary>
         /// <param name="file">Path of the file and name where to save the session details.</param>
-        /// <param name="fallbackStateForm">Type of Form which will be saved instead of Form which has <seealso cref="Attributes.IgnoreState"/> attribute declared. Needs to be subclass of <seealso cref="Form.FormBase"/>.</param>
+        /// <param name="fallbackStateForm">
+        ///     Type of Form which will be saved instead of Form which has
+        ///     <seealso cref="Attributes.IgnoreState" /> attribute declared. Needs to be subclass of
+        ///     <seealso cref="Form.FormBase" />.
+        /// </param>
         /// <param name="overwrite">Declares of the file could be overwritten.</param>
-        public MSSQLSerializer(String ConnectionString, String tablePrefix = "tgb_", Type fallbackStateForm = null)
+        public MssqlSerializer(string connectionString, string tablePrefix = "tgb_", Type fallbackStateForm = null)
         {
-            if (ConnectionString is null)
-            {
-                throw new ArgumentNullException(nameof(ConnectionString));
-            }
+            ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
-            this.ConnectionString = ConnectionString;
+            TablePrefix = tablePrefix;
 
-            this.TablePrefix = tablePrefix;
+            FallbackStateForm = fallbackStateForm;
 
-            this.FallbackStateForm = fallbackStateForm;
-
-            if (this.FallbackStateForm != null && !this.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
+            if (FallbackStateForm != null && !FallbackStateForm.IsSubclassOf(typeof(FormBase)))
             {
                 throw new ArgumentException("FallbackStateForm is not a subclass of FormBase");
             }
         }
+
+        public string ConnectionString { get; }
+        public string TablePrefix { get; set; }
+        public Type FallbackStateForm { get; set; }
 
         public StateContainer LoadFormStates()
         {
@@ -49,7 +48,8 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
                 connection.Open();
 
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT deviceId, deviceTitle, FormUri, QualifiedName FROM " + TablePrefix + "devices_sessions";
+                command.CommandText = "SELECT deviceId, deviceTitle, FormUri, QualifiedName FROM " + TablePrefix +
+                                      "devices_sessions";
 
                 var dataTable = new DataTable();
                 using (var dataAdapter = new SqlDataAdapter(command))
@@ -58,7 +58,7 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
                     foreach (DataRow r in dataTable.Rows)
                     {
-                        var se = new StateEntry()
+                        var se = new StateEntry
                         {
                             DeviceId = (long)r["deviceId"],
                             ChatTitle = r["deviceTitle"].ToString(),
@@ -77,30 +77,28 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
                             sc.GroupIds.Add(se.DeviceId);
                         }
 
-                        var data_command = connection.CreateCommand();
-                        data_command.CommandText = "SELECT [key], value, type FROM " + TablePrefix + "devices_sessions_data WHERE deviceId = @deviceId";
-                        data_command.Parameters.Add(new SqlParameter("@deviceId", r["deviceId"]));
+                        var command2 = connection.CreateCommand();
+                        command2.CommandText = "SELECT [key], value, type FROM " + TablePrefix +
+                                               "devices_sessions_data WHERE deviceId = @deviceId";
+                        command2.Parameters.Add(new SqlParameter("@deviceId", r["deviceId"]));
 
-                        var data_table = new DataTable();
-                        using (var dataAdapter2 = new SqlDataAdapter(data_command))
+                        var dataTable2 = new DataTable();
+                        using (var dataAdapter2 = new SqlDataAdapter(command2))
                         {
-                            dataAdapter2.Fill(data_table);
+                            dataAdapter2.Fill(dataTable2);
 
-                            foreach (DataRow r2 in data_table.Rows)
+                            foreach (DataRow r2 in dataTable2.Rows)
                             {
                                 var key = r2["key"].ToString();
                                 var type = Type.GetType(r2["type"].ToString());
 
-                                var value = Newtonsoft.Json.JsonConvert.DeserializeObject(r2["value"].ToString(), type);
+                                var value = JsonConvert.DeserializeObject(r2["value"].ToString(), type);
 
                                 se.Values.Add(key, value);
                             }
                         }
-
                     }
-
                 }
-
 
 
                 connection.Close();
@@ -118,69 +116,68 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
                 connection.Open();
 
                 //Cleanup old Session data
-                var clear_command = connection.CreateCommand();
+                var clearCommand = connection.CreateCommand();
 
-                clear_command.CommandText = $"DELETE FROM {TablePrefix}devices_sessions_data";
+                clearCommand.CommandText = $"DELETE FROM {TablePrefix}devices_sessions_data";
 
-                clear_command.ExecuteNonQuery();
+                clearCommand.ExecuteNonQuery();
 
-                clear_command.CommandText = $"DELETE FROM {TablePrefix}devices_sessions";
+                clearCommand.CommandText = $"DELETE FROM {TablePrefix}devices_sessions";
 
-                clear_command.ExecuteNonQuery();
+                clearCommand.ExecuteNonQuery();
 
                 //Prepare new session commands
-                var session_command = connection.CreateCommand();
-                var data_command = connection.CreateCommand();
+                var sessionCommand = connection.CreateCommand();
+                var dataCommand = connection.CreateCommand();
 
-                session_command.CommandText = "INSERT INTO " + TablePrefix + "devices_sessions (deviceId, deviceTitle, FormUri, QualifiedName) VALUES (@deviceId, @deviceTitle, @FormUri, @QualifiedName)";
-                session_command.Parameters.Add(new SqlParameter("@deviceId", ""));
-                session_command.Parameters.Add(new SqlParameter("@deviceTitle", ""));
-                session_command.Parameters.Add(new SqlParameter("@FormUri", ""));
-                session_command.Parameters.Add(new SqlParameter("@QualifiedName", ""));
+                sessionCommand.CommandText = "INSERT INTO " + TablePrefix +
+                                             "devices_sessions (deviceId, deviceTitle, FormUri, QualifiedName) VALUES (@deviceId, @deviceTitle, @FormUri, @QualifiedName)";
+                sessionCommand.Parameters.Add(new SqlParameter("@deviceId", ""));
+                sessionCommand.Parameters.Add(new SqlParameter("@deviceTitle", ""));
+                sessionCommand.Parameters.Add(new SqlParameter("@FormUri", ""));
+                sessionCommand.Parameters.Add(new SqlParameter("@QualifiedName", ""));
 
-                data_command.CommandText = "INSERT INTO " + TablePrefix + "devices_sessions_data (deviceId, [key], value, type) VALUES (@deviceId, @key, @value, @type)";
-                data_command.Parameters.Add(new SqlParameter("@deviceId", ""));
-                data_command.Parameters.Add(new SqlParameter("@key", ""));
-                data_command.Parameters.Add(new SqlParameter("@value", ""));
-                data_command.Parameters.Add(new SqlParameter("@type", ""));
+                dataCommand.CommandText = "INSERT INTO " + TablePrefix +
+                                          "devices_sessions_data (deviceId, [key], value, type) VALUES (@deviceId, @key, @value, @type)";
+                dataCommand.Parameters.Add(new SqlParameter("@deviceId", ""));
+                dataCommand.Parameters.Add(new SqlParameter("@key", ""));
+                dataCommand.Parameters.Add(new SqlParameter("@value", ""));
+                dataCommand.Parameters.Add(new SqlParameter("@type", ""));
 
                 //Store session data in database
                 foreach (var state in container.States)
                 {
-                    session_command.Parameters["@deviceId"].Value = state.DeviceId;
-                    session_command.Parameters["@deviceTitle"].Value = state.ChatTitle ?? "";
-                    session_command.Parameters["@FormUri"].Value = state.FormUri;
-                    session_command.Parameters["@QualifiedName"].Value = state.QualifiedName;
+                    sessionCommand.Parameters["@deviceId"].Value = state.DeviceId;
+                    sessionCommand.Parameters["@deviceTitle"].Value = state.ChatTitle ?? "";
+                    sessionCommand.Parameters["@FormUri"].Value = state.FormUri;
+                    sessionCommand.Parameters["@QualifiedName"].Value = state.QualifiedName;
 
-                    session_command.ExecuteNonQuery();
+                    sessionCommand.ExecuteNonQuery();
 
                     foreach (var data in state.Values)
                     {
-                        data_command.Parameters["@deviceId"].Value = state.DeviceId;
-                        data_command.Parameters["@key"].Value = data.Key;
+                        dataCommand.Parameters["@deviceId"].Value = state.DeviceId;
+                        dataCommand.Parameters["@key"].Value = data.Key;
 
                         var type = data.Value.GetType();
-                        
+
                         if (type.IsPrimitive || type.Equals(typeof(string)))
                         {
-                            data_command.Parameters["@value"].Value = data.Value;
+                            dataCommand.Parameters["@value"].Value = data.Value;
                         }
                         else
                         {
-                            data_command.Parameters["@value"].Value = Newtonsoft.Json.JsonConvert.SerializeObject(data.Value);
+                            dataCommand.Parameters["@value"].Value = JsonConvert.SerializeObject(data.Value);
                         }
-                        
-                        data_command.Parameters["@type"].Value = type.AssemblyQualifiedName;
 
-                        data_command.ExecuteNonQuery();
+                        dataCommand.Parameters["@type"].Value = type.AssemblyQualifiedName;
+
+                        dataCommand.ExecuteNonQuery();
                     }
-
                 }
 
                 connection.Close();
             }
-
-
         }
     }
 }

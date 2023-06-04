@@ -1,103 +1,98 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Register
+namespace TelegramBotBase.Example.Tests.Register;
+
+public class PerForm : AutoCleanForm
 {
-    public class PerForm : AutoCleanForm
+    public string EMail { get; set; }
+
+    public string Firstname { get; set; }
+
+    public string Lastname { get; set; }
+
+    public override Task Load(MessageResult message)
     {
-        public String EMail { get; set; }
-
-        public String Firstname { get; set; }
-
-        public String Lastname { get; set; }
-
-        public async override Task Load(MessageResult message)
+        if (message.MessageText.Trim() == "")
         {
-            if (message.MessageText.Trim() == "")
-                return;
-
-            if (this.Firstname == null)
-            {
-                this.Firstname = message.MessageText;
-                return;
-            }
-
-            if (this.Lastname == null)
-            {
-                this.Lastname = message.MessageText;
-                return;
-            }
-
-            if (this.EMail == null)
-            {
-                this.EMail = message.MessageText;
-                return;
-            }
-
+            return Task.CompletedTask;
         }
 
-        public async override Task Action(MessageResult message)
+        if (Firstname == null)
         {
-            var call = message.GetData<CallbackData>();
-
-            await message.ConfirmAction();
-
-            if (call == null)
-                return;
-
-            switch (call.Value)
-            {
-                case "back":
-
-                    var start = new Start();
-
-                    await this.NavigateTo(start);
-
-                    break;
-
-            }
-
-
+            Firstname = message.MessageText;
+            return Task.CompletedTask;
         }
 
-        public async override Task Render(MessageResult message)
+        if (Lastname == null)
         {
-            if (this.Firstname == null)
-            {
-                await this.Device.Send("Please sent your firstname:");
-                return;
-            }
+            Lastname = message.MessageText;
+            return Task.CompletedTask;
+        }
 
-            if (this.Lastname == null)
-            {
-                await this.Device.Send("Please sent your lastname:");
-                return;
-            }
+        if (EMail == null)
+        {
+            EMail = message.MessageText;
+            return Task.CompletedTask;
+        }
 
-            if (this.EMail == null)
-            {
-                await this.Device.Send("Please sent your email address:");
-                return;
-            }
+        return Task.CompletedTask;
+    }
 
+    public override async Task Action(MessageResult message)
+    {
+        var call = message.GetData<CallbackData>();
 
-            String s = "";
+        await message.ConfirmAction();
 
-            s += "Firstname: " + this.Firstname + "\r\n";
-            s += "Lastname: " + this.Lastname + "\r\n";
-            s += "E-Mail: " + this.EMail + "\r\n";
+        if (call == null)
+        {
+            return;
+        }
 
-            ButtonForm bf = new ButtonForm();
-            bf.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
+        switch (call.Value)
+        {
+            case "back":
 
-            await this.Device.Send("Your details:\r\n" + s, bf);
+                var start = new Start();
+
+                await NavigateTo(start);
+
+                break;
+        }
+    }
+
+    public override async Task Render(MessageResult message)
+    {
+        if (Firstname == null)
+        {
+            await Device.Send("Please sent your firstname:");
+            return;
+        }
+
+        if (Lastname == null)
+        {
+            await Device.Send("Please sent your lastname:");
+            return;
+        }
+
+        if (EMail == null)
+        {
+            await Device.Send("Please sent your email address:");
+            return;
         }
 
 
+        var s = "";
+
+        s += "Firstname: " + Firstname + "\r\n";
+        s += "Lastname: " + Lastname + "\r\n";
+        s += "E-Mail: " + EMail + "\r\n";
+
+        var bf = new ButtonForm();
+        bf.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "back").Serialize()));
+
+        await Device.Send("Your details:\r\n" + s, bf);
     }
 }

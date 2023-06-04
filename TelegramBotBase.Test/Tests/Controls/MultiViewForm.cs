@@ -1,53 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using TelegramBotBase.Base;
+﻿using System.Threading.Tasks;
+using TelegramBotBase.Args;
 using TelegramBotBase.Controls.Hybrid;
+using TelegramBotBase.DataSources;
+using TelegramBotBase.Enums;
+using TelegramBotBase.Example.Tests.Controls.Subclass;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls
+namespace TelegramBotBase.Example.Tests.Controls;
+
+public class MultiViewForm : AutoCleanForm
 {
-    public class MultiViewForm : AutoCleanForm
+    private ButtonGrid _bg;
+    private MultiViewTest _mvt;
+
+    public MultiViewForm()
     {
+        DeleteMode = EDeleteMode.OnLeavingForm;
+        Init += MultiViewForm_Init;
+    }
 
-        Subclass.MultiViewTest mvt = null;
+    private Task MultiViewForm_Init(object sender, InitEventArgs e)
+    {
+        _mvt = new MultiViewTest();
 
-        ButtonGrid bg = null;
+        AddControl(_mvt);
 
-        public MultiViewForm()
+        _bg = new ButtonGrid
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
-            this.Init += MultiViewForm_Init;
-        }
+            DataSource = new ButtonFormDataSource()
+        };
+        _bg.DataSource.ButtonForm.AddButtonRow("Back", "$back$");
+        _bg.ButtonClicked += Bg_ButtonClicked;
+        _bg.KeyboardType = EKeyboardType.ReplyKeyboard;
+        AddControl(_bg);
+        return Task.CompletedTask;
+    }
 
-        private async Task MultiViewForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
+    private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+    {
+        switch (e.Button.Value)
         {
-            mvt = new Subclass.MultiViewTest();
+            case "$back$":
 
-            AddControl(mvt);
+                var mn = new Menu();
+                await NavigateTo(mn);
 
-            bg = new ButtonGrid();
-            bg.ButtonsForm = new ButtonForm();
-            bg.ButtonsForm.AddButtonRow("Back", "$back$");
-            bg.ButtonClicked += Bg_ButtonClicked;
-            bg.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-            AddControl(bg);
+                break;
         }
-
-        private async Task Bg_ButtonClicked(object sender, TelegramBotBase.Args.ButtonClickedEventArgs e)
-        {
-            switch(e.Button.Value)
-            {
-                case "$back$":
-
-                    var mn = new Menu();
-                    await NavigateTo(mn);
-
-                    break;
-            }
-        }
-
-
     }
 }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace TelegramBotBase.Builder.Interfaces;
 
-namespace TelegramBotBase.Builder.Interfaces
+public interface IBuildingStage
 {
-    public interface IBuildingStage
-    {
-        BotBase Build();
-    }
+    BotBase Build();
 }

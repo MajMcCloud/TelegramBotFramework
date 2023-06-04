@@ -10,14 +10,15 @@ var serviceCollection = new ServiceCollection()
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 var bot = BotBaseBuilder.Create()
-    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
-    .DefaultMessageLoop()
-    .WithServiceProvider<StartForm>(serviceProvider)
-    .NoProxy()
-    .NoCommands()
-    .NoSerialization()
-    .DefaultLanguage()
-    .Build();
+                        .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
+                                    throw new Exception("API_KEY is not set"))
+                        .DefaultMessageLoop()
+                        .WithServiceProvider<StartForm>(serviceProvider)
+                        .NoProxy()
+                        .NoCommands()
+                        .NoSerialization()
+                        .DefaultLanguage()
+                        .Build();
 
-bot.Start();
+await bot.Start();
 await Task.Delay(-1);

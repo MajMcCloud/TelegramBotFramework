@@ -1,47 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
+using TelegramBotBase.Example.Tests.Register.Steps;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Register
+namespace TelegramBotBase.Example.Tests.Register;
+
+public class PerStep : AutoCleanForm
 {
-    public class PerStep: AutoCleanForm
+    public override async Task Action(MessageResult message)
     {
+        await message.ConfirmAction();
 
-        public async override Task Action(MessageResult message)
+        switch (message.RawData)
         {
-            await message.ConfirmAction();
+            case "start":
 
-            switch (message.RawData)
-            {
-                case "start":
+                var step1 = new Step1();
 
-                    var step1 = new Steps.Step1();
+                await NavigateTo(step1);
 
-                    await this.NavigateTo(step1);
+                break;
+            case "back":
 
-                    break;
-                case "back":
+                var start = new Start();
 
-                    var start = new Start();
+                await NavigateTo(start);
 
-                    await this.NavigateTo(start);
-
-                    break;
-
-            }
+                break;
         }
+    }
 
-        public async override Task Render(MessageResult message)
-        {
-            ButtonForm bf = new ButtonForm();
-            bf.AddButtonRow(new ButtonBase("Goto Step 1", "start"));
-            bf.AddButtonRow(new ButtonBase("Back", "back"));
+    public override async Task Render(MessageResult message)
+    {
+        var bf = new ButtonForm();
+        bf.AddButtonRow(new ButtonBase("Goto Step 1", "start"));
+        bf.AddButtonRow(new ButtonBase("Back", "back"));
 
-            await this.Device.Send("Register Steps", bf);
-        }
+        await Device.Send("Register Steps", bf);
     }
 }

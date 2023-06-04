@@ -1,38 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Tools
+namespace TelegramBotBase.Tools;
+
+public static class Conversion
 {
-    public static class Conversion
+    public static void CustomConversionChecks(FormBase form, KeyValuePair<string, object> p, PropertyInfo f)
     {
-        public static void CustomConversionChecks(FormBase form, KeyValuePair<string, object> p, System.Reflection.PropertyInfo f)
+        //Newtonsoft Int64/Int32 converter issue
+        if (f.PropertyType == typeof(int))
         {
-            //Newtonsoft Int64/Int32 converter issue
-            if (f.PropertyType == typeof(Int32))
+            if (int.TryParse(p.Value.ToString(), out var i))
             {
-                int i = 0;
-                if (int.TryParse(p.Value.ToString(), out i))
-                {
-                    f.SetValue(form, i);
-                }
-                return;
+                f.SetValue(form, i);
             }
 
-            //Newtonsoft Double/Decimal converter issue
-            if (f.PropertyType == typeof(Decimal) | f.PropertyType == typeof(Nullable<Decimal>))
-            {
-                decimal d = 0;
-                if (decimal.TryParse(p.Value.ToString(), out d))
-                {
-                    f.SetValue(form, d);
-                }
-                return;
-            }
-
-
+            return;
         }
 
+        //Newtonsoft Double/Decimal converter issue
+        if ((f.PropertyType == typeof(decimal)) | (f.PropertyType == typeof(decimal?)))
+        {
+            decimal d = 0;
+            if (decimal.TryParse(p.Value.ToString(), out d))
+            {
+                f.SetValue(form, d);
+            }
+        }
     }
 }

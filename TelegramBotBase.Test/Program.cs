@@ -1,118 +1,109 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
-using TelegramBotBase;
-using TelegramBotBase.Form;
-using TelegramBotBaseTest.Tests;
-using TelegramBotBase.Commands;
+using TelegramBotBase.Args;
 using TelegramBotBase.Builder;
+using TelegramBotBase.Commands;
+using TelegramBotBase.Enums;
+using TelegramBotBase.Example.Tests;
 
-namespace TelegramBotBaseTest
+namespace TelegramBotBase.Example;
+
+internal class Program
 {
-    class Program
+    private static async Task Main(string[] args)
     {
-        static async void Main(string[] args)
+        var bot = BotBaseBuilder
+                 .Create()
+                 .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
+                             throw new Exception("API_KEY is not set"))
+                 .DefaultMessageLoop()
+                 .WithStartForm<Start>()
+                 .NoProxy()
+                 .CustomCommands(a =>
+                 {
+                     a.Start("Starts the bot");
+                     a.Add("myid", "Returns my Device ID");
+                     a.Help("Should show you some help");
+                     a.Settings("Should show you some settings");
+                     a.Add("form1", "Opens test form 1");
+                     a.Add("form2", "Opens test form 2");
+                     a.Add("params", "Returns all send parameters as a message.");
+                 })
+                 .NoSerialization()
+                 .UseEnglish()
+                 .Build();
+
+
+        bot.BotCommand += Bb_BotCommand;
+
+        //Update Bot commands to botfather
+        bot.UploadBotCommands().Wait();
+
+        bot.SetSetting(ESettings.LogAllMessages, true);
+
+        bot.Message += (s, en) =>
         {
+            Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
+        };
 
-            String APIKey = "";
+        await bot.Start();
 
-            var bb = BotBaseBuilder
-                      .Create()
-                      .WithAPIKey(APIKey)
-                      .DefaultMessageLoop()
-                      .WithStartForm<Start>()
-                      .NoProxy()
-                      .CustomCommands(a =>
-                      {
-                          a.Start("Starts the bot");
-                          a.Add("myid", "Returns my Device ID");
-                          a.Help("Should show you some help");
-                          a.Settings("Should show you some settings");
-                          a.Add("form1", "Opens test form 1");
-                          a.Add("form2", "Opens test form 2");
-                          a.Add("params", "Returns all send parameters as a message.");
-                      })
-                      .NoSerialization()
-                      .UseEnglish()
-                      .Build();
+        Console.WriteLine("Telegram Bot started...");
+        Console.WriteLine("Press q to quit application.");
 
+        Console.ReadLine();
 
-            bb.BotCommand += Bb_BotCommand;
+        await bot.Stop();
+    }
 
-            //Update Bot commands to botfather
-            await bb.UploadBotCommands();
-
-            bb.SetSetting(TelegramBotBase.Enums.eSettings.LogAllMessages, true);
-
-            bb.Message += (s, en) =>
-            {
-                Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
-            };
-
-            bb.Start();
-
-            Console.WriteLine("Telegram Bot started...");
-
-            Console.WriteLine("Press q to quit application.");
-
-
-            Console.ReadLine();
-
-            bb.Stop();
-
-        }
-
-        private static async Task Bb_BotCommand(object sender, TelegramBotBase.Args.BotCommandEventArgs en)
+    private static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
+    {
+        switch (en.Command)
         {
-            switch (en.Command)
-            {
-                case "/start":
+            case "/start":
 
 
-                    var start = new Menu();
+                var start = new Menu();
 
-                    await en.Device.ActiveForm.NavigateTo(start);
+                await en.Device.ActiveForm.NavigateTo(start);
 
-                    break;
-                case "/form1":
+                break;
+            case "/form1":
 
-                    var form1 = new TestForm();
+                var form1 = new TestForm();
 
-                    await en.Device.ActiveForm.NavigateTo(form1);
-
-
-                    break;
+                await en.Device.ActiveForm.NavigateTo(form1);
 
 
-                case "/form2":
+                break;
 
-                    var form2 = new TestForm2();
 
-                    await en.Device.ActiveForm.NavigateTo(form2);
+            case "/form2":
 
-                    break;
+                var form2 = new TestForm2();
 
-                case "/myid":
+                await en.Device.ActiveForm.NavigateTo(form2);
 
-                    await en.Device.Send($"Your Device ID is: {en.DeviceId}");
+                break;
 
-                    en.Handled = true;
+            case "/myid":
 
-                    break;
+                await en.Device.Send($"Your Device ID is: {en.DeviceId}");
 
-                case "/params":
+                en.Handled = true;
 
-                    String m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
+                break;
 
-                    await en.Device.Send("Your parameters are: " + m, replyTo: en.Device.LastMessageId);
+            case "/params":
 
-                    en.Handled = true;
+                var m = en.Parameters.DefaultIfEmpty("").Aggregate((a, b) => a + " and " + b);
 
-                    break;
-            }
+                await en.Device.Send("Your parameters are: " + m, replyTo: en.Device.LastMessageId);
+
+                en.Handled = true;
+
+                break;
         }
     }
 }

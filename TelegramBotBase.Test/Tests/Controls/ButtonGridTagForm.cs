@@ -1,77 +1,74 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
-using TelegramBotBase.Controls;
 using TelegramBotBase.Controls.Hybrid;
+using TelegramBotBase.DataSources;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls
+namespace TelegramBotBase.Example.Tests.Controls;
+
+public class ButtonGridTagForm : AutoCleanForm
 {
-    public class ButtonGridTagForm : AutoCleanForm
+    private TaggedButtonGrid _mButtons;
+
+    public ButtonGridTagForm()
     {
+        DeleteMode = EDeleteMode.OnLeavingForm;
 
-        TaggedButtonGrid m_Buttons = null;
+        Init += ButtonGridTagForm_Init;
+    }
 
-        public ButtonGridTagForm()
+    private Task ButtonGridTagForm_Init(object sender, InitEventArgs e)
+    {
+        _mButtons = new TaggedButtonGrid
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            KeyboardType = EKeyboardType.ReplyKeyboard,
+            EnablePaging = true,
+            HeadLayoutButtonRow = new List<ButtonBase> { new("Back", "back") }
+        };
 
-            this.Init += ButtonGridTagForm_Init;
+
+        var countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+
+        var bf = new ButtonForm();
+
+        foreach (var c in countries)
+        {
+            bf.AddButtonRow(new TagButtonBase(c.EnglishName, c.EnglishName, c.Parent.EnglishName));
         }
 
-        private async Task ButtonGridTagForm_Init(object sender, InitEventArgs e)
+        _mButtons.Tags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
+        _mButtons.SelectedTags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
+
+        _mButtons.EnableCheckAllTools = true;
+
+        _mButtons.DataSource = new ButtonFormDataSource(bf);
+
+        _mButtons.ButtonClicked += Bg_ButtonClicked;
+
+        AddControl(_mButtons);
+        return Task.CompletedTask;
+    }
+
+    private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+    {
+        if (e.Button == null)
         {
-            m_Buttons = new TaggedButtonGrid();
-
-            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-
-            m_Buttons.EnablePaging = true;
-
-            m_Buttons.HeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase("Back", "back") };
-            
-
-            var countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
-
-            ButtonForm bf = new ButtonForm();
-
-            foreach (var c in countries)
-            {
-                bf.AddButtonRow(new TagButtonBase(c.EnglishName, c.EnglishName, c.Parent.EnglishName));
-            }
-
-            m_Buttons.Tags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
-            m_Buttons.SelectedTags = countries.Select(a => a.Parent.EnglishName).Distinct().OrderBy(a => a).ToList();
-
-            m_Buttons.EnableCheckAllTools = true;
-
-            m_Buttons.DataSource = new TelegramBotBase.Datasources.ButtonFormDataSource(bf);
-
-            m_Buttons.ButtonClicked += Bg_ButtonClicked;
-
-            this.AddControl(m_Buttons);
+            return;
         }
 
-        private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+        switch (e.Button.Value)
         {
-            if (e.Button == null)
+            case "back":
+                var start = new Menu();
+                await NavigateTo(start);
                 return;
-
-            switch (e.Button.Value)
-            {
-
-                case "back":
-                    var start = new Menu();
-                    await this.NavigateTo(start);
-                    return;
-
-            }
-
-
-            await this.Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
         }
+
+
+        await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
     }
 }
