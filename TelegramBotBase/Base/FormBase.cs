@@ -26,16 +26,6 @@ public class FormBase : IDisposable
     public EventHandlerList Events = new();
 
 
-    public FormBase()
-    {
-        Controls = new List<ControlBase>();
-    }
-
-    public FormBase(MessageClient client) : this()
-    {
-        Client = client;
-    }
-
     public NavigationController NavigationController { get; set; }
 
     public DeviceSession Device { get; set; }
@@ -48,6 +38,16 @@ public class FormBase : IDisposable
     public bool IsDisposed { get; set; }
 
     public List<ControlBase> Controls { get; set; }
+
+    public FormBase()
+    {
+        Controls = new List<ControlBase>();
+    }
+
+    public FormBase(MessageClient client) : this()
+    {
+        Client = client;
+    }
 
     /// <summary>
     ///     Cleanup
