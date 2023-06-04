@@ -277,10 +277,10 @@ public class TaggedButtonGrid : MultiView
 
             var max = DataSource.CalculateMax(EnableSearch ? SearchQuery : null);
 
-            //if (this.EnableSearch && this.SearchQuery != null && this.SearchQuery != "")
-            //{
-            //    bf = bf.FilterDuplicate(this.SearchQuery);
-            //}
+            if(SelectedTags.Count < Tags.Count)
+            {
+                max = DataSource.ButtonForm.TagDuplicate(SelectedTags).Count;
+            }
 
             if (max == 0)
             {
