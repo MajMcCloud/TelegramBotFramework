@@ -455,7 +455,7 @@ public class TaggedButtonGrid : MultiView
                     if (result.MessageText == "📁")
                     {
                         //Remove button click message
-                        if (DeletePreviousMessage)
+                        if (DeletePreviousMessage && !Device.ActiveForm.IsAutoCleanForm())
                         {
                             await Device.DeleteMessage(result.MessageId);
                         }

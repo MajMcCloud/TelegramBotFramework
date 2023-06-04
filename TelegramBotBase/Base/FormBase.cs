@@ -447,4 +447,10 @@ public class FormBase : IDisposable
             Controls.Remove(c);
         }
     }
+
+    /// <summary>
+    /// Returns if this instance is a subclass of AutoCleanForm. Necessary to prevent message deletion if not necessary.
+    /// </summary>
+    public bool IsAutoCleanForm() => this.GetType().IsSubclassOf(typeof(AutoCleanForm));
+
 }
