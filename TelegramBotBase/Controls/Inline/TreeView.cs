@@ -23,7 +23,7 @@ public class TreeView : ControlBase
 
     public string Title { get; set; }
 
-    private int? MessageId { get; set; }
+    public int? MessageId { get; set; }
 
     public string MoveUpIcon { get; set; } = Default.Language["TreeView_LevelUp"];
 

@@ -36,7 +36,7 @@ public class CalendarPicker : ControlBase
     public CultureInfo Culture { get; set; }
 
 
-    private int? MessageId { get; set; }
+    public int? MessageId { get; set; }
 
     public string Title { get; set; } = Default.Language["CalendarPicker_Title"];
 
