@@ -41,6 +41,10 @@ public class TaggedButtonGrid : MultiView
 
     public string UncheckAllLabel = Default.Language["ButtonGrid_UncheckAll"];
 
+    public string SearchIcon = Default.Language["ButtonGrid_SearchIcon"];
+
+    public string TagIcon = Default.Language["ButtonGrid_TagIcon"];
+
     public TaggedButtonGrid()
     {
         DataSource = new ButtonFormDataSource();
@@ -427,7 +431,7 @@ public class TaggedButtonGrid : MultiView
                 }
                 else if (EnableSearch)
                 {
-                    if (result.MessageText.StartsWith("🔍"))
+                    if (result.MessageText.StartsWith(SearchIcon))
                     {
                         //Sent note about searching
                         if (SearchQuery == null)
@@ -452,7 +456,7 @@ public class TaggedButtonGrid : MultiView
                 }
                 else if (Tags != null)
                 {
-                    if (result.MessageText == "📁")
+                    if (result.MessageText == TagIcon)
                     {
                         //Remove button click message
                         if (DeletePreviousMessage && !Device.ActiveForm.IsAutoCleanForm())
@@ -993,14 +997,14 @@ public class TaggedButtonGrid : MultiView
 
             if (Tags != null && Tags.Count > 0)
             {
-                row.Add(new ButtonBase("📁", "$filter$"));
+                row.Add(new ButtonBase(TagIcon, "$filter$"));
             }
 
             row.Add(new ButtonBase(NextPageLabel, "$next$"));
 
             if (EnableSearch)
             {
-                row.Insert(2, new ButtonBase("🔍 " + (SearchQuery ?? ""), "$search$"));
+                row.Insert(2, new ButtonBase($"{SearchIcon} {(SearchQuery ?? "")}", "$search$"));
             }
 
             dataForm.InsertButtonRow(0, row);
