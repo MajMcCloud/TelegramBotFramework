@@ -53,7 +53,7 @@ public class TestForm2 : FormBase
                 await NavigateTo(fto);
             };
 
-            await NavigateTo(ad);
+            await OpenModal(ad);
         }
         else if (call.Value == "confirm")
         {
@@ -67,7 +67,7 @@ public class TestForm2 : FormBase
                 await pd.NavigateTo(tf);
             };
 
-            await NavigateTo(pd);
+            await OpenModal(pd);
         }
         else if (call.Value == "prompt")
         {
