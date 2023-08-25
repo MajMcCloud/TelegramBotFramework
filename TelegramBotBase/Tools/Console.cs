@@ -1,65 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
-namespace TelegramBotBase.Tools
+namespace TelegramBotBase.Tools;
+
+public static class Console
 {
-    public static class Console
+    private static EventHandler __handler;
+
+    private static readonly List<Action> __actions = new();
+
+    static Console()
     {
-        [DllImport("Kernel32")]
-        private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
+    }
 
-        private delegate bool EventHandler(CtrlType sig);
-        static EventHandler _handler;
+    [DllImport("Kernel32")]
+    private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
 
-        static List<Action> Actions = new List<Action>();
+    public static void SetHandler(Action action)
+    {
+        __actions.Add(action);
 
-        enum CtrlType
+        if (__handler != null)
         {
-            CTRL_C_EVENT = 0,
-            CTRL_BREAK_EVENT = 1,
-            CTRL_CLOSE_EVENT = 2,
-            CTRL_LOGOFF_EVENT = 5,
-            CTRL_SHUTDOWN_EVENT = 6
+            return;
         }
 
-        static Console()
+        __handler += Handler;
+        SetConsoleCtrlHandler(__handler, true);
+    }
+
+    private static bool Handler(CtrlType sig)
+    {
+        switch (sig)
         {
+            case CtrlType.CtrlCEvent:
+            case CtrlType.CtrlLogoffEvent:
+            case CtrlType.CtrlShutdownEvent:
+            case CtrlType.CtrlCloseEvent:
 
+                foreach (var a in __actions)
+                {
+                    a();
+                }
+
+                return false;
+
+            default:
+                return false;
         }
+    }
 
-        public static void SetHandler(Action action)
-        {
-            Actions.Add(action);
+    private delegate bool EventHandler(CtrlType sig);
 
-            if (_handler != null)
-                return;
-
-            _handler += new EventHandler(Handler);
-            SetConsoleCtrlHandler(_handler, true);
-        }
-
-        private static bool Handler(CtrlType sig)
-        {
-            switch (sig)
-            {
-                case CtrlType.CTRL_C_EVENT:
-                case CtrlType.CTRL_LOGOFF_EVENT:
-                case CtrlType.CTRL_SHUTDOWN_EVENT:
-                case CtrlType.CTRL_CLOSE_EVENT:
-
-                    foreach (var a in Actions)
-                    {
-                        a();
-                    }
-
-                    return false;
-
-                default:
-                    return false;
-            }
-        }
-
+    private enum CtrlType
+    {
+        CtrlCEvent = 0,
+        CtrlBreakEvent = 1,
+        CtrlCloseEvent = 2,
+        CtrlLogoffEvent = 5,
+        CtrlShutdownEvent = 6
     }
 }

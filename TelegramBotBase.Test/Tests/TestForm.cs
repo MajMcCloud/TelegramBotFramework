@@ -1,78 +1,67 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests
+namespace TelegramBotBase.Example.Tests;
+
+public class TestForm : FormBase
 {
-    public class TestForm : FormBase
+    public TestForm()
     {
+        Opened += TestForm_Opened;
+        Closed += TestForm_Closed;
+    }
+
+    private string LastMessage { get; set; }
+
+    private async Task TestForm_Opened(object sender, EventArgs e)
+    {
+        await Device.Send("Welcome to Form 1");
+    }
+
+    private async Task TestForm_Closed(object sender, EventArgs e)
+    {
+        await Device.Send("Ciao from Form 1");
+    }
 
 
-        String LastMessage { get; set; }
-
-        public TestForm()
+    public override async Task Action(MessageResult message)
+    {
+        switch (message.Command)
         {
-            this.Opened += TestForm_Opened;
-            this.Closed += TestForm_Closed;
-        }
+            case "reply":
 
-        private async Task TestForm_Opened(object sender, EventArgs e)
+
+                break;
+
+            case "navigate":
+
+                var tf = new TestForm2();
+
+                await NavigateTo(tf);
+
+                break;
+
+            default:
+
+                if (message.UpdateData == null)
+                {
+                    return;
+                }
+
+                LastMessage = message.Message.Text;
+
+                break;
+        }
+    }
+
+
+    public override async Task Render(MessageResult message)
+    {
+        if (message.Command == "reply")
         {
-            await this.Device.Send("Welcome to Form 1");
+            await Device.Send("Last message: " + LastMessage);
         }
-
-        private async Task TestForm_Closed(object sender, EventArgs e)
-        {
-            await this.Device.Send("Ciao from Form 1");
-        }
-
-
-        public override async Task Action(MessageResult message)
-        {
-            switch (message.Command)
-            {
-                case "reply":
-
-
-                    break;
-
-                case "navigate":
-
-                    var tf = new TestForm2();
-
-                    await this.NavigateTo(tf);
-
-                    break;
-
-                default:
-
-                    if (message.UpdateData == null)
-                        return;
-
-                    this.LastMessage = message.Message.Text;
-
-                    break;
-            }
-
-
-        }
-
-
-        public override async Task Render(MessageResult message)
-        {
-            if (message.Command == "reply")
-            {
-
-                await this.Device.Send("Last message: " + this.LastMessage);
-
-            }
-
-        }
-
     }
 }

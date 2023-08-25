@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TelegramBotBase.Form;
+﻿using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Interfaces
+namespace TelegramBotBase.Interfaces;
+
+public interface IStartFormFactory
 {
-    public interface IStartFormFactory
-    {
-        FormBase CreateForm();
-    }
+    FormBase CreateForm();
 }

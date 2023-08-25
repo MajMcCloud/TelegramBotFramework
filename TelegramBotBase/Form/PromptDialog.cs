@@ -1,125 +1,112 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
+using TelegramBotBase.Localizations;
 
-namespace TelegramBotBase.Form
+namespace TelegramBotBase.Form;
+
+[IgnoreState]
+public class PromptDialog : ModalDialog
 {
-    [IgnoreState]
-    public class PromptDialog : ModalDialog
+    public PromptDialog()
     {
-        /// <summary>
-        /// The message the users sees.
-        /// </summary>
-        public String Message { get; set; }
+    }
 
-        /// <summary>
-        /// The returned text value by the user.
-        /// </summary>
-        public String Value { get; set; }
+    public PromptDialog(string message)
+    {
+        Message = message;
+    }
 
-        /// <summary>
-        /// An additional optional value.
-        /// </summary>
-        public object Tag { get; set; }
+    /// <summary>
+    ///     The message the users sees.
+    /// </summary>
+    public string Message { get; set; }
 
-        private EventHandlerList __Events { get; set; } = new EventHandlerList();
+    /// <summary>
+    ///     The returned text value by the user.
+    /// </summary>
+    public string Value { get; set; }
 
-        private static object __evCompleted { get; } = new object();
+    /// <summary>
+    ///     An additional optional value.
+    /// </summary>
+    public object Tag { get; set; }
 
-        public bool ShowBackButton { get; set; } = false;
+    private static object EvCompleted { get; } = new();
 
-        public String BackLabel { get; set; } = Localizations.Default.Language["PromptDialog_Back"];
+    public bool ShowBackButton { get; set; } = false;
 
-        /// <summary>
-        /// Contains the RAW received message.
-        /// </summary>
-        public Message ReceivedMessage { get; set; }
+    public string BackLabel { get; set; } = Default.Language["PromptDialog_Back"];
 
-        public PromptDialog()
+    /// <summary>
+    ///     Contains the RAW received message.
+    /// </summary>
+    public Message ReceivedMessage { get; set; }
+
+    public override async Task Load(MessageResult message)
+    {
+        if (message.Handled)
         {
-
+            return;
         }
 
-        public PromptDialog(String Message)
+        if (!message.IsFirstHandler)
         {
-            this.Message = Message;
+            return;
         }
 
-        public async override Task Load(MessageResult message)
+        if (ShowBackButton && message.MessageText == BackLabel)
         {
-            if (message.Handled)
-                return;
+            await CloseForm();
 
-            if (!message.IsFirstHandler)
-                return;
-
-            if (this.ShowBackButton && message.MessageText == BackLabel)
-            {
-                await this.CloseForm();
-
-                return;
-            }
-
-            if (this.Value == null)
-            {
-                this.Value = message.MessageText;
-
-                ReceivedMessage = message.Message;
-            }
-
-
+            return;
         }
 
-        public override async Task Render(MessageResult message)
+        if (Value == null)
         {
+            Value = message.MessageText;
 
-            if (this.Value == null)
+            ReceivedMessage = message.Message;
+        }
+    }
+
+    public override async Task Render(MessageResult message)
+    {
+        if (Value == null)
+        {
+            if (ShowBackButton)
             {
-                if (this.ShowBackButton)
-                {
-                    ButtonForm bf = new ButtonForm();
-                    bf.AddButtonRow(new ButtonBase(BackLabel, "back"));
-                    await this.Device.Send(this.Message, (ReplyMarkupBase)bf);
-                    return;
-                }
-
-                await this.Device.Send(this.Message);
+                var bf = new ButtonForm();
+                bf.AddButtonRow(new ButtonBase(BackLabel, "back"));
+                await Device.Send(Message, (ReplyMarkupBase)bf);
                 return;
             }
 
-
-            message.Handled = true;
-
-            OnCompleted(new PromptDialogCompletedEventArgs() { Tag = this.Tag, Value = this.Value });
-
-            await this.CloseForm();
+            await Device.Send(Message);
+            return;
         }
 
 
-        public event EventHandler<PromptDialogCompletedEventArgs> Completed
-        {
-            add
-            {
-                this.__Events.AddHandler(__evCompleted, value);
-            }
-            remove
-            {
-                this.__Events.RemoveHandler(__evCompleted, value);
-            }
-        }
+        message.Handled = true;
 
-        public void OnCompleted(PromptDialogCompletedEventArgs e)
-        {
-            (this.__Events[__evCompleted] as EventHandler<PromptDialogCompletedEventArgs>)?.Invoke(this, e);
-        }
+        OnCompleted(new PromptDialogCompletedEventArgs { Tag = Tag, Value = Value });
 
+        await CloseForm();
+    }
+
+
+    public event EventHandler<PromptDialogCompletedEventArgs> Completed
+    {
+        add => Events.AddHandler(EvCompleted, value);
+        remove => Events.RemoveHandler(EvCompleted, value);
+    }
+
+    public void OnCompleted(PromptDialogCompletedEventArgs e)
+    {
+        (Events[EvCompleted] as EventHandler<PromptDialogCompletedEventArgs>)?.Invoke(this, e);
     }
 }

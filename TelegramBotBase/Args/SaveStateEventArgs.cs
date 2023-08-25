@@ -1,41 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace TelegramBotBase.Args
+namespace TelegramBotBase.Args;
+
+public class SaveStateEventArgs
 {
-    public class SaveStateEventArgs
+    public SaveStateEventArgs()
     {
-        public Dictionary<String, object> Values { get; set; }
+        Values = new Dictionary<string, object>();
+    }
 
-        public SaveStateEventArgs()
-        {
-            Values = new Dictionary<string, object>();
-        }
+    public Dictionary<string, object> Values { get; set; }
 
-        public void Set(String key, String value)
-        {
-            Values[key] = value;
-        }
+    public void Set(string key, string value)
+    {
+        Values[key] = value;
+    }
 
-        public void SetInt(String key, int value)
-        {
-            Values[key] = value;
-        }
+    public void SetInt(string key, int value)
+    {
+        Values[key] = value;
+    }
 
-        public void SetBool(String key, bool value)
-        {
-            Values[key] = value;
-        }
+    public void SetBool(string key, bool value)
+    {
+        Values[key] = value;
+    }
 
-        public void SetDouble(String key, double value)
-        {
-            Values[key] = value;
-        }
-        public void SetObject(String key, object value)
-        {
-            Values[key] = value;
-        }
+    public void SetDouble(string key, double value)
+    {
+        Values[key] = value;
+    }
 
+    public void SetObject(string key, object value)
+    {
+        Values[key] = value;
     }
 }

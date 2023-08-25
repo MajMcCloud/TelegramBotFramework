@@ -1,50 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Register.Steps
+namespace TelegramBotBase.Example.Tests.Register.Steps;
+
+public class Step2 : AutoCleanForm
 {
-    public class Step2 : AutoCleanForm
+    public Data UserData { get; set; }
+
+
+    public override Task Load(MessageResult message)
     {
-        public Data UserData { get; set; }
-
-
-        public async override Task Load(MessageResult message)
+        if (message.Handled)
         {
-            if (message.Handled)
-                return;
-
-            if (message.MessageText.Trim() == "")
-                return;
-
-            if (this.UserData.Lastname == null)
-            {
-                this.UserData.Lastname = message.MessageText;
-                return;
-            }
+            return Task.CompletedTask;
         }
 
-
-        public async override Task Render(MessageResult message)
+        if (message.MessageText.Trim() == "")
         {
-            if (this.UserData.Lastname == null)
-            {
-                await this.Device.Send("Please sent your lastname:");
-                return;
-            }
-
-            message.Handled = true;
-
-            var step3 = new Step3();
-
-            step3.UserData = this.UserData;
-
-            await this.NavigateTo(step3);
+            return Task.CompletedTask;
         }
 
+        if (UserData.Lastname == null)
+        {
+            UserData.Lastname = message.MessageText;
+            return Task.CompletedTask;
+        }
+
+        return Task.CompletedTask;
+    }
+
+
+    public override async Task Render(MessageResult message)
+    {
+        if (UserData.Lastname == null)
+        {
+            await Device.Send("Please sent your lastname:");
+            return;
+        }
+
+        message.Handled = true;
+
+        var step3 = new Step3();
+
+        step3.UserData = UserData;
+
+        await NavigateTo(step3);
     }
 }

@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Args;
-using TelegramBotBase.Base;
 
-namespace TelegramBotBase.Interfaces
+namespace TelegramBotBase.Interfaces;
+
+/// <summary>
+///     Is used to save specific fields into a session state to survive restarts or unhandled exceptions and crashes.
+/// </summary>
+public interface IStateForm
 {
-    /// <summary>
-    /// Is used to save specific fields into a session state to survive restarts or unhandled exceptions and crashes.
-    /// </summary>
-    public interface IStateForm
-    {
+    Task LoadState(LoadStateEventArgs e);
 
-        void LoadState(LoadStateEventArgs e);
-
-        void SaveState(SaveStateEventArgs e);
-
-    }
+    Task SaveState(SaveStateEventArgs e);
 }

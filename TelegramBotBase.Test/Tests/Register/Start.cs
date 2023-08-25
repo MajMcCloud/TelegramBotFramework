@@ -1,72 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Register
+namespace TelegramBotBase.Example.Tests.Register;
+
+public class Start : AutoCleanForm
 {
-    public class Start : AutoCleanForm
+    public override async Task Action(MessageResult message)
     {
-        public Start()
-        {
+        var call = message.GetData<CallbackData>();
 
+        await message.ConfirmAction();
+
+
+        if (call == null)
+        {
+            return;
         }
 
-        public async override Task Action(MessageResult message)
+        switch (call.Value)
         {
-            var call = message.GetData<CallbackData>();
+            case "form":
 
-            await message.ConfirmAction();
+                var form = new PerForm();
 
+                await NavigateTo(form);
 
-            if (call == null)
-                return;
+                break;
+            case "step":
 
-            switch (call.Value)
-            {
-                case "form":
+                var step = new PerStep();
 
-                    var form = new PerForm();
+                await NavigateTo(step);
 
-                    await this.NavigateTo(form);
+                break;
+            case "backtodashboard":
 
-                    break;
-                case "step":
+                var start = new Menu();
 
-                    var step = new PerStep();
+                await NavigateTo(start);
 
-                    await this.NavigateTo(step);
-
-                    break;
-                case "backtodashboard":
-
-                    var start = new Tests.Menu();
-
-                    await this.NavigateTo(start);
-
-                    break;
-            }
-
-
+                break;
         }
+    }
 
-        public async override Task Render(MessageResult message)
-        {
+    public override async Task Render(MessageResult message)
+    {
+        var btn = new ButtonForm();
 
-            ButtonForm btn = new ButtonForm();
+        btn.AddButtonRow(new ButtonBase("#4.1 Per Form", new CallbackData("a", "form").Serialize()));
+        btn.AddButtonRow(new ButtonBase("#4.2 Per Step", new CallbackData("a", "step").Serialize()));
+        btn.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "backtodashboard").Serialize()));
 
-            btn.AddButtonRow(new ButtonBase("#4.1 Per Form", new CallbackData("a", "form").Serialize()));
-            btn.AddButtonRow(new ButtonBase("#4.2 Per Step", new CallbackData("a", "step").Serialize()));
-            btn.AddButtonRow(new ButtonBase("Back", new CallbackData("a", "backtodashboard").Serialize()));
-
-            await this.Device.Send("Choose your test:", btn);
-
-
-        }
-
-
+        await Device.Send("Choose your test:", btn);
     }
 }

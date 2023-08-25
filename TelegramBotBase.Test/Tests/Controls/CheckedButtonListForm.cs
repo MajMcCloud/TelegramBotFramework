@@ -1,92 +1,86 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
-using TelegramBotBase.Controls;
 using TelegramBotBase.Controls.Hybrid;
+using TelegramBotBase.DataSources;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace TelegramBotBaseTest.Tests.Controls
+namespace TelegramBotBase.Example.Tests.Controls;
+
+public class CheckedButtonListForm : AutoCleanForm
 {
-    public class CheckedButtonListForm : AutoCleanForm
+    private CheckedButtonList _mButtons;
+
+    public CheckedButtonListForm()
     {
+        DeleteMode = EDeleteMode.OnLeavingForm;
 
-        CheckedButtonList m_Buttons = null;
+        Init += CheckedButtonListForm_Init;
+    }
 
-        public CheckedButtonListForm()
+    private Task CheckedButtonListForm_Init(object sender, InitEventArgs e)
+    {
+        _mButtons = new CheckedButtonList
         {
-            this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+            KeyboardType = EKeyboardType.InlineKeyBoard,
+            EnablePaging = true,
+            HeadLayoutButtonRow = new List<ButtonBase> { new("Back", "back"), new("Switch Keyboard", "switch") },
+            SubHeadLayoutButtonRow = new List<ButtonBase> { new("No checked items", "$") }
+        };
 
-            this.Init += CheckedButtonListForm_Init;
+        var bf = new ButtonForm();
+
+        for (var i = 0; i < 30; i++)
+        {
+            bf.AddButtonRow($"{i + 1}. Item", i.ToString());
         }
 
-        private async Task CheckedButtonListForm_Init(object sender, InitEventArgs e)
+        _mButtons.DataSource = new ButtonFormDataSource(bf);
+
+        _mButtons.ButtonClicked += Bg_ButtonClicked;
+        _mButtons.CheckedChanged += M_Buttons_CheckedChanged;
+
+        AddControl(_mButtons);
+        return Task.CompletedTask;
+    }
+
+    private Task M_Buttons_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        _mButtons.SubHeadLayoutButtonRow = new List<ButtonBase>
+            { new($"{_mButtons.CheckedItems.Count} checked items", "$") };
+        return Task.CompletedTask;
+    }
+
+    private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
+    {
+        if (e.Button == null)
         {
-            m_Buttons = new CheckedButtonList();
-
-            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-            m_Buttons.EnablePaging = true;
-
-            m_Buttons.HeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase("Back", "back"), new ButtonBase("Switch Keyboard", "switch") };
-
-            m_Buttons.SubHeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase("No checked items", "$") };
-
-            ButtonForm bf = new ButtonForm();
-
-            for (int i = 0; i < 30; i++)
-            {
-                bf.AddButtonRow($"{i + 1}. Item", i.ToString());
-            }
-
-            m_Buttons.DataSource = new TelegramBotBase.Datasources.ButtonFormDataSource(bf);
-
-            m_Buttons.ButtonClicked += Bg_ButtonClicked;
-            m_Buttons.CheckedChanged += M_Buttons_CheckedChanged;
-
-            this.AddControl(m_Buttons);
+            return;
         }
 
-        private async Task M_Buttons_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        switch (e.Button.Value)
         {
-            m_Buttons.SubHeadLayoutButtonRow = new List<ButtonBase>() { new ButtonBase($"{m_Buttons.CheckedItems.Count} checked items", "$") };
-        }
+            case "back":
 
-        private async Task Bg_ButtonClicked(object sender, ButtonClickedEventArgs e)
-        {
-            if (e.Button == null)
-                return;
-
-            switch (e.Button.Value)
-            {
-                case "back":
-
-                    var start = new Menu();
-                    await NavigateTo(start);
-                    break;
+                var start = new Menu();
+                await NavigateTo(start);
+                break;
 
 
-                case "switch":
-                    switch (m_Buttons.KeyboardType)
-                    {
-                        case TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard:
-                            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard;
-                            break;
-                        case TelegramBotBase.Enums.eKeyboardType.InlineKeyBoard:
-                            m_Buttons.KeyboardType = TelegramBotBase.Enums.eKeyboardType.ReplyKeyboard;
-                            break;
-                    }
+            case "switch":
+                _mButtons.KeyboardType = _mButtons.KeyboardType switch
+                {
+                    EKeyboardType.ReplyKeyboard => EKeyboardType.InlineKeyBoard,
+                    EKeyboardType.InlineKeyBoard => EKeyboardType.ReplyKeyboard,
+                    _ => _mButtons.KeyboardType
+                };
 
+                break;
 
-                    break;
-
-                default:
-                    await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
-                    break;
-            }
-
-
+            default:
+                await Device.Send($"Button clicked with Text: {e.Button.Text} and Value {e.Button.Value}");
+                break;
         }
     }
 }

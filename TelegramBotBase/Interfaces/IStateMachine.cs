@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
-using TelegramBotBase.Form;
 
-namespace TelegramBotBase.Interfaces
+namespace TelegramBotBase.Interfaces;
+
+public interface IStateMachine
 {
-    public interface IStateMachine
-    {
-        Type FallbackStateForm { get; }
+    Type FallbackStateForm { get; }
 
-        void SaveFormStates(SaveStatesEventArgs e);
+    void SaveFormStates(SaveStatesEventArgs e);
 
-        StateContainer LoadFormStates();
-    }
+    StateContainer LoadFormStates();
 }
