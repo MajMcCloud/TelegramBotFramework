@@ -10,6 +10,8 @@
 
 **Support group: [@tgbotbase](https://t.me/tgbotbase)**
 
+**Discord Server: [https://discord.gg/p3PPhYbTf](https://discord.gg/p3PPhYbTf)**
+
 **Releases: [GitHub](https://github.com/MajMcCloud/TelegramBotFramework/releases)**
 
 ## Donate
