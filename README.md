@@ -74,6 +74,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [As of Now](#as-of-now)
     * [Usage](#usage)
 - [Extensions](#extensions)
+- [Test Project](#test-project)
 - [Examples](#examples)
 
 ---
@@ -1011,6 +1012,14 @@ A session serializer for Microsoft SQL Server.
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL)
 
 [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+## Test Project
+
+There is a "TelegramBotBase.Test" project inside the repository which includes minimal examples for all controls available.
+Check it out to get a brief overview about all possibilities.
+
+
+- [TelegramBotBase.Test](TelegramBotBase.Test)
 
 ## Examples
 
