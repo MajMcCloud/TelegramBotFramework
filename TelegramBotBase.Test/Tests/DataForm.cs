@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -14,7 +14,7 @@ public class DataForm : AutoCleanForm
     public override async Task SentData(DataResult data)
     {
         var tmp = "";
-        InputOnlineFile file;
+        InputFile file;
 
         switch (data.Type)
         {
@@ -31,7 +31,7 @@ public class DataForm : AutoCleanForm
 
             case MessageType.Document:
 
-                file = new InputOnlineFile(data.Document.FileId);
+                file = InputFile.FromString(data.Document.FileId);
 
                 await Device.SendDocument(file, "Your uploaded document");
 
@@ -40,7 +40,7 @@ public class DataForm : AutoCleanForm
 
             case MessageType.Video:
 
-                file = new InputOnlineFile(data.Document.FileId);
+                file = InputFile.FromString(data.Document.FileId);
 
                 await Device.SendDocument(file, "Your uploaded video");
 
@@ -48,7 +48,7 @@ public class DataForm : AutoCleanForm
 
             case MessageType.Audio:
 
-                file = new InputOnlineFile(data.Document.FileId);
+                file = InputFile.FromString(data.Document.FileId);
 
                 await Device.SendDocument(file, "Your uploaded audio");
 
@@ -65,7 +65,7 @@ public class DataForm : AutoCleanForm
 
             case MessageType.Photo:
 
-                var photo = new InputOnlineFile(data.Photos.Last().FileId);
+                var photo = InputFile.FromString(data.Photos.Last().FileId);
 
                 await Device.Send("Your image: ", replyTo: data.MessageId);
                 await Client.TelegramClient.SendPhotoAsync(Device.DeviceId, photo);

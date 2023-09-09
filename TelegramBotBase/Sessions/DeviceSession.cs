@@ -9,7 +9,6 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -280,7 +279,7 @@ public class DeviceSession : IDeviceSession
 
         try
         {
-            var t = Api(a => a.SendTextMessageAsync(deviceId, text, parseMode, replyToMessageId: replyTo,
+            var t = Api(a => a.SendTextMessageAsync(deviceId, text, null, parseMode, replyToMessageId: replyTo,
                                                     replyMarkup: markup, disableNotification: disableNotification));
 
             var o = GetOrigin(new StackTrace());
@@ -339,7 +338,7 @@ public class DeviceSession : IDeviceSession
 
         try
         {
-            var t = Api(a => a.SendTextMessageAsync(DeviceId, text, parseMode, replyToMessageId: replyTo,
+            var t = Api(a => a.SendTextMessageAsync(DeviceId, text, null, parseMode, replyToMessageId: replyTo,
                                                     replyMarkup: markup, disableNotification: disableNotification));
 
             var o = GetOrigin(new StackTrace());
@@ -382,7 +381,7 @@ public class DeviceSession : IDeviceSession
 
         try
         {
-            var t = Api(a => a.SendTextMessageAsync(DeviceId, text, parseMode, replyToMessageId: replyTo,
+            var t = Api(a => a.SendTextMessageAsync(DeviceId, text, null, parseMode, replyToMessageId: replyTo,
                                                     replyMarkup: markup, disableNotification: disableNotification));
 
             var o = GetOrigin(new StackTrace());
@@ -404,7 +403,7 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo"></param>
     /// <param name="disableNotification"></param>
     /// <returns></returns>
-    public async Task<Message> SendPhoto(InputOnlineFile file, string caption = null, ButtonForm buttons = null,
+    public async Task<Message> SendPhoto(InputFile file, string caption = null, ButtonForm buttons = null,
                                          int replyTo = 0, bool disableNotification = false,
                                          ParseMode parseMode = ParseMode.Markdown)
     {
@@ -417,7 +416,7 @@ public class DeviceSession : IDeviceSession
 
         try
         {
-            var t = Api(a => a.SendPhotoAsync(DeviceId, file, caption, parseMode, replyToMessageId: replyTo,
+            var t = Api(a => a.SendPhotoAsync(DeviceId, file, null, caption, parseMode, replyToMessageId: replyTo,
                                               replyMarkup: markup, disableNotification: disableNotification));
 
             var o = GetOrigin(new StackTrace());
@@ -439,7 +438,7 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo"></param>
     /// <param name="disableNotification"></param>
     /// <returns></returns>
-    public async Task<Message> SendVideo(InputOnlineFile file, string caption = null, ButtonForm buttons = null,
+    public async Task<Message> SendVideo(InputFile file, string caption = null, ButtonForm buttons = null,
                                          int replyTo = 0, bool disableNotification = false,
                                          ParseMode parseMode = ParseMode.Markdown)
     {
@@ -487,7 +486,7 @@ public class DeviceSession : IDeviceSession
 
         try
         {
-            var t = Api(a => a.SendVideoAsync(DeviceId, new InputOnlineFile(url), parseMode: parseMode,
+            var t = Api(a => a.SendVideoAsync(DeviceId, InputFile.FromUri(url), parseMode: parseMode,
                                               replyToMessageId: replyTo, replyMarkup: markup,
                                               disableNotification: disableNotification));
 
@@ -525,7 +524,7 @@ public class DeviceSession : IDeviceSession
         {
             var ms = new MemoryStream(video);
 
-            var fts = new InputOnlineFile(ms, filename);
+            var fts = InputFile.FromStream(ms, filename);
 
             var t = Api(a => a.SendVideoAsync(DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo,
                                               replyMarkup: markup, disableNotification: disableNotification));
@@ -567,7 +566,7 @@ public class DeviceSession : IDeviceSession
 
             var filename = Path.GetFileName(filepath);
 
-            var fts = new InputOnlineFile(fs, filename);
+            var fts = InputFile.FromStream(fs, filename);
 
             var t = Api(a => a.SendVideoAsync(DeviceId, fts, parseMode: parseMode, replyToMessageId: replyTo,
                                               replyMarkup: markup, disableNotification: disableNotification));
@@ -599,7 +598,7 @@ public class DeviceSession : IDeviceSession
     {
         var ms = new MemoryStream(document);
 
-        var fts = new InputOnlineFile(ms, filename);
+        var fts = InputFile.FromStream(ms, filename);
 
         return await SendDocument(fts, caption, buttons, replyTo, disableNotification);
     }
@@ -641,7 +640,7 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo"></param>
     /// <param name="disableNotification"></param>
     /// <returns></returns>
-    public async Task<Message> SendDocument(InputOnlineFile document, string caption = "",
+    public async Task<Message> SendDocument(InputFile document, string caption = "",
                                             ButtonForm buttons = null, int replyTo = 0,
                                             bool disableNotification = false)
     {
@@ -653,7 +652,7 @@ public class DeviceSession : IDeviceSession
 
         try
         {
-            var t = Api(a => a.SendDocumentAsync(DeviceId, document, caption, replyMarkup: markup,
+            var t = Api(a => a.SendDocumentAsync(DeviceId, document, null, null, caption, replyMarkup: markup,
                                                  disableNotification: disableNotification, replyToMessageId: replyTo));
 
             var o = GetOrigin(new StackTrace());
@@ -866,11 +865,11 @@ public class DeviceSession : IDeviceSession
 
     #region "Users"
 
-    public virtual async Task RestrictUser(long userId, ChatPermissions permissions, DateTime until = default)
+    public virtual async Task RestrictUser(long userId, ChatPermissions permissions, bool? useIndependentGroupPermission = null, DateTime until = default)
     {
         try
         {
-            await Api(a => a.RestrictChatMemberAsync(DeviceId, userId, permissions, until));
+            await Api(a => a.RestrictChatMemberAsync(DeviceId, userId, permissions, useIndependentGroupPermission, until));
         }
         catch
         {

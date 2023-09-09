@@ -3,7 +3,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using TelegramBotBase.Form;
 using TelegramBotBase.Sessions;
 
@@ -34,7 +33,7 @@ namespace TelegramBotBase.Extensions.Images
         {
             using (var fileStream = ToStream(image, ImageFormat.Png))
             {
-                var fts = new InputOnlineFile(fileStream, name);
+                var fts = InputFile.FromStream(fileStream, name);
 
                 return await session.SendPhoto(fts, caption, buttons, replyTo, disableNotification);
             }
@@ -55,7 +54,7 @@ namespace TelegramBotBase.Extensions.Images
         {
             using (var fileStream = ToStream(image, ImageFormat.Png))
             {
-                var fts = new InputOnlineFile(fileStream, name);
+                var fts = InputFile.FromStream(fileStream, name);
 
                 return await session.SendPhoto(fts, caption, buttons, replyTo, disableNotification);
             }

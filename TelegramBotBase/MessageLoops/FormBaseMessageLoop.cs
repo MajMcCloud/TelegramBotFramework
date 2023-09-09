@@ -44,6 +44,7 @@ public class FormBaseMessageLoop : IMessageLoopFactory
         }
 
         mr.Device = session;
+        ur.Device = session;
 
         var activeForm = session.ActiveForm;
 

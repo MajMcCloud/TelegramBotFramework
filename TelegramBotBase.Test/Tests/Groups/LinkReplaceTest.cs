@@ -102,7 +102,13 @@ public class LinkReplaceTest : GroupForm
             CanChangeInfo = false,
             CanInviteUsers = false,
             CanPinMessages = false,
-            CanSendMediaMessages = false,
+            CanManageTopics = false,
+            CanSendAudios = false,
+            CanSendVideos = false,
+            CanSendDocuments = false,
+            CanSendPhotos = false,
+            CanSendVideoNotes = false,
+            CanSendVoiceNotes = false,
             CanSendMessages = false,
             CanSendOtherMessages = false,
             CanSendPolls = false
@@ -128,7 +134,7 @@ public class LinkReplaceTest : GroupForm
         }
         else
         {
-            await e.Device.RestrictUser(from, cp, DateTime.UtcNow.AddSeconds(30));
+            await e.Device.RestrictUser(from, cp, null, DateTime.UtcNow.AddSeconds(30));
 
             await e.Device.Send(e.Message.From.FirstName + " " + e.Message.From.LastName +
                                 " has been blocked for 30 seconds");
