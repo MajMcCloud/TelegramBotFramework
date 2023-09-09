@@ -1042,3 +1042,8 @@ When you want to update forms async without any user interaction (message/action
 method of BotBase.
 
 - [Examples/AsyncFormUpdates](Examples/AsyncFormUpdates)
+
+
+Having already a web application and want to add a TelegramBot side-by-side with it running ? Here is an example how you could do it.
+
+- [Examples/BotAndWebApplication](Examples/BotAndWebApplication)
