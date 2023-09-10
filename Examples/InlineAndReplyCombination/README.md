@@ -7,7 +7,7 @@ I used 2 ButtonGrid controls for this purpose.
 
 One for the ReplyKeyboard and one for the Inline buttons.
 
-The ReplyKeyboard is within the base [*MultipleChoiceForm*](Baseclasses/MultipleChoiceForm) class just for reusing a bit of code.
+The ReplyKeyboard is within the base [*MultipleChoiceForm*](Baseclasses/MultipleChoiceForm.cs) class just for reusing a bit of code.
 
 
 You can put it into all single forms as well, if you wish. Works the same.
