@@ -1036,3 +1036,7 @@ method of BotBase.
 Having already a web application and want to add a TelegramBot side-by-side with it running ? Here is an example how you could do it.
 
 - [Examples/BotAndWebApplication](Examples/BotAndWebApplication)
+
+Want to use Inline- and ReplyMarkup at the same time ? Here is an example how you can do that:
+
+- [Examples/InlineAndReplyCombination](Examples/InlineAndReplyCombination)
