@@ -14,11 +14,8 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Drawing.Common" Version="6.0.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj"/>
+        <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+        <PackageReference Include="TelegramBotBase" Version="6.0.0-preview.1" />
     </ItemGroup>
 
 </Project>
