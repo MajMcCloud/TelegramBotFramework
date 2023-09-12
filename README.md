@@ -44,6 +44,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [PromptDialog](#prompt-dialog)
     * [ConfirmDialog](#confirm-dialog)
 - [Controls](#controls)
+    * [Label](#label)
     * [ProgressBar](#progress-bar)
     * [CalendarPicker](#calendar-picker)
     * [MonthPicker](#month-picker)
@@ -632,6 +633,13 @@ await this.NavigateTo(cd);
 ```
 
 ## Controls
+
+### Label
+
+A minimal control which allows to manage a classic "text" message and update its later without having to keep track of the message id.
+
+<img src=".github/images/label.gif?raw=true" />
+
 
 ### Progress Bar
 

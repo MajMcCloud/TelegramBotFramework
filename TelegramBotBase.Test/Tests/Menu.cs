@@ -207,6 +207,14 @@ public class Menu : AutoCleanForm
 
                 break;
 
+            case "label":
+
+                var lf = new LabelForm();
+
+                await NavigateTo(lf);
+
+                break;
+
             default:
 
                 message.Handled = false;
@@ -259,6 +267,9 @@ public class Menu : AutoCleanForm
                                         new CallbackData("a", "dynamicbuttongrid").Serialize()));
 
         btn.AddButtonRow(new ButtonBase("#19 Notifications", new CallbackData("a", "notifications").Serialize()));
+
+
+        btn.AddButtonRow(new ButtonBase("#20 Label", new CallbackData("a", "label").Serialize()));
 
         await Device.Send("Choose your test:", btn);
     }
