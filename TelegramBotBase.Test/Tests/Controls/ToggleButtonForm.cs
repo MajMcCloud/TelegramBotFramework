@@ -7,9 +7,9 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Example.Tests.Controls;
 
-public class ToggleButtons : AutoCleanForm
+public class ToggleButtonForm : AutoCleanForm
 {
-    public ToggleButtons()
+    public ToggleButtonForm()
     {
         DeleteMode = EDeleteMode.OnLeavingForm;
 

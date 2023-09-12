@@ -127,7 +127,7 @@ public class Menu : AutoCleanForm
 
             case "togglebuttons":
 
-                var tb = new ToggleButtons();
+                var tb = new ToggleButtonForm();
 
                 await NavigateTo(tb);
 
@@ -135,7 +135,7 @@ public class Menu : AutoCleanForm
 
             case "multitogglebuttons":
 
-                var mtb = new MultiToggleButtons();
+                var mtb = new MultiToggleButtonForm();
 
                 await NavigateTo(mtb);
 
