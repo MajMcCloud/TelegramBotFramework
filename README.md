@@ -640,10 +640,13 @@ A minimal control which allows to manage a classic "text" message and update its
 
 <img src=".github/images/label.gif?raw=true" />
 
+Check the example project [TelegramBotBase.Example/Tests/Controls/LabelForm](TelegramBotBase.Example/Tests/Controls/LabelForm.cs)
 
 ### Progress Bar
 
 <img src=".github/images/progressbar.PNG?raw=true" />
+
+Check the example project [TelegramBotBase.Example/Tests/ProgressTest.cs](TelegramBotBase.Example/Tests/ProgressTest.cs)
 
 ### Calendar Picker
 
@@ -651,10 +654,15 @@ A minimal control which allows to manage a classic "text" message and update its
 
 <img src=".github/images/calendarpicker.gif?raw=true" />
 
+
+Check the example project [TelegramBotBase.Example/Tests/Controls/CalendarPickerForm.cs](TelegramBotBase.Example/Tests/Controls/CalendarPickerForm.cs)
+
 ### Month Picker
 
 <img src=".github/images/monthpicker1.PNG?raw=true" />
 <img src=".github/images/monthpicker2.PNG?raw=true" />
+
+Check the example project [TelegramBotBase.Example/Tests/Controls/MonthPickerForm.cs](TelegramBotBase.Example/Tests/Controls/MonthPickerForm.cs)
 
 ### Tree View
 
@@ -663,29 +671,43 @@ A minimal control which allows to manage a classic "text" message and update its
 <img src=".github/images/treeview3.PNG?raw=true" />
 <img src=".github/images/treeview4.PNG?raw=true" />    
 
+Check the example project [TelegramBotBase.Example/Tests/Controls/TreeViewForms.cs](TelegramBotBase.Example/Tests/Controls/TreeViewForms.cs)
+
 ### Toggle Button
 
 <img src=".github/images/togglebutton.gif?raw=true" />
+
+Check the example project [TelegramBotBase.Example/Tests/Controls/ToggleButtonForm.cs](TelegramBotBase.Example/Tests/Controls/ToggleButtonForm.cs)
 
 ### Button Grid
 
 <img src=".github/images/buttongrid.gif?raw=true" />
 
+Check the example project [TelegramBotBase.Example/Tests/Controls/ButtonGridForm.cs](TelegramBotBase.Example/Tests/Controls/ButtonGridForm.cs)
+
 #### Paging & Searching
 
 <img src=".github/images/buttongrid_pagingfilter.gif?raw=true" />
+
+Check the example project [TelegramBotBase.Example/Tests/Controls/ButtonGridPadingForm.cs](TelegramBotBase.Example/Tests/Controls/ButtonGridPagingForm.cs)
 
 ### Tagged Button Grid
 
 <img src=".github/images/taggedbuttongrid.gif?raw=true" />
 
+Check the example project [TelegramBotBase.Example/Tests/Controls/ButtonGridTagForm.cs](TelegramBotBase.Example/Tests/Controls/ButtonGridTagForm.cs)
+
 ### Checked Button List
 
 <img src=".github/images/checkedbuttonlist.gif?raw=true" />
 
+Check the example project [TelegramBotBase.Example/Tests/Controls/CheckedButtonListForm.cs](TelegramBotBase.Example/Tests/Controls/CheckedButtonListForm.cs)
+
 ### Multi Toggle Button
 
 <img src=".github/images/multitogglebutton.gif?raw=true" />
+
+Check the example project [TelegramBotBase.Example/Tests/Controls/MultiToggleButtonForm.cs](TelegramBotBase.Example/Tests/Controls/MultiToggleButtonForm.cs)
 
 ## Groups
 
