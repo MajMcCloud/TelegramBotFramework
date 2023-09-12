@@ -10,11 +10,11 @@ namespace InlineAndReplyCombination.Model
     [DebuggerDisplay("{AgeRange}, {FavouriteColor},  {FavouriteCity}")]
     public class UserDetails
     {
-        public String AgeRange { get; set; }
+        public String? AgeRange { get; set; }
 
-        public String FavouriteColor { get; set; }
+        public String? FavouriteColor { get; set; }
 
-        public String FavouriteCity { get; set; }
+        public String? FavouriteCity { get; set; }
 
     }
 }

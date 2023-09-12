@@ -15,9 +15,9 @@ namespace InlineAndReplyCombination.Forms.Steps
     public class MainForm : MultipleChoiceForm
     {
 
-        ButtonGrid InlineButtonGrid;
+        ButtonGrid? InlineButtonGrid;
 
-        public static List<Tuple<String, String>> AllowedInlineInputs = null;
+        public static List<Tuple<String, String>> AllowedInlineInputs;
 
         static MainForm()
         {
@@ -41,7 +41,7 @@ namespace InlineAndReplyCombination.Forms.Steps
             CurrentStep = 1;
         }
 
-        private async Task MainForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
+        private Task MainForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
         {
 
             //Inline Keyboard
@@ -61,6 +61,7 @@ namespace InlineAndReplyCombination.Forms.Steps
 
             AddControl(InlineButtonGrid);
 
+            return Task.CompletedTask;
         }
 
         private async Task InlineButtonGrid_ButtonClicked(object sender, TelegramBotBase.Args.ButtonClickedEventArgs e)
@@ -72,7 +73,12 @@ namespace InlineAndReplyCombination.Forms.Steps
                 return;
             }
 
-            this.UserDetails.AgeRange = e.Button?.Value ?? "unknown";
+            if (UserDetails == null)
+            {
+                return;
+            }
+
+            UserDetails.AgeRange = e.Button?.Value ?? "unknown";
 
             var sf = new SecondForm();
 

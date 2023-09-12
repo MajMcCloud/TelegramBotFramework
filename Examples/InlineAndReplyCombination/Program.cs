@@ -6,7 +6,7 @@ namespace InlineAndReplyCombination
 {
     internal class Program
     {
-        public static BotBase BotBaseInstance { get; private set; }
+        public static BotBase? BotBaseInstance { get; private set; }
 
         static async Task Main(string[] args)
         {

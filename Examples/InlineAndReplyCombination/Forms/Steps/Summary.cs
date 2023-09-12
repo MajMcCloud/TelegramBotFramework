@@ -14,9 +14,9 @@ namespace InlineAndReplyCombination.Forms.Steps
     public class Summary : AutoCleanForm
     {
         [SaveState]
-        public UserDetails UserDetails { get; set; }
+        public UserDetails? UserDetails { get; set; }
 
-        ButtonGrid ReplyButtonGrid { get; set; }
+        ButtonGrid? ReplyButtonGrid { get; set; }
 
         public Summary()
         {
@@ -24,7 +24,7 @@ namespace InlineAndReplyCombination.Forms.Steps
         
         }
 
-        private async Task Summary_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
+        private Task Summary_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
         {
             var bf = new ButtonForm();
 
@@ -39,6 +39,7 @@ namespace InlineAndReplyCombination.Forms.Steps
 
             AddControl(ReplyButtonGrid);
 
+            return Task.CompletedTask;
         }
 
         public override async Task Load(MessageResult message)

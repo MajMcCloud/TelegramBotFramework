@@ -15,9 +15,9 @@ namespace InlineAndReplyCombination.Forms.Steps
     public class SecondForm : MultipleChoiceForm
     {
 
-        ButtonGrid InlineButtonGrid;
+        ButtonGrid? InlineButtonGrid;
 
-        public static List<Tuple<String, String>> AllowedInlineInputs = null;
+        public static List<Tuple<String, String>> AllowedInlineInputs;
 
         static SecondForm()
         {
@@ -42,7 +42,7 @@ namespace InlineAndReplyCombination.Forms.Steps
 
         }
 
-        private async Task SecondForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
+        private Task SecondForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
         {
 
             //Inline Keyboard
@@ -60,6 +60,7 @@ namespace InlineAndReplyCombination.Forms.Steps
 
             AddControl(InlineButtonGrid);
 
+            return Task.CompletedTask;
         }
 
         private async Task InlineButtonGrid_ButtonClicked(object sender, TelegramBotBase.Args.ButtonClickedEventArgs e)
@@ -71,7 +72,12 @@ namespace InlineAndReplyCombination.Forms.Steps
                 return;
             }
 
-            this.UserDetails.FavouriteColor = e.Button?.Value ?? "unknown";
+            if (UserDetails == null)
+            {
+                return;
+            }
+
+            UserDetails.FavouriteColor = e.Button?.Value ?? "unknown";
 
             var tf = new ThirdForm();
 

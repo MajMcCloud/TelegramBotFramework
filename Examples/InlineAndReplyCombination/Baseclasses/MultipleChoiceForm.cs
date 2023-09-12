@@ -14,9 +14,9 @@ namespace InlineAndReplyCombination.Baseclasses
     public class MultipleChoiceForm : AutoCleanForm
     {
         [SaveState]
-        public UserDetails UserDetails { get; set; }
+        public UserDetails? UserDetails { get; set; }
 
-        ButtonGrid ReplyButtonGrid;
+        ButtonGrid? ReplyButtonGrid;
 
         public String ReplyButtonTitle { get; set; } = "Restart";
 
@@ -28,7 +28,7 @@ namespace InlineAndReplyCombination.Baseclasses
             this.Init += MultipleChoiceForm_Init;
         }
 
-        private async Task MultipleChoiceForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
+        private Task MultipleChoiceForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
         {
             //Reply keyboard
             var bf = new ButtonForm();
@@ -43,6 +43,8 @@ namespace InlineAndReplyCombination.Baseclasses
             ReplyButtonGrid.ButtonClicked += ReplyButtonGrid_ButtonClicked;
 
             AddControl(ReplyButtonGrid);
+
+            return Task.CompletedTask;
         }
 
 

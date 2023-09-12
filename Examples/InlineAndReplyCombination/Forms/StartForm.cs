@@ -13,7 +13,7 @@ namespace InlineAndReplyCombination.Forms
 {
     public class StartForm : AutoCleanForm
     {
-        ButtonGrid buttonGrid;
+        ButtonGrid? buttonGrid;
 
         public StartForm()
         {
@@ -21,7 +21,7 @@ namespace InlineAndReplyCombination.Forms
 
         }
 
-        private async Task StartForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
+        private Task StartForm_Init(object sender, TelegramBotBase.Args.InitEventArgs e)
         {
             var bf = new ButtonForm();
 
@@ -35,6 +35,7 @@ namespace InlineAndReplyCombination.Forms
 
             AddControl(buttonGrid);
 
+            return Task.CompletedTask;
         }
 
         private async Task ButtonGrid_ButtonClicked(object sender, TelegramBotBase.Args.ButtonClickedEventArgs e)
