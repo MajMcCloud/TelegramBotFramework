@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -314,19 +315,63 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
+    /// <summary>
+    /// Uses the application runtime path to load and write a states.json file.
+    /// </summary>
+    /// <returns></returns>
+    public ILanguageSelectionStage UseJSON()
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
+        _stateMachine = new JsonStateMachine(path);
+        return this;
+    }
 
+    /// <summary>
+    /// Uses the given path to load and write a states.json file.
+    /// </summary>
+    /// <returns></returns>
     public ILanguageSelectionStage UseJSON(string path)
     {
         _stateMachine = new JsonStateMachine(path);
         return this;
     }
 
+    /// <summary>
+    /// Uses the application runtime path to load and write a states.json file.
+    /// </summary>
+    /// <returns></returns>
+    public ILanguageSelectionStage UseSimpleJSON()
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
+        _stateMachine = new SimpleJsonStateMachine(path);
+        return this;
+    }
+
+    /// <summary>
+    /// Uses the given path to load and write a states.json file.
+    /// </summary>
+    /// <returns></returns>
     public ILanguageSelectionStage UseSimpleJSON(string path)
     {
         _stateMachine = new SimpleJsonStateMachine(path);
         return this;
     }
 
+    /// <summary>
+    /// Uses the application runtime path to load and write a states.xml file.
+    /// </summary>
+    /// <returns></returns>
+    public ILanguageSelectionStage UseXML()
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.xml");
+        _stateMachine = new XmlStateMachine(path);
+        return this;
+    }
+
+    /// <summary>
+    /// Uses the given path to load and write a states.xml file.
+    /// </summary>
+    /// <returns></returns>
     public ILanguageSelectionStage UseXML(string path)
     {
         _stateMachine = new XmlStateMachine(path);
