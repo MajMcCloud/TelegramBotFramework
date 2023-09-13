@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net5;netcoreapp3.1;net6</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;netcoreapp3.1;net6</TargetFrameworks>
         <LangVersion>10</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -57,8 +57,7 @@
 
 
     <ItemGroup>
-        <PackageReference Include="Telegram.Bot" Version="18.0.0" />
-        <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
+        <PackageReference Include="Telegram.Bot" Version="19.0.0" />
     </ItemGroup>
 
 </Project>

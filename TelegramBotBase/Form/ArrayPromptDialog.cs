@@ -41,8 +41,6 @@ public class ArrayPromptDialog : FormBase
 
     public ButtonBase[][] Buttons { get; set; }
 
-    [Obsolete] public Dictionary<string, FormBase> ButtonForms { get; set; } = new();
-
     private static object EvButtonClicked { get; } = new();
 
     public override async Task Action(MessageResult message)
@@ -75,13 +73,6 @@ public class ArrayPromptDialog : FormBase
         }
 
         OnButtonClicked(new ButtonClickedEventArgs(button) { Tag = Tag });
-
-        var fb = ButtonForms.ContainsKey(call.Value) ? ButtonForms[call.Value] : null;
-
-        if (fb != null)
-        {
-            await NavigateTo(fb);
-        }
     }
 
 

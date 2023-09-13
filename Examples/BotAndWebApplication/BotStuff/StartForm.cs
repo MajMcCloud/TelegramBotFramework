@@ -6,7 +6,7 @@ namespace BotAndWebApplication.BotStuff
 {
     public class StartForm : FormBase
     {
-        ButtonGrid _grid = null;
+        ButtonGrid? _grid = null;
 
         int MyCounter { get; set; } = 0;
 
@@ -34,10 +34,10 @@ namespace BotAndWebApplication.BotStuff
             AddControl(_grid);
         }
 
-        private async Task _grid_ButtonClicked(object sender, TelegramBotBase.Args.ButtonClickedEventArgs e)
+        private Task _grid_ButtonClicked(object sender, TelegramBotBase.Args.ButtonClickedEventArgs e)
         {
             if (e.Button == null || e.Button.Value == null)
-                return;
+                return Task.CompletedTask;
 
             switch (e.Button.Value)
             {
@@ -60,6 +60,7 @@ namespace BotAndWebApplication.BotStuff
 
             }
 
+            return Task.CompletedTask;
         }
     }
 }

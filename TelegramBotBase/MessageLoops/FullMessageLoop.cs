@@ -37,6 +37,7 @@ public class FullMessageLoop : IMessageLoopFactory
         }
 
         mr.Device = session;
+        ur.Device = session;
 
         var activeForm = session.ActiveForm;
 

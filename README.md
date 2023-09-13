@@ -46,6 +46,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [PromptDialog](#prompt-dialog)
     * [ConfirmDialog](#confirm-dialog)
 - [Controls](#controls)
+    * [Label](#label)
     * [ProgressBar](#progress-bar)
     * [CalendarPicker](#calendar-picker)
     * [MonthPicker](#month-picker)
@@ -636,9 +637,19 @@ await this.NavigateTo(cd);
 
 ## Controls
 
+### Label
+
+A minimal control which allows to manage a classic "text" message and update its later without having to keep track of the message id.
+
+<img src=".github/images/label.gif?raw=true" />
+
+Check the example project [TelegramBotBase.Test/Tests/Controls/LabelForm.cs](TelegramBotBase.Test/Tests/Controls/LabelForm.cs)
+
 ### Progress Bar
 
 <img src=".github/images/progressbar.PNG?raw=true" />
+
+Check the example project [TelegramBotBase.Test/Tests/ProgressTest.cs](TelegramBotBase.Test/Tests/ProgressTest.cs)
 
 ### Calendar Picker
 
@@ -646,10 +657,15 @@ await this.NavigateTo(cd);
 
 <img src=".github/images/calendarpicker.gif?raw=true" />
 
+
+Check the example project [TelegramBotBase.Test/Tests/Controls/CalendarPickerForm.cs](TelegramBotBase.Test/Tests/Controls/CalendarPickerForm.cs)
+
 ### Month Picker
 
 <img src=".github/images/monthpicker1.PNG?raw=true" />
 <img src=".github/images/monthpicker2.PNG?raw=true" />
+
+Check the example project [TelegramBotBase.Test/Tests/Controls/MonthPickerForm.cs](TelegramBotBase.Test/Tests/Controls/MonthPickerForm.cs)
 
 ### Tree View
 
@@ -658,29 +674,43 @@ await this.NavigateTo(cd);
 <img src=".github/images/treeview3.PNG?raw=true" />
 <img src=".github/images/treeview4.PNG?raw=true" />    
 
+Check the example project [TelegramBotBase.Test/Tests/Controls/TreeViewForms.cs](TelegramBotBase.Test/Tests/Controls/TreeViewForms.cs)
+
 ### Toggle Button
 
 <img src=".github/images/togglebutton.gif?raw=true" />
+
+Check the example project [TelegramBotBase.Test/Tests/Controls/ToggleButtonForm.cs](TelegramBotBase.Test/Tests/Controls/ToggleButtonForm.cs)
 
 ### Button Grid
 
 <img src=".github/images/buttongrid.gif?raw=true" />
 
+Check the example project [TelegramBotBase.Test/Tests/Controls/ButtonGridForm.cs](TelegramBotBase.Test/Tests/Controls/ButtonGridForm.cs)
+
 #### Paging & Searching
 
 <img src=".github/images/buttongrid_pagingfilter.gif?raw=true" />
+
+Check the example project [TelegramBotBase.Test/Tests/Controls/ButtonGridPadingForm.cs](TelegramBotBase.Test/Tests/Controls/ButtonGridPagingForm.cs)
 
 ### Tagged Button Grid
 
 <img src=".github/images/taggedbuttongrid.gif?raw=true" />
 
+Check the example project [TelegramBotBase.Test/Tests/Controls/ButtonGridTagForm.cs](TelegramBotBase.Test/Tests/Controls/ButtonGridTagForm.cs)
+
 ### Checked Button List
 
 <img src=".github/images/checkedbuttonlist.gif?raw=true" />
 
+Check the example project [TelegramBotBase.Test/Tests/Controls/CheckedButtonListForm.cs](TelegramBotBase.Test/Tests/Controls/CheckedButtonListForm.cs)
+
 ### Multi Toggle Button
 
 <img src=".github/images/multitogglebutton.gif?raw=true" />
+
+Check the example project [TelegramBotBase.Test/Tests/Controls/MultiToggleButtonForm.cs](TelegramBotBase.Test/Tests/Controls/MultiToggleButtonForm.cs)
 
 ## Groups
 
@@ -1047,3 +1077,7 @@ method of BotBase.
 Having already a web application and want to add a TelegramBot side-by-side with it running ? Here is an example how you could do it.
 
 - [Examples/BotAndWebApplication](Examples/BotAndWebApplication)
+
+Want to use Inline- and ReplyMarkup at the same time ? Here is an example how you can do that:
+
+- [Examples/InlineAndReplyCombination](Examples/InlineAndReplyCombination)

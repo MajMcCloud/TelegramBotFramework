@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("TelegramBotBase Framework")]
 [assembly: AssemblyDescription("This is a context based application framework for the C# TelegramBot library.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Florian Dahn")]
+[assembly: AssemblyCompany("Florian Zevedei")]
 [assembly: AssemblyProduct("TelegramBotBase Framework")]
-[assembly: AssemblyCopyright("Copyright © Florian Dahn 2020")]
+[assembly: AssemblyCopyright("Copyright © Florian Zevedei 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.1.0.0")]
-[assembly: AssemblyFileVersion("3.1.0.0")]
+[assembly: AssemblyVersion("6.0.0.0")]
+[assembly: AssemblyFileVersion("6.0.0.0")]

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 
 namespace TelegramBotBase.Base;
 
@@ -17,6 +16,7 @@ public class DataResult : ResultBase
     public DataResult(UpdateResult update)
     {
         UpdateData = update;
+        Device = update.Device;
     }
 
     //public Telegram.Bot.Args.MessageEventArgs RawMessageData { get; set; }
@@ -51,14 +51,14 @@ public class DataResult : ResultBase
         Photos.FirstOrDefault()?.FileId;
 
 
-    public async Task<InputOnlineFile> DownloadDocument()
+    public async Task<InputFileStream> DownloadDocument()
     {
         var encryptedContent = new MemoryStream();
         encryptedContent.SetLength(Document.FileSize.Value);
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(Document.FileId,
                        encryptedContent);
 
-        return new InputOnlineFile(encryptedContent, Document.FileName);
+        return InputFile.FromStream(encryptedContent, Document.FileName);
     }
 
 
@@ -112,13 +112,13 @@ public class DataResult : ResultBase
         return sr.ReadToEnd();
     }
 
-    public async Task<InputOnlineFile> DownloadVideo()
+    public async Task<InputFileStream> DownloadVideo()
     {
         var encryptedContent = new MemoryStream();
         encryptedContent.SetLength(Video.FileSize.Value);
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(Video.FileId, encryptedContent);
 
-        return new InputOnlineFile(encryptedContent, "");
+        return InputFile.FromStream(encryptedContent, "");
     }
 
     public async Task DownloadVideo(string path)
@@ -130,13 +130,13 @@ public class DataResult : ResultBase
         fs.Dispose();
     }
 
-    public async Task<InputOnlineFile> DownloadAudio()
+    public async Task<InputFileStream> DownloadAudio()
     {
         var encryptedContent = new MemoryStream();
         encryptedContent.SetLength(Audio.FileSize.Value);
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(Audio.FileId, encryptedContent);
 
-        return new InputOnlineFile(encryptedContent, "");
+        return InputFile.FromStream(encryptedContent, "");
     }
 
     public async Task DownloadAudio(string path)
@@ -148,14 +148,14 @@ public class DataResult : ResultBase
         fs.Dispose();
     }
 
-    public async Task<InputOnlineFile> DownloadPhoto(int index)
+    public async Task<InputFileStream> DownloadPhoto(int index)
     {
         var photo = Photos[index];
         var encryptedContent = new MemoryStream();
         encryptedContent.SetLength(photo.FileSize.Value);
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(photo.FileId, encryptedContent);
 
-        return new InputOnlineFile(encryptedContent, "");
+        return InputFile.FromStream(encryptedContent, "");
     }
 
     public async Task DownloadPhoto(int index, string path)

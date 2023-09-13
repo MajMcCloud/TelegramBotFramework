@@ -18,6 +18,13 @@ public interface ISessionSerializationStage
     /// <returns></returns>
     ILanguageSelectionStage UseSerialization(IStateMachine machine);
 
+    /// <summary>
+    ///     Using the complex version of .Net JSON, which can serialize all objects.
+    ///     Saves in application directory.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    ILanguageSelectionStage UseJSON();
 
     /// <summary>
     ///     Using the complex version of .Net JSON, which can serialize all objects.
@@ -26,6 +33,13 @@ public interface ISessionSerializationStage
     /// <returns></returns>
     ILanguageSelectionStage UseJSON(string path);
 
+    /// <summary>
+    ///     Use the easy version of .Net JSON, which can serialize basic types, but not generics and others.
+    ///     Saves in application directory.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    ILanguageSelectionStage UseSimpleJSON();
 
     /// <summary>
     ///     Use the easy version of .Net JSON, which can serialize basic types, but not generics and others.
@@ -34,6 +48,13 @@ public interface ISessionSerializationStage
     /// <returns></returns>
     ILanguageSelectionStage UseSimpleJSON(string path);
 
+    /// <summary>
+    ///     Uses the XML serializer for session serialization.
+    ///     Saves in application directory.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    ILanguageSelectionStage UseXML();
 
     /// <summary>
     ///     Uses the XML serializer for session serialization.

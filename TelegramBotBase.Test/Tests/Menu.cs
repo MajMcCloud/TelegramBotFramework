@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
@@ -127,7 +128,7 @@ public class Menu : AutoCleanForm
 
             case "togglebuttons":
 
-                var tb = new ToggleButtons();
+                var tb = new ToggleButtonForm();
 
                 await NavigateTo(tb);
 
@@ -135,7 +136,7 @@ public class Menu : AutoCleanForm
 
             case "multitogglebuttons":
 
-                var mtb = new MultiToggleButtons();
+                var mtb = new MultiToggleButtonForm();
 
                 await NavigateTo(mtb);
 
@@ -207,6 +208,22 @@ public class Menu : AutoCleanForm
 
                 break;
 
+            case "label":
+
+                var lf = new LabelForm();
+
+                await NavigateTo(lf);
+
+                break;
+
+            case "arraypromptdialog":
+
+                var apt = new ArrayPromptDialogTest();
+
+                await NavigateTo(apt);
+
+                break;
+
             default:
 
                 message.Handled = false;
@@ -259,6 +276,11 @@ public class Menu : AutoCleanForm
                                         new CallbackData("a", "dynamicbuttongrid").Serialize()));
 
         btn.AddButtonRow(new ButtonBase("#19 Notifications", new CallbackData("a", "notifications").Serialize()));
+
+
+        btn.AddButtonRow(new ButtonBase("#20 Label", new CallbackData("a", "label").Serialize()));
+
+        btn.AddButtonRow(new ButtonBase("#21 ArrayPromptDialogTest", new CallbackData("a", "arraypromptdialog").Serialize()));
 
         await Device.Send("Choose your test:", btn);
     }
