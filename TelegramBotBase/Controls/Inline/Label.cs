@@ -12,7 +12,7 @@ using TelegramBotBase.Localizations;
 namespace TelegramBotBase.Controls.Inline;
 
 [DebuggerDisplay("{Text}")]
-public class LabelControl : ControlBase
+public class Label : ControlBase
 {
     private bool _renderNecessary = true;
 
@@ -52,16 +52,16 @@ public class LabelControl : ControlBase
     }
 
 
-    public LabelControl()
+    public Label()
     {
     }
 
-    public LabelControl(string text)
+    public Label(string text)
     {
         _text = text;
     }
 
-    public LabelControl(string text, ParseMode parseMode)
+    public Label(string text, ParseMode parseMode)
     {
         _text = text;
         _parseMode = parseMode;
