@@ -58,7 +58,7 @@ public class DataResult : ResultBase
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(Document.FileId,
                        encryptedContent);
 
-        return new InputFileStream(encryptedContent, Document.FileName);
+        return InputFile.FromStream(encryptedContent, Document.FileName);
     }
 
 
@@ -118,7 +118,7 @@ public class DataResult : ResultBase
         encryptedContent.SetLength(Video.FileSize.Value);
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(Video.FileId, encryptedContent);
 
-        return new InputFileStream(encryptedContent, "");
+        return InputFile.FromStream(encryptedContent, "");
     }
 
     public async Task DownloadVideo(string path)
@@ -136,7 +136,7 @@ public class DataResult : ResultBase
         encryptedContent.SetLength(Audio.FileSize.Value);
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(Audio.FileId, encryptedContent);
 
-        return new InputFileStream(encryptedContent, "");
+        return InputFile.FromStream(encryptedContent, "");
     }
 
     public async Task DownloadAudio(string path)
@@ -155,7 +155,7 @@ public class DataResult : ResultBase
         encryptedContent.SetLength(photo.FileSize.Value);
         var file = await Device.Client.TelegramClient.GetInfoAndDownloadFileAsync(photo.FileId, encryptedContent);
 
-        return new InputFileStream(encryptedContent, "");
+        return InputFile.FromStream(encryptedContent, "");
     }
 
     public async Task DownloadPhoto(int index, string path)
