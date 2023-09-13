@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
@@ -215,6 +216,14 @@ public class Menu : AutoCleanForm
 
                 break;
 
+            case "arraypromptdialog":
+
+                var apt = new ArrayPromptDialogTest();
+
+                await NavigateTo(apt);
+
+                break;
+
             default:
 
                 message.Handled = false;
@@ -270,6 +279,8 @@ public class Menu : AutoCleanForm
 
 
         btn.AddButtonRow(new ButtonBase("#20 Label", new CallbackData("a", "label").Serialize()));
+
+        btn.AddButtonRow(new ButtonBase("#21 ArrayPromptDialogTest", new CallbackData("a", "arraypromptdialog").Serialize()));
 
         await Device.Send("Choose your test:", btn);
     }
