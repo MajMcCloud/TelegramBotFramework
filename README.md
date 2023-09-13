@@ -14,6 +14,8 @@
 
 ## Donate
 
+Paypal: [https://paypal.me/majmccloud](https://paypal.me/majmccloud)
+
 Bitcoin: `1GoUJYMwAvBipQTfw2FKydAz12J8RDyeJs` / `bc1qqwlp0p5ley29lsu6jhe0qv7s7963kfc7d0m53d`
 
 Etherium: `0xAf3835104c2C3E5b3e721FA2c7365955e87DB931`
