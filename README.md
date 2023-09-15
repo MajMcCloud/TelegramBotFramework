@@ -643,7 +643,7 @@ await this.NavigateTo(cd);
 
 A minimal control which allows to manage a classic "text" message and update its later without having to keep track of the message id.
 
-<img src=".github/images/label.gif?raw=true" />
+<img src=".github/images/label.gif?raw=true" style="width:500px" />
 
 Check the example project [TelegramBotBase.Test/Tests/Controls/LabelForm.cs](TelegramBotBase.Test/Tests/Controls/LabelForm.cs)
 
