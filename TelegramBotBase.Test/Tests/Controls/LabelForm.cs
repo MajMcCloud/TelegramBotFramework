@@ -11,7 +11,7 @@ namespace TelegramBotBase.Example.Tests.Controls;
 public class LabelForm : AutoCleanForm
 {
 
-    TelegramBotBase.Controls.Inline.LabelControl _label;
+    TelegramBotBase.Controls.Inline.Label _label;
 
     ButtonGrid _buttonGrid;
 
@@ -27,7 +27,7 @@ public class LabelForm : AutoCleanForm
     private Task LabelForm_Init(object sender, InitEventArgs e)
     {
         //The "label" control
-        _label = new LabelControl("My test label");
+        _label = new Label("My test label");
 
         AddControl(_label);
 
