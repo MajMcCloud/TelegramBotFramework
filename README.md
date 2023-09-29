@@ -1072,3 +1072,8 @@ Having already a web application and want to add a TelegramBot side-by-side with
 Want to use Inline- and ReplyMarkup at the same time ? Here is an example how you can do that:
 
 - [Examples/InlineAndReplyCombination](Examples/InlineAndReplyCombination)
+
+
+Alpha: Full Dependency Injection example within this framework.
+
+- [Examples/DependencyInjection](Examples/DependencyInjection)
