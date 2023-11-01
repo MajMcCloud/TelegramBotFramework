@@ -12,7 +12,7 @@ namespace TelegramBotBase.MessageLoops;
 /// <summary>
 ///     This message loop reacts to all update types.
 /// </summary>
-public class FullMessageLoop : IMessageLoopFactory
+public sealed class FullMessageLoop : IMessageLoopFactory
 {
     private static readonly object EvUnhandledCall = new();
 

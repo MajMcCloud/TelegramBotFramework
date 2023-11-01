@@ -11,7 +11,7 @@ namespace TelegramBotBase.MessageLoops;
 /// <summary>
 ///     This is a minimal message loop which will react to all update types and just calling the Load method.
 /// </summary>
-public class MinimalMessageLoop : IMessageLoopFactory
+public sealed class MinimalMessageLoop : IMessageLoopFactory
 {
     private static readonly object EvUnhandledCall = new();
 
