@@ -19,9 +19,6 @@ public sealed class MinimalMessageLoop : IMessageLoopFactory
 
     public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
     {
-        var update = ur.RawData;
-
-
         mr.Device = session;
 
         var activeForm = session.ActiveForm;
