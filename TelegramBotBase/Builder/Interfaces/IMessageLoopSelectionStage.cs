@@ -1,4 +1,6 @@
-﻿using TelegramBotBase.Interfaces;
+﻿using System;
+using TelegramBotBase.Interfaces;
+using TelegramBotBase.MessageLoops;
 
 namespace TelegramBotBase.Builder.Interfaces;
 
@@ -10,6 +12,12 @@ public interface IMessageLoopSelectionStage
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     IStartFormSelectionStage DefaultMessageLoop();
+
+
+    /// <summary>
+    ///     Choses a fully customizable middleware-based message loop.
+    /// </summary>
+    IStartFormSelectionStage MiddlewareMessageLoop(Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration);
 
 
     /// <summary>

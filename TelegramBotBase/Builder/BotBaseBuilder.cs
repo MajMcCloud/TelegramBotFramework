@@ -137,6 +137,12 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
+    public IStartFormSelectionStage MiddlewareMessageLoop(Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
+    {
+        _messageLoopFactory = messageLoopConfiguration(new MiddlewareBaseMessageLoop());
+
+        return this;
+    }
 
     public IStartFormSelectionStage MinimalMessageLoop()
     {
