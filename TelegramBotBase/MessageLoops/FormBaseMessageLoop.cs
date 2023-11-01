@@ -22,7 +22,6 @@ public sealed class FormBaseMessageLoop : IMessageLoopFactory
     {
         var update = ur.RawData;
 
-
         if (update.Type != UpdateType.Message
             && update.Type != UpdateType.EditedMessage
             && update.Type != UpdateType.CallbackQuery)

@@ -20,9 +20,6 @@ public sealed class FullMessageLoop : IMessageLoopFactory
 
     public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
     {
-        var update = ur.RawData;
-
-
         //Is this a bot command ?
         if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
         {
@@ -50,6 +47,7 @@ public sealed class FullMessageLoop : IMessageLoopFactory
         //Loading Event
         await activeForm.Load(mr);
 
+        var update = ur.RawData;
 
         //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document) (Ignore Callback Queries)
         if (update.Type == UpdateType.Message)
