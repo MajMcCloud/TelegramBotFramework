@@ -23,6 +23,12 @@ public interface ILanguageSelectionStage
     IBuildingStage UseGerman();
 
     /// <summary>
+    ///     Selects persian as the default language for control labels.
+    /// </summary>
+    /// <returns></returns>
+    IBuildingStage UsePersian();
+
+    /// <summary>
     ///     Selects a custom language as the default language for control labels.
     /// </summary>
     /// <returns></returns>

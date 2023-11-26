@@ -403,6 +403,12 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
+    public IBuildingStage UsePersian()
+    {
+        Default.Language = new Persian();
+        return this;
+    }
+
     public IBuildingStage Custom(Localization language)
     {
         Default.Language = language;

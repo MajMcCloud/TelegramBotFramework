@@ -1,6 +1,6 @@
 ﻿namespace TelegramBotBase.Localizations;
 
-public class German : Localization
+public sealed class German : Localization
 {
     public German()
     {

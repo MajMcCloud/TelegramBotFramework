@@ -1,6 +1,6 @@
 # .NET Telegram Bot Framework - Context based addon
 
-[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/vpre/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 [![Telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://www.t.me/tgbotbase)
 
 [![License](https://img.shields.io/github/license/MajMcCloud/telegrambotframework.svg?style=flat-square&maxAge=2592000&label=License)](https://raw.githubusercontent.com/MajMcCloud/TelegramBotFramework/master/LICENCE.md)
@@ -9,6 +9,8 @@
 **Showcase: [@TGBaseBot](https://t.me/TGBaseBot)**
 
 **Support group: [@tgbotbase](https://t.me/tgbotbase)**
+
+**Discord Server: [https://discord.gg/p3PPhYbTf](https://discord.gg/p3PPhYbTf)**
 
 **Releases: [GitHub](https://github.com/MajMcCloud/TelegramBotFramework/releases)**
 
@@ -75,6 +77,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [As of Now](#as-of-now)
     * [Usage](#usage)
 - [Extensions](#extensions)
+- [Test Project](#test-project)
 - [Examples](#examples)
 
 ---
@@ -640,7 +643,7 @@ await this.NavigateTo(cd);
 
 A minimal control which allows to manage a classic "text" message and update its later without having to keep track of the message id.
 
-<img src=".github/images/label.gif?raw=true" />
+<img src=".github/images/label.gif?raw=true" style="width:500px" />
 
 Check the example project [TelegramBotBase.Test/Tests/Controls/LabelForm.cs](TelegramBotBase.Test/Tests/Controls/LabelForm.cs)
 
@@ -1041,6 +1044,14 @@ A session serializer for Microsoft SQL Server.
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL)
 
 [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+## Test Project
+
+There is a "TelegramBotBase.Test" project inside the repository which includes minimal examples for all controls available.
+Check it out to get a brief overview about all possibilities.
+
+
+- [TelegramBotBase.Test](TelegramBotBase.Test)
 
 ## Examples
 
