@@ -18,6 +18,7 @@ namespace TelegramBotBase.Base;
 public class MessageClient
 {
     private static readonly object EvOnMessageLoop = new();
+    private static readonly object EvOnReceiveError = new();
 
     private static object __evOnMessage = new();
 
@@ -128,21 +129,11 @@ public class MessageClient
         await OnMessageLoop(new UpdateResult(update, null));
     }
 
-    public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+    public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
                                  CancellationToken cancellationToken)
     {
-        if (exception is ApiRequestException exApi)
-        {
-            Console.WriteLine($"Telegram API Error:\n[{exApi.ErrorCode}]\n{exApi.Message}");
-        }
-        else
-        {
-            Console.WriteLine(exception.ToString());
-        }
-
-        return Task.CompletedTask;
+        await OnReceiveError(new ErrorResult(exception));
     }
-
 
     /// <summary>
     ///     This will return the current list of bot commands.
@@ -186,7 +177,40 @@ public class MessageClient
 
     public async Task OnMessageLoop(UpdateResult update)
     {
-        await (Events[EvOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
+        var eventHandlers = (Events[EvOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
+
+        if (eventHandlers != null)
+        {
+            await eventHandlers;
+        }
+    }
+
+
+    public event Async.AsyncEventHandler<ErrorResult> ReceiveError
+    {
+        add => Events.AddHandler(EvOnReceiveError, value);
+        remove => Events.RemoveHandler(EvOnReceiveError, value);
+    }
+
+    public async Task OnReceiveError(ErrorResult update)
+    {
+        var eventHandlers = (Events[EvOnReceiveError] as Async.AsyncEventHandler<ErrorResult>)?.Invoke(this, update);
+
+        if (eventHandlers != null)
+        {
+            await eventHandlers;
+        }
+        else
+        {
+            if (update.Exception is ApiRequestException exApi)
+            {
+                Console.WriteLine($"Telegram API Error:\n[{exApi.ErrorCode}]\n{exApi.Message}");
+            }
+            else
+            {
+                Console.WriteLine(update.Exception.ToString());
+            }
+        }
     }
 
     #endregion
