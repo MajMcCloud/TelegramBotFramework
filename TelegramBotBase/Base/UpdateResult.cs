@@ -16,6 +16,7 @@ public class UpdateResult : ResultBase
     /// </summary>
     public override long DeviceId =>
         RawData?.Message?.Chat?.Id
+        ?? RawData?.EditedMessage?.Chat?.Id
         ?? RawData?.CallbackQuery?.Message?.Chat?.Id
         ?? Device?.DeviceId
         ?? 0;
