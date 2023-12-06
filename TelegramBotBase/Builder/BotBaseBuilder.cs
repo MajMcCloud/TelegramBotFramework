@@ -39,7 +39,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// </summary>
     private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; } = new();
 
-
+    /// <summary>
+    /// Creates a full BotBase instance with all parameters previously set.
+    /// </summary>
+    /// <returns></returns>
     public BotBase Build()
     {
         var bot = new BotBase(_apiKey, _client)
