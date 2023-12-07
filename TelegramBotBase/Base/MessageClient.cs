@@ -199,18 +199,19 @@ public class MessageClient
         if (eventHandlers != null)
         {
             await eventHandlers;
+            return;
+        }
+
+        //Fallback when no event handler is used.
+        if (update.Exception is ApiRequestException exApi)
+        {
+            Console.WriteLine($"Telegram API Error:\n[{exApi.ErrorCode}]\n{exApi.Message}");
         }
         else
         {
-            if (update.Exception is ApiRequestException exApi)
-            {
-                Console.WriteLine($"Telegram API Error:\n[{exApi.ErrorCode}]\n{exApi.Message}");
-            }
-            else
-            {
-                Console.WriteLine(update.Exception.ToString());
-            }
+            Console.WriteLine(update.Exception.ToString());
         }
+
     }
 
     #endregion
