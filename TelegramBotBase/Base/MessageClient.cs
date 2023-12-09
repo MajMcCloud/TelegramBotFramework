@@ -28,6 +28,14 @@ public class MessageClient
 
     private CancellationTokenSource _cancellationTokenSource;
 
+    /// <summary>
+    ///    Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before
+    //     start polling. If set to true Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates
+    //     should be set to not null, otherwise Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates
+    //     will effectively be set to receive all Telegram.Bot.Types.Updates.
+    /// </summary>
+    public bool ThrowPendingUpdates { get; set; }
+
 
     public MessageClient(string apiKey)
     {
@@ -113,6 +121,8 @@ public class MessageClient
         _cancellationTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions();
+
+        receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
 
         TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions,
                                       _cancellationTokenSource.Token);
