@@ -23,7 +23,7 @@ public class Program
     {
         var bot = BotBaseBuilder
                     .Create()
-                    .WithAPIKey("token")
+                    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                     .MiddlewareMessageLoop(
                         messageLoop =>
                             messageLoop
@@ -68,7 +68,7 @@ public class Program
     {
         var bot = BotBaseBuilder
                     .Create()
-                    .WithAPIKey("token")
+                    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                     .MiddlewareMessageLoop(
                         messageLoop =>
                             messageLoop
@@ -103,7 +103,7 @@ public class Program
     {
         var bot = BotBaseBuilder
                             .Create()
-                            .WithAPIKey("token")
+                            .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                             .MiddlewareMessageLoop(
                                 messageLoop =>
                                     messageLoop
@@ -136,7 +136,7 @@ public class Program
     {
         var bot = BotBaseBuilder
                             .Create()
-                            .WithAPIKey("token")
+                            .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                             .MiddlewareMessageLoop(
                                 messageLoop =>
                                     messageLoop
@@ -159,7 +159,7 @@ public class Program
     {
         var bot = BotBaseBuilder
                             .Create()
-                            .WithAPIKey("token")
+                            .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                             .MiddlewareMessageLoop(
                                 messageLoop =>
                                     messageLoop
@@ -178,7 +178,7 @@ public class Program
     {
         var bot = BotBaseBuilder
                     .Create()
-                    .WithAPIKey("token")
+                    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                     .MiddlewareMessageLoop(
                         messageLoop =>
                             messageLoop
