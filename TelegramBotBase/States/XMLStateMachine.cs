@@ -27,7 +27,7 @@ public class XmlStateMachine : IStateMachine
 
         if (FallbackStateForm != null && !FallbackStateForm.IsSubclassOf(typeof(FormBase)))
         {
-            throw new ArgumentException("FallbackStateForm is not a subclass of FormBase");
+            throw new ArgumentException($"{nameof(FallbackStateForm)} is not a subclass of {nameof(FormBase)}");
         }
 
         FilePath = file ?? throw new ArgumentNullException(nameof(file));

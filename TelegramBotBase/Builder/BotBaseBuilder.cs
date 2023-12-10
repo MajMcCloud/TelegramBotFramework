@@ -39,7 +39,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// </summary>
     private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; } = new();
 
-
+    /// <summary>
+    /// Creates a full BotBase instance with all parameters previously set.
+    /// </summary>
+    /// <returns></returns>
     public BotBase Build()
     {
         var bot = new BotBase(_apiKey, _client)
@@ -210,7 +213,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 4 (Network Settings)"
 
-    public IBotCommandsStage WithProxy(string proxyAddress)
+    public IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false)
     {
         var url = new Uri(proxyAddress);
         _client = new MessageClient(_apiKey, url)
@@ -220,11 +223,12 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = new TimeSpan(0, 1, 0)
             },
         };
+        _client.ThrowPendingUpdates = throwPendingUpdates;
         return this;
     }
 
 
-    public IBotCommandsStage NoProxy()
+    public IBotCommandsStage NoProxy(bool throwPendingUpdates = false)
     {
         _client = new MessageClient(_apiKey)
         {
@@ -233,11 +237,12 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = new TimeSpan(0, 1, 0)
             }
         };
+        _client.ThrowPendingUpdates = throwPendingUpdates;
         return this;
     }
 
 
-    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient)
+    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
@@ -246,11 +251,12 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = new TimeSpan(0, 1, 0)
             }
         };
+        _client.ThrowPendingUpdates = throwPendingUpdates;
         return this;
     }
 
 
-    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort)
+    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false)
     {
         _client = new MessageClient(_apiKey, proxyHost, proxyPort)
         {
@@ -259,10 +265,11 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = new TimeSpan(0, 1, 0)
             }
         };
+        _client.ThrowPendingUpdates = throwPendingUpdates;
         return this;
     }
 
-    public IBotCommandsStage WithHttpClient(HttpClient tgclient)
+    public IBotCommandsStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
@@ -271,6 +278,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = new TimeSpan(0, 1, 0)
             }
         };
+        _client.ThrowPendingUpdates = throwPendingUpdates;
         return this;
     }
 

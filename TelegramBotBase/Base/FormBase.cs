@@ -32,6 +32,8 @@ public class FormBase : IDisposable
 
     public MessageClient Client { get; set; }
 
+    IServiceProvider _serviceProvider = null;
+
     /// <summary>
     ///     has this formular already been disposed ?
     /// </summary>

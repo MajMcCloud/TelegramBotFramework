@@ -9,22 +9,25 @@ public interface INetworkingSelectionStage
     ///     Chooses a proxy as network configuration.
     /// </summary>
     /// <param name="proxyAddress"></param>
+    /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IBotCommandsStage WithProxy(string proxyAddress);
+    IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false);
 
     /// <summary>
     ///     Do not choose a proxy as network configuration.
     /// </summary>
+    /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IBotCommandsStage NoProxy();
+    IBotCommandsStage NoProxy(bool throwPendingUpdates = false);
 
 
     /// <summary>
     ///     Chooses a custom instance of TelegramBotClient.
     /// </summary>
     /// <param name="client"></param>
+    /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IBotCommandsStage WithBotClient(TelegramBotClient client);
+    IBotCommandsStage WithBotClient(TelegramBotClient client, bool throwPendingUpdates = false);
 
 
     /// <summary>
@@ -32,13 +35,15 @@ public interface INetworkingSelectionStage
     /// </summary>
     /// <param name="proxyHost"></param>
     /// <param name="Port"></param>
+    /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IBotCommandsStage WithHostAndPort(string proxyHost, int Port);
+    IBotCommandsStage WithHostAndPort(string proxyHost, int Port, bool throwPendingUpdates = false);
 
     /// <summary>
     ///     Uses a custom http client.
     /// </summary>
     /// <param name="client"></param>
+    /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IBotCommandsStage WithHttpClient(HttpClient client);
+    IBotCommandsStage WithHttpClient(HttpClient client, bool throwPendingUpdates = false);
 }

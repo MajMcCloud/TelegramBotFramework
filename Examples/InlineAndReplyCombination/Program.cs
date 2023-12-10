@@ -27,6 +27,8 @@ namespace InlineAndReplyCombination
 
             await BotBaseInstance.UploadBotCommands();
 
+            BotBaseInstance.BotCommand += BotBaseInstance_BotCommand;
+
 
             await BotBaseInstance.Start();
 
@@ -36,6 +38,29 @@ namespace InlineAndReplyCombination
 
 
             await BotBaseInstance.Stop();
+        }
+
+        private static async Task BotBaseInstance_BotCommand(object sender, TelegramBotBase.Args.BotCommandEventArgs e)
+        {
+            
+            switch(e.Command)
+            {
+                case "/start":
+
+
+                    var start = new StartForm();
+
+                    await e.Device.ActiveForm.NavigateTo(start);
+
+
+                    break;
+
+
+
+            }
+
+
+
         }
     }
 }

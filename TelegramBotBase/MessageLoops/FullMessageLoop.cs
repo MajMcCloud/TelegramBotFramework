@@ -63,6 +63,12 @@ public sealed class FullMessageLoop : IMessageLoopFactory
             }
         }
 
+        //Message edited ?
+        if (update.Type == UpdateType.EditedMessage)
+        {
+            await activeForm.Edited(mr);
+        }
+
         //Action Event
         if (!session.FormSwitched && mr.IsAction)
         {

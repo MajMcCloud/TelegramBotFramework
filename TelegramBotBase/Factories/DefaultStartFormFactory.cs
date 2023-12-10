@@ -12,7 +12,7 @@ public class DefaultStartFormFactory : IStartFormFactory
     {
         if (!typeof(FormBase).IsAssignableFrom(startFormClass))
         {
-            throw new ArgumentException("startFormClass argument must be a FormBase type");
+            throw new ArgumentException($"{nameof(startFormClass)} argument must be a {nameof(FormBase)} type");
         }
 
         _startFormClass = startFormClass;

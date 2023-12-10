@@ -1,6 +1,6 @@
 # .NET Telegram Bot Framework - Context based addon
 
-[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/vpre/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 [![Telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://www.t.me/tgbotbase)
 
 [![License](https://img.shields.io/github/license/MajMcCloud/telegrambotframework.svg?style=flat-square&maxAge=2592000&label=License)](https://raw.githubusercontent.com/MajMcCloud/TelegramBotFramework/master/LICENCE.md)
@@ -59,6 +59,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [TaggedButtonGrid](#tagged-button-grid)
     * [CheckedButtonList](#checked-button-list)
     * [MultiToggleButton](#multi-toggle-button)
+- [Localizations](#localizations)
 - [Groups](#groups)
     * [SplitterForm](#splitter-form)
     * [GroupForm](#group-form)
@@ -714,6 +715,19 @@ Check the example project [TelegramBotBase.Test/Tests/Controls/CheckedButtonList
 
 Check the example project [TelegramBotBase.Test/Tests/Controls/MultiToggleButtonForm.cs](TelegramBotBase.Test/Tests/Controls/MultiToggleButtonForm.cs)
 
+
+## Localizations
+
+The current available languages for controls are:
+
+- English
+- German
+- Persian
+
+You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
+
+To set the default language set the *Language* property on the static [TelegramBotBase/Localizations/Default.cs](TelegramBotBase/Localizations/Default.cs) instance.
+
 ## Groups
 
 For groups, there are multiple different tools which help to work with and allows bot also to manage
@@ -1083,3 +1097,8 @@ Having already a web application and want to add a TelegramBot side-by-side with
 Want to use Inline- and ReplyMarkup at the same time ? Here is an example how you can do that:
 
 - [Examples/InlineAndReplyCombination](Examples/InlineAndReplyCombination)
+
+
+Alpha: Full Dependency Injection example within this framework.
+
+- [Examples/DependencyInjection](Examples/DependencyInjection)

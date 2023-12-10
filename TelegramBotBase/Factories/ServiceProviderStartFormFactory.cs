@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using TelegramBotBase.DependencyInjection;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 
@@ -14,16 +15,21 @@ public class ServiceProviderStartFormFactory : IStartFormFactory
     {
         if (!typeof(FormBase).IsAssignableFrom(startFormClass))
         {
-            throw new ArgumentException("startFormClass argument must be a FormBase type");
+            throw new ArgumentException($"{nameof(startFormClass)} argument must be a {nameof(FormBase)} type");
         }
-
+        
         _startFormClass = startFormClass;
         _serviceProvider = serviceProvider;
     }
 
     public FormBase CreateForm()
     {
-        return (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, _startFormClass);
+        var fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, _startFormClass);
+
+        //Sets an internal field for future ServiceProvider navigation
+        fb.SetServiceProvider(_serviceProvider);
+
+        return fb;
     }
 }
 
