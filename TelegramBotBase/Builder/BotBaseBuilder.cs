@@ -18,7 +18,7 @@ namespace TelegramBotBase.Builder;
 
 public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage,
                               IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage,
-                              ILanguageSelectionStage
+                              ILanguageSelectionStage, IThreadingStage
 {
     private string _apiKey;
 
@@ -87,6 +87,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultLanguage();
 
+        UseSingleThread();
+
         return this;
     }
 
@@ -107,6 +109,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultLanguage();
 
+        UseSingleThread();
+
         return this;
     }
 
@@ -124,6 +128,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         NoSerialization();
 
         DefaultLanguage();
+
+        UseSingleThread();
 
         return this;
     }
@@ -391,34 +397,58 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 7 (Language)"
 
-    public IBuildingStage DefaultLanguage()
+    public IThreadingStage DefaultLanguage()
     {
         return this;
     }
 
-    public IBuildingStage UseEnglish()
+    public IThreadingStage UseEnglish()
     {
         Default.Language = new English();
         return this;
     }
 
-    public IBuildingStage UseGerman()
+    public IThreadingStage UseGerman()
     {
         Default.Language = new German();
         return this;
     }
 
-    public IBuildingStage UsePersian()
+    public IThreadingStage UsePersian()
     {
         Default.Language = new Persian();
         return this;
     }
 
-    public IBuildingStage Custom(Localization language)
+    public IThreadingStage Custom(Localization language)
     {
         Default.Language = language;
         return this;
     }
 
+
     #endregion
+
+    #region "Step 8 (Threading)"
+
+    public IBuildingStage UseSingleThread()
+    {
+        _client.UseThreadPool = false;
+
+        return this;
+    }
+
+    public IBuildingStage UseThreadPool(int workerThreads = 2, int ioThreads = 1)
+    {
+        _client.UseThreadPool = true;
+        _client.ThreadPool_WorkerThreads = workerThreads;
+        _client.ThreadPool_IOThreads = ioThreads;
+
+        return this;
+    }
+
+
+
+    #endregion
+
 }

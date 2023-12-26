@@ -28,6 +28,12 @@ public class MessageClient
 
     private CancellationTokenSource _cancellationTokenSource;
 
+    public string ApiKey { get; }
+
+    public ITelegramBotClient TelegramClient { get; set; }
+
+    private EventHandlerList Events { get; } = new();
+
     /// <summary>
     ///    Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before
     //     start polling. If set to true Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates
@@ -35,6 +41,12 @@ public class MessageClient
     //     will effectively be set to receive all Telegram.Bot.Types.Updates.
     /// </summary>
     public bool ThrowPendingUpdates { get; set; }
+
+    public bool UseThreadPool { get; set; } = false;
+
+    public int ThreadPool_WorkerThreads { get; set; } = 1;
+
+    public int ThreadPool_IOThreads { get; set; } = 1;
 
 
     public MessageClient(string apiKey)
@@ -103,11 +115,6 @@ public class MessageClient
     }
 
 
-    public string ApiKey { get; }
-
-    public ITelegramBotClient TelegramClient { get; set; }
-
-    private EventHandlerList Events { get; } = new();
 
 
     public void Prepare()
@@ -124,8 +131,19 @@ public class MessageClient
 
         receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
 
-        TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions,
-                                      _cancellationTokenSource.Token);
+        if (UseThreadPool)
+        {
+            ThreadPool.SetMaxThreads(ThreadPool_WorkerThreads, ThreadPool_IOThreads);
+
+            TelegramClient.StartReceiving(HandleUpdateAsyncThreadPool, HandleErrorAsyncThreadPool, receiverOptions,
+                                     _cancellationTokenSource.Token);
+        }
+        else
+        {
+            TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions,
+                                     _cancellationTokenSource.Token);
+        }
+
     }
 
     public void StopReceiving()
@@ -133,6 +151,7 @@ public class MessageClient
         _cancellationTokenSource.Cancel();
     }
 
+    #region "Single Thread"
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
@@ -144,6 +163,33 @@ public class MessageClient
     {
         await OnReceiveError(new ErrorResult(exception));
     }
+
+    #endregion
+
+    #region "Thread Pool"
+
+    public Task HandleUpdateAsyncThreadPool(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    {
+        ThreadPool.QueueUserWorkItem(async a =>
+        {
+            await OnMessageLoop(new UpdateResult(update, null));
+        });
+
+        return Task.CompletedTask;
+    }
+
+    public Task HandleErrorAsyncThreadPool(ITelegramBotClient botClient, Exception exception,
+                             CancellationToken cancellationToken)
+    {
+        ThreadPool.QueueUserWorkItem(async a =>
+        {
+            await OnReceiveError(new ErrorResult(exception));
+        });
+
+        return Task.CompletedTask;
+    }
+
+    #endregion
 
     /// <summary>
     ///     This will return the current list of bot commands.

@@ -8,29 +8,29 @@ public interface ILanguageSelectionStage
     ///     Selects the default language for control usage. (English)
     /// </summary>
     /// <returns></returns>
-    IBuildingStage DefaultLanguage();
+    IThreadingStage DefaultLanguage();
 
     /// <summary>
     ///     Selects english as the default language for control labels.
     /// </summary>
     /// <returns></returns>
-    IBuildingStage UseEnglish();
+    IThreadingStage UseEnglish();
 
     /// <summary>
     ///     Selects german as the default language for control labels.
     /// </summary>
     /// <returns></returns>
-    IBuildingStage UseGerman();
+    IThreadingStage UseGerman();
 
     /// <summary>
     ///     Selects persian as the default language for control labels.
     /// </summary>
     /// <returns></returns>
-    IBuildingStage UsePersian();
+    IThreadingStage UsePersian();
 
     /// <summary>
     ///     Selects a custom language as the default language for control labels.
     /// </summary>
     /// <returns></returns>
-    IBuildingStage Custom(Localization language);
+    IThreadingStage Custom(Localization language);
 }
