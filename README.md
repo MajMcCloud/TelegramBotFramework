@@ -59,6 +59,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [TaggedButtonGrid](#tagged-button-grid)
     * [CheckedButtonList](#checked-button-list)
     * [MultiToggleButton](#multi-toggle-button)
+- [Localizations](#localizations)
 - [Groups](#groups)
     * [SplitterForm](#splitter-form)
     * [GroupForm](#group-form)
@@ -713,6 +714,19 @@ Check the example project [TelegramBotBase.Test/Tests/Controls/CheckedButtonList
 <img src=".github/images/multitogglebutton.gif?raw=true" />
 
 Check the example project [TelegramBotBase.Test/Tests/Controls/MultiToggleButtonForm.cs](TelegramBotBase.Test/Tests/Controls/MultiToggleButtonForm.cs)
+
+
+## Localizations
+
+The current available languages for controls are:
+
+- English
+- German
+- Persian
+
+You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
+
+To set the default language set the *Language* property on the static [TelegramBotBase/Localizations/Default.cs](TelegramBotBase/Localizations/Default.cs) instance.
 
 ## Groups
 
