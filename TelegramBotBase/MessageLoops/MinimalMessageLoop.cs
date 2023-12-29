@@ -11,7 +11,7 @@ namespace TelegramBotBase.MessageLoops;
 /// <summary>
 ///     This is a minimal message loop which will react to all update types and just calling the Load method.
 /// </summary>
-public class MinimalMessageLoop : IMessageLoopFactory
+public sealed class MinimalMessageLoop : IMessageLoopFactory
 {
     private static readonly object EvUnhandledCall = new();
 
@@ -19,9 +19,6 @@ public class MinimalMessageLoop : IMessageLoopFactory
 
     public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
     {
-        var update = ur.RawData;
-
-
         mr.Device = session;
 
         var activeForm = session.ActiveForm;

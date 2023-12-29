@@ -12,7 +12,7 @@ namespace TelegramBotBase.MessageLoops;
 /// <summary>
 ///     Thats the default message loop which reacts to Message, EditMessage and CallbackQuery.
 /// </summary>
-public class FormBaseMessageLoop : IMessageLoopFactory
+public sealed class FormBaseMessageLoop : IMessageLoopFactory
 {
     private static readonly object EvUnhandledCall = new();
 
@@ -21,7 +21,6 @@ public class FormBaseMessageLoop : IMessageLoopFactory
     public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
     {
         var update = ur.RawData;
-
 
         if (update.Type != UpdateType.Message
             && update.Type != UpdateType.EditedMessage
