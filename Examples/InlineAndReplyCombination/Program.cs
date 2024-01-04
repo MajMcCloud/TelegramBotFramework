@@ -21,6 +21,7 @@ namespace InlineAndReplyCombination
                     .DefaultCommands()
                     .UseJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"))
                     .UseEnglish()
+                    .UseSingleThread()
                     .Build();
 
 

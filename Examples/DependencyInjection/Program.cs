@@ -25,6 +25,7 @@ namespace DependencyInjection
                                     .NoCommands()
                                     .NoSerialization()
                                     .DefaultLanguage()
+                                    .UseSingleThread()
                                     .Build();
 
             await bot.Start();
