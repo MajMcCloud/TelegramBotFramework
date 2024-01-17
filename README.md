@@ -1052,6 +1052,7 @@ Source code: [TelegramBotBase.Extensions.Images/](/TelegramBotBase.Extensions.Im
 
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
 
+
 ### TelegramBotBase.Extensions.Images.IronSoftware
 
 Extends the base package with some additional image methods like SendPhoto (using Bitmap)
@@ -1062,6 +1063,10 @@ Important: This extension uses the IronSoftware drawing library.
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware)
 
 [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+
+Source code: [open source](TelegramBotBase.Extensions.Images.IronSoftware/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/)
 
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
@@ -1086,6 +1091,7 @@ Source code: [TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](/Teleg
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
 
 Credits: [@Kataane](https://github.com/Kataane)
+
 
 ## Test Project
 
