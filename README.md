@@ -1050,6 +1050,17 @@ Extends the base package with some additional image methods like SendPhoto (usin
 
 [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
 
+### TelegramBotBase.Extensions.Images.IronSoftware
+
+Extends the base package with some additional image methods like SendPhoto (using Bitmap)
+
+Important: This extension uses the IronSoftware drawing library.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware)
+
+[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
 A session serializer for Microsoft SQL Server.
