@@ -5,7 +5,7 @@ There is no guarantee that any of these ideas comes in the main project.
 
 Please try everything on your own. Nothing can work, so everything can as well.
 
-You will find all experiments within the ["Experiments"](Experiements) sub folder.
+You will find all experiments within the ["Experiments"](Experiments) sub folder.
 
 For feedback please join our Telegram group.
 
