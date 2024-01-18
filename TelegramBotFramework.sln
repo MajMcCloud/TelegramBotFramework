@@ -36,6 +36,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection", "Exam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase.Extensions.Images.IronSoftware", "TelegramBotBase.Extensions.Images.IronSoftware\TelegramBotBase.Extensions.Images.IronSoftware.csproj", "{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experiments", "Experiments", "{2E1FF127-4DC2-40A1-849C-ED1432204E8A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalActionManager", "Experiments\ExternalActionManager\DemoBot\ExternalActionManager.csproj", "{5184D3F8-8526-413D-8EB0-23636EA7A4EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +94,10 @@ Global
 		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5184D3F8-8526-413D-8EB0-23636EA7A4EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5184D3F8-8526-413D-8EB0-23636EA7A4EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5184D3F8-8526-413D-8EB0-23636EA7A4EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5184D3F8-8526-413D-8EB0-23636EA7A4EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +113,7 @@ Global
 		{067E8EBE-F90A-4AFF-A0FF-20578216486E} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 		{689B16BC-200E-4C68-BB2E-8B209070849B} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
+		{5184D3F8-8526-413D-8EB0-23636EA7A4EF} = {2E1FF127-4DC2-40A1-849C-ED1432204E8A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59CB40E1-9FA7-4867-A56F-4F418286F057}

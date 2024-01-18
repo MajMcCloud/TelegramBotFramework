@@ -1,3 +1,20 @@
+# Development Lab
+
+Attention: This is a lab for **experimental features**.  Here we can try out different ideas and scenarios if they will work and what can be improved.
+There is no guarantee that any of these ideas comes in the main project. 
+
+Please try everything on your own. Nothing can work, so everything can as well.
+
+You will find all experiments within the ["Experiments"](Experiements) sub folder.
+
+For feedback please join our Telegram group.
+
+**Support group: [@tgbotbase](https://t.me/tgbotbase)**
+
+
+---
+
+
 # .NET Telegram Bot Framework - Context based addon
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/vpre/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
