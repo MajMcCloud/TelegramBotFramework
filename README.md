@@ -11,6 +11,10 @@ For feedback please join our Telegram group.
 
 **Support group: [@tgbotbase](https://t.me/tgbotbase)**
 
+## current experiments
+
+- [ExternalActionManager](Experiments/ExternalActionManager/DemoBot) => Manager for unhandled actions from "outside"
+
 
 ---
 
