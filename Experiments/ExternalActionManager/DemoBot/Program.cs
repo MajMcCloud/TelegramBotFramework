@@ -27,6 +27,11 @@ namespace DemoBot
                 a.value = b;
             });
 
+
+            //Minimal version, using reflection right now
+            eam.AddStartsWithAction<HiddenForm>("a_", a => a.value);
+
+
             eam.AddStartsWithAction(typeof(HiddenForm), "t_", (a, b) =>
             {
                 var hf = a as HiddenForm;
@@ -36,10 +41,16 @@ namespace DemoBot
                 hf.value = b;
             });
 
+
             eam.AddGuidAction<HiddenTicketForm>("tickets", (a, b) =>
             {
                 a.ticketId = b;
             });
+
+
+            //Minimal version, using reflection right now
+            eam.AddGuidAction<HiddenLetterForm>("letters", a => a.letterId);
+
 
             eam.AddGuidAction<HiddenOpenForm>("open", (a, b) =>
             {
@@ -122,14 +133,18 @@ namespace DemoBot
 
                     String max_value2 = "t_".PadRight(32, '5'); //Starts with
 
+                    String max_value3 = "a_".PadRight(32, '5'); //Starts with
+
                     Guid test_value = Guid.NewGuid(); //Unhandled caller
 
                     var callback_guid = GuidAction.GetCallback("open", Guid.NewGuid()); //HiddenOpenForm
 
                     var callback_tickets = GuidAction.GetCallback("tickets", Guid.NewGuid()); //HiddenTicketForm
 
+                    var callback_letters = GuidAction.GetCallback("letters", Guid.NewGuid()); //HiddenLetterForm
 
-                    String message = $"Test notification from 'outside'\n\nTest values are:\n\nTest: {max_value}\nTest2: {max_value2}\nTest (Guid): {test_value.ToString()}\nTest (Callback Guid): {callback_guid.Value}\nTickets (Guid): {callback_tickets.Value}\n";
+
+                    String message = $"Test notification from 'outside'\n\nTest values are:\n\nTest: {max_value}\nTest2: {max_value2}\nTest3: {max_value3}\nTest (Guid): {test_value.ToString()}\nTest (Callback Guid): {callback_guid.Value}\nTickets (Guid): {callback_tickets.Value}\nLetters (Guid): {callback_letters.Value}\n";
 
 
                     var tb = new TelegramBotClient(Token);
@@ -142,11 +157,15 @@ namespace DemoBot
 
                     bf.AddButtonRow("Test2", max_value2);
 
+                    bf.AddButtonRow("Test3", max_value3);
+
                     bf.AddButtonRow("Test (Guid)", test_value.ToString());
 
                     bf.AddButtonRow("Test (Callback Gui)", callback_guid);
 
                     bf.AddButtonRow("Tickets", callback_tickets);
+
+                    bf.AddButtonRow("Letters", callback_letters);
 
                     bf.AddButtonRow("Close", "close");
 

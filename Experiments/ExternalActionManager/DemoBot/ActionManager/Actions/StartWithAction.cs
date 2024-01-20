@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using TelegramBotBase.Base;
 using TelegramBotBase.DependencyInjection;
 using TelegramBotBase.Form;
@@ -101,7 +102,22 @@ namespace DemoBot.ActionManager.Actions
 
     public static class StartWithAction_Extensions
     {
+        public static void AddStartsWithAction<TForm>(this ExternalActionManager manager, string method, Expression<Func<TForm, String>> propertySelector)
+            where TForm : FormBase
+        {
+            if (!typeof(FormBase).IsAssignableFrom(typeof(TForm)))
+            {
+                throw new ArgumentException($"{nameof(TForm)} argument must be a {nameof(FormBase)} type");
+            }
 
+            var newValue = Expression.Parameter(propertySelector.Body.Type);
+
+            var assign = Expression.Lambda<Action<TForm, String>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
+
+            var setter = assign.Compile(true);
+
+            manager.Add(new StartWithAction<TForm>(method, setter));
+        }
         public static void AddStartsWithAction<TForm>(this ExternalActionManager manager, string value, Action<TForm, String> setProperty)
             where TForm : FormBase
         {

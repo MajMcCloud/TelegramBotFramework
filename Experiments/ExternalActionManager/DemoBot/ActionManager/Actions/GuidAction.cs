@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using TelegramBotBase.Base;
@@ -122,6 +123,23 @@ namespace DemoBot.ActionManager.Actions
 
     public static class GuidAction_Extensions
     {
+
+        public static void AddGuidAction<TForm>(this ExternalActionManager manager, string method, Expression<Func<TForm, Guid>> propertySelector)
+            where TForm : FormBase
+        {
+            if (!typeof(FormBase).IsAssignableFrom(typeof(TForm)))
+            {
+                throw new ArgumentException($"{nameof(TForm)} argument must be a {nameof(FormBase)} type");
+            }
+
+            var newValue = Expression.Parameter(propertySelector.Body.Type);
+
+            var assign = Expression.Lambda<Action<TForm, Guid>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
+
+            var setter = assign.Compile(true);
+
+            manager.Add(new GuidAction<TForm>(method, setter));
+        }
 
         public static void AddGuidAction<TForm>(this ExternalActionManager manager, string method, Action<TForm, Guid> action)
             where TForm : FormBase
