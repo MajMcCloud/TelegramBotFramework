@@ -38,5 +38,19 @@ namespace DemoBot.ActionManager
 
             return false;
         }
+
+        /// <summary>
+        /// Creates an instance of the ExternalActionManager for configuration.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static ExternalActionManager Configure(Action<ExternalActionManager> action)
+        {
+            var eam = new ExternalActionManager();
+
+            action(eam);
+
+            return eam;
+        }
     }
 }

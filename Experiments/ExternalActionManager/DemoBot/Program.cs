@@ -1,5 +1,6 @@
 ﻿using DemoBot.ActionManager;
 using DemoBot.ActionManager.Actions;
+using DemoBot.Extensions;
 using DemoBot.Forms;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -18,50 +19,97 @@ namespace DemoBot
 
             //Using a custom FormBase message loop which is based on the original FormBaseMessageLoop within the framework.
             //Would integrate this later into the BotBaseBuilder -> MessageLoop step.
-            var cfb = new CustomFormBaseMessageLoop();
+            //var cfb = new CustomFormBaseMessageLoop();
 
-            var eam = new ExternalActionManager();
-
-            eam.AddStartsWithAction<HiddenForm>("n_", (a, b) =>
+            //Example 1: Long version
+            var eam = ExternalActionManager.Configure(config =>
             {
-                a.value = b;
+                //Waiting for input starting with 'n_'
+                config.AddStartsWithAction<HiddenForm>("n_", (a, b) =>
+                {
+                    a.value = b;
+                });
+
+
+                //Minimal version, using reflection right now
+                config.AddStartsWithAction<HiddenForm>("a_", (a, b) =>
+                {
+                    a.value = b;
+                });
+
+
+                //Waiting for input starting with 't_'
+                config.AddStartsWithAction(typeof(HiddenForm), "t_", (a, b) =>
+                {
+                    var hf = a as HiddenForm;
+                    if (hf == null)
+                        return;
+
+                    hf.value = b;
+                });
+
+
+                //Deserialize input and waiting for the method property to has value 'tickets'
+                config.AddGuidAction<HiddenTicketForm>("tickets", (a, b) =>
+                {
+                    a.ticketId = b;
+                });
+
+
+                //Minimal version, using reflection right now
+                config.AddGuidAction<HiddenLetterForm>("letters", (a, b) =>
+                {
+                    a.letterId = b;
+                });
+
+
+                //Deserialize input and waiting for the method property to has value 'open'
+                config.AddGuidAction<HiddenOpenForm>("open", (a, b) =>
+                {
+                    a.guid = b;
+                });
+
             });
 
-
-            //Minimal version, using reflection right now
-            eam.AddStartsWithAction<HiddenForm>("a_", a => a.value);
-
-
-            eam.AddStartsWithAction(typeof(HiddenForm), "t_", (a, b) =>
+            //Example 2: Short version
+            var eam2 = ExternalActionManager.Configure(config =>
             {
-                var hf = a as HiddenForm;
-                if (hf == null)
-                    return;
+                //Waiting for input starting with 'n_'
+                config.AddStartsWithAction<HiddenForm>("n_", a => a.value);
 
-                hf.value = b;
+
+                //Waiting for input starting with 'a_'
+                config.AddStartsWithAction<HiddenForm>("a_", a => a.value);
+
+
+                //Waiting for input starting with 't_'
+                config.AddStartsWithAction(typeof(HiddenForm), "t_", (a, b) =>
+                {
+                    var hf = a as HiddenForm;
+                    if (hf == null)
+                        return;
+
+                    hf.value = b;
+                });
+
+
+                //Deserialize input and waiting for the method property to has value 'tickets'
+                config.AddGuidAction<HiddenTicketForm>("tickets", a => a.ticketId);
+
+
+                //Minimal version, using reflection right now
+                config.AddGuidAction<HiddenLetterForm>("letters", a => a.letterId);
+
+
+                //Deserialize input and waiting for the method property to has value 'open'
+                config.AddGuidAction<HiddenOpenForm>("open", a => a.guid);
+
             });
 
-
-            eam.AddGuidAction<HiddenTicketForm>("tickets", (a, b) =>
-            {
-                a.ticketId = b;
-            });
-
-
-            //Minimal version, using reflection right now
-            eam.AddGuidAction<HiddenLetterForm>("letters", a => a.letterId);
-
-
-            eam.AddGuidAction<HiddenOpenForm>("open", (a, b) =>
-            {
-                a.guid = b;
-            });
-
-            cfb.ExternalActionManager = eam;
 
             var bb = BotBaseBuilder.Create()
                                     .WithAPIKey(Token)
-                                    .CustomMessageLoop(cfb)
+                                    .ActionMessageLoop(eam2) //.CustomMessageLoop(cfb)
                                     .WithStartForm<Forms.StartForm>()
                                     .NoProxy()
                                     .CustomCommands(a =>
