@@ -152,6 +152,22 @@ namespace DemoBot.ActionManager.Actions
             manager.Add(new GuidAction<TForm>(method, action));
         }
 
+        public static void AddGuidAction(this ExternalActionManager manager, Type formType, string value, Expression<Func<FormBase, Guid>> propertySelector)
+        {
+            if (!typeof(FormBase).IsAssignableFrom(formType))
+            {
+                throw new ArgumentException($"{nameof(formType)} argument must be a {nameof(FormBase)} type");
+            }
+
+            var newValue = Expression.Parameter(propertySelector.Body.Type);
+
+            var assign = Expression.Lambda<Action<FormBase, Guid>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
+
+            var setter = assign.Compile(true);
+
+            manager.Add(new GuidAction(formType, value, setter));
+        }
+
         public static void AddGuidAction(this ExternalActionManager manager, Type formType, string method, Action<FormBase, Guid> action)
         {
             if (!typeof(FormBase).IsAssignableFrom(formType))

@@ -129,6 +129,22 @@ namespace DemoBot.ActionManager.Actions
             manager.Add(new StartWithAction<TForm>(value, setProperty));
         }
 
+        public static void AddStartsWithAction(this ExternalActionManager manager, Type formType, string value, Expression<Func<FormBase, String>> propertySelector)
+        {
+            if (!typeof(FormBase).IsAssignableFrom(formType))
+            {
+                throw new ArgumentException($"{nameof(formType)} argument must be a {nameof(FormBase)} type");
+            }
+
+            var newValue = Expression.Parameter(propertySelector.Body.Type);
+
+            var assign = Expression.Lambda<Action<FormBase, String>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
+
+            var setter = assign.Compile(true);
+
+            manager.Add(new StartWithAction(formType, value, setter));
+        }
+
         public static void AddStartsWithAction(this ExternalActionManager manager, Type formType, string value, Action<FormBase, String> setProperty)
         {
             if (!typeof(FormBase).IsAssignableFrom(formType))

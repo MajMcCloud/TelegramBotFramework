@@ -81,17 +81,8 @@ namespace DemoBot
                 //Waiting for input starting with 'a_'
                 config.AddStartsWithAction<HiddenForm>("a_", a => a.value);
 
-
-                //Waiting for input starting with 't_'
-                config.AddStartsWithAction(typeof(HiddenForm), "t_", (a, b) =>
-                {
-                    var hf = a as HiddenForm;
-                    if (hf == null)
-                        return;
-
-                    hf.value = b;
-                });
-
+                //Waiting for input starting with 't_' (Non generic version)
+                config.AddStartsWithAction(typeof(HiddenForm), "t_", a => ((HiddenForm)a).value);
 
                 //Deserialize input and waiting for the method property to has value 'tickets'
                 config.AddGuidAction<HiddenTicketForm>("tickets", a => a.ticketId);
