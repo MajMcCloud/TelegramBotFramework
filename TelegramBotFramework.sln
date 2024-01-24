@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase.Extensions.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experiments", "Experiments", "{2E1FF127-4DC2-40A1-849C-ED1432204E8A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalActionManager", "Experiments\ExternalActionManager\DemoBot\ExternalActionManager.csproj", "{5184D3F8-8526-413D-8EB0-23636EA7A4EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoBot", "Experiments\ExternalActionManager\DemoBot\DemoBot.csproj", "{5184D3F8-8526-413D-8EB0-23636EA7A4EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
