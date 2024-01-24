@@ -22,7 +22,7 @@ namespace DemoBot
 
         public ExternalActionManager ExternalActionManager { get; set; }
 
-        public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
+        public async Task MessageLoop(BotBase bot, DeviceSession s, UpdateResult ur, MessageResult mr)
         {
             var update = ur.RawData;
 
@@ -33,6 +33,9 @@ namespace DemoBot
             {
                 return;
             }
+
+            //Remove unecessary parameter from method call in the future
+            var session = ur.Device;
 
             //Is this a bot command ?
             if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))

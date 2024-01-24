@@ -115,11 +115,12 @@ public sealed class BotBase
             if (ds == null)
             {
                 ds = await Sessions.StartSession(e.DeviceId);
-                e.Device = ds;
                 ds.LastMessage = e.RawData.Message;
 
-                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds)); 
             }
+
+            e.Device = ds;
 
             var mr = new MessageResult(e.RawData);
 
@@ -210,6 +211,7 @@ public sealed class BotBase
         try
         {
             var ds = Sessions.GetSession(deviceId);
+
             e.Device = ds;
 
             await MessageLoopFactory.MessageLoop(this, ds, new UpdateResult(e.UpdateData, ds), e);
