@@ -1,15 +1,13 @@
 ﻿using TelegramBotBase.Base;
-using TelegramBotBase.Interfaces;
-using TelegramBotBase.Sessions;
 
 namespace DemoBot.ActionManager
 {
 
     public interface IExternalAction
     {
-        bool DoesFit(string raw_action);
+        bool DoesFit(string raw_data);
 
-        Task DoAction(UpdateResult ur, MessageResult mr, DeviceSession session);
+        Task DoAction(String raw_data, UpdateResult ur, MessageResult mr);
     }
 
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using DemoBot.ActionManager;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase;
@@ -25,7 +20,6 @@ namespace DemoBot
         public async Task MessageLoop(BotBase bot, DeviceSession s, UpdateResult ur, MessageResult mr)
         {
             var update = ur.RawData;
-
 
             if (update.Type != UpdateType.Message
                 && update.Type != UpdateType.EditedMessage
@@ -96,7 +90,7 @@ namespace DemoBot
 
                 if (!mr.Handled)
                 {
-                    var handled = await ExternalActionManager?.ManageCall(ur, mr, session);
+                    var handled = await ExternalActionManager?.ManageCall(ur, mr);
 
                     if (handled)
                     {
