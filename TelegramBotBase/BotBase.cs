@@ -115,11 +115,12 @@ public sealed class BotBase
             if (ds == null)
             {
                 ds = await Sessions.StartSession(e.DeviceId);
-                e.Device = ds;
                 ds.LastMessage = e.RawData.Message;
 
                 OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
             }
+
+            e.Device = ds;
 
             var mr = new MessageResult(e.RawData);
 
