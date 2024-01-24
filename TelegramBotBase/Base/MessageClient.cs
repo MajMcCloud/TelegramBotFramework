@@ -24,7 +24,7 @@ public class MessageClient
     private static readonly object EvOnMessageLoop = new();
     private static readonly object EvOnReceiveError = new();
 
-    private CancellationTokenSource _cancellationTokenSource;
+    protected CancellationTokenSource _cancellationTokenSource;
 
     public string ApiKey { get; }
 

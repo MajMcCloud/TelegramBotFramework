@@ -18,7 +18,6 @@ namespace TelegramBotBase.Base;
 /// </summary>
 public class ThreadPoolMessageClient : MessageClient
 {
-    private CancellationTokenSource _cancellationTokenSource;
 
     /// <summary>
     ///    Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before
