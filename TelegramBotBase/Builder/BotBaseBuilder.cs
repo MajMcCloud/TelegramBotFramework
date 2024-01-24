@@ -32,6 +32,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     private BotBaseBuilder()
     {
+
     }
 
     /// <summary>
@@ -429,25 +430,25 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #endregion
 
+
     #region "Step 8 (Threading)"
 
     public IBuildingStage UseSingleThread()
     {
-        _client.UseThreadPool = false;
-
         return this;
     }
 
     public IBuildingStage UseThreadPool(int workerThreads = 2, int ioThreads = 1)
     {
-        _client.UseThreadPool = true;
-        _client.ThreadPool_WorkerThreads = workerThreads;
-        _client.ThreadPool_IOThreads = ioThreads;
+        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
+
+        c.ThreadPool_WorkerThreads = workerThreads;
+        c.ThreadPool_IOThreads = ioThreads;
+
+        _client = c;
 
         return this;
     }
-
-
 
     #endregion
 
