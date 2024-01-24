@@ -76,9 +76,7 @@ public class ThreadPoolMessageClient : MessageClient
         receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
 
         ThreadPool.SetMaxThreads(ThreadPool_WorkerThreads, ThreadPool_IOThreads);
-
-        TelegramClient.Timeout = new TimeSpan(0, 1, 0);
-
+        
         TelegramClient.StartReceiving(HandleUpdateAsyncThreadPool, HandleErrorAsyncThreadPool, receiverOptions, _cancellationTokenSource.Token);
     }
 

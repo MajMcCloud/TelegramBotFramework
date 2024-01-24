@@ -214,14 +214,14 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 4 (Network Settings)"
 
-    public IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         var url = new Uri(proxyAddress);
         _client = new MessageClient(_apiKey, url)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)
             },
         };
         _client.ThrowPendingUpdates = throwPendingUpdates;
@@ -229,13 +229,13 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBotCommandsStage NoProxy(bool throwPendingUpdates = false)
+    public IBotCommandsStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
         _client.ThrowPendingUpdates = throwPendingUpdates;
@@ -243,13 +243,13 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
         _client.ThrowPendingUpdates = throwPendingUpdates;
@@ -257,26 +257,26 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, proxyHost, proxyPort)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
         _client.ThrowPendingUpdates = throwPendingUpdates;
         return this;
     }
 
-    public IBotCommandsStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
         _client.ThrowPendingUpdates = throwPendingUpdates;

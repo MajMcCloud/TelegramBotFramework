@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
-using TelegramBotBase.Interfaces;
+
 
 namespace TelegramBotBase.Base;
 
@@ -104,8 +105,6 @@ public class MessageClient
 
         receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
 
-        TelegramClient.Timeout = new TimeSpan(0, 1, 0);
-
         TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, _cancellationTokenSource.Token);
     }
 
@@ -116,13 +115,13 @@ public class MessageClient
     }
 
 
-    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         await OnMessageLoop(new UpdateResult(update, null));
     }
 
 
-    public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+    private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
                                  CancellationToken cancellationToken)
     {
         await OnReceiveError(new ErrorResult(exception));
