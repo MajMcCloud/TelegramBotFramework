@@ -48,6 +48,12 @@ namespace DemoBot
                     hf.value = b;
                 });
 
+                //Minimal version, using reflection right now
+                config.AddEndsWithAction<HiddenForm_EndsWith>("_u", (a, b) =>
+                {
+                    a.value = b;
+                });
+
 
                 //Deserialize input and waiting for the method property to has value 'tickets'
                 config.AddGuidAction<HiddenTicketForm>("tickets", (a, b) =>
@@ -83,6 +89,10 @@ namespace DemoBot
 
                 //Waiting for input starting with 't_' (Non generic version)
                 config.AddStartsWithAction(typeof(HiddenForm), "t_", a => ((HiddenForm)a).value);
+
+                //Waiting for input ending with 'n_'
+                config.AddEndsWithAction<HiddenForm_EndsWith>("_u", a => a.value);
+
 
                 //Deserialize input and waiting for the method property to has value 'tickets'
                 config.AddGuidAction<HiddenTicketForm>("tickets", a => a.ticketId);
@@ -174,6 +184,8 @@ namespace DemoBot
 
                     String max_value3 = "a_".PadRight(32, '5'); //Starts with
 
+                    String max_value4 = "_u".PadLeft(32, '5'); //Ends with
+
                     Guid test_value = Guid.NewGuid(); //Unhandled caller
 
                     var callback_guid = GuidAction.GetCallback("open", Guid.NewGuid()); //HiddenOpenForm
@@ -197,6 +209,8 @@ namespace DemoBot
                     bf.AddButtonRow("Test2", max_value2);
 
                     bf.AddButtonRow("Test3", max_value3);
+
+                    bf.AddButtonRow("Test4", max_value4);
 
                     bf.AddButtonRow("Test (Guid)", test_value.ToString());
 
