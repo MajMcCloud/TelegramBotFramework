@@ -21,7 +21,7 @@ namespace DemoBot.Forms
 
         private async Task StartForm_Opened(object sender, EventArgs e)
         {
-            await Device.Send("Hey!", disableNotification: true);
+            await Device.Send("Hey!\r\n\r\nChoose the /test command to get a message from outside.", disableNotification: true);
         }
 
         public override async Task Load(MessageResult message)
