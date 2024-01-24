@@ -40,7 +40,7 @@ namespace DemoBot.ActionManager.Navigation
         }
 
 
-        public async Task DoAction(String data, UpdateResult ur, MessageResult mr)
+        public async Task DoAction(UpdateResult ur, MessageResult mr)
         {
             await mr.ConfirmAction();
 
@@ -90,7 +90,7 @@ namespace DemoBot.ActionManager.Navigation
         }
 
 
-        public async Task DoAction(String raw_data, UpdateResult ur, MessageResult mr)
+        public async Task DoAction(UpdateResult ur, MessageResult mr)
         {
             await mr.ConfirmAction();
 

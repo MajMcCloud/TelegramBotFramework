@@ -7,7 +7,7 @@ namespace DemoBot.ActionManager
     {
         bool DoesFit(string raw_data);
 
-        Task DoAction(String raw_data, UpdateResult ur, MessageResult mr);
+        Task DoAction(UpdateResult ur, MessageResult mr);
     }
 
 }

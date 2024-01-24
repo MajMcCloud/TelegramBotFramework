@@ -36,7 +36,7 @@ namespace DemoBot.ActionManager.Actions
         }
 
 
-        public async Task DoAction(String raw_data, UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, ur, mr);
+        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, ur, mr);
 
         public static CallbackData GetCallback(string method, Guid guid) => new CallbackData(method, guid.ToString());
 
@@ -76,7 +76,7 @@ namespace DemoBot.ActionManager.Actions
         }
 
 
-        public async Task DoAction(String raw_data, UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, ur, mr);
+        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, ur, mr);
 
 
         public static CallbackData GetCallback(string method, Guid guid) => new CallbackData(method, guid.ToString());

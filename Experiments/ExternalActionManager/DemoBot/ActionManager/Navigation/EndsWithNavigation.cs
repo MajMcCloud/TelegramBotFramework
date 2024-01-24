@@ -23,15 +23,15 @@ namespace DemoBot.ActionManager.Navigation
         public bool DoesFit(string raw_data) => raw_data.EndsWith(Value);
 
 
-        public async Task DoAction(String raw_data, UpdateResult ur, MessageResult mr)
+        public async Task DoAction(UpdateResult ur, MessageResult mr)
         {
             await mr.ConfirmAction();
 
             var new_form = FormType.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
 
-            if (raw_data != null)
+            if (mr.RawData != null)
             {
-                SetProperty(new_form, raw_data);
+                SetProperty(new_form, mr.RawData);
             }
 
             await ur.Device.ActiveForm.NavigateTo(new_form);
@@ -55,7 +55,7 @@ namespace DemoBot.ActionManager.Navigation
         public bool DoesFit(string raw_data) => raw_data.EndsWith(Value);
 
 
-        public async Task DoAction(String raw_data, UpdateResult ur, MessageResult mr)
+        public async Task DoAction(UpdateResult ur, MessageResult mr)
         {
             await mr.ConfirmAction();
 
@@ -63,9 +63,9 @@ namespace DemoBot.ActionManager.Navigation
 
             TForm new_form = type.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as TForm;
 
-            if (raw_data != null)
+            if (mr.RawData != null)
             {
-                SetProperty(new_form, raw_data);
+                SetProperty(new_form, mr.RawData);
             }
 
             await ur.Device.ActiveForm.NavigateTo(new_form);

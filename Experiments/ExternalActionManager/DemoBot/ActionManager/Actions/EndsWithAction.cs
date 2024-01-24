@@ -22,7 +22,7 @@ namespace DemoBot.ActionManager.Actions
         public bool DoesFit(string raw_data) => raw_data.EndsWith(SearchForString);
 
 
-        public async Task DoAction(String raw_data, UpdateResult ur, MessageResult mr) => await Action(raw_data, ur, mr);
+        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(mr.RawData, ur, mr);
 
     }
 
