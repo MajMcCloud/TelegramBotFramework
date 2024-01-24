@@ -1,5 +1,4 @@
 ﻿using DemoBot.ActionManager;
-using DemoBot.ActionManager.Actions;
 using DemoBot.Extensions;
 using DemoBot.Forms;
 using Telegram.Bot;
@@ -7,6 +6,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Builder;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Form;
+using DemoBot.ActionManager.Navigation;
+using DemoBot.ActionManager.Actions;
+using TelegramBotBase.Base;
 
 namespace DemoBot
 {
@@ -25,21 +27,21 @@ namespace DemoBot
             var eam = ExternalActionManager.Configure(config =>
             {
                 //Waiting for input starting with 'n_'
-                config.AddStartsWithAction<HiddenForm>("n_", (a, b) =>
+                config.AddStartsWithNavigation<HiddenForm>("n_", (a, b) =>
                 {
                     a.value = b;
                 });
 
 
                 //Minimal version, using reflection right now
-                config.AddStartsWithAction<HiddenForm>("a_", (a, b) =>
+                config.AddStartsWithNavigation<HiddenForm>("a_", (a, b) =>
                 {
                     a.value = b;
                 });
 
 
                 //Waiting for input starting with 't_'
-                config.AddStartsWithAction(typeof(HiddenForm), "t_", (a, b) =>
+                config.AddStartsWithNavigation(typeof(HiddenForm), "t_", (a, b) =>
                 {
                     var hf = a as HiddenForm;
                     if (hf == null)
@@ -48,31 +50,45 @@ namespace DemoBot
                     hf.value = b;
                 });
 
+
                 //Minimal version, using reflection right now
-                config.AddEndsWithAction<HiddenForm_EndsWith>("_u", (a, b) =>
+                config.AddEndsWithNavigation<HiddenForm_EndsWith>("_u", (a, b) =>
                 {
                     a.value = b;
                 });
 
 
                 //Deserialize input and waiting for the method property to has value 'tickets'
-                config.AddGuidAction<HiddenTicketForm>("tickets", (a, b) =>
+                config.AddGuidNavigation<HiddenTicketForm>("tickets", (a, b) =>
                 {
                     a.ticketId = b;
                 });
 
 
                 //Minimal version, using reflection right now
-                config.AddGuidAction<HiddenLetterForm>("letters", (a, b) =>
+                config.AddGuidNavigation<HiddenLetterForm>("letters", (a, b) =>
                 {
                     a.letterId = b;
                 });
 
 
                 //Deserialize input and waiting for the method property to has value 'open'
-                config.AddGuidAction<HiddenOpenForm>("open", (a, b) =>
+                config.AddGuidNavigation<HiddenOpenForm>("open", (a, b) =>
                 {
                     a.guid = b;
+                });
+
+
+                //Do custom action
+                config.AddStartsWithAction("p_", StartsWithActionCallback_Demo);
+
+                //Do custom action
+                config.AddStartsWithAction("p2_", async (value, update, message) =>
+                {
+                    if (message.UpdateData.CallbackQuery == null)
+                        return;
+
+                    await update.Device.ConfirmAction(message.UpdateData.CallbackQuery.Id, "Confirmed!");
                 });
 
             });
@@ -81,29 +97,45 @@ namespace DemoBot
             var eam2 = ExternalActionManager.Configure(config =>
             {
                 //Waiting for input starting with 'n_'
-                config.AddStartsWithAction<HiddenForm>("n_", a => a.value);
+                config.AddStartsWithNavigation<HiddenForm>("n_", a => a.value);
 
 
                 //Waiting for input starting with 'a_'
-                config.AddStartsWithAction<HiddenForm>("a_", a => a.value);
+                config.AddStartsWithNavigation<HiddenForm>("a_", a => a.value);
+
 
                 //Waiting for input starting with 't_' (Non generic version)
-                config.AddStartsWithAction(typeof(HiddenForm), "t_", a => ((HiddenForm)a).value);
+                config.AddStartsWithNavigation(typeof(HiddenForm), "t_", a => ((HiddenForm)a).value);
+
 
                 //Waiting for input ending with 'n_'
-                config.AddEndsWithAction<HiddenForm_EndsWith>("_u", a => a.value);
+                config.AddEndsWithNavigation<HiddenForm_EndsWith>("_u", a => a.value);
 
 
                 //Deserialize input and waiting for the method property to has value 'tickets'
-                config.AddGuidAction<HiddenTicketForm>("tickets", a => a.ticketId);
+                config.AddGuidNavigation<HiddenTicketForm>("tickets", a => a.ticketId);
 
 
                 //Minimal version, using reflection right now
-                config.AddGuidAction<HiddenLetterForm>("letters", a => a.letterId);
+                config.AddGuidNavigation<HiddenLetterForm>("letters", a => a.letterId);
 
 
                 //Deserialize input and waiting for the method property to has value 'open'
-                config.AddGuidAction<HiddenOpenForm>("open", a => a.guid);
+                config.AddGuidNavigation<HiddenOpenForm>("open", a => a.guid);
+
+
+                //Do custom action
+                config.AddStartsWithAction("p_", StartsWithActionCallback_Demo);
+
+
+                //Do custom action
+                config.AddStartsWithAction("p2_", async (value, update, message) =>
+                {
+                    if (message.UpdateData.CallbackQuery == null)
+                        return;
+
+                    await update.Device.ConfirmAction(message.UpdateData.CallbackQuery.Id, "Confirmed!");
+                });
 
             });
 
@@ -144,6 +176,14 @@ namespace DemoBot
 
         }
 
+        private static async Task StartsWithActionCallback_Demo(String value, UpdateResult ur, MessageResult mr)
+        {
+            if (mr.UpdateData.CallbackQuery == null)
+                return;
+
+            await ur.Device.ConfirmAction(mr.UpdateData.CallbackQuery.Id, "Confirmed!");
+        }
+
         private static void Bb_UnhandledCall(object? sender, TelegramBotBase.Args.UnhandledCallEventArgs e)
         {
 
@@ -178,21 +218,25 @@ namespace DemoBot
 
                     //Test values
 
-                    String max_value = "n_".PadRight(32, '5'); //Starts with
+                    String max_value = "n_".PadRight(32, '1'); //Starts with
 
-                    String max_value2 = "t_".PadRight(32, '5'); //Starts with
+                    String max_value2 = "t_".PadRight(32, '2'); //Starts with
 
-                    String max_value3 = "a_".PadRight(32, '5'); //Starts with
+                    String max_value3 = "a_".PadRight(32, '3'); //Starts with
 
-                    String max_value4 = "_u".PadLeft(32, '5'); //Ends with
+                    String max_value4 = "_u".PadLeft(32, '4'); //Ends with
+
+                    String max_value5 = "p_".PadRight(32, '5'); //Ends with
+
+                    String max_value6 = "p2_".PadRight(32, '6'); //Ends with
 
                     Guid test_value = Guid.NewGuid(); //Unhandled caller
 
-                    var callback_guid = GuidAction.GetCallback("open", Guid.NewGuid()); //HiddenOpenForm
+                    var callback_guid = GuidNavigation.GetCallback("open", Guid.NewGuid()); //HiddenOpenForm
 
-                    var callback_tickets = GuidAction.GetCallback("tickets", Guid.NewGuid()); //HiddenTicketForm
+                    var callback_tickets = GuidNavigation.GetCallback("tickets", Guid.NewGuid()); //HiddenTicketForm
 
-                    var callback_letters = GuidAction.GetCallback("letters", Guid.NewGuid()); //HiddenLetterForm
+                    var callback_letters = GuidNavigation.GetCallback("letters", Guid.NewGuid()); //HiddenLetterForm
 
 
                     String message = $"Test notification from 'outside'\n\nTest values are:\n\nTest: {max_value}\nTest2: {max_value2}\nTest3: {max_value3}\nTest (Guid): {test_value.ToString()}\nTest (Callback Guid): {callback_guid.Value}\nTickets (Guid): {callback_tickets.Value}\nLetters (Guid): {callback_letters.Value}\n";
@@ -204,13 +248,17 @@ namespace DemoBot
 
                     bf.AddButtonRow(new ButtonBase("Ok", "n_ok"), new ButtonBase("Later", "n_later"));
 
-                    bf.AddButtonRow("Test", max_value);
+                    bf.AddButtonRow("Test (n_)", max_value);
 
-                    bf.AddButtonRow("Test2", max_value2);
+                    bf.AddButtonRow("Test2 (t_)", max_value2);
 
-                    bf.AddButtonRow("Test3", max_value3);
+                    bf.AddButtonRow("Test3 (a_)", max_value3);
 
-                    bf.AddButtonRow("Test4", max_value4);
+                    bf.AddButtonRow("Test4 (_u)", max_value4);
+
+                    bf.AddButtonRow("Test5 (p_)", max_value5);
+
+                    bf.AddButtonRow("Test6 (p2_)", max_value6);
 
                     bf.AddButtonRow("Test (Guid)", test_value.ToString());
 
