@@ -444,6 +444,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         c.ThreadPool_WorkerThreads = workerThreads;
         c.ThreadPool_IOThreads = ioThreads;
+        c.ThrowPendingUpdates = _client.ThrowPendingUpdates;
 
         _client = c;
 
