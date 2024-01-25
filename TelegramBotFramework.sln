@@ -40,7 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experiments", "Experiments"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoBot", "Experiments\ExternalActionManager\DemoBot\DemoBot.csproj", "{5184D3F8-8526-413D-8EB0-23636EA7A4EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Experiments", "Experiments\ExternalActionManager\TelegramBotBase.Experiments\TelegramBotBase.Experiments.csproj", "{625F84FE-6809-4CA4-9C58-3453382D1C65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Experiments.ActionManager", "Experiments\ExternalActionManager\TelegramBotBase.Experiments\TelegramBotBase.Experiments.ActionManager.csproj", "{625F84FE-6809-4CA4-9C58-3453382D1C65}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExternalActionManager", "ExternalActionManager", "{359F7D60-362C-4F42-9606-A138FB1293E9}"
 EndProject

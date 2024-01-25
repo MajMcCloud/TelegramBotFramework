@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\TelegramBotBase\TelegramBotBase.csproj" />
-    <ProjectReference Include="..\TelegramBotBase.Experiments\TelegramBotBase.Experiments.csproj" />
+    <ProjectReference Include="..\TelegramBotBase.Experiments\TelegramBotBase.Experiments.ActionManager.csproj" />
   </ItemGroup>
 
 
