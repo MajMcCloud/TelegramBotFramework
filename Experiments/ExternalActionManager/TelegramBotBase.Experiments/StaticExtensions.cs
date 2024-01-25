@@ -1,5 +1,4 @@
-﻿using DemoBot.ActionManager;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Builder.Interfaces;
 using TelegramBotBase.Interfaces;
 
-namespace DemoBot.Extensions
+namespace TelegramBotBase.Experiments.ActionManager
 {
     public static class StaticExtensions
     {

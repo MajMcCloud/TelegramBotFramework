@@ -1,6 +1,6 @@
 ﻿using TelegramBotBase.Base;
 
-namespace DemoBot.ActionManager
+namespace TelegramBotBase.Experiments.ActionManager
 {
     public partial class ExternalActionManager
     {

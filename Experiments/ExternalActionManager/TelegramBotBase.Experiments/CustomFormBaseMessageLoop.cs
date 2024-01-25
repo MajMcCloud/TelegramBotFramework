@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using DemoBot.ActionManager;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase;
 using TelegramBotBase.Args;
@@ -7,7 +6,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 
-namespace DemoBot
+namespace TelegramBotBase.Experiments.ActionManager
 {
     public class CustomFormBaseMessageLoop : IMessageLoopFactory
     {

@@ -1,7 +1,7 @@
 ﻿using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace DemoBot.ActionManager.Actions
+namespace TelegramBotBase.Experiments.ActionManager.Actions
 {
     public class GuidAction : IExternalAction
     {

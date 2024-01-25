@@ -2,7 +2,7 @@
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
 
-namespace DemoBot.ActionManager.Navigation
+namespace TelegramBotBase.Experiments.ActionManager.Navigation
 {
     public class GuidNavigation : IExternalAction
     {
