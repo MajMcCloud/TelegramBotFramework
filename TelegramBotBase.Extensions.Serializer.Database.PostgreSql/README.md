@@ -19,7 +19,7 @@ var bot = BotBaseBuilder
             .WithStartForm<Start>()
             .NoProxy()
             .OnlyStart()
-            .UseSQLDatabase("localhost", "telegram_bot")
+            .UsePostgreSqlDatabase("localhost",  "8181", "telegram_bot")
             .UseEnglish()
             .Build();
 
