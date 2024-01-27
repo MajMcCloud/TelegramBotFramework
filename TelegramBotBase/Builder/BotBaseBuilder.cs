@@ -421,7 +421,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <inheritdoc cref="ILanguageSelectionStage.UseRussian"/>
     public IBuildingStage UseRussian()
     {
-        Default.Language = new Persian();
+        Default.Language = new Russian();
         return this;
     }
 
