@@ -1048,7 +1048,9 @@ Extends the base package with some additional image methods like SendPhoto (usin
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images)
 
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
+Source code: [TelegramBotBase.Extensions.Images/](/TelegramBotBase.Extensions.Images/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
 
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
@@ -1057,7 +1059,9 @@ A session serializer for Microsoft SQL Server.
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL)
 
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+Source code: [TelegramBotBase.Extensions.Serializer.Database.MSSQL/](/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
@@ -1066,7 +1070,9 @@ A session serializer for PostgreSql Server.
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql)
 
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+Source code: [TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
 
 
 ## Test Project
