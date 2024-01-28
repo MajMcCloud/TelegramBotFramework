@@ -1074,6 +1074,7 @@ Source code: [TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](/Teleg
 
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
 
+Credits: [@Kataane](https://github.com/Kataane)
 
 ## Test Project
 
