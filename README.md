@@ -1063,7 +1063,7 @@ Source code: [TelegramBotBase.Extensions.Serializer.Database.MSSQL/](/TelegramBo
 
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 
-### TelegramBotBase.Extensions.Serializer.Database.MSSQL
+### TelegramBotBase.Extensions.Serializer.Database.PostgreSql
 
 A session serializer for PostgreSql Server.
 
