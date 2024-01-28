@@ -1039,6 +1039,8 @@ again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the con
 you
 have given to the constructor at the beginning.*
 
+---
+
 ## Extensions
 
 ### TelegramBotBase.Extensions.Images
@@ -1052,6 +1054,7 @@ Source code: [TelegramBotBase.Extensions.Images/](/TelegramBotBase.Extensions.Im
 
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
 
+---
 
 ### TelegramBotBase.Extensions.Images.IronSoftware
 
@@ -1064,9 +1067,11 @@ Important: This extension uses the IronSoftware drawing library.
 
 [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
 
-Source code: [open source](TelegramBotBase.Extensions.Images.IronSoftware/)
+Source code: [TelegramBotBase.Extensions.Images.IronSoftware/](TelegramBotBase.Extensions.Images.IronSoftware/)
 
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/)
+
+---
 
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
@@ -1078,6 +1083,8 @@ A session serializer for Microsoft SQL Server.
 Source code: [TelegramBotBase.Extensions.Serializer.Database.MSSQL/](/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+---
 
 ### TelegramBotBase.Extensions.Serializer.Database.PostgreSql
 
@@ -1092,6 +1099,7 @@ Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serial
 
 Credits: [@Kataane](https://github.com/Kataane)
 
+---
 
 ## Test Project
 
