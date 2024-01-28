@@ -1059,6 +1059,16 @@ A session serializer for Microsoft SQL Server.
 
 [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 
+### TelegramBotBase.Extensions.Serializer.Database.MSSQL
+
+A session serializer for PostgreSql Server.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql)
+
+[https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+
+
 ## Test Project
 
 There is a "TelegramBotBase.Test" project inside the repository which includes minimal examples for all controls available.
