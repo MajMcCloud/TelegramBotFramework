@@ -383,14 +383,6 @@ public class TaggedButtonGrid : MultiView
             index = br.Item2;
         }
 
-
-        //var button = HeadLayoutButtonRow?. .FirstOrDefault(a => a.Text.Trim() == result.MessageText)
-        //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText);
-
-        // bf.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText)
-
-        //var index = bf.FindRowByButton(button);
-
         check:
 
 
@@ -579,15 +571,6 @@ public class TaggedButtonGrid : MultiView
             index = br.Item2;
         }
 
-
-        //var bf = DataSource.ButtonForm;
-
-        //var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-        //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-        //            ?? bf.ToList().FirstOrDefault(a => a.Value == result.RawData);
-
-        //var index = bf.FindRowByButton(button);
-
         check:
         if (match != null)
         {
@@ -658,15 +641,6 @@ public class TaggedButtonGrid : MultiView
                         return;
 
                 }
-
-
-                //var i = result.RawData.LastIndexOf(" ");
-                //if (i == -1)
-                //{
-                //    i = result.RawData.Length;
-                //}
-
-                //var t = result.RawData.Substring(0, i);
 
                 if (SelectedTags.Contains(result.RawData))
                 {
@@ -802,10 +776,6 @@ public class TaggedButtonGrid : MultiView
                     return;
                 }
 
-                //if (bf.Count == 0)
-                //    return;
-
-
                 var rkm = (ReplyKeyboardMarkup)bf;
                 rkm.ResizeKeyboard = ResizeKeyboard;
                 rkm.OneTimeKeyboard = OneTimeKeyboard;
@@ -928,15 +898,6 @@ public class TaggedButtonGrid : MultiView
         Message m = null;
 
         ButtonForm form = null;
-
-        //if (this.EnableSearch && this.SearchQuery != null && this.SearchQuery != "")
-        //{
-        //    form = form.FilterDuplicate(this.SearchQuery, true);
-        //}
-        //else
-        //{
-        //    form = form.Duplicate();
-        //}
 
         if (Tags != null && SelectedTags != null)
         {
