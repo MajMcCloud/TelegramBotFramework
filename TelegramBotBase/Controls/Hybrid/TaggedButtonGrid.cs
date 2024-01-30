@@ -494,10 +494,16 @@ public class TaggedButtonGrid : MultiView
                 if (result.MessageText == CheckAllLabel)
                 {
                     CheckAllTags();
+                    Updated();
+                    result.Handled = true;
+                    return;
                 }
                 else if (result.MessageText == UncheckAllLabel)
                 {
                     UncheckAllTags();
+                    Updated();
+                    result.Handled = true;
+                    return;
                 }
 
                 var i = result.MessageText.LastIndexOf(" ");
