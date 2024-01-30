@@ -426,8 +426,6 @@ public class ButtonGrid : ControlBase
             return;
         }
 
-        await result.ConfirmAction(ConfirmationText ?? "");
-
         ButtonRow match = null;
         var index = -1;
 
@@ -462,6 +460,8 @@ public class ButtonGrid : ControlBase
         check:
         if (match != null)
         {
+            await result.ConfirmAction(ConfirmationText ?? "");
+
             await OnButtonClicked(new ButtonClickedEventArgs(match.GetButtonMatch(result.RawData, false), index,
                                                              match));
 
