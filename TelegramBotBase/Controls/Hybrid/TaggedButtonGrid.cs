@@ -767,8 +767,10 @@ public class TaggedButtonGrid : MultiView
 
         if (EnableCheckAllTools)
         {
-            TagsSubHeadLayoutButtonRow = new ButtonRow(new ButtonBase(CheckAllLabel, "$checkall$"),
-                                                       new ButtonBase(UncheckAllLabel, "$uncheckall$"));
+            TagsSubHeadLayoutButtonRow = new ButtonRow(new ButtonBase(string.Format(TotalTagsLabel, Tags.Count), "$total$"),
+                                                        new ButtonBase(CheckAllLabel, "$checkall$"),
+                                                        new ButtonBase(UncheckAllLabel, "$uncheckall$"),
+                                                        new ButtonBase(string.Format(CheckedTagsLabel, SelectedTags.Count), "checked$"));
             bf.AddButtonRow(TagsSubHeadLayoutButtonRow);
         }
 
