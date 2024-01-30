@@ -629,22 +629,56 @@ public class TaggedButtonGrid : MultiView
 
                 break;
 
-            case "$back$":
 
-                SelectedViewIndex = 0;
+            default:
+
+                if (SelectedViewIndex != 1)
+                    return;
+
+
+                switch (result.RawData)
+                {
+                    case "$back$":
+
+                        SelectedViewIndex = 0;
+                        Updated();
+
+                        return;
+
+                    case "$checkall$":
+
+                        CheckAllTags();
+
+                        return;
+
+                    case "$uncheckall$":
+
+                        UncheckAllTags();
+
+                        return;
+
+                }
+
+
+                //var i = result.RawData.LastIndexOf(" ");
+                //if (i == -1)
+                //{
+                //    i = result.RawData.Length;
+                //}
+
+                //var t = result.RawData.Substring(0, i);
+
+                if (SelectedTags.Contains(result.RawData))
+                {
+                    SelectedTags.Remove(result.RawData);
+                }
+                else
+                {
+                    SelectedTags.Add(result.RawData);
+                }
+
                 Updated();
 
-                break;
-
-            case "$checkall$":
-
-                CheckAllTags();
-
-                break;
-
-            case "$uncheckall$":
-
-                UncheckAllTags();
 
                 break;
         }
