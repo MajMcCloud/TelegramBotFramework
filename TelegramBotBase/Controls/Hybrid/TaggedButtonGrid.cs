@@ -29,8 +29,6 @@ public class TaggedButtonGrid : MultiView
 
     public string BackLabel = Default.Language["ButtonGrid_Back"];
 
-    public string CheckAllLabel = Default.Language["ButtonGrid_CheckAll"];
-
     public string NextPageLabel = Default.Language["ButtonGrid_NextPage"];
 
     public string NoItemsLabel = Default.Language["ButtonGrid_NoItems"];
@@ -39,11 +37,17 @@ public class TaggedButtonGrid : MultiView
 
     public string SearchLabel = Default.Language["ButtonGrid_SearchFeature"];
 
-    public string UncheckAllLabel = Default.Language["ButtonGrid_UncheckAll"];
+    public string TotalTagsLabel = Default.Language["TaggedButtonGrid_TotalTags"];
+
+    public string CheckedTagsLabel = Default.Language["TaggedButtonGrid_CheckedTags"];
+
+    public string CheckAllLabel = Default.Language["TaggedButtonGrid_CheckAll"];
+
+    public string UncheckAllLabel = Default.Language["TaggedButtonGrid_UncheckAll"];
 
     public string SearchIcon = Default.Language["ButtonGrid_SearchIcon"];
 
-    public string TagIcon = Default.Language["ButtonGrid_TagIcon"];
+    public string TagIcon = Default.Language["TaggedButtonGrid_TagIcon"];
 
     public TaggedButtonGrid()
     {

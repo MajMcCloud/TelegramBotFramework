@@ -12,8 +12,8 @@
             Values["ButtonGrid_CurrentPage"] = "صفحه ی {0} از {1}";
             Values["ButtonGrid_SearchFeature"] = "💡 برای فیلتر کردن لیست پیام ارسال کنید. برای بازنشانی فیلتر روی 🔍 کلیک کنید.";
             Values["ButtonGrid_Back"] = "بازگشت";
-            Values["ButtonGrid_CheckAll"] = "بررسی کردن همه";
-            Values["ButtonGrid_UncheckAll"] = "بررسی نکردن همه";
+            Values["TaggedButtonGrid_CheckAll"] = "بررسی کردن همه";
+            Values["TaggedButtonGrid_UncheckAll"] = "بررسی نکردن همه";
             Values["CalendarPicker_Title"] = "تاریخ را انتخاب کنید";
             Values["CalendarPicker_PreviousPage"] = "◀️";
             Values["CalendarPicker_NextPage"] = "▶️";
@@ -31,7 +31,7 @@
             Values["PromptDialog_Back"] = "بازگشت";
             Values["ToggleButton_Changed"] = "تنظیمات تغییر کرد";
             Values["ButtonGrid_SearchIcon"] = "🔍";
-            Values["ButtonGrid_TagIcon"] = "📁";
+            Values["TaggedButtonGrid_TagIcon"] = "📁";
         }
     }
 }

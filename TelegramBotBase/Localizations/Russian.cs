@@ -12,8 +12,8 @@ public sealed class Russian : Localization
         Values["ButtonGrid_CurrentPage"] = "Страница {0} из {1}";
         Values["ButtonGrid_SearchFeature"] = "💡 Отправьте сообщение, чтобы отфильтровать список. Нажмите на 🔍, чтобы сбросить фильтр.";
         Values["ButtonGrid_Back"] = "Назада";
-        Values["ButtonGrid_CheckAll"] = "Выделить все";
-        Values["ButtonGrid_UncheckAll"] = "Отменить выбор";
+        Values["TaggedButtonGrid_CheckAll"] = "Выделить все";
+        Values["TaggedButtonGrid_UncheckAll"] = "Отменить выбор";
         Values["CalendarPicker_Title"] = "Календарь / Выберите дату";
         Values["CalendarPicker_PreviousPage"] = "◀️";
         Values["CalendarPicker_NextPage"] = "▶️";
@@ -31,6 +31,6 @@ public sealed class Russian : Localization
         Values["PromptDialog_Back"] = "Назад";
         Values["ToggleButton_Changed"] = "Настройки изменены";
         Values["ButtonGrid_SearchIcon"] = "🔍";
-        Values["ButtonGrid_TagIcon"] = "📁";
+        Values["TaggedButtonGrid_TagIcon"] = "📁";
     }
 }

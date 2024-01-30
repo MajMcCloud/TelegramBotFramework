@@ -12,8 +12,10 @@ public sealed class English : Localization
         Values["ButtonGrid_CurrentPage"] = "Page {0} of {1}";
         Values["ButtonGrid_SearchFeature"] = "💡 Send a message to filter the list. Click the 🔍 to reset the filter.";
         Values["ButtonGrid_Back"] = "Back";
-        Values["ButtonGrid_CheckAll"] = "Check all";
-        Values["ButtonGrid_UncheckAll"] = "Uncheck all";
+        Values["TaggedButtonGrid_TotalTags"] = "Total: {0}";
+        Values["TaggedButtonGrid_CheckedTags"] = "Checked: {0}";
+        Values["TaggedButtonGrid_CheckAll"] = "Check all";
+        Values["TaggedButtonGrid_UncheckAll"] = "Uncheck all";
         Values["CalendarPicker_Title"] = "Pick date";
         Values["CalendarPicker_PreviousPage"] = "◀️";
         Values["CalendarPicker_NextPage"] = "▶️";
@@ -31,6 +33,6 @@ public sealed class English : Localization
         Values["PromptDialog_Back"] = "Back";
         Values["ToggleButton_Changed"] = "Setting changed";
         Values["ButtonGrid_SearchIcon"] = "🔍";
-        Values["ButtonGrid_TagIcon"] = "📁";
+        Values["TaggedButtonGrid_TagIcon"] = "📁";
     }
 }
