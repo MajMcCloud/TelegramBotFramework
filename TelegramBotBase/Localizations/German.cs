@@ -31,5 +31,7 @@ public sealed class German : Localization
         Values["MultiToggleButton_Changed"] = "Ausgewählt";
         Values["PromptDialog_Back"] = "Zurück";
         Values["ToggleButton_Changed"] = "Einstellung geändert";
+        Values["ButtonGrid_SearchIcon"] = "🔍";
+        Values["ButtonGrid_TagIcon"] = "📁";
     }
 }
