@@ -44,7 +44,7 @@ namespace TelegramBotBase.Extensions.Serializer.Database.PostgreSql
         /// <returns>The language selection stage builder.</returns>
         public static ILanguageSelectionStage UsePostgreSqlDatabase(
             this ISessionSerializationStage builder,
-            string hostOrIp, string port, 
+            string hostOrIp, int port, 
             string databaseName, string userId, 
             string password, Type fallbackForm = null,
             string tablePrefix = "tgb_")
@@ -71,7 +71,7 @@ namespace TelegramBotBase.Extensions.Serializer.Database.PostgreSql
         /// <returns>The language selection stage builder.</returns>
         public static ILanguageSelectionStage UsePostgreSqlDatabase(
             this ISessionSerializationStage builder,
-            string hostOrIp, string port, 
+            string hostOrIp, int port, 
             string databaseName, bool integratedSecurity = true, 
             Type fallbackForm = null, string tablePrefix = "tgb_")
         {
