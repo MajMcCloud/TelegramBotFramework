@@ -927,8 +927,7 @@ public class TaggedButtonGrid : MultiView
     {
         Message m = null;
 
-        var form = DataSource.PickItems(CurrentPageIndex * ItemRowsPerPage, ItemRowsPerPage,
-                                        EnableSearch ? SearchQuery : null);
+        ButtonForm form = null;
 
         //if (this.EnableSearch && this.SearchQuery != null && this.SearchQuery != "")
         //{
@@ -941,7 +940,16 @@ public class TaggedButtonGrid : MultiView
 
         if (Tags != null && SelectedTags != null)
         {
+            form = DataSource.PickAllItems(EnableSearch ? SearchQuery : null); //CurrentPageIndex * ItemRowsPerPage, ItemRowsPerPage,
+
             form = form.TagDuplicate(SelectedTags);
+
+            form = new ButtonForm(form.ToRowList().Skip(CurrentPageIndex * ItemRowsPerPage).Take(ItemRowsPerPage));
+        }
+        else
+        {
+            form = DataSource.PickItems(CurrentPageIndex * ItemRowsPerPage, ItemRowsPerPage,
+                                        EnableSearch ? SearchQuery : null);
         }
 
         if (EnablePaging)
