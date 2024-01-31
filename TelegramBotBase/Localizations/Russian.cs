@@ -11,7 +11,7 @@ public sealed class Russian : Localization
         Values["ButtonGrid_NextPage"] = "▶️";
         Values["ButtonGrid_CurrentPage"] = "Страница {0} из {1}";
         Values["ButtonGrid_SearchFeature"] = "💡 Отправьте сообщение, чтобы отфильтровать список. Нажмите на 🔍, чтобы сбросить фильтр.";
-        Values["ButtonGrid_Back"] = "Назада";
+        Values["ButtonGrid_Back"] = "Назад";
         Values["TaggedButtonGrid_TotalTags"] = "Всего: {0}";
         Values["TaggedButtonGrid_CheckedTags"] = "Отмечено: {0}";
         Values["TaggedButtonGrid_CheckAll"] = "Выделить все";
