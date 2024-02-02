@@ -26,12 +26,4 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
 
     }
 
-    public static class StartWithAction_Extensions
-    {
-        public static void AddStartsWithAction(this ExternalActionManager manager, string value, Func<String, UpdateResult, MessageResult, Task> action)
-        {
-            manager.Add(new StartWithAction(value, action));
-        }
-    }
-
 }

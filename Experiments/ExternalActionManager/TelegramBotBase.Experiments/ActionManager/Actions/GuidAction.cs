@@ -82,13 +82,4 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
         public static CallbackData GetCallback(string method, Guid guid) => new CallbackData(method, guid.ToString());
 
     }
-
-    public static class GuidAction_Extensions
-    {
-
-        public static void AddGuidAction(this ExternalActionManager manager, string method, Func<Guid, UpdateResult, MessageResult, Task> action)
-        {
-            manager.Add(new GuidAction(method, action));
-        }
-    }
 }
