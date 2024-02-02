@@ -3,17 +3,17 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Experiments.ActionManager.Navigation
 {
-    public class GuidNavigation : IExternalAction
+    public class StringNavigation : IExternalAction
     {
         public Type FormType { get; }
 
         public string Method { get; set; }
 
-        public Action<FormBase, Guid> SetProperty { get; set; }
+        public Action<FormBase, String> SetProperty { get; set; }
 
-        Guid? _lastValue { get; set; }
+        String? _lastValue { get; set; }
 
-        public GuidNavigation(Type formType, string method, Action<FormBase, Guid> setProperty)
+        public StringNavigation(Type formType, string method, Action<FormBase, String> setProperty)
         {
             FormType = formType;
             Method = method;
@@ -30,10 +30,7 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
             if (cd.Method != Method)
                 return false;
 
-            Guid g;
-
-            if (Guid.TryParse(cd.Value, out g))
-                _lastValue = g;
+            _lastValue = cd.Value;
 
             return true;
         }
@@ -46,25 +43,25 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
             var new_form = FormType.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
 
             if (_lastValue != null)
-                SetProperty(new_form, _lastValue.Value);
+                SetProperty(new_form, _lastValue);
 
             await ur.Device.ActiveForm.NavigateTo(new_form);
         }
 
 
-        public static CallbackData GetCallback(string method, Guid guid) => new CallbackData(method, guid.ToString());
+        public static CallbackData GetCallback(string method, String str) => new CallbackData(method, str);
     }
 
-    public class GuidNavigation<TForm> : IExternalAction
+    public class StringNavigation<TForm> : IExternalAction
         where TForm : FormBase
     {
         public string Method { get; set; }
 
-        public Action<TForm, Guid> SetProperty { get; set; }
+        public Action<TForm, String> SetProperty { get; set; }
 
-        Guid? _lastValue { get; set; }
+        String? _lastValue { get; set; }
 
-        public GuidNavigation(string method, Action<TForm, Guid> setProperty)
+        public StringNavigation(string method, Action<TForm, String> setProperty)
         {
             Method = method;
             SetProperty = setProperty;
@@ -80,10 +77,7 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
             if (cd.Method != Method)
                 return false;
 
-            Guid g;
-
-            if (Guid.TryParse(cd.Value, out g))
-                _lastValue = g;
+            _lastValue = cd.Value;
 
             return true;
         }
@@ -98,7 +92,7 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
             TForm new_form = type.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as TForm;
 
             if (_lastValue != null)
-                SetProperty(new_form, _lastValue.Value);
+                SetProperty(new_form, _lastValue);
 
             await ur.Device.ActiveForm.NavigateTo(new_form);
         }

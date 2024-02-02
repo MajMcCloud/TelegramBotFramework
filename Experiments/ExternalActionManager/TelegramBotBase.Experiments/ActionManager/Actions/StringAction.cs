@@ -36,7 +36,7 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
 
         public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue, ur, mr);
 
-        public static CallbackData GetCallback(string method, long l) => new CallbackData(method, l.ToString());
+        public static CallbackData GetCallback(string method, string str) => new CallbackData(method, str);
 
     }
 

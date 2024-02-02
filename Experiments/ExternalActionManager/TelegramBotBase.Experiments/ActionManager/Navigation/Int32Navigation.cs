@@ -3,17 +3,17 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Experiments.ActionManager.Navigation
 {
-    public class GuidNavigation : IExternalAction
+    public class Int32Navigation : IExternalAction
     {
         public Type FormType { get; }
 
         public string Method { get; set; }
 
-        public Action<FormBase, Guid> SetProperty { get; set; }
+        public Action<FormBase, int> SetProperty { get; set; }
 
-        Guid? _lastValue { get; set; }
+        int? _lastValue { get; set; }
 
-        public GuidNavigation(Type formType, string method, Action<FormBase, Guid> setProperty)
+        public Int32Navigation(Type formType, string method, Action<FormBase, int> setProperty)
         {
             FormType = formType;
             Method = method;
@@ -30,10 +30,10 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
             if (cd.Method != Method)
                 return false;
 
-            Guid g;
+            int i;
 
-            if (Guid.TryParse(cd.Value, out g))
-                _lastValue = g;
+            if (int.TryParse(cd.Value, out i))
+                _lastValue = i;
 
             return true;
         }
@@ -52,19 +52,19 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
         }
 
 
-        public static CallbackData GetCallback(string method, Guid guid) => new CallbackData(method, guid.ToString());
+        public static CallbackData GetCallback(string method, int i) => new CallbackData(method, i.ToString());
     }
 
-    public class GuidNavigation<TForm> : IExternalAction
+    public class Int32Navigation<TForm> : IExternalAction
         where TForm : FormBase
     {
         public string Method { get; set; }
 
-        public Action<TForm, Guid> SetProperty { get; set; }
+        public Action<TForm, int> SetProperty { get; set; }
 
-        Guid? _lastValue { get; set; }
+        int? _lastValue { get; set; }
 
-        public GuidNavigation(string method, Action<TForm, Guid> setProperty)
+        public Int32Navigation(string method, Action<TForm, int> setProperty)
         {
             Method = method;
             SetProperty = setProperty;
@@ -80,9 +80,9 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
             if (cd.Method != Method)
                 return false;
 
-            Guid g;
+            int g;
 
-            if (Guid.TryParse(cd.Value, out g))
+            if (int.TryParse(cd.Value, out g))
                 _lastValue = g;
 
             return true;
