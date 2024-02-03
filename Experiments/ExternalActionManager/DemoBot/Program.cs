@@ -8,6 +8,7 @@ using TelegramBotBase.Base;
 using TelegramBotBase.Experiments.ActionManager;
 using TelegramBotBase.Experiments.ActionManager.Actions;
 using TelegramBotBase.Experiments.ActionManager.Navigation;
+using Telegram.Bot.Types;
 
 namespace DemoBot
 {
@@ -136,6 +137,14 @@ namespace DemoBot
                     await update.Device.ConfirmAction(message.UpdateData.CallbackQuery.Id, "Confirmed!");
                 });
 
+
+                config.AddGuidAction("guid.test.too.long", async (g, c, u, m) =>
+                {
+                    if (m.UpdateData.CallbackQuery == null)
+                        return;
+
+                    await u.Device.ConfirmAction(m.UpdateData.CallbackQuery.Id, "Confirmed!");
+                });
             });
 
 
@@ -148,7 +157,7 @@ namespace DemoBot
                                     {
                                         a.Start("Starts the bot");
                                         a.Add("test", "Sends a test notification");
-
+                                        a.Add("invalid", "Try to send an invalid data message");
 
                                     })
                                     .NoSerialization()
@@ -270,6 +279,23 @@ namespace DemoBot
                     bf.AddButtonRow("Close", "close");
 
                     await tb.SendTextMessageAsync(e.DeviceId, message, disableNotification: true, replyMarkup: (InlineKeyboardMarkup)bf);
+
+                    break;
+
+                case "/invalid":
+
+                    Guid g = Guid.NewGuid();
+
+                    var tb2 = new TelegramBotClient(Token);
+
+                    var bf2 = new ButtonForm();
+
+                    bf2.AddButtonRow("Test test", GuidAction.GetCallback("guid.test.too.long", g).Serialize(true));
+
+                    String message2 = "This is an invalid test message.";
+
+                    await tb2.SendTextMessageAsync(e.DeviceId, message2, disableNotification: true, replyMarkup: (InlineKeyboardMarkup)bf2);
+
 
                     break;
 
