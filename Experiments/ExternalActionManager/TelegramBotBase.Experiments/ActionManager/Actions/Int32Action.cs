@@ -7,11 +7,13 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
     {
         public string Method { get; set; }
 
+        CallbackData? _lastData { get; set; }
+
         int? _lastValue { get; set; }
 
-        Func<int, UpdateResult, MessageResult, Task> Action;
+        Func<int, CallbackData, UpdateResult, MessageResult, Task> Action;
 
-        public Int32Action(string method, Func<int, UpdateResult, MessageResult, Task> action)
+        public Int32Action(string method, Func<int, CallbackData, UpdateResult, MessageResult, Task> action)
         {
             Method = method;
             Action = action;
@@ -33,11 +35,13 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
             if (int.TryParse(cd.Value, out i))
                 _lastValue = i;
 
+            _lastData = cd;
+
             return true;
         }
 
 
-        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, ur, mr);
+        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, _lastData, ur, mr);
 
         public static CallbackData GetCallback(string method, long l) => new CallbackData(method, l.ToString());
 
@@ -48,11 +52,13 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
     {
         public string Method { get; set; }
 
+        CallbackData? _lastData { get; set; }
+
         int? _lastValue { get; set; }
 
-        Func<int, UpdateResult, MessageResult, Task> Action;
+        Func<int, CallbackData, UpdateResult, MessageResult, Task> Action;
 
-        public Int32Action(string method, Func<int, UpdateResult, MessageResult, Task> action)
+        public Int32Action(string method, Func<int, CallbackData, UpdateResult, MessageResult, Task> action)
         {
             Method = method;
             Action = action;
@@ -73,10 +79,12 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
             if (int.TryParse(cd.Value, out i))
                 _lastValue = i;
 
+            _lastData = cd;
+
             return true;
         }
 
 
-        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, ur, mr);
+        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, _lastData, ur, mr);
     }
 }

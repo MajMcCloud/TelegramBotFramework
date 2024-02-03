@@ -7,11 +7,13 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
     {
         public string Method { get; set; }
 
+        CallbackData? _lastData { get; set; }
+
         Guid? _lastValue { get; set; }
 
-        Func<Guid, UpdateResult, MessageResult, Task> Action;
+        Func<Guid, CallbackData, UpdateResult, MessageResult, Task> Action;
 
-        public GuidAction(string method, Func<Guid, UpdateResult, MessageResult, Task> action)
+        public GuidAction(string method, Func<Guid, CallbackData, UpdateResult, MessageResult, Task> action)
         {
             Method = method;
             Action = action;
@@ -32,11 +34,13 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
             if (Guid.TryParse(cd.Value, out g))
                 _lastValue = g;
 
+            _lastData = cd;
+
             return true;
         }
 
 
-        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, ur, mr);
+        public async Task DoAction(UpdateResult ur, MessageResult mr) => await Action(_lastValue.Value, _lastData, ur, mr);
 
         public static CallbackData GetCallback(string method, Guid guid) => new CallbackData(method, guid.ToString());
 
