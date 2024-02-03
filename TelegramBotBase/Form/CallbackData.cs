@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.Text;
+using TelegramBotBase.Exceptions;
 
 namespace TelegramBotBase.Form;
 
@@ -30,7 +32,7 @@ public class CallbackData
     ///     Serializes data to json string
     /// </summary>
     /// <returns></returns>
-    public string Serialize()
+    public string Serialize(bool throwExceptionOnOverflow = false)
     {
         var s = "";
         try
@@ -40,6 +42,16 @@ public class CallbackData
         catch
         {
         }
+
+#if DEBUG
+
+        //Data is over 64 bytes
+        if(throwExceptionOnOverflow && Encoding.UTF8.GetByteCount(s) > Constants.Telegram.MaxCallBackDataBytes)
+        {
+            throw new CallbackDataTooLongException();
+        }
+
+#endif
 
         return s;
     }
@@ -65,5 +77,5 @@ public class CallbackData
         return null;
     }
 
-    public static implicit operator string(CallbackData callbackData) => callbackData.Serialize();
+    public static implicit operator string(CallbackData callbackData) => callbackData.Serialize(true);
 }
