@@ -290,7 +290,7 @@ namespace DemoBot
 
                     var bf2 = new ButtonForm();
 
-                    bf2.AddButtonRow("Test test", GuidAction.GetCallback("guid.test.too.long", g).Serialize(true));
+                    bf2.AddButtonRow("Test test", GuidAction.GetCallback("guid.test.too.long", g));
 
                     String message2 = "This is an invalid test message.";
 
