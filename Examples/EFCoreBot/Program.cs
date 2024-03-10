@@ -18,6 +18,7 @@ var bot = BotBaseBuilder.Create()
                         .NoCommands()
                         .NoSerialization()
                         .DefaultLanguage()
+                        .UseSingleThread()
                         .Build();
 
 await bot.Start();

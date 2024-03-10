@@ -32,6 +32,7 @@ internal class Program
                  })
                  .NoSerialization()
                  .UseEnglish()
+                 .UseThreadPool()
                  .Build();
 
 
