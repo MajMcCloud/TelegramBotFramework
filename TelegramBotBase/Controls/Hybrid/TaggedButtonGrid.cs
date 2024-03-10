@@ -29,8 +29,6 @@ public class TaggedButtonGrid : MultiView
 
     public string BackLabel = Default.Language["ButtonGrid_Back"];
 
-    public string CheckAllLabel = Default.Language["ButtonGrid_CheckAll"];
-
     public string NextPageLabel = Default.Language["ButtonGrid_NextPage"];
 
     public string NoItemsLabel = Default.Language["ButtonGrid_NoItems"];
@@ -39,11 +37,17 @@ public class TaggedButtonGrid : MultiView
 
     public string SearchLabel = Default.Language["ButtonGrid_SearchFeature"];
 
-    public string UncheckAllLabel = Default.Language["ButtonGrid_UncheckAll"];
+    public string TotalTagsLabel = Default.Language["TaggedButtonGrid_TotalTags"];
+
+    public string CheckedTagsLabel = Default.Language["TaggedButtonGrid_CheckedTags"];
+
+    public string CheckAllLabel = Default.Language["TaggedButtonGrid_CheckAll"];
+
+    public string UncheckAllLabel = Default.Language["TaggedButtonGrid_UncheckAll"];
 
     public string SearchIcon = Default.Language["ButtonGrid_SearchIcon"];
 
-    public string TagIcon = Default.Language["ButtonGrid_TagIcon"];
+    public string TagIcon = Default.Language["TaggedButtonGrid_TagIcon"];
 
     public TaggedButtonGrid()
     {
@@ -379,14 +383,6 @@ public class TaggedButtonGrid : MultiView
             index = br.Item2;
         }
 
-
-        //var button = HeadLayoutButtonRow?. .FirstOrDefault(a => a.Text.Trim() == result.MessageText)
-        //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText);
-
-        // bf.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText)
-
-        //var index = bf.FindRowByButton(button);
-
         check:
 
 
@@ -490,10 +486,16 @@ public class TaggedButtonGrid : MultiView
                 if (result.MessageText == CheckAllLabel)
                 {
                     CheckAllTags();
+                    Updated();
+                    result.Handled = true;
+                    return;
                 }
                 else if (result.MessageText == UncheckAllLabel)
                 {
                     UncheckAllTags();
+                    Updated();
+                    result.Handled = true;
+                    return;
                 }
 
                 var i = result.MessageText.LastIndexOf(" ");
@@ -569,15 +571,6 @@ public class TaggedButtonGrid : MultiView
             index = br.Item2;
         }
 
-
-        //var bf = DataSource.ButtonForm;
-
-        //var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-        //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-        //            ?? bf.ToList().FirstOrDefault(a => a.Value == result.RawData);
-
-        //var index = bf.FindRowByButton(button);
-
         check:
         if (match != null)
         {
@@ -619,22 +612,47 @@ public class TaggedButtonGrid : MultiView
 
                 break;
 
-            case "$back$":
 
-                SelectedViewIndex = 0;
+            default:
+
+                if (SelectedViewIndex != 1)
+                    return;
+
+
+                switch (result.RawData)
+                {
+                    case "$back$":
+
+                        SelectedViewIndex = 0;
+                        Updated();
+
+                        return;
+
+                    case "$checkall$":
+
+                        CheckAllTags();
+
+                        return;
+
+                    case "$uncheckall$":
+
+                        UncheckAllTags();
+
+                        return;
+
+                }
+
+                if (SelectedTags.Contains(result.RawData))
+                {
+                    SelectedTags.Remove(result.RawData);
+                }
+                else
+                {
+                    SelectedTags.Add(result.RawData);
+                }
+
                 Updated();
 
-                break;
-
-            case "$checkall$":
-
-                CheckAllTags();
-
-                break;
-
-            case "$uncheckall$":
-
-                UncheckAllTags();
 
                 break;
         }
@@ -723,8 +741,10 @@ public class TaggedButtonGrid : MultiView
 
         if (EnableCheckAllTools)
         {
-            TagsSubHeadLayoutButtonRow = new ButtonRow(new ButtonBase(CheckAllLabel, "$checkall$"),
-                                                       new ButtonBase(UncheckAllLabel, "$uncheckall$"));
+            TagsSubHeadLayoutButtonRow = new ButtonRow(new ButtonBase(string.Format(TotalTagsLabel, Tags.Count), "$total$"),
+                                                        new ButtonBase(CheckAllLabel, "$checkall$"),
+                                                        new ButtonBase(UncheckAllLabel, "$uncheckall$"),
+                                                        new ButtonBase(string.Format(CheckedTagsLabel, SelectedTags.Count), "checked$"));
             bf.AddButtonRow(TagsSubHeadLayoutButtonRow);
         }
 
@@ -755,10 +775,6 @@ public class TaggedButtonGrid : MultiView
 
                     return;
                 }
-
-                //if (bf.Count == 0)
-                //    return;
-
 
                 var rkm = (ReplyKeyboardMarkup)bf;
                 rkm.ResizeKeyboard = ResizeKeyboard;
@@ -881,21 +897,20 @@ public class TaggedButtonGrid : MultiView
     {
         Message m = null;
 
-        var form = DataSource.PickItems(CurrentPageIndex * ItemRowsPerPage, ItemRowsPerPage,
-                                        EnableSearch ? SearchQuery : null);
-
-        //if (this.EnableSearch && this.SearchQuery != null && this.SearchQuery != "")
-        //{
-        //    form = form.FilterDuplicate(this.SearchQuery, true);
-        //}
-        //else
-        //{
-        //    form = form.Duplicate();
-        //}
+        ButtonForm form = null;
 
         if (Tags != null && SelectedTags != null)
         {
+            form = DataSource.PickAllItems(EnableSearch ? SearchQuery : null); //CurrentPageIndex * ItemRowsPerPage, ItemRowsPerPage,
+
             form = form.TagDuplicate(SelectedTags);
+
+            form = new ButtonForm(form.ToRowList().Skip(CurrentPageIndex * ItemRowsPerPage).Take(ItemRowsPerPage));
+        }
+        else
+        {
+            form = DataSource.PickItems(CurrentPageIndex * ItemRowsPerPage, ItemRowsPerPage,
+                                        EnableSearch ? SearchQuery : null);
         }
 
         if (EnablePaging)

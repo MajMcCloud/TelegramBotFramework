@@ -1,6 +1,6 @@
 # .NET Telegram Bot Framework - Context based addon
 
-[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/vpre/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 [![Telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://www.t.me/tgbotbase)
 
 [![License](https://img.shields.io/github/license/MajMcCloud/telegrambotframework.svg?style=flat-square&maxAge=2592000&label=License)](https://raw.githubusercontent.com/MajMcCloud/TelegramBotFramework/master/LICENCE.md)
@@ -723,6 +723,7 @@ The current available languages for controls are:
 - English
 - German
 - Persian
+- Russian
 
 You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
 
@@ -1039,6 +1040,8 @@ again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the con
 you
 have given to the constructor at the beginning.*
 
+---
+
 ## Extensions
 
 ### TelegramBotBase.Extensions.Images
@@ -1048,7 +1051,28 @@ Extends the base package with some additional image methods like SendPhoto (usin
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images)
 
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
+Source code: [TelegramBotBase.Extensions.Images/](/TelegramBotBase.Extensions.Images/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
+
+---
+
+### TelegramBotBase.Extensions.Images.IronSoftware
+
+Extends the base package with some additional image methods like SendPhoto (using Bitmap)
+
+Important: This extension uses the IronSoftware drawing library.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware)
+
+[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+
+Source code: [TelegramBotBase.Extensions.Images.IronSoftware/](TelegramBotBase.Extensions.Images.IronSoftware/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/)
+
+---
 
 Project: [open source](TelegramBotBase.Extensions.Images/)
 
@@ -1072,7 +1096,26 @@ A session serializer for Microsoft SQL Server.
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL)
 
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+Source code: [TelegramBotBase.Extensions.Serializer.Database.MSSQL/](/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+---
+
+### TelegramBotBase.Extensions.Serializer.Database.PostgreSql
+
+A session serializer for PostgreSql Server.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql)
+
+Source code: [TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+
+Credits: [@Kataane](https://github.com/Kataane)
+
+---
 
 Project: [open source](TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 

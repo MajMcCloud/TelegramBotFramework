@@ -398,30 +398,42 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 7 (Language)"
 
-    public IThreadingStage DefaultLanguage()
+    /// <inheritdoc cref="ILanguageSelectionStage.DefaultLanguage"/>
+    public IBuildingStage DefaultLanguage()
     {
         return this;
     }
 
-    public IThreadingStage UseEnglish()
+    /// <inheritdoc cref="ILanguageSelectionStage.UseEnglish"/>
+    public IBuildingStage UseEnglish()
     {
         Default.Language = new English();
         return this;
     }
 
-    public IThreadingStage UseGerman()
+    /// <inheritdoc cref="ILanguageSelectionStage.UseGerman"/>
+    public IBuildingStage UseGerman()
     {
         Default.Language = new German();
         return this;
     }
 
-    public IThreadingStage UsePersian()
+    /// <inheritdoc cref="ILanguageSelectionStage.UsePersian"/>
+    public IBuildingStage UsePersian()
     {
         Default.Language = new Persian();
         return this;
     }
 
-    public IThreadingStage Custom(Localization language)
+    /// <inheritdoc cref="ILanguageSelectionStage.UseRussian"/>
+    public IBuildingStage UseRussian()
+    {
+        Default.Language = new Russian();
+        return this;
+    }
+
+    /// <inheritdoc cref="ILanguageSelectionStage.Custom"/>
+    public IBuildingStage Custom(Localization language)
     {
         Default.Language = language;
         return this;
