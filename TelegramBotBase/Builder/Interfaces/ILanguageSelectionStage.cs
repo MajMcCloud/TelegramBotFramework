@@ -11,35 +11,35 @@ public interface ILanguageSelectionStage
     ///     Selects the default language for control usage. (English)
     /// </summary>
     /// <returns>The next stage in the building process.</returns>
-    IBuildingStage DefaultLanguage();
+    IThreadingStage DefaultLanguage();
 
     /// <summary>
     ///     Selects english as the default language for control labels.
     /// </summary>
     /// <returns>The next stage in the building process.</returns>
-    IBuildingStage UseEnglish();
+    IThreadingStage UseEnglish();
 
     /// <summary>
     ///     Selects german as the default language for control labels.
     /// </summary>
     /// <returns>The next stage in the building process.</returns>
-    IBuildingStage UseGerman();
+    IThreadingStage UseGerman();
 
     /// <summary>
     ///     Selects persian as the default language for control labels.
     /// </summary>
     /// <returns>The next stage in the building process.</returns>
-    IBuildingStage UsePersian();
+    IThreadingStage UsePersian();
 
     /// <summary>
     ///     Selects russian as the default language for control labels.
     /// </summary>
     /// <returns>The next stage in the building process.</returns>
-    IBuildingStage UseRussian();
+    IThreadingStage UseRussian();
 
     /// <summary>
     ///     Selects a custom language as the default language for control labels.
     /// </summary>
     /// <returns>The next stage in the building process.</returns>
-    IBuildingStage Custom(Localization language);
+    IThreadingStage Custom(Localization language);
 }
