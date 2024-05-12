@@ -16,6 +16,10 @@ public sealed class CallbackDataTooLongException : Exception
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="current_callback_bytes">The amount of callback bytes generated.</param>
     public CallbackDataTooLongException(int current_callback_bytes) : base(getMessage(current_callback_bytes), _innerException)
     {
 
