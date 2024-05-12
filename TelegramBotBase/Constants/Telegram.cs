@@ -16,4 +16,9 @@ public static class Telegram
     public const int MaxReplyKeyboardCols = 12;
 
     public const int MessageDeletionsPerSecond = 30;
+
+    /// <summary>
+    /// The maximum length of callback data. Will raise an exception of it exceeds it.
+    /// </summary>
+    public const int MaxCallBackDataBytes = 64;
 }
