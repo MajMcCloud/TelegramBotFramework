@@ -72,7 +72,7 @@ public class FullMessageLoop : IMessageLoopFactory
         }
 
         //Action Event
-        if (!session.FormSwitched && mr.IsAction)
+        if (!session.FormSwitched && mr.IsAction && !mr.Handled)
         {
             //Send Action event to controls
             await activeForm.ActionControls(mr);
