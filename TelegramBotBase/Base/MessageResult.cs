@@ -63,6 +63,11 @@ public class MessageResult : ResultBase
     public bool IsBotCommand => MessageText.StartsWith("/");
 
     /// <summary>
+    /// Is this a bot command sent from a group via @BotId ?
+    /// </summary>
+    public bool IsBotGroupCommand => IsBotCommand && MessageText.Contains("@");
+
+    /// <summary>
     ///     Returns a List of all parameters which has been sent with the command itself (i.e. /start 123 456 789 =>
     ///     123,456,789)
     /// </summary>
@@ -87,12 +92,17 @@ public class MessageResult : ResultBase
     {
         get
         {
-            if (!IsBotCommand)
+            if (IsBotGroupCommand)
             {
-                return null;
+                return MessageText.Substring(0, MessageText.LastIndexOf('@')).Split(' ')[0];
             }
 
-            return MessageText.Split(' ')[0];
+            if (IsBotCommand)
+            {
+                return MessageText.Split(' ')[0];
+            }
+
+            return null;
         }
     }
 
