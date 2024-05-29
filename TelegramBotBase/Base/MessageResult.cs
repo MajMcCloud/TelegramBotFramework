@@ -21,7 +21,7 @@ public class MessageResult : ResultBase
     {
         IsAction = UpdateData.CallbackQuery != null;
 
-        IsBotCommand = UpdateData.Message.Entities.Any(a => a.Type == MessageEntityType.BotCommand);
+        IsBotCommand = Message.Entities?.Any(a => a.Type == MessageEntityType.BotCommand) ?? false;
 
         if (!IsBotCommand)
             return;
@@ -34,8 +34,6 @@ public class MessageResult : ResultBase
         {
             BotCommand = BotCommand.Substring(0, BotCommand.LastIndexOf('@'));
         }
-
-        
     }
 
     public Update UpdateData { get; private set; }
