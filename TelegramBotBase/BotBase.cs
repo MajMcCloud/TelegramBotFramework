@@ -197,13 +197,10 @@ public sealed class BotBase
     /// <param name="deviceId">Contains the device/chat id of the device to update.</param>
     public async Task InvokeMessageLoop(long deviceId)
     {
-        var mr = new MessageResult
+        var mr = new MessageResult(new Update
         {
-            UpdateData = new Update
-            {
-                Message = new Message()
-            }
-        };
+            Message = new Message()
+        });
 
         await InvokeMessageLoop(deviceId, mr);
     }

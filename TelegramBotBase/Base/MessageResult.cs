@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -9,16 +10,35 @@ namespace TelegramBotBase.Base;
 
 public class MessageResult : ResultBase
 {
-    internal MessageResult()
-    {
-    }
-
     public MessageResult(Update update)
     {
         UpdateData = update;
+
+        init();
     }
 
-    public Update UpdateData { get; set; }
+    void init()
+    {
+        IsAction = UpdateData.CallbackQuery != null;
+
+        IsBotCommand = UpdateData.Message.Entities.Any(a => a.Type == MessageEntityType.BotCommand);
+
+        if (!IsBotCommand)
+            return;
+
+        BotCommand = MessageText.Split(' ')[0];
+
+        IsBotGroupCommand = BotCommand.Contains("@");
+
+        if (IsBotGroupCommand)
+        {
+            BotCommand = BotCommand.Substring(0, BotCommand.LastIndexOf('@'));
+        }
+
+        
+    }
+
+    public Update UpdateData { get; private set; }
 
     /// <summary>
     ///     Returns the Device/ChatId
@@ -55,17 +75,17 @@ public class MessageResult : ResultBase
     /// <summary>
     ///     Is this an action ? (i.e. button click)
     /// </summary>
-    public bool IsAction => UpdateData.CallbackQuery != null;
+    public bool IsAction { get; private set; }
 
     /// <summary>
     ///     Is this a command ? Starts with a slash '/' and a command
     /// </summary>
-    public bool IsBotCommand => MessageText.StartsWith("/");
+    public bool IsBotCommand { get; private set; }
 
     /// <summary>
     /// Is this a bot command sent from a group via @BotId ?
     /// </summary>
-    public bool IsBotGroupCommand => IsBotCommand && MessageText.Contains("@");
+    public bool IsBotGroupCommand { get; private set; }
 
     /// <summary>
     ///     Returns a List of all parameters which has been sent with the command itself (i.e. /start 123 456 789 =>
@@ -88,23 +108,7 @@ public class MessageResult : ResultBase
     /// <summary>
     ///     Returns just the command (i.e. /start 1 2 3 => /start)
     /// </summary>
-    public string BotCommand
-    {
-        get
-        {
-            if (IsBotGroupCommand)
-            {
-                return MessageText.Substring(0, MessageText.LastIndexOf('@')).Split(' ')[0];
-            }
-
-            if (IsBotCommand)
-            {
-                return MessageText.Split(' ')[0];
-            }
-
-            return null;
-        }
-    }
+    public string BotCommand { get; private set; }
 
     /// <summary>
     ///     Returns if this message will be used on the first form or not.
