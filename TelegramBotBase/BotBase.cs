@@ -265,7 +265,7 @@ public sealed class BotBase
     {
         foreach (var scope in BotCommandScopes)
         {
-            if (scope.Value.Any(a => "/" + a.Command == command))
+            if (scope.Value.Any(a => Constants.Telegram.BotCommandIndicator + a.Command == command))
             {
                 return true;
             }
