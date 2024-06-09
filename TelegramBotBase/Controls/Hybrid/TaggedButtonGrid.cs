@@ -67,7 +67,24 @@ public class TaggedButtonGrid : MultiView
         DataSource = new ButtonFormDataSource(form);
     }
 
-    public string Title { get; set; } = Default.Language["ButtonGrid_Title"];
+    string m_Title = Default.Language["ButtonGrid_Title"];
+
+    public string Title
+    {
+        get
+        {
+            return m_Title;
+        }
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException($"{nameof(Title)}", $"{nameof(Title)} property must have been a value unequal to null/empty");
+            }
+
+            m_Title = value;
+        }
+    }
 
     public string ConfirmationText { get; set; }
 

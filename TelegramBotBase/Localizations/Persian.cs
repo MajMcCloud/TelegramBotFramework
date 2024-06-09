@@ -34,6 +34,7 @@ public sealed class Persian : Localization
         Values["ToggleButton_Changed"] = "تنظیمات تغییر کرد";
         Values["ButtonGrid_SearchIcon"] = "🔍";
         Values["TaggedButtonGrid_TagIcon"] = "📁";
+        Values["Label_Text"] = "متن برچسب پیش‌فرض";
     }
 }
 

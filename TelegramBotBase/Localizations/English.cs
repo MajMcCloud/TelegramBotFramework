@@ -34,5 +34,6 @@ public sealed class English : Localization
         Values["ToggleButton_Changed"] = "Setting changed";
         Values["ButtonGrid_SearchIcon"] = "🔍";
         Values["TaggedButtonGrid_TagIcon"] = "📁";
+        Values["Label_Text"] = "Default label text";
     }
 }

@@ -51,7 +51,24 @@ public class ButtonGrid : ControlBase
         DataSource = new ButtonFormDataSource(form);
     }
 
-    public string Title { get; set; } = Default.Language["ButtonGrid_Title"];
+    string m_Title = Default.Language["ButtonGrid_Title"];
+
+    public string Title
+    {
+        get
+        {
+            return m_Title;
+        }
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException($"{nameof(Title)}", $"{nameof(Title)} property must have been a value unequal to null/empty");
+            }
+
+            m_Title = value;
+        }
+    }
 
     public string ConfirmationText { get; set; } = "";
 
@@ -340,14 +357,14 @@ public class ButtonGrid : ControlBase
         }
 
 
-        //var button = HeadLayoutButtonRow?. .FirstOrDefault(a => a.Text.Trim() == result.MessageText)
-        //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText);
+    //var button = HeadLayoutButtonRow?. .FirstOrDefault(a => a.Text.Trim() == result.MessageText)
+    //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Text.Trim() == result.MessageText);
 
-        // bf.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText)
+    // bf.ToList().FirstOrDefault(a => a.Text.Trim() == result.MessageText)
 
-        //var index = bf.FindRowByButton(button);
+    //var index = bf.FindRowByButton(button);
 
-        check:
+    check:
 
         //Remove button click message
         if (DeleteReplyMessage)
@@ -449,15 +466,15 @@ public class ButtonGrid : ControlBase
         }
 
 
-        //var bf = DataSource.ButtonForm;
+    //var bf = DataSource.ButtonForm;
 
-        //var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-        //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
-        //            ?? bf.ToList().FirstOrDefault(a => a.Value == result.RawData);
+    //var button = HeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
+    //            ?? SubHeadLayoutButtonRow?.FirstOrDefault(a => a.Value == result.RawData)
+    //            ?? bf.ToList().FirstOrDefault(a => a.Value == result.RawData);
 
-        //var index = bf.FindRowByButton(button);
+    //var index = bf.FindRowByButton(button);
 
-        check:
+    check:
         if (match != null)
         {
             await result.ConfirmAction(ConfirmationText ?? "");
@@ -506,13 +523,13 @@ public class ButtonGrid : ControlBase
                 if (DataSource.RowCount > Constants.Telegram.MaxInlineKeyBoardRows && !EnablePaging)
                 {
                     throw new MaximumRowsReachedException
-                        { Value = DataSource.RowCount, Maximum = Constants.Telegram.MaxInlineKeyBoardRows };
+                    { Value = DataSource.RowCount, Maximum = Constants.Telegram.MaxInlineKeyBoardRows };
                 }
 
                 if (DataSource.ColumnCount > Constants.Telegram.MaxInlineKeyBoardCols)
                 {
                     throw new MaximumColsException
-                        { Value = DataSource.ColumnCount, Maximum = Constants.Telegram.MaxInlineKeyBoardCols };
+                    { Value = DataSource.ColumnCount, Maximum = Constants.Telegram.MaxInlineKeyBoardCols };
                 }
 
                 break;
@@ -522,13 +539,13 @@ public class ButtonGrid : ControlBase
                 if (DataSource.RowCount > Constants.Telegram.MaxReplyKeyboardRows && !EnablePaging)
                 {
                     throw new MaximumRowsReachedException
-                        { Value = DataSource.RowCount, Maximum = Constants.Telegram.MaxReplyKeyboardRows };
+                    { Value = DataSource.RowCount, Maximum = Constants.Telegram.MaxReplyKeyboardRows };
                 }
 
                 if (DataSource.ColumnCount > Constants.Telegram.MaxReplyKeyboardCols)
                 {
                     throw new MaximumColsException
-                        { Value = DataSource.ColumnCount, Maximum = Constants.Telegram.MaxReplyKeyboardCols };
+                    { Value = DataSource.ColumnCount, Maximum = Constants.Telegram.MaxReplyKeyboardCols };
                 }
 
                 break;
@@ -693,7 +710,7 @@ public class ButtonGrid : ControlBase
             Updated();
         }
         else
-            //Remove event handler
+        //Remove event handler
         {
             Device.MessageDeleted -= Device_MessageDeleted;
         }

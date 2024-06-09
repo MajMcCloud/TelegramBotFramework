@@ -34,5 +34,6 @@ public sealed class Russian : Localization
         Values["ToggleButton_Changed"] = "Настройки изменены";
         Values["ButtonGrid_SearchIcon"] = "🔍";
         Values["TaggedButtonGrid_TagIcon"] = "📁";
+        Values["Label_Text"] = "Текст метки по умолчанию";
     }
 }

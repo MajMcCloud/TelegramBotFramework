@@ -16,7 +16,7 @@ public class Label : ControlBase
 {
     private bool _renderNecessary = true;
 
-    private string _text = string.Empty;
+    private string _text = Default.Language["Label_Text"];
 
     public String Text
     {
@@ -29,12 +29,18 @@ public class Label : ControlBase
             if (_text == value)
                 return;
 
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException($"{nameof(Text)}", $"{nameof(Text)} property must have been a value unequal to null/empty");
+            }
 
             _text = value;
             _renderNecessary = true;
 
         }
     }
+
+
 
     private ParseMode _parseMode = ParseMode.Markdown;
 
