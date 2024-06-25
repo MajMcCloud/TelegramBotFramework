@@ -16,6 +16,7 @@ namespace BotAndWebApplication.BotStuff.Tasks
                                 .DefaultCommands()
                                 .NoSerialization()
                                 .UseEnglish()
+                                .UseThreadPool()
                                 .Build();
         }
 
