@@ -34,5 +34,6 @@ public sealed class German : Localization
         Values["ToggleButton_Changed"] = "Einstellung geändert";
         Values["ButtonGrid_SearchIcon"] = "🔍";
         Values["TaggedButtonGrid_TagIcon"] = "📁";
+        Values["Label_Text"] = "Standard Label Text";
     }
 }

@@ -36,7 +36,31 @@ public class ToggleButton : ControlBase
 
     public string ChangedString { get; set; } = Default.Language["ToggleButton_Changed"];
 
-    public string Title { get; set; } = Default.Language["ToggleButton_Title"];
+    private string _title = Default.Language["ToggleButton_Title"];
+
+    public String Title
+    {
+        get
+        {
+            return _title;
+        }
+        set
+        {
+            if (_title == value)
+                return;
+
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException($"{nameof(Title)}", $"{nameof(Title)} property must have been a value unequal to null/empty");
+            }
+
+            _title = value;
+            _renderNecessary = true;
+
+        }
+    }
+
+
 
     public int? MessageId { get; set; }
 

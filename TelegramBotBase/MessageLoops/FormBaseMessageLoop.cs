@@ -79,13 +79,16 @@ public class FormBaseMessageLoop : IMessageLoopFactory
         }
 
         //Action Event
-        if (!session.FormSwitched && mr.IsAction)
+        if (!session.FormSwitched && mr.IsAction && !mr.Handled)
         {
             //Send Action event to controls
             await activeForm.ActionControls(mr);
 
-            //Send Action event to form itself
-            await activeForm.Action(mr);
+            if (!mr.Handled)
+            {
+                //Send Action event to form itself, if not already handled by a control
+                await activeForm.Action(mr);
+            }
 
             if (!mr.Handled)
             {

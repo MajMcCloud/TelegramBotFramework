@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
+using TelegramBotBase.Exceptions;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 using Console = TelegramBotBase.Tools.Console;
@@ -139,6 +140,13 @@ public sealed class BotBase
                 mr.IsFirstHandler = false;
             } while (ds.FormSwitched && i < GetSetting(ESettings.NavigationMaximum, 10));
         }
+        catch (InvalidServiceProviderConfiguration ex)
+        {
+            var ds = Sessions.GetSession(e.DeviceId);
+            OnException(new SystemExceptionEventArgs(e.Message.Text, e.DeviceId, ds, ex));
+
+            throw;
+        }
         catch (Exception ex)
         {
             var ds = Sessions.GetSession(e.DeviceId);
@@ -189,13 +197,10 @@ public sealed class BotBase
     /// <param name="deviceId">Contains the device/chat id of the device to update.</param>
     public async Task InvokeMessageLoop(long deviceId)
     {
-        var mr = new MessageResult
+        var mr = new MessageResult(new Update
         {
-            UpdateData = new Update
-            {
-                Message = new Message()
-            }
-        };
+            Message = new Message()
+        });
 
         await InvokeMessageLoop(deviceId, mr);
     }
@@ -260,7 +265,7 @@ public sealed class BotBase
     {
         foreach (var scope in BotCommandScopes)
         {
-            if (scope.Value.Any(a => "/" + a.Command == command))
+            if (scope.Value.Any(a => Constants.Telegram.BotCommandIndicator + a.Command == command))
             {
                 return true;
             }
