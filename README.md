@@ -916,7 +916,7 @@ datatype and one for implementing into a form which should be invoked with event
 #### IStateMachine
 
 Is the basic StateMachine interface, it has two methods `SaveFormStates(SaveStatesEventArgs e)`
-and `StateContainerLoadFormStates()`, nothing fancy, just simple calls. Implement both methods with your own
+and `LoadFormStates()`, nothing fancy, just simple calls. Implement both methods with your own
 serialization process.
 
 ```csharp
