@@ -73,14 +73,14 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBuildingStage QuickStart(string apiKey, Type startForm)
+    public IBuildingStage QuickStart(string apiKey, Type startForm, bool throwPendingUpdates = false)
     {
         _apiKey = apiKey;
         _factory = new DefaultStartFormFactory(startForm);
 
         DefaultMessageLoop();
 
-        NoProxy();
+        NoProxy(throwPendingUpdates);
 
         OnlyStart();
 
@@ -94,7 +94,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBuildingStage QuickStart<T>(string apiKey)
+    public IBuildingStage QuickStart<T>(string apiKey, bool throwPendingUpdates = false)
         where T : FormBase
     {
         _apiKey = apiKey;
@@ -102,7 +102,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultMessageLoop();
 
-        NoProxy();
+        NoProxy(throwPendingUpdates);
 
         OnlyStart();
 
@@ -115,14 +115,14 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public IBuildingStage QuickStart(string apiKey, IStartFormFactory startFormFactory)
+    public IBuildingStage QuickStart(string apiKey, IStartFormFactory startFormFactory, bool throwPendingUpdates = false)
     {
         _apiKey = apiKey;
         _factory = startFormFactory;
 
         DefaultMessageLoop();
 
-        NoProxy();
+        NoProxy(throwPendingUpdates);
 
         OnlyStart();
 
