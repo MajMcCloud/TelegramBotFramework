@@ -14,6 +14,8 @@
 
 **Releases: [GitHub](https://github.com/MajMcCloud/TelegramBotFramework/releases)**
 
+**Need your own bot? Get in touch https://t.me/botbasebuilder**
+
 ## Donate
 
 Paypal: [https://paypal.me/majmccloud](https://paypal.me/majmccloud)
