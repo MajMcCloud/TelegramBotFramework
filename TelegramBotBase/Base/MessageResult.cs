@@ -21,6 +21,9 @@ public class MessageResult : ResultBase
     {
         IsAction = UpdateData.CallbackQuery != null;
 
+        if (Message == null)
+            return;
+
         IsBotCommand = Message.Entities?.Any(a => a.Type == MessageEntityType.BotCommand) ?? false;
 
         if (!IsBotCommand)
