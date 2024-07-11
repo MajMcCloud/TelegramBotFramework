@@ -60,4 +60,9 @@
         <PackageReference Include="Telegram.Bot" Version="19.0.0" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <ProjectReference Include="..\TelegramBotBase.SourceGenerators\TelegramBotBase.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" TargetFramework="netstandard2.0"  />
+    </ItemGroup>
+
 </Project>
