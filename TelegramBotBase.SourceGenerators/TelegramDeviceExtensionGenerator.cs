@@ -36,6 +36,7 @@ namespace TelegramBotBase
             StringBuilder sb = new StringBuilder();
             sb.AppendLine();
 
+            //Search for reference library
             var telegram_package = compilation.References.FirstOrDefault(a => a.Display != null && a.Display.Contains("Telegram.Bot"));
             if (telegram_package == null)
                 return;
@@ -48,25 +49,24 @@ namespace TelegramBotBase
             if (assemblySymbol.Name != "Telegram.Bot")
                 return;
 
+            //Get class which includes the existing methods
             var apiClass = assemblySymbol.GetTypeByMetadataName("Telegram.Bot.TelegramBotClientExtensions");
             if (apiClass == null)
                 return;
 
+            //Get existing list of methods
             var methods = apiClass.GetMembers().OfType<IMethodSymbol>().ToList();
 
             foreach (var method in methods)
             {
                 if (!method.Parameters.Any(a => a.Type.Name == "ITelegramBotClient"))
-                {
                     continue;
-                }
 
                 if (!method.Parameters.Any(a => a.Type.Name == "ChatId"))
-                {
                     continue;
-                }
 
-                if (method.Name == ".ctor") continue;
+                if (method.Name == ".ctor") 
+                    continue;
 
                 String parameters = "";
                 String subCallParameters = "";
@@ -126,7 +126,7 @@ namespace TelegramBotBase
 
 
 
-            // Der generierte Code
+            //The generated source
             var sourceCode = $$"""
             using System;
             using System.Threading.Tasks;
@@ -151,13 +151,9 @@ namespace TelegramBotBase
             """;
 
             //Cleanup
-
             sourceCode = sourceCode.Replace("System.Threading.Tasks.", "");
-            //sourceCode = sourceCode.Replace("Telegram.Bot.", "");
-            //sourceCode = sourceCode.Replace("Telegram.Bot.Types.", "");
 
 
-            // Fügen Sie den generierten Code der Compilation hinzu
             context.AddSource("DeviceExtensions.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
 
         }
