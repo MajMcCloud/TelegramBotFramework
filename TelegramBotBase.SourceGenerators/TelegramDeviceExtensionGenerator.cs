@@ -34,6 +34,7 @@ namespace TelegramBotBase
             //if (!Debugger.IsAttached) Debugger.Launch();
 
             StringBuilder sb = new StringBuilder();
+            sb.AppendLine();
 
             var telegram_package = compilation.References.FirstOrDefault(a => a.Display != null && a.Display.Contains("Telegram.Bot"));
             if (telegram_package == null)
@@ -116,18 +117,9 @@ namespace TelegramBotBase
                     returnStatement = "return ";
                 }
 
-                sb.AppendLine($$""""
-                    
+                String tmp = GenerateMethod(method, parameters, subCallParameters, returnStatement);
 
-                            public static async {{method.ReturnType.ToDisplayString()}} {{method.Name}}(this DeviceSession device, {{parameters}}){
-                    
-                    
-                                {{returnStatement}} device.Client.TelegramClient.{{method.Name}}({{subCallParameters}});
-                            }
-                                        
-                    
-                            """");
-
+                sb.Append(tmp);
 
             }
 
@@ -170,5 +162,21 @@ namespace TelegramBotBase
 
         }
 
+        private static String GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this DeviceSession device, {parameters})");
+
+            sb.AppendLine($"    {{");
+
+            sb.AppendLine($"        {returnStatement} device.Client.TelegramClient.{method.Name}({subCallParameters});");
+
+            sb.AppendLine($"    }}");
+
+            sb.AppendLine();
+
+            return sb.ToString();
+        }
     }
 }
