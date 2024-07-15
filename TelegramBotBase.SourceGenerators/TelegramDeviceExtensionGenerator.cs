@@ -19,7 +19,7 @@ namespace TelegramBotBase
     [Generator(LanguageNames.CSharp)]
     public class TelegramDeviceExtensionGenerator : IIncrementalGenerator
     {
-        XmlDocumentationLoader xml;
+        static XmlDocumentationLoader xml;
 
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
