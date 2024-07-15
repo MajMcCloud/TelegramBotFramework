@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using TelegramBotBase.SourceGenerators;
 
 namespace TelegramBotBase
 {
@@ -14,6 +19,8 @@ namespace TelegramBotBase
     [Generator(LanguageNames.CSharp)]
     public class TelegramDeviceExtensionGenerator : IIncrementalGenerator
     {
+        XmlDocumentationLoader xml;
+
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -27,7 +34,10 @@ namespace TelegramBotBase
 
             context.RegisterSourceOutput(compilation, (spc, source) => Execute(spc, source));
 
+
+
         }
+
 
         private void Execute(SourceProductionContext context, Compilation compilation)
         {
@@ -40,6 +50,15 @@ namespace TelegramBotBase
             var telegram_package = compilation.References.FirstOrDefault(a => a.Display != null && a.Display.Contains("Telegram.Bot"));
             if (telegram_package == null)
                 return;
+
+
+
+            //Load only once
+            if (xml == null)
+            {
+                xml = new XmlDocumentationLoader();
+                xml.ReadEmbeddedXml("Telegram.Bot.xml");
+            }
 
             var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(telegram_package) as IAssemblySymbol;
 
@@ -57,6 +76,7 @@ namespace TelegramBotBase
             //Get existing list of methods
             var methods = apiClass.GetMembers().OfType<IMethodSymbol>().ToList();
 
+
             foreach (var method in methods)
             {
                 if (!method.Parameters.Any(a => a.Type.Name == "ITelegramBotClient"))
@@ -65,7 +85,7 @@ namespace TelegramBotBase
                 if (!method.Parameters.Any(a => a.Type.Name == "ChatId"))
                     continue;
 
-                if (method.Name == ".ctor") 
+                if (method.Name == ".ctor")
                     continue;
 
                 String parameters = "";
@@ -158,9 +178,22 @@ namespace TelegramBotBase
 
         }
 
-        private static String GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
+        /// <summary>
+        /// Test
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="parameters"></param>
+        /// <param name="subCallParameters"></param>
+        /// <param name="returnStatement"></param>
+        /// <returns></returns>
+        private String GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
         {
+            //Adding xml comments from embedded xml file (Workaround)
+            String xml_comments = xml?.GetDocumentationLinesForSymbol(method);
+
             StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(xml_comments);
 
             sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this DeviceSession device, {parameters})");
 
@@ -169,6 +202,8 @@ namespace TelegramBotBase
             sb.AppendLine($"        {returnStatement} device.Client.TelegramClient.{method.Name}({subCallParameters});");
 
             sb.AppendLine($"    }}");
+
+            sb.AppendLine();
 
             sb.AppendLine();
 
