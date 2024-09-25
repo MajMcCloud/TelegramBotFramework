@@ -1,4 +1,5 @@
-﻿using TelegramBotBase.Interfaces;
+﻿using System;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Builder.Interfaces;
 
@@ -39,6 +40,7 @@ public interface ISessionSerializationStage
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
+    [Obsolete("Use UseJSON instead.")]
     ILanguageSelectionStage UseSimpleJSON();
 
     /// <summary>
@@ -46,6 +48,7 @@ public interface ISessionSerializationStage
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
+    [Obsolete("Use UseJSON instead.")]
     ILanguageSelectionStage UseSimpleJSON(string path);
 
     /// <summary>

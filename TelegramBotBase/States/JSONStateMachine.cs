@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Newtonsoft.Json;
+using System.Text.Json;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
@@ -48,11 +48,15 @@ public class JsonStateMachine : IStateMachine
         {
             var content = File.ReadAllText(FilePath);
 
-            var sc = JsonConvert.DeserializeObject<StateContainer>(content, new JsonSerializerSettings
+            var options = new JsonSerializerOptions
             {
-                TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple
-            });
+                Converters = { 
+                    new Converter.DictionaryObjectJsonConverter(),
+                    new Converter.JsonTypeConverter()
+                }
+            };
+
+            var sc = JsonSerializer.Deserialize<StateContainer>(content, options);
 
             return sc;
         }
@@ -77,11 +81,16 @@ public class JsonStateMachine : IStateMachine
 
         try
         {
-            var content = JsonConvert.SerializeObject(e.States, Formatting.Indented, new JsonSerializerSettings
+            var options = new JsonSerializerOptions
             {
-                TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple
-            });
+                WriteIndented = true,
+                Converters = {
+                    new Converter.DictionaryObjectJsonConverter(),
+                    new Converter.JsonTypeConverter()
+                }
+            };
+
+            var content = JsonSerializer.Serialize(e.States, options);
 
             File.WriteAllText(FilePath, content);
         }

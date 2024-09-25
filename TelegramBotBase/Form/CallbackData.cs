@@ -1,16 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using System.Text;
 using TelegramBotBase.Exceptions;
+using System.Text.Json.Serialization;
 
 namespace TelegramBotBase.Form;
 
 /// <summary>
-///     Base class for serializing buttons and data
+/// Base class for serializing buttons and data
 /// </summary>
 public class CallbackData
 {
     public CallbackData()
     {
+
     }
 
     public CallbackData(string method, string value)
@@ -19,9 +21,9 @@ public class CallbackData
         Value = value;
     }
 
-    [JsonProperty("m")] public string Method { get; set; }
+    [JsonPropertyName("m")] public string Method { get; set; }
 
-    [JsonProperty("v")] public string Value { get; set; }
+    [JsonPropertyName("v")] public string Value { get; set; }
 
     public static string Create(string method, string value)
     {
@@ -36,7 +38,7 @@ public class CallbackData
     {
         var s = string.Empty;
 
-        s = JsonConvert.SerializeObject(this);
+        s = JsonSerializer.Serialize(this);
 
         //Is data over 64 bytes ?
         int byte_count = Encoding.UTF8.GetByteCount(s);
@@ -55,7 +57,7 @@ public class CallbackData
     /// <returns></returns>
     public static CallbackData Deserialize(string data)
     {
-        return JsonConvert.DeserializeObject<CallbackData>(data);
+        return JsonSerializer.Deserialize<CallbackData>(data);
     }
 
     public static implicit operator string(CallbackData callbackData) => callbackData.Serialize(true);
