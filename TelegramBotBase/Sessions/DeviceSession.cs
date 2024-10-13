@@ -312,7 +312,7 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo"></param>
     /// <param name="disableNotification"></param>
     /// <returns></returns>
-    public async Task<Message> Send(string text, ReplyMarkupBase markup, int replyTo = 0,
+    public async Task<Message> Send(string text, IReplyMarkup markup, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
     {
