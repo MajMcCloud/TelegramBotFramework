@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.DataSources;
 using TelegramBotBase.Form;
@@ -36,7 +36,7 @@ public class CustomDataSource : ButtonFormDataSource
         {
             try
             {
-                var list = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText("countries.json"));
+                var list = JsonSerializer.Deserialize<List<string>>(File.ReadAllText("countries.json"));
 
 
                 Countries = list;
@@ -56,7 +56,7 @@ public class CustomDataSource : ButtonFormDataSource
 
             Countries = countries;
 
-            var tmp = JsonConvert.SerializeObject(countries);
+            var tmp = JsonSerializer.Serialize(countries);
 
             File.WriteAllText(AppContext.BaseDirectory + "countries.json", tmp);
         }
