@@ -187,6 +187,7 @@ namespace TelegramBotBase
             var sourceCode = $$"""
             using System;
             using System.Threading.Tasks;
+            using TelegramBotBase.Interfaces;
             using TelegramBotBase.Sessions;
             using Telegram.Bot;
             using Telegram.Bot.Extensions;
@@ -232,7 +233,7 @@ namespace TelegramBotBase
 
             sb.AppendLine(xml_comments);
 
-            sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this DeviceSession device, {parameters})");
+            sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this IDeviceSession device, {parameters})");
 
             sb.AppendLine($"    {{");
 

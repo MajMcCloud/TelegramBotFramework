@@ -21,7 +21,7 @@ public class SessionManager
     public SessionManager(BotBase botBase)
     {
         BotBase = botBase;
-        SessionList = new Dictionary<long, DeviceSession>();
+        SessionList = new Dictionary<long, IDeviceSession>();
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class SessionManager
     /// <summary>
     ///     A list of all active sessions.
     /// </summary>
-    public Dictionary<long, DeviceSession> SessionList { get; set; }
+    public Dictionary<long, IDeviceSession> SessionList { get; set; }
 
 
     /// <summary>
@@ -45,7 +45,7 @@ public class SessionManager
     /// </summary>
     /// <param name="deviceId"></param>
     /// <returns></returns>
-    public DeviceSession GetSession(long deviceId)
+    public IDeviceSession GetSession(long deviceId)
     {
         var ds = SessionList.FirstOrDefault(a => a.Key == deviceId).Value ?? null;
         return ds;
@@ -57,7 +57,7 @@ public class SessionManager
     /// <typeparam name="T"></typeparam>
     /// <param name="deviceId"></param>
     /// <returns></returns>
-    public async Task<DeviceSession> StartSession(long deviceId)
+    public async Task<IDeviceSession> StartSession(long deviceId)
     {
         var start = BotBase.StartFormFactory.CreateForm();
 
@@ -91,7 +91,7 @@ public class SessionManager
     ///     Returns all active User Sessions.
     /// </summary>
     /// <returns></returns>
-    public List<DeviceSession> GetUserSessions()
+    public List<IDeviceSession> GetUserSessions()
     {
         return SessionList.Where(a => a.Key > 0).Select(a => a.Value).ToList();
     }
@@ -100,7 +100,7 @@ public class SessionManager
     ///     Returns all active Group Sessions.
     /// </summary>
     /// <returns></returns>
-    public List<DeviceSession> GetGroupSessions()
+    public List<IDeviceSession> GetGroupSessions()
     {
         return SessionList.Where(a => a.Key < 0).Select(a => a.Value).ToList();
     }

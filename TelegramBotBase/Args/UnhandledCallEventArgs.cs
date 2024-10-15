@@ -1,6 +1,6 @@
 ﻿using System;
 using Telegram.Bot.Types;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Args;
 
@@ -12,7 +12,7 @@ public class UnhandledCallEventArgs : EventArgs
     }
 
     public UnhandledCallEventArgs(string command, string rawData, long deviceId, int messageId, Message message,
-                                  DeviceSession device) : this()
+                                  IDeviceSession device) : this()
     {
         Command = command;
         RawData = rawData;
@@ -26,7 +26,7 @@ public class UnhandledCallEventArgs : EventArgs
 
     public long DeviceId { get; set; }
 
-    public DeviceSession Device { get; set; }
+    public IDeviceSession Device { get; set; }
 
     public string RawData { get; set; }
 

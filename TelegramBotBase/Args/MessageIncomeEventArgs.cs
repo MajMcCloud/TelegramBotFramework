@@ -1,11 +1,11 @@
 ﻿using System;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Base;
 
 public class MessageIncomeEventArgs : EventArgs
 {
-    public MessageIncomeEventArgs(long deviceId, DeviceSession device, MessageResult message)
+    public MessageIncomeEventArgs(long deviceId, IDeviceSession device, MessageResult message)
     {
         DeviceId = deviceId;
         Device = device;
@@ -14,7 +14,7 @@ public class MessageIncomeEventArgs : EventArgs
 
     public long DeviceId { get; set; }
 
-    public DeviceSession Device { get; set; }
+    public IDeviceSession Device { get; set; }
 
     public MessageResult Message { get; set; }
 }

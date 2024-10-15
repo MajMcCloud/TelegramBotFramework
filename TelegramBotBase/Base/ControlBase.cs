@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Base;
 
@@ -8,7 +8,7 @@ namespace TelegramBotBase.Base;
 /// </summary>
 public class ControlBase
 {
-    public DeviceSession Device { get; set; }
+    public IDeviceSession Device { get; set; }
 
     public int Id { get; set; }
 

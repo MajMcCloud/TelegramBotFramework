@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form.Navigation;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 using static TelegramBotBase.Base.Async;
 
 namespace TelegramBotBase.Form;
@@ -28,7 +28,7 @@ public class FormBase : IDisposable
 
     public NavigationController NavigationController { get; set; }
 
-    public DeviceSession Device { get; set; }
+    public IDeviceSession Device { get; set; }
 
     public MessageClient Client { get; set; }
 

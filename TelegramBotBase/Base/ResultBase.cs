@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Base;
 
 public class ResultBase : EventArgs
 {
-    public DeviceSession Device { get; set; }
+    public IDeviceSession Device { get; set; }
 
     public virtual long DeviceId { get; set; }
 
