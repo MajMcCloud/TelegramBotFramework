@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Resources;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -105,15 +106,51 @@ namespace TelegramBotBase
                         subCallParameters += ", ";
                     }
 
-                    if (par.Name != "chatId")
-                    {
-                        subCallParameters += $"{par.Name}";
-                        parameters += $"{par.Type.ToDisplayString()} {par.Name}";
-                    }
-                    else
+                    if (par.Name == "chatId")
                     {
                         subCallParameters += $"device.DeviceId";
+                        continue;
                     }
+
+                    subCallParameters += $"{par.Name}";
+                    parameters += $"{par.Type.ToDisplayString()} {par.Name}";
+
+                    if (par.HasExplicitDefaultValue)
+                    {
+                        var defaultValue = par.ExplicitDefaultValue;
+
+                        // Handle specific default value cases
+                        if (defaultValue == null)
+                        {
+                            if(par.Name == "cancellationToken")
+                            {
+                                parameters += " = default";
+                            }
+                            else
+                            {
+                                parameters += " = null";
+                            }
+
+                            
+                        }
+                        else if (defaultValue is string)
+                        {
+                            parameters += $" = \"{defaultValue}\""; // Add quotes around string default values
+                        }
+                        else if (defaultValue is bool)
+                        {
+                            parameters += $" = {defaultValue.ToString().ToLower()}"; // Use lower case for booleans (true/false)
+                        }
+                        else if (defaultValue is char)
+                        {
+                            parameters += $" = '{defaultValue}'"; // Use single quotes for char
+                        }
+                        else
+                        {
+                            parameters += $" = {defaultValue}"; // General case for other types (numbers, enums, etc.)
+                        }
+                    }
+
 
                 }
 
