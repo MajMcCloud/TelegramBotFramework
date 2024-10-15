@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBotBase.Form;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Extensions.Images
 {
@@ -27,7 +27,7 @@ namespace TelegramBotBase.Extensions.Images
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public static async Task<Message> SendPhoto(this DeviceSession session, Image image, string name,
+        public static async Task<Message> SendPhoto(this IDeviceSession session, Image image, string name,
                                                     string caption, ButtonForm buttons = null, int replyTo = 0,
                                                     bool disableNotification = false)
         {
@@ -48,7 +48,7 @@ namespace TelegramBotBase.Extensions.Images
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public static async Task<Message> SendPhoto(this DeviceSession session, Bitmap image, string name,
+        public static async Task<Message> SendPhoto(this IDeviceSession session, Bitmap image, string name,
                                                     string caption, ButtonForm buttons = null, int replyTo = 0,
                                                     bool disableNotification = false)
         {
