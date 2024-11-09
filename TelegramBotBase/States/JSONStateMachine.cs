@@ -50,18 +50,22 @@ public class JsonStateMachine : IStateMachine
 
             var options = new JsonSerializerOptions
             {
-                Converters = { 
-                    new Converter.DictionaryObjectJsonConverter(),
-                    new Converter.JsonTypeConverter()
-                }
+                Converters = {
+                    new Converter.JsonTypeConverter(),
+                    //new Converter.DictionaryObjectJsonConverter(),
+                    
+                },
+                PropertyNameCaseInsensitive = true
             };
 
-            var sc = JsonSerializer.Deserialize<StateContainer>(content, options);
+            var obj = JsonSerializer.Deserialize<object>(content, options) ;
+            var sc = obj as StateContainer;
 
             return sc;
         }
-        catch
+        catch(Exception ex)
         {
+            throw ex;
         }
 
         return new StateContainer();
@@ -85,17 +89,19 @@ public class JsonStateMachine : IStateMachine
             {
                 WriteIndented = true,
                 Converters = {
-                    new Converter.DictionaryObjectJsonConverter(),
-                    new Converter.JsonTypeConverter()
-                }
+                    new Converter.JsonTypeConverter(),
+                },
+                 PropertyNameCaseInsensitive = true
             };
 
-            var content = JsonSerializer.Serialize(e.States, options);
+            var content = JsonSerializer.Serialize<object>(e.States, options);
 
             File.WriteAllText(FilePath, content);
         }
         catch
         {
+
+
         }
     }
 }
