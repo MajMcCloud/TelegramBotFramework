@@ -111,7 +111,7 @@ public class MessageClient
 
     public virtual void StopReceiving()
     {
-        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource?.Cancel();
     }
 
 

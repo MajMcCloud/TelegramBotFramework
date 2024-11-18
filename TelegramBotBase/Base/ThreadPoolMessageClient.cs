@@ -81,7 +81,7 @@ public class ThreadPoolMessageClient : MessageClient
 
     public override void StopReceiving()
     {
-        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource?.Cancel();
     }
 
 
