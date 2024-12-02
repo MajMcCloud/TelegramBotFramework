@@ -23,15 +23,32 @@ public interface ISessionSerializationStage
     ///     Using the complex version of .Net JSON, which can serialize all objects.
     ///     Saves in application directory.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Has been changed lately to not use Newtonsoft.Json anymore.
+    ///     For the legacy version add the nuget package below and use the <seealso cref="UseNewtonsoftJson"></seealso> method.
+    ///     </para>
+    ///     <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
+    /// </remarks>
     /// <param name="path"></param>
     /// <returns></returns>
+    /// <seealso cref="UseNewtonsoftJson"/>
     ILanguageSelectionStage UseJSON();
 
     /// <summary>
     ///     Using the complex version of .Net JSON, which can serialize all objects.
+    ///     Saves in application directory.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Has been changed lately to not use Newtonsoft.Json anymore.
+    ///     For the legacy version add the nuget package below and use the <seealso cref="UseNewtonsoftJson"></seealso> method.
+    ///     </para>
+    ///     <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
+    /// </remarks>
     /// <param name="path"></param>
     /// <returns></returns>
+    /// <seealso cref="UseNewtonsoftJson"/>
     ILanguageSelectionStage UseJSON(string path);
 
     /// <summary>
