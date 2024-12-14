@@ -224,7 +224,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)
             },
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -238,7 +238,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -252,7 +252,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -266,7 +266,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -279,7 +279,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -458,7 +458,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         c.ThreadPool_WorkerThreads = workerThreads;
         c.ThreadPool_IOThreads = ioThreads;
-        c.ThrowPendingUpdates = _client.ThrowPendingUpdates;
+        c.DropPendingUpdates = _client.DropPendingUpdates;
 
         _client = c;
 

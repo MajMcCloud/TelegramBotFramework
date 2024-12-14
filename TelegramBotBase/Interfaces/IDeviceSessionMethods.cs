@@ -23,7 +23,7 @@ namespace TelegramBotBase.Interfaces
 
         Task ChangeChatPermissions(ChatPermissions permissions);
 
-        Task RestrictUser(long userId, ChatPermissions permissions, bool? useIndependentGroupPermission = null, DateTime until = default);
+        Task RestrictUser(long userId, ChatPermissions permissions, bool useIndependentGroupPermission = false, DateTime until = default);
 
         Task ConfirmAction(string callbackQueryId, string message = "", bool showAlert = false,
                                     string urlToOpen = null);

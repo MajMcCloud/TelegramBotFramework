@@ -72,7 +72,7 @@ public class ThreadPoolMessageClient : MessageClient
 
         var receiverOptions = new ReceiverOptions();
 
-        receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
+        receiverOptions.DropPendingUpdates = DropPendingUpdates;
 
         ThreadPool.SetMaxThreads(ThreadPool_WorkerThreads, ThreadPool_IOThreads);
         

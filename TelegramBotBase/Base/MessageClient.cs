@@ -38,7 +38,7 @@ public class MessageClient
     //     should be set to not null, otherwise Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates
     //     will effectively be set to receive all Telegram.Bot.Types.Updates.
     /// </summary>
-    public bool ThrowPendingUpdates { get; set; }
+    public bool DropPendingUpdates { get; set; }
 
 
     public MessageClient(string apiKey)
@@ -103,7 +103,7 @@ public class MessageClient
 
         var receiverOptions = new ReceiverOptions();
 
-        receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
+        receiverOptions.DropPendingUpdates = DropPendingUpdates;
 
         TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, _cancellationTokenSource.Token);
     }
