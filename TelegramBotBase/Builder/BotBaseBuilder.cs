@@ -333,6 +333,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <summary>
     /// Uses the application runtime path to load and write a states.json file.
     /// </summary>
+    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// <returns></returns>
     public ILanguageSelectionStage UseJSON()
     {
@@ -344,6 +345,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <summary>
     /// Uses the given path to load and write a states.json file.
     /// </summary>
+    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// <returns></returns>
     public ILanguageSelectionStage UseJSON(string path)
     {
