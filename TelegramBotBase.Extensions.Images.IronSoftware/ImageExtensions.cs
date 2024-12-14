@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBotBase.Form;
+using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
 using static IronSoftware.Drawing.AnyBitmap;
 using SKImage = SixLabors.ImageSharp.Image;
@@ -37,7 +38,7 @@ namespace TelegramBotBase.Extensions.Images.IronSoftware
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public static async Task<Message> SendPhoto(this DeviceSession session, AnyBitmap image, string name,
+        public static async Task<Message> SendPhoto(this IDeviceSession session, AnyBitmap image, string name,
                                                     string caption, ButtonForm buttons = null, int replyTo = 0,
                                                     bool disableNotification = false)
         {
@@ -58,7 +59,7 @@ namespace TelegramBotBase.Extensions.Images.IronSoftware
         /// <param name="replyTo"></param>
         /// <param name="disableNotification"></param>
         /// <returns></returns>
-        public static async Task<Message> SendPhoto(this DeviceSession session, SKImage image, string name,
+        public static async Task<Message> SendPhoto(this IDeviceSession session, SKImage image, string name,
                                                     string caption, ButtonForm buttons = null, int replyTo = 0,
                                                     bool disableNotification = false)
         {

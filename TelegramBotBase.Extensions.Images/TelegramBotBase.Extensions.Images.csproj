@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netcoreapp3.1;net6</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net6;net7;net8</TargetFrameworks>
         <RepositoryUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images</RepositoryUrl>
         <PackageProjectUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images</PackageProjectUrl>
         <Copyright>MIT</Copyright>
@@ -21,11 +21,14 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-        <PackageReference Include="TelegramBotBase" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Properties\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
     </ItemGroup>
 
 </Project>

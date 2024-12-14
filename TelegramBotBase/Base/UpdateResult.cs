@@ -1,11 +1,11 @@
 ﻿using Telegram.Bot.Types;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Base;
 
 public class UpdateResult : ResultBase
 {
-    public UpdateResult(Update rawData, DeviceSession device)
+    public UpdateResult(Update rawData, IDeviceSession device)
     {
         RawData = rawData;
         Device = device;

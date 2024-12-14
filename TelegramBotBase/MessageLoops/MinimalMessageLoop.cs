@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
-using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.MessageLoops;
 
@@ -17,7 +16,7 @@ public class MinimalMessageLoop : IMessageLoopFactory
 
     private readonly EventHandlerList _events = new();
 
-    public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
+    public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         var update = ur.RawData;
 
