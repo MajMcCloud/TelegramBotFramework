@@ -52,8 +52,6 @@ namespace TelegramBotBase
             if (telegram_package == null)
                 return;
 
-
-
             //Load only once
             if (xml == null)
             {
@@ -232,6 +230,12 @@ namespace TelegramBotBase
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(xml_comments);
+
+            if(method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
+            {
+                sb.AppendLine("[Obsolete]");
+            }
+
 
             sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this IDeviceSession device, {parameters})");
 

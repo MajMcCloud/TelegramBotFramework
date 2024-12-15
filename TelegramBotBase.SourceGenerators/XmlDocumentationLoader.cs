@@ -19,6 +19,8 @@ namespace TelegramBotBase.SourceGenerators
             var docElement = xDocument?.Descendants("member")
                 .FirstOrDefault(e => e.Attribute("name")?.Value == GetDocumentationCommentId(symbol));
 
+            if (docElement == null)
+                return "No documentation";
 
             StringBuilder sb = new StringBuilder();
 
@@ -32,7 +34,7 @@ namespace TelegramBotBase.SourceGenerators
                 first = first.NextNode;
 
             } 
-            while (first.NextNode != null);
+            while (first?.NextNode != null);
 
             var lines = sb.ToString().Split('\n');
 
