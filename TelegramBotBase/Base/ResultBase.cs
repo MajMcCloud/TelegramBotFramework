@@ -35,8 +35,7 @@ public class ResultBase : EventArgs
     {
         try
         {
-            await Device.Client.TelegramClient.DeleteMessageAsync(DeviceId,
-                                                                  messageId == -1 ? MessageId : messageId);
+            await Device.Client.TelegramClient.DeleteMessage(DeviceId, messageId == -1 ? MessageId : messageId);
         }
         catch
         {
