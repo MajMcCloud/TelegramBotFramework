@@ -74,8 +74,8 @@ public class MessageResult : ResultBase
     public override Message Message =>
         UpdateData?.Message
         ?? UpdateData?.EditedMessage
-        ?? UpdateData?.BusinessMessage?.MessageId
-        ?? UpdateData?.EditedBusinessMessage?.MessageId
+        ?? UpdateData?.BusinessMessage
+        ?? UpdateData?.EditedBusinessMessage
         ?? UpdateData?.ChannelPost
         ?? UpdateData?.EditedChannelPost
         ?? UpdateData?.CallbackQuery?.Message;

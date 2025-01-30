@@ -25,6 +25,7 @@ public class FormBaseMessageLoop : IMessageLoopFactory
         if (update.Type != UpdateType.Message
             && update.Type != UpdateType.EditedMessage
             && update.Type != UpdateType.BusinessMessage
+            && update.Type != UpdateType.EditedBusinessMessage
             && update.Type != UpdateType.CallbackQuery)
         {
             return;
