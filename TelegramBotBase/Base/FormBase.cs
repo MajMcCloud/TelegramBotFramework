@@ -32,6 +32,11 @@ public class FormBase : IDisposable
 
     public MessageClient Client { get; set; }
 
+    /// <summary>
+    /// Direct access to the Telegram.Bot API
+    /// </summary>
+    public Telegram.Bot.ITelegramBotClient API => Client?.TelegramClient;
+
     IServiceProvider _serviceProvider = null;
 
     /// <summary>
