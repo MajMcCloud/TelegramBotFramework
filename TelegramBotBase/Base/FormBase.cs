@@ -28,6 +28,9 @@ public class FormBase : IDisposable
 
     public NavigationController NavigationController { get; set; }
 
+    /// <summary>
+    ///    The device which is active in the current context.
+    /// </summary>
     public IDeviceSession Device { get; set; }
 
     public MessageClient Client { get; set; }
