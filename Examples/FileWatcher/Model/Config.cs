@@ -16,6 +16,8 @@ namespace FileWatcher.Model
 
         public List<long> DeviceIds { get; set; } = new List<long>();
 
+        public string Filter { get; set; } = "*.*";
+
         public static Config Load()
         {
             Config config = new Config();

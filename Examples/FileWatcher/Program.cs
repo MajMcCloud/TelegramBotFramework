@@ -27,7 +27,17 @@ namespace FileWatcher
                 return;
             }
 
-            FileSystemWatcher watcher = new FileSystemWatcher(Config.DirectoryToWatch);
+            FileSystemWatcher watcher = null;
+
+            if(string.IsNullOrEmpty(Config.Filter))
+            {
+                watcher = new FileSystemWatcher(Config.DirectoryToWatch);
+            }
+            else
+            {
+                watcher = new FileSystemWatcher(Config.DirectoryToWatch, Config.Filter);
+            }
+
             watcher.IncludeSubdirectories = false;
 
             Console.WriteLine($"Directory: {Config.DirectoryToWatch}");
