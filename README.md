@@ -724,6 +724,7 @@ The current available languages for controls are:
 - German
 - Persian
 - Russian
+- Ukrainian
 
 You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
 
