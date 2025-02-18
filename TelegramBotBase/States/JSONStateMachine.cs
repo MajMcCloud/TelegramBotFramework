@@ -65,7 +65,7 @@ public class JsonStateMachine : IStateMachine
         }
         catch(Exception ex)
         {
-            throw ex;
+            
         }
 
         return new StateContainer();
