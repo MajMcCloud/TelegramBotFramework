@@ -18,7 +18,6 @@ namespace FileWatcher
             if (string.IsNullOrEmpty(Config.APIKey))
             {
                 Console.WriteLine("No API Key set");
-                return;
             }
 
             if (string.IsNullOrEmpty(Config.DirectoryToWatch))
@@ -42,29 +41,31 @@ namespace FileWatcher
 
             Console.WriteLine($"Directory: {Config.DirectoryToWatch}");
 
+            //start file watcher even without api key for testing
+            if (!string.IsNullOrEmpty(Config.APIKey))
+            {
+                Bot = BotBaseBuilder.Create()
+                    .WithAPIKey(Config.APIKey)
+                    .DefaultMessageLoop()
+                    .WithStartForm<Forms.Start>()
+                    .NoProxy()
+                    .CustomCommands(a =>
+                    {
+                        a.Start("Starts the bot");
+                        a.Add("myid", "Whats my id?");
 
+                    })
+                    .NoSerialization()
+                    .UseGerman()
+                    .UseSingleThread()
+                    .Build();
 
-            Bot = BotBaseBuilder.Create()
-                .WithAPIKey(Config.APIKey)
-                .DefaultMessageLoop()
-                .WithStartForm<Forms.Start>()
-                .NoProxy()
-                .CustomCommands(a =>
-                {
-                    a.Start("Starts the bot");
-                    a.Add("myid", "Whats my id?");
+                Bot.BotCommand += Bot_BotCommand;
 
-                })
-                .NoSerialization()
-                .UseGerman()
-                .UseSingleThread()
-                .Build();
+                Bot.UploadBotCommands();
 
-            Bot.BotCommand += Bot_BotCommand;
-
-            Bot.UploadBotCommands();
-
-            Bot.Start();
+                Bot.Start();
+            }
 
             watcher.EnableRaisingEvents = true;
 
@@ -79,7 +80,7 @@ namespace FileWatcher
 
             watcher.EnableRaisingEvents = false;
 
-            Bot.Stop();
+            Bot?.Stop();
 
         }
 
@@ -105,6 +106,9 @@ namespace FileWatcher
         {
             Console.WriteLine($"File '{e.Name}' changed");
 
+            if (Bot == null)
+                return;
+
             foreach (var device in Config.DeviceIds)
             {
                 await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' changed");
@@ -115,6 +119,9 @@ namespace FileWatcher
         {
             Console.WriteLine($"File '{e.Name}' created");
 
+            if (Bot == null)
+                return;
+
             foreach (var device in Config.DeviceIds)
             {
                 await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' created");
@@ -124,6 +131,9 @@ namespace FileWatcher
         private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
             Console.WriteLine($"File '{e.Name}' renamed");
+
+            if (Bot == null)
+                return;
 
             foreach (var device in Config.DeviceIds)
             {
