@@ -26,6 +26,11 @@ namespace FileWatcher
                 return;
             }
 
+            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            {
+                Console.WriteLine("Files to exclude: " + Config.FilesToExclude);
+            }
+
             FileSystemWatcher watcher = null;
 
             if(string.IsNullOrEmpty(Config.Filter))
@@ -104,6 +109,16 @@ namespace FileWatcher
 
         private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
+            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            {
+                var exclude = Config.FilesToExclude.Split('|');
+                var fn = Path.GetFileName(e.Name);
+
+                if (exclude.Contains(fn))
+                    return;
+            }
+
+
             Console.WriteLine($"File '{e.Name}' changed");
 
             if (Bot == null)
@@ -117,6 +132,15 @@ namespace FileWatcher
 
         private static async void Watcher_Created(object sender, FileSystemEventArgs e)
         {
+            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            {
+                var exclude = Config.FilesToExclude.Split('|');
+                var fn = Path.GetFileName(e.Name);
+
+                if (exclude.Contains(fn))
+                    return;
+            }
+
             Console.WriteLine($"File '{e.Name}' created");
 
             if (Bot == null)
@@ -130,6 +154,15 @@ namespace FileWatcher
 
         private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
+            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            {
+                var exclude = Config.FilesToExclude.Split('|');
+                var fn = Path.GetFileName(e.Name);
+
+                if (exclude.Contains(fn))
+                    return;
+            }
+
             Console.WriteLine($"File '{e.Name}' renamed");
 
             if (Bot == null)

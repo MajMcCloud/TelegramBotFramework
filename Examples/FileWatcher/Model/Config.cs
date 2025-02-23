@@ -18,6 +18,8 @@ namespace FileWatcher.Model
 
         public string Filter { get; set; } = "*.*";
 
+        public string FilesToExclude { get; set; } = "anything.txt|others.txt";
+
         public static Config Load()
         {
             Config config = new Config();
