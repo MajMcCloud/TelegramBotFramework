@@ -126,7 +126,14 @@ namespace FileWatcher
 
             foreach (var device in Config.DeviceIds)
             {
-                await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' changed");
+                try
+                {
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' changed");
+                }
+                catch
+                {
+
+                }
             }
         }
 
@@ -148,7 +155,14 @@ namespace FileWatcher
 
             foreach (var device in Config.DeviceIds)
             {
-                await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' created");
+                try
+                {
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' created");
+                }
+                catch
+                {
+
+                }
             }
         }
 
@@ -170,7 +184,15 @@ namespace FileWatcher
 
             foreach (var device in Config.DeviceIds)
             {
-                await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' renamed");
+                try
+                {
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' renamed");
+                }
+                catch
+                {
+
+                }
+
             }
         }
     }
