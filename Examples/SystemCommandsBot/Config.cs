@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SystemCommandsBot;
 
@@ -45,7 +46,7 @@ public class Config
     {
         try
         {
-            var cfg = JsonConvert.DeserializeObject<Config>(File.ReadAllText(path));
+            var cfg = JsonSerializer.Deserialize<Config>(File.ReadAllText(path));
             return cfg;
         }
         catch (DirectoryNotFoundException)
@@ -81,7 +82,7 @@ public class Config
     {
         try
         {
-            File.WriteAllText(path, JsonConvert.SerializeObject(this));
+            File.WriteAllText(path, JsonSerializer.Serialize(this));
         }
         catch
         {
