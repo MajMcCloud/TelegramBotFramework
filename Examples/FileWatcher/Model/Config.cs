@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FileWatcher.Model
@@ -18,7 +19,9 @@ namespace FileWatcher.Model
 
         public string Filter { get; set; } = "*.*";
 
-        public string FilesToExclude { get; set; } = "anything.txt|others.txt";
+        public List<string> FilesToExclude { get; set; } = new List<string>() { "anything.txt" , "others.txt" };
+
+
 
         public static Config Load()
         {

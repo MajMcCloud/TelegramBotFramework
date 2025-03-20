@@ -26,14 +26,14 @@ namespace FileWatcher
                 return;
             }
 
-            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            if (Config.FilesToExclude.Count > 0)
             {
-                Console.WriteLine("Files to exclude: " + Config.FilesToExclude);
+                Console.WriteLine("Files to exclude: " + string.Join(',', Config.FilesToExclude));
             }
 
             FileSystemWatcher watcher = null;
 
-            if(string.IsNullOrEmpty(Config.Filter))
+            if (string.IsNullOrEmpty(Config.Filter))
             {
                 watcher = new FileSystemWatcher(Config.DirectoryToWatch);
             }
@@ -109,12 +109,11 @@ namespace FileWatcher
 
         private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            if (Config.FilesToExclude.Count > 0)
             {
-                var exclude = Config.FilesToExclude.Split('|');
                 var fn = Path.GetFileName(e.Name);
 
-                if (exclude.Contains(fn))
+                if (Config.FilesToExclude.Contains(fn))
                     return;
             }
 
@@ -139,12 +138,11 @@ namespace FileWatcher
 
         private static async void Watcher_Created(object sender, FileSystemEventArgs e)
         {
-            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            if (Config.FilesToExclude.Count > 0)
             {
-                var exclude = Config.FilesToExclude.Split('|');
                 var fn = Path.GetFileName(e.Name);
 
-                if (exclude.Contains(fn))
+                if (Config.FilesToExclude.Contains(fn))
                     return;
             }
 
@@ -164,16 +162,15 @@ namespace FileWatcher
 
                 }
             }
-        }
+        }   
 
         private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(Config.FilesToExclude))
+            if (Config.FilesToExclude.Count > 0)
             {
-                var exclude = Config.FilesToExclude.Split('|');
                 var fn = Path.GetFileName(e.Name);
 
-                if (exclude.Contains(fn))
+                if (Config.FilesToExclude.Contains(fn))
                     return;
             }
 
