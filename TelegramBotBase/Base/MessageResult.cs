@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -111,7 +111,7 @@ public class MessageResult : ResultBase
         T cd = null;
         try
         {
-            cd = JsonConvert.DeserializeObject<T>(RawData);
+            cd = JsonSerializer.Deserialize<T>(RawData);
 
             return cd;
         }
