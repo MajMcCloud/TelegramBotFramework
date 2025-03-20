@@ -7,9 +7,9 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
     {
         public string Method { get; set; }
 
-        CallbackData? _lastData { get; set; }
+        CallbackData _lastData { get; set; }
 
-        String? _lastValue { get; set; }
+        string _lastValue { get; set; }
 
         Func<string, CallbackData, UpdateResult, MessageResult, Task> Action;
 
@@ -49,9 +49,9 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
     {
         public string Method { get; set; }
 
-        CallbackData? _lastData { get; set; }
+        CallbackData _lastData { get; set; }
 
-        String? _lastValue { get; set; }
+        string _lastValue { get; set; }
 
         Func<String, CallbackData, UpdateResult, MessageResult, Task> Action;
 

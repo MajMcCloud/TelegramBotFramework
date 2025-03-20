@@ -11,7 +11,7 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
 
         public Action<FormBase, String> SetProperty { get; set; }
 
-        String? _lastValue { get; set; }
+        string _lastValue { get; set; }
 
         public StringNavigation(Type formType, string method, Action<FormBase, String> setProperty)
         {
@@ -59,7 +59,7 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
 
         public Action<TForm, String> SetProperty { get; set; }
 
-        String? _lastValue { get; set; }
+        string _lastValue { get; set; }
 
         public StringNavigation(string method, Action<TForm, String> setProperty)
         {

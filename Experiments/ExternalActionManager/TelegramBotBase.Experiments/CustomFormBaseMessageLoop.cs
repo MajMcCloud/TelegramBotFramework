@@ -14,9 +14,9 @@ namespace TelegramBotBase.Experiments.ActionManager
 
         private readonly EventHandlerList _events = new();
 
-        public ExternalActionManager ExternalActionManager { get; set; }
+        public IExternalActionManager ExternalActionManager { get; set; }
 
-        public async Task MessageLoop(BotBase bot, DeviceSession s, UpdateResult ur, MessageResult mr)
+        public async Task MessageLoop(BotBase bot, IDeviceSession s, UpdateResult ur, MessageResult mr)
         {
             var update = ur.RawData;
 

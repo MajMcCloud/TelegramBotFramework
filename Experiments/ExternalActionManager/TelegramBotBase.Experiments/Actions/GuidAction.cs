@@ -7,7 +7,7 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
     {
         public string Method { get; set; }
 
-        CallbackData? _lastData { get; set; }
+        CallbackData _lastData { get; set; }
 
         Guid? _lastValue { get; set; }
 

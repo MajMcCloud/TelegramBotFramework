@@ -10,7 +10,7 @@ namespace TelegramBotBase.Experiments.ActionManager
 {
     public static class StaticExtensions
     {
-        public static IStartFormSelectionStage ActionMessageLoop(this IMessageLoopSelectionStage loopSelection, ExternalActionManager managerInstance)
+        public static IStartFormSelectionStage ActionMessageLoop(this IMessageLoopSelectionStage loopSelection, IExternalActionManager managerInstance)
         {
             var cfb = new CustomFormBaseMessageLoop();
 

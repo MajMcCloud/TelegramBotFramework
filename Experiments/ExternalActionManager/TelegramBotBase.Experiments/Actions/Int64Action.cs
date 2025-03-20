@@ -3,22 +3,21 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Experiments.ActionManager.Actions
 {
-    public class Int32Action : IExternalAction
+    public class Int64Action : IExternalAction
     {
         public string Method { get; set; }
 
-        CallbackData? _lastData { get; set; }
+        CallbackData _lastData { get; set; }
 
-        int? _lastValue { get; set; }
+        long? _lastValue { get; set; }
 
-        Func<int, CallbackData, UpdateResult, MessageResult, Task> Action;
+        Func<long, CallbackData, UpdateResult, MessageResult, Task> Action;
 
-        public Int32Action(string method, Func<int, CallbackData, UpdateResult, MessageResult, Task> action)
+        public Int64Action(string method, Func<long, CallbackData, UpdateResult, MessageResult, Task> action)
         {
             Method = method;
             Action = action;
         }
-
 
         public bool DoesFit(string raw_data)
         {
@@ -30,10 +29,10 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
             if (cd.Method != Method)
                 return false;
 
-            int i;
+            long l;
 
-            if (int.TryParse(cd.Value, out i))
-                _lastValue = i;
+            if (long.TryParse(cd.Value, out l))
+                _lastValue = l;
 
             _lastData = cd;
 
@@ -47,18 +46,18 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
 
     }
 
-    public class Int32Action<TForm> : IExternalAction
+    public class Int64Action<TForm> : IExternalAction
         where TForm : FormBase
     {
         public string Method { get; set; }
 
-        CallbackData? _lastData { get; set; }
+        CallbackData _lastData { get; set; }
 
-        int? _lastValue { get; set; }
+        long? _lastValue { get; set; }
 
-        Func<int, CallbackData, UpdateResult, MessageResult, Task> Action;
+        Func<long, CallbackData, UpdateResult, MessageResult, Task> Action;
 
-        public Int32Action(string method, Func<int, CallbackData, UpdateResult, MessageResult, Task> action)
+        public Int64Action(string method, Func<long, CallbackData, UpdateResult, MessageResult, Task> action)
         {
             Method = method;
             Action = action;
@@ -74,10 +73,10 @@ namespace TelegramBotBase.Experiments.ActionManager.Actions
             if (cd.Method != Method)
                 return false;
 
-            int i;
+            long g;
 
-            if (int.TryParse(cd.Value, out i))
-                _lastValue = i;
+            if (long.TryParse(cd.Value, out g))
+                _lastValue = g;
 
             _lastData = cd;
 

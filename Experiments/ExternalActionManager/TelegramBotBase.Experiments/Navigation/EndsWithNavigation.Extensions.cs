@@ -3,10 +3,9 @@ using TelegramBotBase.Form;
 
 namespace TelegramBotBase.Experiments.ActionManager.Navigation
 {
-    public static class Int32Navigation_Extensions
+    public static class EndsWithNavigation_Extensions
     {
-
-        public static void AddInt32Navigation<TForm>(this ExternalActionManager manager, string method, Expression<Func<TForm, int>> propertySelector)
+        public static void AddEndsWithNavigation<TForm>(this IExternalActionManager manager, string method, Expression<Func<TForm, string>> propertySelector)
             where TForm : FormBase
         {
             if (!typeof(FormBase).IsAssignableFrom(typeof(TForm)))
@@ -16,14 +15,13 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
 
             var newValue = Expression.Parameter(propertySelector.Body.Type);
 
-            var assign = Expression.Lambda<Action<TForm, int>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
+            var assign = Expression.Lambda<Action<TForm, string>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
 
             var setter = assign.Compile(true);
 
-            manager.Add(new Int32Navigation<TForm>(method, setter));
+            manager.Add(new EndsWithNavigation<TForm>(method, setter));
         }
-
-        public static void AddInt32Navigation<TForm>(this ExternalActionManager manager, string method, Action<TForm, int> action)
+        public static void AddEndsWithNavigation<TForm>(this IExternalActionManager manager, string value, Action<TForm, string> setProperty)
             where TForm : FormBase
         {
             if (!typeof(FormBase).IsAssignableFrom(typeof(TForm)))
@@ -31,10 +29,10 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
                 throw new ArgumentException($"{nameof(TForm)} argument must be a {nameof(FormBase)} type");
             }
 
-            manager.Add(new Int32Navigation<TForm>(method, action));
+            manager.Add(new EndsWithNavigation<TForm>(value, setProperty));
         }
 
-        public static void AddInt32Navigation(this ExternalActionManager manager, Type formType, string value, Expression<Func<FormBase, int>> propertySelector)
+        public static void AddEndsWithNavigation(this IExternalActionManager manager, Type formType, string value, Expression<Func<FormBase, string>> propertySelector)
         {
             if (!typeof(FormBase).IsAssignableFrom(formType))
             {
@@ -43,21 +41,23 @@ namespace TelegramBotBase.Experiments.ActionManager.Navigation
 
             var newValue = Expression.Parameter(propertySelector.Body.Type);
 
-            var assign = Expression.Lambda<Action<FormBase, int>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
+            var assign = Expression.Lambda<Action<FormBase, string>>(Expression.Assign(propertySelector.Body, newValue), propertySelector.Parameters[0], newValue);
 
             var setter = assign.Compile(true);
 
-            manager.Add(new Int32Navigation(formType, value, setter));
+            manager.Add(new EndsWithNavigation(formType, value, setter));
         }
 
-        public static void AddInt32Navigation(this ExternalActionManager manager, Type formType, string method, Action<FormBase, int> action)
+        public static void AddEndsWithNavigation(this IExternalActionManager manager, Type formType, string value, Action<FormBase, string> setProperty)
         {
             if (!typeof(FormBase).IsAssignableFrom(formType))
             {
                 throw new ArgumentException($"{nameof(formType)} argument must be a {nameof(FormBase)} type");
             }
 
-            manager.Add(new Int32Navigation(formType, method, action));
+            manager.Add(new EndsWithNavigation(formType, value, setProperty));
         }
+
     }
+
 }

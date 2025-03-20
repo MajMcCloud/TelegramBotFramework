@@ -2,7 +2,7 @@
 
 namespace TelegramBotBase.Experiments.ActionManager
 {
-    public partial class ExternalActionManager
+    public partial class ExternalActionManager : IExternalActionManager
     {
 
         List<IExternalAction> actions = new List<IExternalAction>();
@@ -34,7 +34,7 @@ namespace TelegramBotBase.Experiments.ActionManager
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static ExternalActionManager Configure(Action<ExternalActionManager> action)
+        public static IExternalActionManager Configure(Action<IExternalActionManager> action)
         {
             var eam = new ExternalActionManager();
 
