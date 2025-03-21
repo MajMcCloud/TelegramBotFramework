@@ -39,7 +39,7 @@ internal class Program
         bot.BotCommand += Bb_BotCommand;
 
         //Update Bot commands to botfather
-        bot.UploadBotCommands().Wait();
+        await bot.UploadBotCommands();
 
         bot.SetSetting(ESettings.LogAllMessages, true);
 
