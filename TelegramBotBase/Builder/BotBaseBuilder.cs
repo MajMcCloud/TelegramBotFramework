@@ -38,7 +38,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <summary>
     ///     Contains different Botcommands for different areas.
     /// </summary>
-    private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; } = new();
+    private List<BotCommandScopeGroup> BotCommandScopes { get; } = new();
 
     /// <summary>
     /// Creates a full BotBase instance with all parameters previously set.
@@ -308,7 +308,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
+    public ISessionSerializationStage CustomCommands(Action<List<BotCommandScopeGroup>> action)
     {
         action?.Invoke(BotCommandScopes);
         return this;

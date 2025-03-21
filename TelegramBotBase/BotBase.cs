@@ -7,6 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
+using TelegramBotBase.Commands;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Interfaces;
@@ -34,7 +35,7 @@ public sealed class BotBase
         SetSetting(ESettings.SkipAllMessages, false);
         SetSetting(ESettings.SaveSessionsOnConsoleExit, false);
 
-        BotCommandScopes = new Dictionary<BotCommandScope, List<BotCommand>>();
+        BotCommandScopes = new List<BotCommandScopeGroup>();
 
         Sessions = new SessionManager(this);
     }
@@ -54,7 +55,7 @@ public sealed class BotBase
     /// <summary>
     ///     Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
     /// </summary>
-    public Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; internal set; }
+    public List<BotCommandScopeGroup> BotCommandScopes { get; internal set; }
 
 
     /// <summary>
@@ -238,6 +239,39 @@ public sealed class BotBase
         OnUnhandledCall(e);
     }
 
+  
+    /// <summary>
+    /// Returns a list of all bot commands in all configured scopes.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<List<BotCommandScopeGroup>> GetBotCommands()
+    {
+        var languages = BotCommandScopes.Select(a => a.Language).Distinct().ToArray();
+
+        return await GetBotCommands(languages);
+    }
+
+    /// <summary>
+    /// Returns a list of all bot commands in all configured scopes and given languages.
+    /// </summary>
+    /// <param name="additional_languages"></param>
+    /// <returns></returns>
+    public async Task<List<BotCommandScopeGroup>> GetBotCommands(params string[] additional_languages)
+    {
+        List<BotCommandScopeGroup> scopes = new List<BotCommandScopeGroup>();
+
+        foreach (var bs in BotCommandScopes)
+        {
+            foreach(var lang in additional_languages)
+            {
+                var commands = await Client.GetBotCommands(bs.Scope, lang);
+                scopes.Add(new BotCommandScopeGroup(bs.Scope, commands, lang));
+            }
+
+        }
+        return scopes;
+    }
+
     /// <summary>
     ///     This method will update all local created bot commands to the botfather.
     /// </summary>
@@ -245,15 +279,16 @@ public sealed class BotBase
     {
         foreach (var bs in BotCommandScopes)
         {
-            if (bs.Value != null)
+            if (bs.Remove)
             {
-                await Client.SetBotCommands(bs.Value, bs.Key);
+                await Client.DeleteBotCommands(bs.Scope, bs.Language);
+                continue;
             }
-            else
-            {
-                await Client.DeleteBotCommands(bs.Key);
-            }
+
+            await Client.SetBotCommands(bs.Commands, bs.Scope, bs.Language);
         }
+
+        BotCommandScopes = BotCommandScopes.Where(a => !a.Remove).ToList();
     }
 
     /// <summary>
@@ -265,7 +300,7 @@ public sealed class BotBase
     {
         foreach (var scope in BotCommandScopes)
         {
-            if (scope.Value.Any(a => Constants.Telegram.BotCommandIndicator + a.Command == command))
+            if (scope.HasCommand(command))
             {
                 return true;
             }
