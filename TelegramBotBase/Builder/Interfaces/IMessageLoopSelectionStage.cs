@@ -21,6 +21,13 @@ public interface IMessageLoopSelectionStage
 
 
     /// <summary>
+    /// Choose a full message loop, which catches all update types and calls all functions.
+    /// </summary>
+    /// <returns></returns>
+    IStartFormSelectionStage FullMessageLoop(IExternalActionManager managerInstance = null);
+
+
+    /// <summary>
     ///     Chooses a custom message loop.
     /// </summary>
     /// <param name="startFormClass"></param>

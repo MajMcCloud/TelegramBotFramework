@@ -161,6 +161,18 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
+    public IStartFormSelectionStage FullMessageLoop(IExternalActionManager managerInstance = null)
+    {
+        var loop = new FullMessageLoop();
+
+        loop.ExternalActionManager = managerInstance;
+
+        _messageLoopFactory = loop;
+
+        return this;
+    }
+
+
     public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
     {
         _messageLoopFactory = messageLoopClass;
