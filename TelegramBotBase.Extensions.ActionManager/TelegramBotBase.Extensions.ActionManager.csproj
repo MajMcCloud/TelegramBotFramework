@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6;net7;net8</TargetFrameworks>
+    <TargetFrameworks>net6;net7;net8;net9</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
+    <PackageReference Include="TelegramBotBase" Version="7.0.0-preview.7" />
   </ItemGroup>
 
 </Project>
