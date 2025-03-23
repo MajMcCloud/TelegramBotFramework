@@ -12,7 +12,7 @@ To use the Action Manager, you need to create an instance of it and then add the
 
 var eam = ExternalActionManager.Configure(a =>
         {
-            //Handling all callback data values where method is "test" and value is a guid
+            //Handling all callback data values where method is "test" and value is a int32
             //You need to use a serialized CallbackData object for this
             a.AddInt32Action("test", async (value, cd, ur, mr) =>
             {
