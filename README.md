@@ -78,6 +78,12 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [As of Now](#as-of-now)
     * [Usage](#usage)
 - [Extensions](#extensions)
+    * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
+    * [TelegramBotBase.Extensions.Images.IronSoftware](#telegrambotbaseextensionsimagesironsoftware)
+    * [TelegramBotBase.Extensions.Serializer.Database.MSSQL](#telegrambotbaseextensionsserializerdatabasemssql)
+    * [TelegramBotBase.Extensions.Serializer.Database.PostgreSql](#telegrambotbaseextensionsserializerdatabasemysql)
+    * [TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson](#telegrambotbaseextensionsserializerlegacynewtonsoftjson)
+    * [TelegramBotBase.Extensions.ActionManager](#telegrambotbaseextensionsactionmanager)
 - [Test Project](#test-project)
 - [Examples](#examples)
 
@@ -1115,6 +1121,19 @@ Source code: [TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](/Teleg
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
 
 Credits: [@Kataane](https://github.com/Kataane)
+
+
+### TelegramBotBase.Extensions.ActionManager
+
+A simple action manager to manage unhandled action calls in a bot.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.ActionManager.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.ActionManager.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager)
+
+Source code: [TelegramBotBase.Extensions.ActionManager/](/TelegramBotBase.Extensions.ActionManager/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/)
+
 
 ---
 
