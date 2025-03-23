@@ -1,4 +1,5 @@
 ﻿using TelegramBotBase.Interfaces;
+using TelegramBotBase.Interfaces.ExternalActions;
 
 namespace TelegramBotBase.Builder.Interfaces;
 
@@ -9,7 +10,7 @@ public interface IMessageLoopSelectionStage
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    IStartFormSelectionStage DefaultMessageLoop();
+    IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null);
 
 
     /// <summary>

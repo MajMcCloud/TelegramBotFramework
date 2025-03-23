@@ -10,6 +10,7 @@ using TelegramBotBase.Commands;
 using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Interfaces.ExternalActions;
 using TelegramBotBase.Localizations;
 using TelegramBotBase.MessageLoops;
 using TelegramBotBase.States;
@@ -140,9 +141,13 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 2 (Message Loop)"
 
-    public IStartFormSelectionStage DefaultMessageLoop()
+    public IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null)
     {
-        _messageLoopFactory = new FormBaseMessageLoop();
+        var loop =  new FormBaseMessageLoop();
+        
+        loop.ExternalActionManager = managerInstance;
+
+        _messageLoopFactory = loop;
 
         return this;
     }
