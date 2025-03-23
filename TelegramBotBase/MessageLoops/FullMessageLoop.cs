@@ -5,6 +5,7 @@ using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Interfaces.ExternalActions;
 
 namespace TelegramBotBase.MessageLoops;
 
@@ -16,6 +17,8 @@ public class FullMessageLoop : IMessageLoopFactory
     private static readonly object EvUnhandledCall = new();
 
     private readonly EventHandlerList _events = new();
+
+    public IExternalActionManager ExternalActionManager { get; set; }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
@@ -80,6 +83,20 @@ public class FullMessageLoop : IMessageLoopFactory
             {
                 //Send Action event to form itself, if not already handled by a control
                 await activeForm.Action(mr);
+            }
+
+            //Send action to external action manager
+            if (!mr.Handled && ExternalActionManager != null)
+            {
+                mr.Handled = await ExternalActionManager.ManageCall(ur, mr);
+
+                if (mr.Handled)
+                {
+                    if (!session.FormSwitched)
+                    {
+                        return;
+                    }
+                }
             }
 
             if (!mr.Handled)
