@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using TelegramBotBase.Form;
 
@@ -27,6 +28,17 @@ public static class Conversion
             {
                 f.SetValue(form, d);
             }
+        }
+
+        //Newtonsoft Guid converter issue
+        if (f.PropertyType == typeof(Guid))
+        {
+            Guid g;
+            if(Guid.TryParse(p.Value.ToString(), out g))
+            {
+                f.SetValue(form, g);
+            }
+
         }
     }
 }
