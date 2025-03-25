@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
+using static TelegramBotBase.Base.Async;
 
 namespace TelegramBotBase.Form;
 
@@ -43,6 +44,8 @@ public class ConfirmDialog : ModalDialog
     public bool AutoCloseOnClick { get; set; } = true;
 
     public List<ButtonBase> Buttons { get; set; }
+
+    public ButtonBase Result { get; set; } = null;
 
     private static object EvButtonClicked { get; } = new();
 
@@ -86,12 +89,15 @@ public class ConfirmDialog : ModalDialog
             return;
         }
 
-        OnButtonClicked(new ButtonClickedEventArgs(button) { Tag = Tag });
+        Result = button;
+
+        await OnButtonClicked(new ButtonClickedEventArgs(button) { Tag = Tag });
 
         if (AutoCloseOnClick)
         {
             await CloseForm();
         }
+
     }
 
 
@@ -106,14 +112,24 @@ public class ConfirmDialog : ModalDialog
     }
 
 
-    public event EventHandler<ButtonClickedEventArgs> ButtonClicked
+    public event AsyncEventHandler<ButtonClickedEventArgs> ButtonClicked
     {
-        add => Events.AddHandler(EvButtonClicked, value);
+        add => Events.AddHandler(EvButtonClicked, value); 
         remove => Events.RemoveHandler(EvButtonClicked, value);
     }
 
-    public void OnButtonClicked(ButtonClickedEventArgs e)
+    public async Task OnButtonClicked(ButtonClickedEventArgs e)
     {
-        (Events[EvButtonClicked] as EventHandler<ButtonClickedEventArgs>)?.Invoke(this, e);
+        var handler = Events[EvButtonClicked]?.GetInvocationList()
+                                      .Cast<AsyncEventHandler<ButtonClickedEventArgs>>();
+        if (handler == null)
+        {
+            return;
+        }
+
+        foreach (var h in handler)
+        {
+            await h.InvokeAllAsync(this, e);
+        }
     }
 }
