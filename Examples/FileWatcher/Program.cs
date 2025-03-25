@@ -36,10 +36,12 @@ namespace FileWatcher
             if (string.IsNullOrEmpty(Config.Filter))
             {
                 watcher = new FileSystemWatcher(Config.DirectoryToWatch);
+                Console.WriteLine("No filter set, using default *.*");
             }
             else
             {
                 watcher = new FileSystemWatcher(Config.DirectoryToWatch, Config.Filter);
+                Console.WriteLine($"Filter: {Config.Filter}");
             }
 
             watcher.IncludeSubdirectories = false;
