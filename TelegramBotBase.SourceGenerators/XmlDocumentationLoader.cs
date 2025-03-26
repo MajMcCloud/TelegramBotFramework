@@ -54,13 +54,13 @@ namespace TelegramBotBase.SourceGenerators
             return sb.ToString().Trim();
         }
 
-        private string GetDocumentationCommentId(ISymbol symbol)
+        private string? GetDocumentationCommentId(ISymbol symbol)
         {
             // Returns the documentation comment ID for a symbol
-            return symbol.GetDocumentationCommentId();
+            return symbol?.GetDocumentationCommentId();
         }
 
-        public XDocument ReadEmbeddedXml(string resourceName)
+        public XDocument? ReadEmbeddedXml(string resourceName)
         {
             // Get the assembly where the resource is embedded
             Assembly assembly = Assembly.GetExecutingAssembly();
