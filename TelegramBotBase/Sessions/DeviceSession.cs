@@ -22,6 +22,7 @@ namespace TelegramBotBase.Sessions;
 /// <summary>
 ///     Base class for a device/chat session
 /// </summary>
+[DebuggerDisplay("{DeviceId}")]
 public class DeviceSession : IDeviceSession
 {
     private static readonly object EvMessageSent = new();
