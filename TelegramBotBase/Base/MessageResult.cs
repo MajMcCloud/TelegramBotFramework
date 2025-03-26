@@ -50,7 +50,7 @@ public class MessageResult : ResultBase
         ?? UpdateData?.BusinessConnection?.UserChatId 
         ?? UpdateData?.BusinessMessage?.Chat?.Id 
         ?? UpdateData?.EditedBusinessMessage?.Chat?.Id
-        ?? UpdateData?.CallbackQuery.Message?.Chat.Id
+        ?? UpdateData?.CallbackQuery?.Message?.Chat.Id
         ?? Device?.DeviceId
         ?? 0;
 

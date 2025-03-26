@@ -22,6 +22,7 @@ public class UpdateResult : ResultBase
         ?? RawData?.EditedMessage?.Chat?.Id
         ?? RawData?.CallbackQuery?.Message?.Chat?.Id
         ?? Device?.DeviceId
+        ?? RawData?.MyChatMember?.From?.Id
         ?? 0;
 
     public Update RawData { get; set; }
