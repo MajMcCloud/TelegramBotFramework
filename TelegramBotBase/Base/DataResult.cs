@@ -69,7 +69,7 @@ public class DataResult : ResultBase
     /// <returns></returns>
     public async Task DownloadDocument(string path)
     {
-        var file = await Device.Client.TelegramClient.GetFileAsync(Document.FileId);
+        var file = await Device.Client.TelegramClient.GetFile(Document.FileId);
         var fs = new FileStream(path, FileMode.Create);
         await Device.Client.TelegramClient.DownloadFile(file.FilePath, fs);
         fs.Close();
@@ -123,7 +123,7 @@ public class DataResult : ResultBase
 
     public async Task DownloadVideo(string path)
     {
-        var file = await Device.Client.TelegramClient.GetFileAsync(Video.FileId);
+        var file = await Device.Client.TelegramClient.GetFile(Video.FileId);
         var fs = new FileStream(path, FileMode.Create);
         await Device.Client.TelegramClient.DownloadFile(file.FilePath, fs);
         fs.Close();
@@ -141,7 +141,7 @@ public class DataResult : ResultBase
 
     public async Task DownloadAudio(string path)
     {
-        var file = await Device.Client.TelegramClient.GetFileAsync(Audio.FileId);
+        var file = await Device.Client.TelegramClient.GetFile(Audio.FileId);
         var fs = new FileStream(path, FileMode.Create);
         await Device.Client.TelegramClient.DownloadFile(file.FilePath, fs);
         fs.Close();
@@ -161,7 +161,7 @@ public class DataResult : ResultBase
     public async Task DownloadPhoto(int index, string path)
     {
         var photo = Photos[index];
-        var file = await Device.Client.TelegramClient.GetFileAsync(photo.FileId);
+        var file = await Device.Client.TelegramClient.GetFile(photo.FileId);
         var fs = new FileStream(path, FileMode.Create);
         await Device.Client.TelegramClient.DownloadFile(file.FilePath, fs);
         fs.Close();

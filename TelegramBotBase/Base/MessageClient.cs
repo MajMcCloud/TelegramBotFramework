@@ -135,7 +135,7 @@ public class MessageClient
     /// <returns></returns>
     public async Task<BotCommand[]> GetBotCommands(BotCommandScope scope = null, string languageCode = null)
     {
-        return await TelegramClient.GetMyCommandsAsync(scope, languageCode);
+        return await TelegramClient.GetMyCommands(scope, languageCode);
     }
 
 
@@ -148,7 +148,7 @@ public class MessageClient
     public async Task SetBotCommands(List<BotCommand> botcommands, BotCommandScope scope = null,
                                      string languageCode = null)
     {
-        await TelegramClient.SetMyCommandsAsync(botcommands, scope, languageCode);
+        await TelegramClient.SetMyCommands(botcommands, scope, languageCode);
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public class MessageClient
     /// <returns></returns>
     public async Task DeleteBotCommands(BotCommandScope scope = null, string languageCode = null)
     {
-        await TelegramClient.DeleteMyCommandsAsync(scope, languageCode);
+        await TelegramClient.DeleteMyCommands(scope, languageCode);
     }
 
     #endregion

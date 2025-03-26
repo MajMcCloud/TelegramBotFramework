@@ -197,7 +197,7 @@ public sealed class BotBase
 
         foreach (var s in Sessions.SessionList)
         {
-            await Client.TelegramClient.SendTextMessageAsync(s.Key, message);
+            await Client.TelegramClient.SendMessage(s.Key, message);
         }
     }
 

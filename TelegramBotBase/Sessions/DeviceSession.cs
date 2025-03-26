@@ -132,7 +132,7 @@ public class DeviceSession : IDeviceSession
                                     string urlToOpen = null)
     {
 
-        await Client.TelegramClient.AnswerCallbackQueryAsync(callbackQueryId, message, showAlert, urlToOpen);
+        await Client.TelegramClient.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen);
 
     }
 
@@ -154,7 +154,7 @@ public class DeviceSession : IDeviceSession
         }
 
 
-        return await Api(a => a.EditMessageTextAsync(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await Api(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ public class DeviceSession : IDeviceSession
         }
 
 
-        return await Api(a => a.EditMessageTextAsync(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await Api(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
 
     }
 
@@ -194,7 +194,7 @@ public class DeviceSession : IDeviceSession
             throw new MessageTooLongException(message.Text.Length);
         }
 
-        return await Api(a => a.EditMessageTextAsync(DeviceId, message.MessageId, message.Text, parseMode,
+        return await Api(a => a.EditMessageText(DeviceId, message.MessageId, message.Text, parseMode,
                                                     replyMarkup: markup));
     }
 
@@ -207,7 +207,7 @@ public class DeviceSession : IDeviceSession
     public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf)
     {
 
-        return await Api(a => a.EditMessageReplyMarkupAsync(DeviceId, messageId, bf));
+        return await Api(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf));
     }
 
     /// <summary>
@@ -592,7 +592,7 @@ public class DeviceSession : IDeviceSession
     /// <returns></returns>
     public async Task SetAction(ChatAction action)
     {
-        await Api(a => a.SendChatActionAsync(DeviceId, action));
+        await Api(a => a.SendChatAction(DeviceId, action));
     }
 
     /// <summary>
@@ -610,7 +610,7 @@ public class DeviceSession : IDeviceSession
         {
             OneTimeKeyboard = oneTimeOnly
         };
-        return await Api(a => a.SendTextMessageAsync(DeviceId, requestMessage, replyMarkup: rck));
+        return await Api(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rck));
     }
 
     /// <summary>
@@ -628,7 +628,7 @@ public class DeviceSession : IDeviceSession
         {
             OneTimeKeyboard = oneTimeOnly
         };
-        return await Api(a => a.SendTextMessageAsync(DeviceId, requestMessage, replyMarkup: rcl));
+        return await Api(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rcl));
     }
 
     public async Task<Message> HideReplyKeyboard(string closedMsg = "Closed", bool autoDeleteResponse = true)
@@ -652,7 +652,7 @@ public class DeviceSession : IDeviceSession
     /// <returns></returns>
     public virtual async Task<bool> DeleteMessage(int messageId = -1)
     {
-        await Raw(a => a.DeleteMessageAsync(DeviceId, messageId));
+        await Raw(a => a.DeleteMessage(DeviceId, messageId));
 
         OnMessageDeleted(new MessageDeletedEventArgs(messageId));
 
@@ -673,7 +673,7 @@ public class DeviceSession : IDeviceSession
     public virtual async Task ChangeChatPermissions(ChatPermissions permissions)
     {
 
-        await Api(a => a.SetChatPermissionsAsync(DeviceId, permissions));
+        await Api(a => a.SetChatPermissions(DeviceId, permissions));
 
     }
 
