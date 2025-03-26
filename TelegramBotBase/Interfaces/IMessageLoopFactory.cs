@@ -9,5 +9,4 @@ public interface IMessageLoopFactory
 {
     Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult e);
 
-    event EventHandler<UnhandledCallEventArgs> UnhandledCall;
 }

@@ -55,8 +55,6 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             MessageLoopFactory = _messageLoopFactory
         };
 
-        bot.MessageLoopFactory.UnhandledCall += bot.MessageLoopFactory_UnhandledCall;
-
         return bot;
     }
 

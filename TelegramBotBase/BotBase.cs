@@ -229,17 +229,7 @@ public sealed class BotBase
     }
 
 
-    /// <summary>
-    ///     Will get invoke on an unhandled call.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void MessageLoopFactory_UnhandledCall(object sender, UnhandledCallEventArgs e)
-    {
-        OnUnhandledCall(e);
-    }
 
-  
     /// <summary>
     /// Returns a list of all bot commands in all configured scopes.
     /// </summary>

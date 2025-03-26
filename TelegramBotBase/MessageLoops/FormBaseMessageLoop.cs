@@ -14,16 +14,11 @@ namespace TelegramBotBase.MessageLoops;
 /// </summary>
 public class FormBaseMessageLoop : IMessageLoopFactory
 {
-    private static readonly object EvUnhandledCall = new();
-
-    private readonly EventHandlerList _events = new();
-
     public IExternalActionManager ExternalActionManager { get; set; }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         var update = ur.RawData;
-
 
         if (update.Type != UpdateType.Message
             && update.Type != UpdateType.EditedMessage
@@ -46,9 +41,6 @@ public class FormBaseMessageLoop : IMessageLoopFactory
                 return;
             }
         }
-
-        mr.Device = session;
-        ur.Device = session;
 
         var activeForm = session.ActiveForm;
 
@@ -112,7 +104,7 @@ public class FormBaseMessageLoop : IMessageLoopFactory
             {
                 var uhc = new UnhandledCallEventArgs(ur.Message.Text, mr.RawData, session.DeviceId, mr.MessageId,
                                                      ur.Message, session);
-                OnUnhandledCall(uhc);
+                bot.OnUnhandledCall(uhc);
 
                 if (uhc.Handled)
                 {
@@ -134,17 +126,4 @@ public class FormBaseMessageLoop : IMessageLoopFactory
         }
     }
 
-    /// <summary>
-    ///     Will be called if no form handled this call
-    /// </summary>
-    public event EventHandler<UnhandledCallEventArgs> UnhandledCall
-    {
-        add => _events.AddHandler(EvUnhandledCall, value);
-        remove => _events.RemoveHandler(EvUnhandledCall, value);
-    }
-
-    public void OnUnhandledCall(UnhandledCallEventArgs e)
-    {
-        (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-    }
 }
