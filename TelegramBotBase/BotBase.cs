@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Commands;
@@ -34,6 +35,7 @@ public sealed class BotBase
         SetSetting(ESettings.LogAllMessages, false);
         SetSetting(ESettings.SkipAllMessages, false);
         SetSetting(ESettings.SaveSessionsOnConsoleExit, false);
+        SetSetting(ESettings.HandleRelationChanges, true);
 
         BotCommandScopes = new List<BotCommandScopeGroup>();
 
@@ -125,6 +127,15 @@ public sealed class BotBase
             e.Device = ds;
 
             var mr = new MessageResult(e.RawData);
+            mr.Device = ds;
+
+            //Check if user blocked or unblocked the bot
+            if (e.RawData.Type == UpdateType.MyChatMember && GetSetting(Enums.ESettings.HandleRelationChanges, true)
+                && e?.RawData?.MyChatMember?.NewChatMember is not null)
+            {
+                OnBotRelationChanged(new BotRelationChangedEventArgs(ds, e, mr));
+                return;
+            }
 
             var i = 0;
 
@@ -366,9 +377,8 @@ public sealed class BotBase
 
     private static readonly object EvUnhandledCall = new();
 
-    #endregion
+    private static readonly object EvOnBotRelationChanged = new();
 
-    #region "Events"
 
     /// <summary>
     ///     Will be called if a session/context gets started
@@ -439,6 +449,22 @@ public sealed class BotBase
     {
         (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
     }
+
+
+    /// <summary>
+    ///     Will be called if the relation between the bot and the user has changed.
+    /// </summary>
+    public event EventHandler<BotRelationChangedEventArgs> BotRelationChanged
+    {
+        add => _events.AddHandler(EvOnBotRelationChanged, value);
+        remove => _events.RemoveHandler(EvOnBotRelationChanged, value);
+    }
+
+    public void OnBotRelationChanged(BotRelationChangedEventArgs e)
+    {
+        (_events[EvOnBotRelationChanged] as EventHandler<BotRelationChangedEventArgs>)?.Invoke(this, e);
+    }
+
 
     #endregion
 }
