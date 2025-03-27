@@ -77,6 +77,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
     * [As of Now](#as-of-now)
     * [Usage](#usage)
+- [Action Manager (Extension)](#action-manager)
 - [Extensions](#extensions)
     * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
     * [TelegramBotBase.Extensions.Images.IronSoftware](#telegrambotbaseextensionsimagesironsoftware)
@@ -1046,6 +1047,20 @@ is
 again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the controller automatically with the root form
 you
 have given to the constructor at the beginning.*
+
+---
+
+## Action Manager
+
+The Action Manager is a simple way to manage unhandled action calls in a bot.
+
+As well you can handle notifications with inline buttons, which will be shown to the user from outside of a messageloop.
+
+i.E. you have a bot which is running in a group and you want to notify the user about a new message or event.
+
+
+See [More details](TelegramBotBase.Extensions.ActionManager/README.md)
+
 
 ---
 
