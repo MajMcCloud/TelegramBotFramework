@@ -1059,7 +1059,7 @@ As well you can handle notifications with inline buttons, which will be shown to
 i.E. you have a bot which is running in a group and you want to notify the user about a new message or event.
 
 
-See [More details](/TelegramBotBase.Extensions.ActionManager/README.md)
+See [More details](/TelegramBotBase.Extensions.ActionManager/Readme.md)
 
 Source code: [TelegramBotBase.Extensions.ActionManager/](/TelegramBotBase.Extensions.ActionManager/)
 
