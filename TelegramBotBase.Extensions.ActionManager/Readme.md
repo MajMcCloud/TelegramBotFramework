@@ -83,11 +83,11 @@ long deviceId = 1;
 var bf = new ButtonForm();
 
 //Create a serialized CallbackData object
-var cd_int32 = new CallbackData("test", "123").Serialize();
+var cd_int32 = Int32Action.GetCallback("test", 123);
 bf.AddButtonRow(new ButtonBase("1. Test", cd_int32));
 
 //Create a serialized CallbackData object
-var cd_guid = new CallbackData("test2", Guid.NewGuid().ToString()).Serialize();
+var cd_guid = GuidAction.GetCallback("test2", Guid.NewGuid());
 bf.AddButtonRow(new ButtonBase("2. Test", cd_guid));
 
 //Add the raw string value
