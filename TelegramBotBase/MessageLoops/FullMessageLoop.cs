@@ -12,14 +12,12 @@ namespace TelegramBotBase.MessageLoops;
 /// <summary>
 ///     This message loop reacts to all update types.
 /// </summary>
-public class FullMessageLoop : IMessageLoopFactory
+public sealed class FullMessageLoop : IMessageLoopFactory
 {
     public IExternalActionManager ExternalActionManager { get; set; }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
-        var update = ur.RawData;
-
         //Is this a bot command ?
         if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
         {
@@ -44,6 +42,7 @@ public class FullMessageLoop : IMessageLoopFactory
         //Loading Event
         await activeForm.Load(mr);
 
+        var update = ur.RawData;
 
         //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document) (Ignore Callback Queries)
         if (update.Type == UpdateType.Message)

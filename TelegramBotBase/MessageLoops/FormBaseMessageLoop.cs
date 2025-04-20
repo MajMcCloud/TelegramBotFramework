@@ -12,7 +12,7 @@ namespace TelegramBotBase.MessageLoops;
 /// <summary>
 ///     Thats the default message loop which reacts to Message, EditMessage and CallbackQuery.
 /// </summary>
-public class FormBaseMessageLoop : IMessageLoopFactory
+public sealed class FormBaseMessageLoop : IMessageLoopFactory
 {
     public IExternalActionManager ExternalActionManager { get; set; }
 
