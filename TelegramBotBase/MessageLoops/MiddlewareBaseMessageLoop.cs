@@ -20,7 +20,7 @@ public sealed class MiddlewareBaseMessageLoop : IMessageLoopFactory
 
     public event EventHandler<UnhandledCallEventArgs> UnhandledCall;
 
-    public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
+    public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         ur.Device = session;
         mr.Device = session;
@@ -58,16 +58,17 @@ public sealed class MiddlewareBaseMessageLoop : IMessageLoopFactory
     {
         Middlewares.Add(middleware);
     }
+
 }
 
 public struct MessageContainer
 {
     public BotBase BotBase { get; private set; }
-    public DeviceSession DeviceSession { get; private set; }
+    public IDeviceSession DeviceSession { get; private set; }
     public UpdateResult UpdateResult { get; private set; }
     public MessageResult MessageResult { get; private set; }
 
-    public MessageContainer(BotBase botBase, DeviceSession deviceSession, UpdateResult updateResult, MessageResult messageResult)
+    public MessageContainer(BotBase botBase, IDeviceSession deviceSession, UpdateResult updateResult, MessageResult messageResult)
     {
         BotBase = botBase;
         DeviceSession = deviceSession;

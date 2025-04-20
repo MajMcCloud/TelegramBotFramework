@@ -56,6 +56,7 @@ public class Program
                     .DefaultCommands()
                     .NoSerialization()
                     .UsePersian()
+                    .UseSingleThread()
                     .Build();
 
         return bot;
@@ -91,6 +92,7 @@ public class Program
                     .DefaultCommands()
                     .NoSerialization()
                     .UsePersian()
+                    .UseSingleThread()
                     .Build();
 
         return bot;
@@ -124,6 +126,7 @@ public class Program
                             .DefaultCommands()
                             .NoSerialization()
                             .UsePersian()
+                            .UseSingleThread()
                             .Build();
 
         return bot;
@@ -147,6 +150,7 @@ public class Program
                             .DefaultCommands()
                             .NoSerialization()
                             .UsePersian()
+                            .UseSingleThread()
                             .Build();
 
         return bot;
@@ -169,6 +173,7 @@ public class Program
                             .DefaultCommands()
                             .NoSerialization()
                             .UsePersian()
+                            .UseSingleThread()
                             .Build();
 
         return bot;
@@ -188,6 +193,7 @@ public class Program
                     .DefaultCommands()
                     .NoSerialization()
                     .UsePersian()
+                    .UseSingleThread()
                     .Build();
 
         return bot;
