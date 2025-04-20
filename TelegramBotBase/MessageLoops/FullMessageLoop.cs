@@ -5,7 +5,7 @@ using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces.ExternalActions;
 
 namespace TelegramBotBase.MessageLoops;
 
@@ -14,11 +14,9 @@ namespace TelegramBotBase.MessageLoops;
 /// </summary>
 public sealed class FullMessageLoop : IMessageLoopFactory
 {
-    private static readonly object EvUnhandledCall = new();
+    public IExternalActionManager ExternalActionManager { get; set; }
 
-    private readonly EventHandlerList _events = new();
-
-    public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
+    public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         //Is this a bot command ?
         if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
@@ -32,9 +30,6 @@ public sealed class FullMessageLoop : IMessageLoopFactory
                 return;
             }
         }
-
-        mr.Device = session;
-        ur.Device = session;
 
         var activeForm = session.ActiveForm;
 
@@ -70,19 +65,37 @@ public sealed class FullMessageLoop : IMessageLoopFactory
         }
 
         //Action Event
-        if (!session.FormSwitched && mr.IsAction)
+        if (!session.FormSwitched && mr.IsAction && !mr.Handled)
         {
             //Send Action event to controls
             await activeForm.ActionControls(mr);
 
-            //Send Action event to form itself
-            await activeForm.Action(mr);
+            if (!mr.Handled)
+            {
+                //Send Action event to form itself, if not already handled by a control
+                await activeForm.Action(mr);
+            }
+
+            //Send action to external action manager
+            if (!mr.Handled && ExternalActionManager != null)
+            {
+                mr.Handled = await ExternalActionManager.ManageCall(ur, mr);
+
+                if (mr.Handled)
+                {
+                    if (!session.FormSwitched)
+                    {
+                        return;
+                    }
+                }
+            }
 
             if (!mr.Handled)
             {
                 var uhc = new UnhandledCallEventArgs(ur.Message.Text, mr.RawData, session.DeviceId, mr.MessageId,
                                                      ur.Message, session);
-                OnUnhandledCall(uhc);
+
+                bot.OnUnhandledCall(uhc);
 
                 if (uhc.Handled)
                 {
@@ -104,17 +117,4 @@ public sealed class FullMessageLoop : IMessageLoopFactory
         }
     }
 
-    /// <summary>
-    ///     Will be called if no form handled this call
-    /// </summary>
-    public event EventHandler<UnhandledCallEventArgs> UnhandledCall
-    {
-        add => _events.AddHandler(EvUnhandledCall, value);
-        remove => _events.RemoveHandler(EvUnhandledCall, value);
-    }
-
-    public void OnUnhandledCall(UnhandledCallEventArgs e)
-    {
-        (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-    }
 }

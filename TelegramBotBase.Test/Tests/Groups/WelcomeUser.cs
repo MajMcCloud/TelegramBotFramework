@@ -67,12 +67,12 @@ public class WelcomeUser : GroupForm
 
     public override async Task OnMemberChanges(MemberChangeEventArgs e)
     {
-        if (e.Type == MessageType.ChatMembersAdded)
+        if (e.Type == MessageType.NewChatMembers)
         {
             await Device.Send("Welcome you new members!\r\n\r\n" + e.Members.Select(a => a.FirstName + " " + a.LastName)
                                                                     .Aggregate((a, b) => a + "\r\n" + b));
         }
-        else if (e.Type == MessageType.ChatMemberLeft)
+        else if (e.Type == MessageType.LeftChatMember)
         {
             await Device.Send(
                 e.Members.Select(a => a.FirstName + " " + a.LastName).Aggregate((a, b) => a + " and " + b) +

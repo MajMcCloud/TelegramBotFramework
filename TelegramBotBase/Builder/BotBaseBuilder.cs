@@ -10,6 +10,7 @@ using TelegramBotBase.Commands;
 using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Interfaces.ExternalActions;
 using TelegramBotBase.Localizations;
 using TelegramBotBase.MessageLoops;
 using TelegramBotBase.States;
@@ -18,7 +19,7 @@ namespace TelegramBotBase.Builder;
 
 public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage,
                               IBuildingStage, INetworkingSelectionStage, IBotCommandsStage, ISessionSerializationStage,
-                              ILanguageSelectionStage
+                              ILanguageSelectionStage, IThreadingStage
 {
     private string _apiKey;
 
@@ -32,12 +33,13 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     private BotBaseBuilder()
     {
+
     }
 
     /// <summary>
     ///     Contains different Botcommands for different areas.
     /// </summary>
-    private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; } = new();
+    private List<BotCommandScopeGroup> BotCommandScopes { get; } = new();
 
     /// <summary>
     /// Creates a full BotBase instance with all parameters previously set.
@@ -52,8 +54,6 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             StateMachine = _stateMachine,
             MessageLoopFactory = _messageLoopFactory
         };
-
-        bot.MessageLoopFactory.UnhandledCall += bot.MessageLoopFactory_UnhandledCall;
 
         return bot;
     }
@@ -72,14 +72,14 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBuildingStage QuickStart(string apiKey, Type startForm)
+    public IBuildingStage QuickStart(string apiKey, Type startForm, bool throwPendingUpdates = false)
     {
         _apiKey = apiKey;
         _factory = new DefaultStartFormFactory(startForm);
 
         DefaultMessageLoop();
 
-        NoProxy();
+        NoProxy(throwPendingUpdates);
 
         OnlyStart();
 
@@ -87,11 +87,13 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultLanguage();
 
+        UseSingleThread();
+
         return this;
     }
 
 
-    public IBuildingStage QuickStart<T>(string apiKey)
+    public IBuildingStage QuickStart<T>(string apiKey, bool throwPendingUpdates = false)
         where T : FormBase
     {
         _apiKey = apiKey;
@@ -99,7 +101,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultMessageLoop();
 
-        NoProxy();
+        NoProxy(throwPendingUpdates);
 
         OnlyStart();
 
@@ -107,23 +109,27 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultLanguage();
 
+        UseSingleThread();
+
         return this;
     }
 
-    public IBuildingStage QuickStart(string apiKey, IStartFormFactory startFormFactory)
+    public IBuildingStage QuickStart(string apiKey, IStartFormFactory startFormFactory, bool throwPendingUpdates = false)
     {
         _apiKey = apiKey;
         _factory = startFormFactory;
 
         DefaultMessageLoop();
 
-        NoProxy();
+        NoProxy(throwPendingUpdates);
 
         OnlyStart();
 
         NoSerialization();
 
         DefaultLanguage();
+
+        UseSingleThread();
 
         return this;
     }
@@ -133,9 +139,13 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 2 (Message Loop)"
 
-    public IStartFormSelectionStage DefaultMessageLoop()
+    public IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null)
     {
-        _messageLoopFactory = new FormBaseMessageLoop();
+        var loop =  new FormBaseMessageLoop();
+        
+        loop.ExternalActionManager = managerInstance;
+
+        _messageLoopFactory = loop;
 
         return this;
     }
@@ -150,6 +160,18 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     public IStartFormSelectionStage MinimalMessageLoop()
     {
         _messageLoopFactory = new MinimalMessageLoop();
+
+        return this;
+    }
+
+
+    public IStartFormSelectionStage FullMessageLoop(IExternalActionManager managerInstance = null)
+    {
+        var loop = new FullMessageLoop();
+
+        loop.ExternalActionManager = managerInstance;
+
+        _messageLoopFactory = loop;
 
         return this;
     }
@@ -213,72 +235,72 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 4 (Network Settings)"
 
-    public IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         var url = new Uri(proxyAddress);
         _client = new MessageClient(_apiKey, url)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)
             },
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
 
-    public IBotCommandsStage NoProxy(bool throwPendingUpdates = false)
+    public IBotCommandsStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
 
-    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
 
-    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, proxyHost, proxyPort)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
-    public IBotCommandsStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false)
+    public IBotCommandsStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
             TelegramClient =
             {
-                Timeout = new TimeSpan(0, 1, 0)
+                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -307,7 +329,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
+    public ISessionSerializationStage CustomCommands(Action<List<BotCommandScopeGroup>> action)
     {
         action?.Invoke(BotCommandScopes);
         return this;
@@ -332,6 +354,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <summary>
     /// Uses the application runtime path to load and write a states.json file.
     /// </summary>
+    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// <returns></returns>
     public ILanguageSelectionStage UseJSON()
     {
@@ -343,6 +366,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <summary>
     /// Uses the given path to load and write a states.json file.
     /// </summary>
+    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// <returns></returns>
     public ILanguageSelectionStage UseJSON(string path)
     {
@@ -397,34 +421,79 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 7 (Language)"
 
-    public IBuildingStage DefaultLanguage()
+    /// <inheritdoc cref="ILanguageSelectionStage.DefaultLanguage"/>
+    public IThreadingStage DefaultLanguage()
     {
         return this;
     }
 
-    public IBuildingStage UseEnglish()
+    /// <inheritdoc cref="ILanguageSelectionStage.UseEnglish"/>
+    public IThreadingStage UseEnglish()
     {
         Default.Language = new English();
         return this;
     }
 
-    public IBuildingStage UseGerman()
+    /// <inheritdoc cref="ILanguageSelectionStage.UseGerman"/>
+    public IThreadingStage UseGerman()
     {
         Default.Language = new German();
         return this;
     }
 
-    public IBuildingStage UsePersian()
+    /// <inheritdoc cref="ILanguageSelectionStage.UsePersian"/>
+    public IThreadingStage UsePersian()
     {
         Default.Language = new Persian();
         return this;
     }
 
-    public IBuildingStage Custom(Localization language)
+    /// <inheritdoc cref="ILanguageSelectionStage.UseRussian"/>
+    public IThreadingStage UseRussian()
+    {
+        Default.Language = new Russian();
+        return this;
+        
+    }
+    
+    /// <inheritdoc cref="ILanguageSelectionStage.UseUkrainian"/>
+    public IThreadingStage UseUkrainian()
+    {
+        Default.Language = new Ukrainian();
+        return this;
+    }
+
+    /// <inheritdoc cref="ILanguageSelectionStage.Custom"/>
+    public IThreadingStage Custom(Localization language)
     {
         Default.Language = language;
         return this;
     }
 
+
     #endregion
+
+
+    #region "Step 8 (Threading)"
+
+    public IBuildingStage UseSingleThread()
+    {
+        return this;
+    }
+
+    public IBuildingStage UseThreadPool(int workerThreads = 2, int ioThreads = 1)
+    {
+        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
+
+        c.ThreadPool_WorkerThreads = workerThreads;
+        c.ThreadPool_IOThreads = ioThreads;
+        c.DropPendingUpdates = _client.DropPendingUpdates;
+
+        _client = c;
+
+        return this;
+    }
+
+    #endregion
+
 }

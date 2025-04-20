@@ -1,10 +1,24 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types;
 using TelegramBotBase.Form;
+using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBotBase.Args;
+using TelegramBotBase.Base;
+using Telegram.Bot;
+using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Interfaces;
 
-internal interface IDeviceSession
+public interface IDeviceSession : IDeviceSessionMethods
 {
+    MessageClient Client => ActiveForm.Client;
+
+    int LastMessageId => LastMessage?.MessageId ?? -1;
+
+    Message LastMessage { get; set; }
+
     /// <summary>
     ///     Device or chat id
     /// </summary>
@@ -35,4 +49,6 @@ internal interface IDeviceSession
     ///     contains if the form has been switched (navigated)
     /// </summary>
     bool FormSwitched { get; set; }
+
+
 }

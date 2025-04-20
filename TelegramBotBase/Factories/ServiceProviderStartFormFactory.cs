@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using TelegramBotBase.DependencyInjection;
+using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 
@@ -24,7 +25,16 @@ public class ServiceProviderStartFormFactory : IStartFormFactory
 
     public FormBase CreateForm()
     {
-        var fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, _startFormClass);
+        FormBase fb = null;
+
+        try
+        {
+            fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, _startFormClass);
+        }
+        catch(InvalidOperationException ex)
+        {
+            throw new InvalidServiceProviderConfiguration(ex.Message, ex);
+        }
 
         //Sets an internal field for future ServiceProvider navigation
         fb.SetServiceProvider(_serviceProvider);

@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.1;net6</TargetFrameworks>
+        <RepositoryUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images.IronSoftware</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images.IronSoftware</PackageProjectUrl>
+        <Copyright>MIT</Copyright>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <AssemblyVersion>1.0.1</AssemblyVersion>
+        <FileVersion>1.0.1</FileVersion>
+        <Description>This is an extension for sending Bitmap/Images platform independent by using IronSoftware's drawing library via TelegramBotBase.</Description>
+        <Version>1.0.1</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="IronSoftware.System.Drawing" Version="2024.5.1" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Properties\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
+    </ItemGroup>
+
+</Project>

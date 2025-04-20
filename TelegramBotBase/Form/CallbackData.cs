@@ -1,14 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text;
+using TelegramBotBase.Exceptions;
+using System.Text.Json.Serialization;
 
 namespace TelegramBotBase.Form;
 
 /// <summary>
-///     Base class for serializing buttons and data
+/// Base class for serializing buttons and data
 /// </summary>
 public class CallbackData
 {
     public CallbackData()
     {
+
     }
 
     public CallbackData(string method, string value)
@@ -17,28 +21,30 @@ public class CallbackData
         Value = value;
     }
 
-    [JsonProperty("m")] public string Method { get; set; }
+    [JsonPropertyName("m")] public string Method { get; set; }
 
-    [JsonProperty("v")] public string Value { get; set; }
+    [JsonPropertyName("v")] public string Value { get; set; }
 
     public static string Create(string method, string value)
     {
-        return new CallbackData(method, value).Serialize();
+        return new CallbackData(method, value).Serialize(true);
     }
 
     /// <summary>
     ///     Serializes data to json string
     /// </summary>
     /// <returns></returns>
-    public string Serialize()
+    public string Serialize(bool throwExceptionOnOverflow = false)
     {
-        var s = "";
-        try
+        var s = string.Empty;
+
+        s = JsonSerializer.Serialize(this);
+
+        //Is data over 64 bytes ?
+        int byte_count = Encoding.UTF8.GetByteCount(s);
+        if (throwExceptionOnOverflow && byte_count > Constants.Telegram.MaxCallBackDataBytes)
         {
-            s = JsonConvert.SerializeObject(this);
-        }
-        catch
-        {
+            throw new CallbackDataTooLongException(byte_count);
         }
 
         return s;
@@ -51,19 +57,8 @@ public class CallbackData
     /// <returns></returns>
     public static CallbackData Deserialize(string data)
     {
-        CallbackData cd = null;
-        try
-        {
-            cd = JsonConvert.DeserializeObject<CallbackData>(data);
-
-            return cd;
-        }
-        catch
-        {
-        }
-
-        return null;
+        return JsonSerializer.Deserialize<CallbackData>(data);
     }
 
-    public static implicit operator string(CallbackData callbackData) => callbackData.Serialize();
+    public static implicit operator string(CallbackData callbackData) => callbackData.Serialize(true);
 }

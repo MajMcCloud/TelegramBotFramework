@@ -13,6 +13,7 @@ using TelegramBotBase.Enums;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
 using TelegramBotBase.Localizations;
+using static System.Net.Mime.MediaTypeNames;
 using static TelegramBotBase.Base.Async;
 
 namespace TelegramBotBase.Controls.Hybrid;
@@ -35,6 +36,8 @@ public class CheckedButtonList : ControlBase
 
     public string PreviousPageLabel = Default.Language["ButtonGrid_PreviousPage"];
 
+    public string PagingInfo = Default.Language["ButtonGrid_CurrentPage"];
+
     public CheckedButtonList()
     {
         DataSource = new ButtonFormDataSource();
@@ -51,7 +54,24 @@ public class CheckedButtonList : ControlBase
         DataSource = new ButtonFormDataSource(form);
     }
 
-    public string Title { get; set; } = Default.Language["ButtonGrid_Title"];
+    string m_Title = Default.Language["ButtonGrid_Title"];
+
+    public string Title
+    {
+        get
+        {
+            return m_Title;
+        }
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException($"{nameof(Title)}", $"{nameof(Title)} property must have been a value unequal to null/empty");
+            }
+
+            m_Title = value;
+        }
+    }
 
     public string ConfirmationText { get; set; } = "";
 
@@ -774,7 +794,7 @@ public class CheckedButtonList : ControlBase
             var row = new ButtonRow();
             row.Add(new ButtonBase(PreviousPageLabel, "$previous$"));
             row.Add(new ButtonBase(
-                        string.Format(Default.Language["ButtonGrid_CurrentPage"], CurrentPageIndex + 1, PageCount),
+                        string.Format(PagingInfo, CurrentPageIndex + 1, PageCount),
                         "$site$"));
             row.Add(new ButtonBase(NextPageLabel, "$next$"));
 

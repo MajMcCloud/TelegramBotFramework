@@ -34,7 +34,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InlineAndReplyCombination",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiddlewareBaseBot", "Examples\MiddlewareBaseBot\MiddlewareBaseBot.csproj", "{8D053824-966C-4F82-B184-4840DB36D5F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjection", "Examples\DependencyInjection\DependencyInjection.csproj", "{689B16BC-200E-4C68-BB2E-8B209070849B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection", "Examples\DependencyInjection\DependencyInjection.csproj", "{689B16BC-200E-4C68-BB2E-8B209070849B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase.Extensions.Serializer.Database.PostgreSql", "TelegramBotBase.Extensions.Serializer.Database.PostgreSql\TelegramBotBase.Extensions.Serializer.Database.PostgreSql.csproj", "{7C55D9FF-7DC1-41D0-809C-469EBFA20992}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase.Extensions.Images.IronSoftware", "TelegramBotBase.Extensions.Images.IronSoftware\TelegramBotBase.Extensions.Images.IronSoftware.csproj", "{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase.SourceGenerators", "TelegramBotBase.SourceGenerators\TelegramBotBase.SourceGenerators.csproj", "{B78455D6-8AF2-459C-B56A-210DC89D7793}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWatcher", "Examples\FileWatcher\FileWatcher.csproj", "{CB2B4543-7304-4549-B0BB-BCC5CCB75DD6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson", "TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson\TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson.csproj", "{21C44B20-1ED8-4BE6-A629-C2EC737C06E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Extensions.ActionManager", "TelegramBotBase.Extensions.ActionManager\TelegramBotBase.Extensions.ActionManager.csproj", "{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,6 +102,30 @@ Global
 		{689B16BC-200E-4C68-BB2E-8B209070849B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{689B16BC-200E-4C68-BB2E-8B209070849B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{689B16BC-200E-4C68-BB2E-8B209070849B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C55D9FF-7DC1-41D0-809C-469EBFA20992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C55D9FF-7DC1-41D0-809C-469EBFA20992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C55D9FF-7DC1-41D0-809C-469EBFA20992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C55D9FF-7DC1-41D0-809C-469EBFA20992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B78455D6-8AF2-459C-B56A-210DC89D7793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B78455D6-8AF2-459C-B56A-210DC89D7793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B78455D6-8AF2-459C-B56A-210DC89D7793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B78455D6-8AF2-459C-B56A-210DC89D7793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB2B4543-7304-4549-B0BB-BCC5CCB75DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB2B4543-7304-4549-B0BB-BCC5CCB75DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB2B4543-7304-4549-B0BB-BCC5CCB75DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB2B4543-7304-4549-B0BB-BCC5CCB75DD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21C44B20-1ED8-4BE6-A629-C2EC737C06E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21C44B20-1ED8-4BE6-A629-C2EC737C06E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21C44B20-1ED8-4BE6-A629-C2EC737C06E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21C44B20-1ED8-4BE6-A629-C2EC737C06E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +141,11 @@ Global
 		{067E8EBE-F90A-4AFF-A0FF-20578216486E} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 		{8D053824-966C-4F82-B184-4840DB36D5F2} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 		{689B16BC-200E-4C68-BB2E-8B209070849B} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
+		{7C55D9FF-7DC1-41D0-809C-469EBFA20992} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
+		{DC521A4C-7446-46F7-845B-AAF10EDCF8C6} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
+		{CB2B4543-7304-4549-B0BB-BCC5CCB75DD6} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
+		{21C44B20-1ED8-4BE6-A629-C2EC737C06E0} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
+		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59CB40E1-9FA7-4867-A56F-4F418286F057}

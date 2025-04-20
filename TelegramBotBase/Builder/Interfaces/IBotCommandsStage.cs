@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Telegram.Bot.Types;
+using TelegramBotBase.Commands;
 
 namespace TelegramBotBase.Builder.Interfaces;
 
@@ -32,5 +33,5 @@ public interface IBotCommandsStage
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action);
+    ISessionSerializationStage CustomCommands(Action<List<BotCommandScopeGroup>> action);
 }

@@ -16,7 +16,7 @@ public class Label : ControlBase
 {
     private bool _renderNecessary = true;
 
-    private string _text = string.Empty;
+    private string _text = Default.Language["Label_Text"];
 
     public String Text
     {
@@ -29,12 +29,18 @@ public class Label : ControlBase
             if (_text == value)
                 return;
 
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException($"{nameof(Text)}", $"{nameof(Text)} property must have been a value unequal to null/empty");
+            }
 
             _text = value;
             _renderNecessary = true;
 
         }
     }
+
+
 
     private ParseMode _parseMode = ParseMode.Markdown;
 
@@ -83,14 +89,14 @@ public class Label : ControlBase
         //Update ?
         if (MessageId != null)
         {
-            m = await Device.Raw(a => a.EditMessageTextAsync(Device.DeviceId, MessageId.Value, Text, _parseMode));
+            m = await Device.Raw(a => a.EditMessageText(Device.DeviceId, MessageId.Value, Text, _parseMode));
             _renderNecessary = false;
 
             return;
         }
 
         //New Message
-        m = await Device.Raw(a => a.SendTextMessageAsync(Device.DeviceId, Text, disableNotification: true, parseMode: _parseMode));
+        m = await Device.Raw(a => a.SendMessage(Device.DeviceId, Text, disableNotification: true, parseMode: _parseMode));
         if (m != null)
         {
             MessageId = m.MessageId;

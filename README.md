@@ -10,7 +10,7 @@
 
 **Support group: [@tgbotbase](https://t.me/tgbotbase)**
 
-**Discord Server: [https://discord.gg/p3PPhYbTf](https://discord.gg/p3PPhYbTf)**
+**Discord Server: [https://discord.gg/V3PxreDYfE](https://discord.gg/V3PxreDYfE)**
 
 **Releases: [GitHub](https://github.com/MajMcCloud/TelegramBotFramework/releases)**
 
@@ -77,7 +77,14 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
     * [As of Now](#as-of-now)
     * [Usage](#usage)
+- [Action Manager (Extension)](#action-manager)
 - [Extensions](#extensions)
+    * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
+    * [TelegramBotBase.Extensions.Images.IronSoftware](#telegrambotbaseextensionsimagesironsoftware)
+    * [TelegramBotBase.Extensions.Serializer.Database.MSSQL](#telegrambotbaseextensionsserializerdatabasemssql)
+    * [TelegramBotBase.Extensions.Serializer.Database.PostgreSql](#telegrambotbaseextensionsserializerdatabasemysql)
+    * [TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson](#telegrambotbaseextensionsserializerlegacynewtonsoftjson)
+    * [TelegramBotBase.Extensions.ActionManager](#telegrambotbaseextensionsactionmanager)
 - [Test Project](#test-project)
 - [Examples](#examples)
 
@@ -723,6 +730,8 @@ The current available languages for controls are:
 - English
 - German
 - Persian
+- Russian
+- Ukrainian
 
 You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
 
@@ -1039,6 +1048,24 @@ again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the con
 you
 have given to the constructor at the beginning.*
 
+---
+
+## Action Manager
+
+The Action Manager is a simple way to manage unhandled action calls in a bot.
+
+As well you can handle notifications with inline buttons, which will be shown to the user from outside of a messageloop.
+
+i.E. you have a bot which is running in a group and you want to notify the user about a new message or event.
+
+
+See [More details](/TelegramBotBase.Extensions.ActionManager/Readme.md)
+
+Source code: [TelegramBotBase.Extensions.ActionManager/](/TelegramBotBase.Extensions.ActionManager/)
+
+
+---
+
 ## Extensions
 
 ### TelegramBotBase.Extensions.Images
@@ -1048,7 +1075,43 @@ Extends the base package with some additional image methods like SendPhoto (usin
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images)
 
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
+Source code: [TelegramBotBase.Extensions.Images/](/TelegramBotBase.Extensions.Images/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images/)
+
+---
+
+### TelegramBotBase.Extensions.Images.IronSoftware
+
+Extends the base package with some additional image methods like SendPhoto (using Bitmap)
+
+Important: This extension uses the IronSoftware drawing library.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware)
+
+[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+
+Source code: [TelegramBotBase.Extensions.Images.IronSoftware/](TelegramBotBase.Extensions.Images.IronSoftware/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSoftware/)
+
+---
+
+Project: [open source](TelegramBotBase.Extensions.Images/)
+
+### TelegramBotBase.Extensions.Images.IronSoftware
+
+Extends the base package with some additional image methods like SendPhoto (using Bitmap)
+
+Important: This extension uses the IronSoftware drawing library.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware)
+
+[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
+
+Project: [open source](TelegramBotBase.Extensions.Images.IronSoftware/)
 
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
@@ -1057,7 +1120,41 @@ A session serializer for Microsoft SQL Server.
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL)
 
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+Source code: [TelegramBotBase.Extensions.Serializer.Database.MSSQL/](/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
+
+---
+
+### TelegramBotBase.Extensions.Serializer.Database.PostgreSql
+
+A session serializer for PostgreSql Server.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql)
+
+Source code: [TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
+
+Credits: [@Kataane](https://github.com/Kataane)
+
+
+### TelegramBotBase.Extensions.ActionManager
+
+A simple action manager to manage unhandled action calls in a bot.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.ActionManager.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.ActionManager.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager)
+
+Source code: [TelegramBotBase.Extensions.ActionManager/](/TelegramBotBase.Extensions.ActionManager/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/)
+
+
+---
+
+Project: [open source](TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 
 ## Test Project
 

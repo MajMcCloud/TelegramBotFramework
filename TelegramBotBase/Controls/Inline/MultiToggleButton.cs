@@ -32,10 +32,32 @@ public class MultiToggleButton : ControlBase
     /// </summary>
     public string ChangedString { get; set; } = Default.Language["MultiToggleButton_Changed"];
 
+    private string _title = Default.Language["MultiToggleButton_Title"];
+
     /// <summary>
     ///     This holds the title of the control.
     /// </summary>
-    public string Title { get; set; } = Default.Language["MultiToggleButton_Title"];
+    public String Title
+    {
+        get
+        {
+            return _title;
+        }
+        set
+        {
+            if (_title == value)
+                return;
+
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException($"{nameof(Title)}", $"{nameof(Title)} must have been a value unequal to null/empty");
+            }
+
+            _title = value;
+            _renderNecessary = true;
+
+        }
+    }
 
     public int? MessageId { get; set; }
 

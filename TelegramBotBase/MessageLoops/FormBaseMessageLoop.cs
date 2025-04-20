@@ -5,7 +5,7 @@ using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces.ExternalActions;
 
 namespace TelegramBotBase.MessageLoops;
 
@@ -14,16 +14,16 @@ namespace TelegramBotBase.MessageLoops;
 /// </summary>
 public sealed class FormBaseMessageLoop : IMessageLoopFactory
 {
-    private static readonly object EvUnhandledCall = new();
+    public IExternalActionManager ExternalActionManager { get; set; }
 
-    private readonly EventHandlerList _events = new();
-
-    public async Task MessageLoop(BotBase bot, DeviceSession session, UpdateResult ur, MessageResult mr)
+    public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         var update = ur.RawData;
 
         if (update.Type != UpdateType.Message
             && update.Type != UpdateType.EditedMessage
+            && update.Type != UpdateType.BusinessMessage
+            && update.Type != UpdateType.EditedBusinessMessage
             && update.Type != UpdateType.CallbackQuery)
         {
             return;
@@ -41,9 +41,6 @@ public sealed class FormBaseMessageLoop : IMessageLoopFactory
                 return;
             }
         }
-
-        mr.Device = session;
-        ur.Device = session;
 
         var activeForm = session.ActiveForm;
 
@@ -72,25 +69,42 @@ public sealed class FormBaseMessageLoop : IMessageLoopFactory
         }
 
         //Message edited ?
-        if(update.Type == UpdateType.EditedMessage)
+        if (update.Type == UpdateType.EditedMessage)
         {
             await activeForm.Edited(mr);
         }
 
         //Action Event
-        if (!session.FormSwitched && mr.IsAction)
+        if (!session.FormSwitched && mr.IsAction && !mr.Handled)
         {
             //Send Action event to controls
             await activeForm.ActionControls(mr);
 
-            //Send Action event to form itself
-            await activeForm.Action(mr);
+            if (!mr.Handled)
+            {
+                //Send Action event to form itself, if not already handled by a control
+                await activeForm.Action(mr);
+            }
+
+            //Send action to external action manager
+            if (!mr.Handled && ExternalActionManager != null)
+            {
+                mr.Handled = await ExternalActionManager.ManageCall(ur, mr);
+
+                if (mr.Handled)
+                {
+                    if (!session.FormSwitched)
+                    {
+                        return;
+                    }
+                }
+            }
 
             if (!mr.Handled)
             {
                 var uhc = new UnhandledCallEventArgs(ur.Message.Text, mr.RawData, session.DeviceId, mr.MessageId,
                                                      ur.Message, session);
-                OnUnhandledCall(uhc);
+                bot.OnUnhandledCall(uhc);
 
                 if (uhc.Handled)
                 {
@@ -112,17 +126,4 @@ public sealed class FormBaseMessageLoop : IMessageLoopFactory
         }
     }
 
-    /// <summary>
-    ///     Will be called if no form handled this call
-    /// </summary>
-    public event EventHandler<UnhandledCallEventArgs> UnhandledCall
-    {
-        add => _events.AddHandler(EvUnhandledCall, value);
-        remove => _events.RemoveHandler(EvUnhandledCall, value);
-    }
-
-    public void OnUnhandledCall(UnhandledCallEventArgs e)
-    {
-        (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-    }
 }

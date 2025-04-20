@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -9,16 +10,36 @@ namespace TelegramBotBase.Base;
 
 public class MessageResult : ResultBase
 {
-    internal MessageResult()
-    {
-    }
-
     public MessageResult(Update update)
     {
         UpdateData = update;
+
+        init();
     }
 
-    public Update UpdateData { get; set; }
+    void init()
+    {
+        IsAction = UpdateData.CallbackQuery != null;
+
+        if (Message == null)
+            return;
+
+        IsBotCommand = Message.Entities?.Any(a => a.Type == MessageEntityType.BotCommand) ?? false;
+
+        if (!IsBotCommand)
+            return;
+
+        BotCommand = MessageText.Split(' ')[0];
+
+        IsBotGroupCommand = BotCommand.Contains("@");
+
+        if (IsBotGroupCommand)
+        {
+            BotCommand = BotCommand.Substring(0, BotCommand.LastIndexOf('@'));
+        }
+    }
+
+    public Update UpdateData { get; private set; }
 
     /// <summary>
     ///     Returns the Device/ChatId
@@ -26,7 +47,10 @@ public class MessageResult : ResultBase
     public override long DeviceId =>
         UpdateData?.Message?.Chat?.Id
         ?? UpdateData?.EditedMessage?.Chat.Id
-        ?? UpdateData?.CallbackQuery.Message?.Chat.Id
+        ?? UpdateData?.BusinessConnection?.UserChatId 
+        ?? UpdateData?.BusinessMessage?.Chat?.Id 
+        ?? UpdateData?.EditedBusinessMessage?.Chat?.Id
+        ?? UpdateData?.CallbackQuery?.Message?.Chat.Id
         ?? Device?.DeviceId
         ?? 0;
 
@@ -37,6 +61,8 @@ public class MessageResult : ResultBase
         UpdateData?.Message?.MessageId
         ?? Message?.MessageId
         ?? UpdateData?.CallbackQuery?.Message?.MessageId
+        ?? UpdateData?.BusinessMessage?.MessageId
+        ?? UpdateData?.EditedBusinessMessage?.MessageId
         ?? 0;
 
     public string Command => UpdateData?.Message?.Text ?? "";
@@ -48,6 +74,8 @@ public class MessageResult : ResultBase
     public override Message Message =>
         UpdateData?.Message
         ?? UpdateData?.EditedMessage
+        ?? UpdateData?.BusinessMessage
+        ?? UpdateData?.EditedBusinessMessage
         ?? UpdateData?.ChannelPost
         ?? UpdateData?.EditedChannelPost
         ?? UpdateData?.CallbackQuery?.Message;
@@ -55,12 +83,17 @@ public class MessageResult : ResultBase
     /// <summary>
     ///     Is this an action ? (i.e. button click)
     /// </summary>
-    public bool IsAction => UpdateData.CallbackQuery != null;
+    public bool IsAction { get; private set; }
 
     /// <summary>
     ///     Is this a command ? Starts with a slash '/' and a command
     /// </summary>
-    public bool IsBotCommand => MessageText.StartsWith("/");
+    public bool IsBotCommand { get; private set; }
+
+    /// <summary>
+    /// Is this a bot command sent from a group via @BotId ?
+    /// </summary>
+    public bool IsBotGroupCommand { get; private set; }
 
     /// <summary>
     ///     Returns a List of all parameters which has been sent with the command itself (i.e. /start 123 456 789 =>
@@ -83,18 +116,7 @@ public class MessageResult : ResultBase
     /// <summary>
     ///     Returns just the command (i.e. /start 1 2 3 => /start)
     /// </summary>
-    public string BotCommand
-    {
-        get
-        {
-            if (!IsBotCommand)
-            {
-                return null;
-            }
-
-            return MessageText.Split(' ')[0];
-        }
-    }
+    public string BotCommand { get; private set; }
 
     /// <summary>
     ///     Returns if this message will be used on the first form or not.
@@ -111,7 +133,7 @@ public class MessageResult : ResultBase
         T cd = null;
         try
         {
-            cd = JsonConvert.DeserializeObject<T>(RawData);
+            cd = JsonSerializer.Deserialize<T>(RawData);
 
             return cd;
         }

@@ -134,7 +134,7 @@ public class LinkReplaceTest : GroupForm
         }
         else
         {
-            await e.Device.RestrictUser(from, cp, null, DateTime.UtcNow.AddSeconds(30));
+            await e.Device.RestrictUser(from, cp, false, DateTime.UtcNow.AddSeconds(30));
 
             await e.Device.Send(e.Message.From.FirstName + " " + e.Message.From.LastName +
                                 " has been blocked for 30 seconds");

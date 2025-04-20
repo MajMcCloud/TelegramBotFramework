@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+
 
 namespace TelegramBotBase.Base;
 
@@ -17,16 +19,18 @@ namespace TelegramBotBase.Base;
 /// </summary>
 public class MessageClient
 {
+    private EventHandlerList Events { get; } = new();
+
     private static readonly object EvOnMessageLoop = new();
     private static readonly object EvOnReceiveError = new();
 
-    private static object __evOnMessage = new();
+    protected CancellationTokenSource _cancellationTokenSource;
 
-    private static object __evOnMessageEdit = new();
+    public string ApiKey { get; }
 
-    private static object __evCallbackQuery = new();
+    public ITelegramBotClient TelegramClient { get; set; }
 
-    private CancellationTokenSource _cancellationTokenSource;
+
 
     /// <summary>
     ///    Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before
@@ -34,23 +38,19 @@ public class MessageClient
     //     should be set to not null, otherwise Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates
     //     will effectively be set to receive all Telegram.Bot.Types.Updates.
     /// </summary>
-    public bool ThrowPendingUpdates { get; set; }
+    public bool DropPendingUpdates { get; set; }
 
 
     public MessageClient(string apiKey)
     {
         ApiKey = apiKey;
         TelegramClient = new TelegramBotClient(apiKey);
-
-        Prepare();
     }
 
     public MessageClient(string apiKey, HttpClient proxy)
     {
         ApiKey = apiKey;
         TelegramClient = new TelegramBotClient(apiKey, proxy);
-
-        Prepare();
     }
 
 
@@ -68,8 +68,6 @@ public class MessageClient
         );
 
         TelegramClient = new TelegramBotClient(apiKey, httpClient);
-
-        Prepare();
     }
 
     /// <summary>
@@ -89,8 +87,6 @@ public class MessageClient
         );
 
         TelegramClient = new TelegramBotClient(apiKey, httpClient);
-
-        Prepare();
     }
 
 
@@ -98,60 +94,48 @@ public class MessageClient
     {
         ApiKey = apiKey;
         TelegramClient = client;
-
-        Prepare();
     }
 
 
-    public string ApiKey { get; }
-
-    public ITelegramBotClient TelegramClient { get; set; }
-
-    private EventHandlerList Events { get; } = new();
-
-
-    public void Prepare()
-    {
-        TelegramClient.Timeout = new TimeSpan(0, 0, 30);
-    }
-
-
-    public void StartReceiving()
+    public virtual void StartReceiving()
     {
         _cancellationTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions();
 
-        receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
+        receiverOptions.DropPendingUpdates = DropPendingUpdates;
 
-        TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions,
-                                      _cancellationTokenSource.Token);
+        TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, _cancellationTokenSource.Token);
     }
 
-    public void StopReceiving()
+
+    public virtual void StopReceiving()
     {
-        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource?.Cancel();
     }
 
 
-    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         await OnMessageLoop(new UpdateResult(update, null));
     }
 
-    public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+
+    private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
                                  CancellationToken cancellationToken)
     {
         await OnReceiveError(new ErrorResult(exception));
     }
 
+
+    #region "BotCommands"
     /// <summary>
     ///     This will return the current list of bot commands.
     /// </summary>
     /// <returns></returns>
     public async Task<BotCommand[]> GetBotCommands(BotCommandScope scope = null, string languageCode = null)
     {
-        return await TelegramClient.GetMyCommandsAsync(scope, languageCode);
+        return await TelegramClient.GetMyCommands(scope, languageCode);
     }
 
 
@@ -164,7 +148,7 @@ public class MessageClient
     public async Task SetBotCommands(List<BotCommand> botcommands, BotCommandScope scope = null,
                                      string languageCode = null)
     {
-        await TelegramClient.SetMyCommandsAsync(botcommands, scope, languageCode);
+        await TelegramClient.SetMyCommands(botcommands, scope, languageCode);
     }
 
     /// <summary>
@@ -173,8 +157,10 @@ public class MessageClient
     /// <returns></returns>
     public async Task DeleteBotCommands(BotCommandScope scope = null, string languageCode = null)
     {
-        await TelegramClient.DeleteMyCommandsAsync(scope, languageCode);
+        await TelegramClient.DeleteMyCommands(scope, languageCode);
     }
+
+    #endregion
 
 
     #region "Events"
@@ -184,6 +170,7 @@ public class MessageClient
         add => Events.AddHandler(EvOnMessageLoop, value);
         remove => Events.RemoveHandler(EvOnMessageLoop, value);
     }
+
 
     public async Task OnMessageLoop(UpdateResult update)
     {
@@ -201,6 +188,7 @@ public class MessageClient
         add => Events.AddHandler(EvOnReceiveError, value);
         remove => Events.RemoveHandler(EvOnReceiveError, value);
     }
+
 
     public async Task OnReceiveError(ErrorResult update)
     {
@@ -225,4 +213,5 @@ public class MessageClient
     }
 
     #endregion
+
 }

@@ -23,6 +23,11 @@ public class ButtonForm
         DependencyControl = control;
     }
 
+    public ButtonForm(IEnumerable<ButtonRow> rows)
+    {
+        _buttons = rows.ToList();
+    }
+
 
     public IReplyMarkup Markup { get; set; }
 
@@ -147,6 +152,11 @@ public class ButtonForm
     {
         return _buttons.DefaultIfEmpty(new List<ButtonBase>()).Select(a => a.ToList())
                        .Aggregate((a, b) => a.Union(b).ToList());
+    }
+
+    public List<ButtonRow> ToRowList()
+    {
+        return _buttons;
     }
 
     public InlineKeyboardButton[][] ToInlineButtonArray()
