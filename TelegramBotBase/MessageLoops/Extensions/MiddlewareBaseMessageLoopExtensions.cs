@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
+using TelegramBotBase.Interfaces.ExternalActions;
 using static System.Collections.Specialized.BitVector32;
 
 namespace TelegramBotBase.MessageLoops.Extensions;
@@ -79,7 +81,7 @@ public static class MiddlewareBaseMessageLoopExtensions
     /// <summary>
     ///     Adds forms handler middleware to the message loop then returns message loop
     /// </summary>
-    public static MiddlewareBaseMessageLoop UseForms(this MiddlewareBaseMessageLoop messageLoop)
+    public static MiddlewareBaseMessageLoop UseForms(this MiddlewareBaseMessageLoop messageLoop, IExternalActionManager externalActionManager = null)
     {
         messageLoop.Use(async (container, next) =>
         {
@@ -123,6 +125,19 @@ public static class MiddlewareBaseMessageLoopExtensions
 
                 //Send Action event to form itself
                 await activeForm.Action(messageResult);
+
+                if(!messageResult.Handled && externalActionManager != null)
+                {
+                    messageResult.Handled = await externalActionManager.ManageCall(container.UpdateResult, messageResult);
+
+                    if (messageResult.Handled)
+                    {
+                        if (!container.DeviceSession.FormSwitched)
+                        {
+                            return;
+                        }
+                    }
+                }
 
                 if (!messageResult.Handled)
                 {
@@ -300,6 +315,41 @@ public static class MiddlewareBaseMessageLoopExtensions
                 await activeForm.RenderControls(messageResult);
 
                 await activeForm.Render(messageResult);
+            }
+
+            await next();
+        });
+
+        return messageLoop;
+    }
+
+    /// <summary>
+    ///  Adds the external action manager handler middleware to the message loop.
+    /// </summary>
+    public static MiddlewareBaseMessageLoop UseActionManager(this MiddlewareBaseMessageLoop messageLoop, IExternalActionManager externalActionManager)
+    {
+        if (externalActionManager == null)
+            throw new ArgumentNullException(nameof(externalActionManager));
+
+        messageLoop.Use(async (container, next) =>
+        {
+            var activeForm = container.DeviceSession.ActiveForm;
+            var messageResult = container.MessageResult;
+
+            if (messageResult.Handled)
+            {
+                await next();
+                return;
+            }
+
+            messageResult.Handled = await externalActionManager.ManageCall(container.UpdateResult, messageResult);
+
+            if (messageResult.Handled)
+            {
+                if (!container.DeviceSession.FormSwitched)
+                {
+                    return;
+                }
             }
 
             await next();
