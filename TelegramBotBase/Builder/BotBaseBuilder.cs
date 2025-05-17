@@ -481,12 +481,25 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public IBuildingStage UseThreadPool(int workerThreads = 2, int ioThreads = 1)
+    public IBuildingStage UseThreadPool()
+    {
+        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
+
+        c.DropPendingUpdates = _client.DropPendingUpdates;
+
+        _client = c;
+
+        return this;
+    }
+
+
+    public IBuildingStage UseThreadPool(int workerThreads, int ioThreads)
     {
         var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
 
         c.ThreadPool_WorkerThreads = workerThreads;
         c.ThreadPool_IOThreads = ioThreads;
+
         c.DropPendingUpdates = _client.DropPendingUpdates;
 
         _client = c;
