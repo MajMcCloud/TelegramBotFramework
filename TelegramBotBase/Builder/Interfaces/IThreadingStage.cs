@@ -7,9 +7,12 @@ namespace TelegramBotBase.Builder.Interfaces
     public interface IThreadingStage
     {
         /// <summary>
-        /// Uses one single thread for message loop. (Default)
+        /// Configures the building stage to use a single thread for processing.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>This method is typically used to optimize performance in scenarios where
+        /// multithreading is unnecessary or could introduce complexity, such as when working with non-thread-safe
+        /// resources or ensuring sequential execution.</remarks>
+        /// <returns>An <see cref="IBuildingStage"/> instance configured to operate on a single thread.</returns>
         public IBuildingStage UseSingleThread();
 
 
@@ -23,11 +26,13 @@ namespace TelegramBotBase.Builder.Interfaces
         public IBuildingStage UseThreadPool();
 
         /// <summary>
-        /// Using the threadpool for managing requests.
+        /// Configures the application to use a thread pool with the specified number of worker and I/O threads.
         /// </summary>
-        /// <param name="workerThreads">Number of concurrent working threads.</param>
-        /// <param name="ioThreads">Number of concurrent I/O threads.</param>
-        /// <returns></returns>
+        /// <remarks>This method is typically used to optimize thread pool usage for applications with
+        /// specific concurrency or I/O requirements.</remarks>
+        /// <param name="workerThreads">The number of worker threads to allocate in the thread pool. Must be a positive integer.</param>
+        /// <param name="ioThreads">The number of I/O threads to allocate in the thread pool. Must be a positive integer.</param>
+        /// <returns>An <see cref="IBuildingStage"/> instance that allows further configuration of the application.</returns>
         public IBuildingStage UseThreadPool(int workerThreads, int ioThreads);
 
     }
