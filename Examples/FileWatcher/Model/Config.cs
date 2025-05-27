@@ -21,7 +21,10 @@ namespace FileWatcher.Model
 
         public List<string> FilesToExclude { get; set; } = new List<string>() { "anything.txt" , "others.txt" };
 
+        public string MessageTemplate { get; set; } = "File '%filename%' %action%";
 
+        public const string FilenamePlaceholder = "%filename%";
+        public const string ActionPlaceholder = "%action%";
 
         public static Config Load()
         {

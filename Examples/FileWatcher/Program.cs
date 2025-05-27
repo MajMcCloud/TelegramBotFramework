@@ -119,8 +119,10 @@ namespace FileWatcher
                     return;
             }
 
+            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
+                                             .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
 
-            Console.WriteLine($"File '{e.Name}' changed");
+            Console.WriteLine(s);
 
             if (Bot == null)
                 return;
@@ -129,7 +131,7 @@ namespace FileWatcher
             {
                 try
                 {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' changed");
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
                 }
                 catch
                 {
@@ -148,7 +150,10 @@ namespace FileWatcher
                     return;
             }
 
-            Console.WriteLine($"File '{e.Name}' created");
+            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
+                                 .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
+
+            Console.WriteLine(s);
 
             if (Bot == null)
                 return;
@@ -157,14 +162,14 @@ namespace FileWatcher
             {
                 try
                 {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' created");
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
                 }
                 catch
                 {
 
                 }
             }
-        }   
+        }
 
         private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
@@ -176,7 +181,10 @@ namespace FileWatcher
                     return;
             }
 
-            Console.WriteLine($"File '{e.Name}' renamed");
+            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
+                                 .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
+
+            Console.WriteLine(s);
 
             if (Bot == null)
                 return;
@@ -185,7 +193,7 @@ namespace FileWatcher
             {
                 try
                 {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' renamed");
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
                 }
                 catch
                 {
