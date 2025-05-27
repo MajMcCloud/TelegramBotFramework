@@ -71,7 +71,10 @@ namespace FileWatcher
 
                 Bot.UploadBotCommands();
 
-                Bot.Start();
+                if (Config.ListenForCommands)
+                {
+                    Bot.Start();
+                }
             }
 
             watcher.EnableRaisingEvents = true;
@@ -87,8 +90,10 @@ namespace FileWatcher
 
             watcher.EnableRaisingEvents = false;
 
-            Bot?.Stop();
-
+            if (Config.ListenForCommands)
+            {
+                Bot?.Stop();
+            }
         }
 
 

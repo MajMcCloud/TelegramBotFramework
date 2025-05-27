@@ -15,6 +15,8 @@ namespace FileWatcher.Model
 
         public String DirectoryToWatch { get; set; } = "";
 
+        public bool ListenForCommands { get; set; } = true;
+
         public List<long> DeviceIds { get; set; } = new List<long>();
 
         public string Filter { get; set; } = "*.*";
