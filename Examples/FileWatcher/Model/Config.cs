@@ -39,7 +39,7 @@ namespace FileWatcher.Model
                     config.Save();
                 }
 
-                var content = File.ReadAllText(path);
+                var content = File.ReadAllText(path, Encoding.UTF8);
 
                 config = JsonSerializer.Deserialize<Config>(content);
             }
@@ -70,7 +70,7 @@ namespace FileWatcher.Model
 
                 var content = System.Text.Json.JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true });
 
-                File.WriteAllText(path, content);
+                File.WriteAllText(path, content, Encoding.UTF8);
             }
             catch
             {
