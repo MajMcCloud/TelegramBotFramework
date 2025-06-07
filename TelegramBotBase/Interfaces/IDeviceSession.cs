@@ -15,6 +15,16 @@ public interface IDeviceSession : IDeviceSessionMethods
 {
     MessageClient Client => ActiveForm.Client;
 
+    /// <summary>
+    ///     Returns if the messages is posted within a group.
+    /// </summary>
+    bool IsGroup { get;}
+
+    /// <summary>
+    ///     Returns if the messages is posted within a channel.
+    /// </summary>
+    bool IsChannel { get; }
+
     int LastMessageId => LastMessage?.MessageId ?? -1;
 
     Message LastMessage { get; set; }
