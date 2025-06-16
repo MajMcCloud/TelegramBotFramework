@@ -71,6 +71,7 @@ public class ThreadPoolMessageClient : MessageClient
         _cancellationTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions();
+        receiverOptions.AllowedUpdates = AllowedUpdates;
 
         receiverOptions.DropPendingUpdates = DropPendingUpdates;
 

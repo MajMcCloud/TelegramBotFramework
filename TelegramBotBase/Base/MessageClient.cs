@@ -10,6 +10,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 
 namespace TelegramBotBase.Base;
@@ -30,6 +31,7 @@ public class MessageClient
 
     public ITelegramBotClient TelegramClient { get; set; }
 
+    public UpdateType[] AllowedUpdates { get; set; } = Update.AllTypes;
 
 
     /// <summary>
@@ -102,6 +104,7 @@ public class MessageClient
         _cancellationTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions();
+        receiverOptions.AllowedUpdates = AllowedUpdates;
 
         receiverOptions.DropPendingUpdates = DropPendingUpdates;
 

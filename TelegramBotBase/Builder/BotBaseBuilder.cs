@@ -478,6 +478,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     public IBuildingStage UseSingleThread()
     {
+        _client.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
+
         return this;
     }
 
@@ -486,6 +488,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
 
         c.DropPendingUpdates = _client.DropPendingUpdates;
+        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
 
         _client = c;
 
@@ -501,6 +504,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         c.ThreadPool_IOThreads = ioThreads;
 
         c.DropPendingUpdates = _client.DropPendingUpdates;
+        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
 
         _client = c;
 
