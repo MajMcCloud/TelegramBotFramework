@@ -16,18 +16,21 @@ public sealed class FormBaseMessageLoop : IMessageLoopFactory
 {
     public IExternalActionManager ExternalActionManager { get; set; }
 
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return new[]
+        {
+            UpdateType.Message,
+            UpdateType.EditedMessage,
+            UpdateType.BusinessMessage,
+            UpdateType.EditedBusinessMessage,
+            UpdateType.CallbackQuery
+        };
+    }
+
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         var update = ur.RawData;
-
-        if (update.Type != UpdateType.Message
-            && update.Type != UpdateType.EditedMessage
-            && update.Type != UpdateType.BusinessMessage
-            && update.Type != UpdateType.EditedBusinessMessage
-            && update.Type != UpdateType.CallbackQuery)
-        {
-            return;
-        }
 
         //Is this a bot command ?
         if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))

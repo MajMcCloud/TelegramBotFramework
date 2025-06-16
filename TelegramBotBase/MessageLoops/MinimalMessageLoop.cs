@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -13,6 +14,11 @@ namespace TelegramBotBase.MessageLoops;
 /// </summary>
 public sealed class MinimalMessageLoop : IMessageLoopFactory
 {
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return Update.AllTypes;
+    }
+
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         var activeForm = session.ActiveForm;

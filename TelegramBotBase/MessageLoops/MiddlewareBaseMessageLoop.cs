@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
@@ -19,6 +21,11 @@ public sealed class MiddlewareBaseMessageLoop : IMessageLoopFactory
     private List<Func<MessageContainer, Func<Task>, Task>> Middlewares = new();
 
     public event EventHandler<UnhandledCallEventArgs> UnhandledCall;
+
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return Update.AllTypes;
+    }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
@@ -58,6 +65,7 @@ public sealed class MiddlewareBaseMessageLoop : IMessageLoopFactory
     {
         Middlewares.Add(middleware);
     }
+
 
 }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -15,6 +16,11 @@ namespace TelegramBotBase.MessageLoops;
 public sealed class FullMessageLoop : IMessageLoopFactory
 {
     public IExternalActionManager ExternalActionManager { get; set; }
+
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return Update.AllTypes;
+    }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
