@@ -60,5 +60,29 @@ public class CallbackData
         return JsonSerializer.Deserialize<CallbackData>(data);
     }
 
+    /// <summary>
+    /// Attempts to deserialize the specified raw data into a <see cref="CallbackData"/> object.
+    /// </summary>
+    /// <param name="raw_data">The raw data string to deserialize.</param>
+    /// <param name="data">When this method returns, contains the deserialized <see cref="CallbackData"/> object if the operation succeeds;
+    /// otherwise, <see langword="null"/>. This parameter is passed uninitialized.</param>
+    /// <returns><see langword="true"/> if the raw data was successfully deserialized; otherwise, <see langword="false"/>.</returns>
+    public static bool TryDeserialize(string raw_data, out CallbackData data)
+    {
+        try
+        {
+            data = Deserialize(raw_data);
+
+            return true;
+        }
+        catch
+        {
+            
+        }
+
+        data = null;
+        return false;
+    }
+
     public static implicit operator string(CallbackData callbackData) => callbackData.Serialize(true);
 }
