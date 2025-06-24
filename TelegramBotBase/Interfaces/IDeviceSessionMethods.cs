@@ -77,15 +77,15 @@ namespace TelegramBotBase.Interfaces
                                               ParseMode parseMode = ParseMode.Markdown);
 
         Task<Message> Edit(int messageId, string text, ButtonForm buttons = null,
-                                    ParseMode parseMode = ParseMode.Markdown);
+                                    ParseMode parseMode = ParseMode.Markdown, bool markdownV2AutoEscape = false);
 
 
 
         Task<Message> Edit(int messageId, string text, InlineKeyboardMarkup markup,
-                                    ParseMode parseMode = ParseMode.Markdown);
+                                    ParseMode parseMode = ParseMode.Markdown, bool markdownV2AutoEscape = false);
 
         Task<Message> Edit(Message message, ButtonForm buttons = null,
-                                    ParseMode parseMode = ParseMode.Markdown);
+                                    ParseMode parseMode = ParseMode.Markdown, bool markdownV2AutoEscape = false);
 
         Task<Message> EditReplyMarkup(int messageId, ButtonForm bf);
 

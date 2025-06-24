@@ -145,13 +145,19 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons"></param>
     /// <returns></returns>
     public async Task<Message> Edit(int messageId, string text, ButtonForm buttons = null,
-                                    ParseMode parseMode = ParseMode.Markdown)
+                                    ParseMode parseMode = ParseMode.Markdown,
+                                    bool markdownV2AutoEscape = false)
     {
         InlineKeyboardMarkup markup = buttons;
 
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
             throw new MessageTooLongException(text.Length);
+        }
+
+        if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
+        {
+            text = text.MarkdownV2Escape();
         }
 
 
@@ -166,13 +172,18 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons"></param>
     /// <returns></returns>
     public async Task<Message> Edit(int messageId, string text, InlineKeyboardMarkup markup,
-                                    ParseMode parseMode = ParseMode.Markdown)
+                                    ParseMode parseMode = ParseMode.Markdown,
+                                    bool markdownV2AutoEscape = false)
     {
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
             throw new MessageTooLongException(text.Length);
         }
 
+        if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
+        {
+            text = text.MarkdownV2Escape();
+        }
 
         return await Api(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
 
@@ -186,13 +197,19 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons"></param>
     /// <returns></returns>
     public async Task<Message> Edit(Message message, ButtonForm buttons = null,
-                                    ParseMode parseMode = ParseMode.Markdown)
+                                    ParseMode parseMode = ParseMode.Markdown,
+                                    bool markdownV2AutoEscape = false)
     {
         InlineKeyboardMarkup markup = buttons;
 
         if (message.Text.Length > Constants.Telegram.MaxMessageLength)
         {
             throw new MessageTooLongException(message.Text.Length);
+        }
+
+        if (parseMode == ParseMode.MarkdownV2 && markdownV2AutoEscape)
+        {
+            message.Text = message.Text.MarkdownV2Escape();
         }
 
         return await Api(a => a.EditMessageText(DeviceId, message.MessageId, message.Text, parseMode,
