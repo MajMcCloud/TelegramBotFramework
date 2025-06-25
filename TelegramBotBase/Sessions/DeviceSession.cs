@@ -146,7 +146,7 @@ public class DeviceSession : IDeviceSession
     /// <returns></returns>
     public async Task<Message> Edit(int messageId, string text, ButtonForm buttons = null,
                                     ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = false)
+                                    bool markdownV2AutoEscape = true)
     {
         InlineKeyboardMarkup markup = buttons;
 
@@ -173,7 +173,7 @@ public class DeviceSession : IDeviceSession
     /// <returns></returns>
     public async Task<Message> Edit(int messageId, string text, InlineKeyboardMarkup markup,
                                     ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = false)
+                                    bool markdownV2AutoEscape = true)
     {
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
@@ -198,7 +198,7 @@ public class DeviceSession : IDeviceSession
     /// <returns></returns>
     public async Task<Message> Edit(Message message, ButtonForm buttons = null,
                                     ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = false)
+                                    bool markdownV2AutoEscape = true)
     {
         InlineKeyboardMarkup markup = buttons;
 
