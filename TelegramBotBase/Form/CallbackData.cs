@@ -69,18 +69,25 @@ public class CallbackData
     /// <returns><see langword="true"/> if the raw data was successfully deserialized; otherwise, <see langword="false"/>.</returns>
     public static bool TryDeserialize(string raw_data, out CallbackData data)
     {
+        data = null;
+
+        if (string.IsNullOrWhiteSpace(raw_data))
+            return false;
+
+        if (raw_data[0] != '{' || raw_data[^1] != '}')
+            return false;
+
         try
         {
             data = Deserialize(raw_data);
-
-            return true;
+            return data != null;
         }
-        catch
+        catch (JsonException)
         {
-            
+            // Ungültiges JSON-Format
         }
 
-        data = null;
+
         return false;
     }
 
