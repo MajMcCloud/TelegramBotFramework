@@ -84,7 +84,7 @@ public class CallbackData
         }
         catch (JsonException)
         {
-            // Ungültiges JSON-Format
+            // Invalid JSON-Format
         }
 
 
