@@ -14,6 +14,10 @@
 
 **Releases: [GitHub](https://github.com/MajMcCloud/TelegramBotFramework/releases)**
 
+**Need your own bot? Get in touch https://t.me/botbasebuilder**
+
+**on X: @florian_zevedei**
+
 ## Donate
 
 Paypal: [https://paypal.me/majmccloud](https://paypal.me/majmccloud)
@@ -109,6 +113,7 @@ var bot = BotBaseBuilder
     })
     .NoSerialization()
     .UseEnglish()
+    .UseSingleThread()
     .Build();
 
 // Upload bot commands to BotFather
@@ -129,8 +134,32 @@ like ChatId and other stuff your carrying.
 From there you build up your bots:
 
 ```csharp
-public class StartForm : FormBase
+public class Start : FormBase
 {
+     
+    public Start()
+    {
+        //Additional event handlers
+        Init += Start_Init;
+        Opened += Start_Opened;
+        Closed += Start_Closed;
+    }
+
+    // Gets invoked on initialization, before navigation
+    private async Task Start_Init(object sender, Args.InitEventArgs e)
+    {
+    }
+
+    // Gets invoked after opened
+    private async Task Start_Opened(object sender, EventArgs e)
+    {
+    }
+
+    // Gets invoked after form has been closed
+    private async Task Start_Closed(object sender, EventArgs e)
+    {
+    }
+
     // Gets invoked during Navigation to this form
     public override async Task PreLoad(MessageResult message)
     {
@@ -227,6 +256,7 @@ var bot = BotBaseBuilder
     })
     .NoSerialization()
     .UseEnglish()
+    .UseSingleThread()
     .Build();
 
 bot.BotCommand += async (s, en) =>
@@ -267,15 +297,15 @@ public class SimpleForm : AutoCleanForm
 {
     public SimpleForm()
     {
-        this.DeleteSide = TelegramBotBase.Enums.eDeleteSide.Both;
-        this.DeleteMode = TelegramBotBase.Enums.eDeleteMode.OnLeavingForm;
+        DeleteSide = EDeleteSide.Both;
+        DeleteMode = EDeleteMode.OnLeavingForm;
 
-        this.Opened += SimpleForm_Opened;
+        Opened += SimpleForm_Opened;
     }
 
     private async Task SimpleForm_Opened(object sender, EventArgs e)
     {
-        await this.Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
+        await Device.Send("Hello world! (send 'back' to get back to Start)\r\nOr\r\nhi, hello, maybe, bye and ciao");
     }
 
     public override async Task Load(MessageResult message)
@@ -313,7 +343,13 @@ public class SimpleForm : AutoCleanForm
 ```csharp
 public class ButtonTestForm : AutoCleanForm
 {
-    public override async Task Opened()
+    public ButtonTestForm()
+    {
+        this.DeleteMode = eDeleteMode.OnLeavingForm;
+        Opened += ButtonTestForm_Opened;
+    }
+
+    private async Task ButtonTestForm_Opened(object sender, EventArgs e)
     {
         await this.Device.Send("Hello world! (Click 'back' to get back to Start)");
     }
@@ -383,9 +419,10 @@ public class ProgressTest : AutoCleanForm
     public ProgressTest()
     {
         this.DeleteMode = eDeleteMode.OnLeavingForm;
+        Opened += ProgressTest_Opened;
     }
 
-    public override async Task Opened()
+    private async Task ProgressTest_Opened(object sender, EventArgs e)
     {
         await this.Device.Send("Welcome to ProgressTest");
     }
@@ -866,6 +903,7 @@ var bot = BotBaseBuilder
     })
     .UseSimpleJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
+    .UseSingleThread()
     .Build();
 
 await bot.Start();
@@ -889,6 +927,7 @@ var bot = BotBaseBuilder
     })
     .UseJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
+    .UseSingleThread()
     .Build();
 
 await bot.Start();
@@ -911,6 +950,7 @@ var bot = BotBaseBuilder
     })
     .UseXML(AppContext.BaseDirectory + "config\\states.xml")
     .UseEnglish()
+    .UseSingleThread()
     .Build();
 
 await bot.Start();
@@ -924,7 +964,7 @@ datatype and one for implementing into a form which should be invoked with event
 #### IStateMachine
 
 Is the basic StateMachine interface, it has two methods `SaveFormStates(SaveStatesEventArgs e)`
-and `StateContainerLoadFormStates()`, nothing fancy, just simple calls. Implement both methods with your own
+and `LoadFormStates()`, nothing fancy, just simple calls. Implement both methods with your own
 serialization process.
 
 ```csharp

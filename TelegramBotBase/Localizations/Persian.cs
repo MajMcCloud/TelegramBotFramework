@@ -12,8 +12,8 @@ public sealed class Persian : Localization
         Values["ButtonGrid_CurrentPage"] = "صفحه ی {0} از {1}";
         Values["ButtonGrid_SearchFeature"] = "💡 برای فیلتر کردن لیست پیام ارسال کنید. برای بازنشانی فیلتر روی 🔍 کلیک کنید.";
         Values["ButtonGrid_Back"] = "بازگشت";
-        Values["TaggedButtonGrid_TotalTags"] = "Total: {0}";
-        Values["TaggedButtonGrid_CheckedTags"] = "Checked: {0}";
+        Values["TaggedButtonGrid_TotalTags"] = "مجموع: {0}";
+        Values["TaggedButtonGrid_CheckedTags"] = "انتخاب شده: {0}";
         Values["TaggedButtonGrid_CheckAll"] = "بررسی کردن همه";
         Values["TaggedButtonGrid_UncheckAll"] = "بررسی نکردن همه";
         Values["CalendarPicker_Title"] = "تاریخ را انتخاب کنید";
