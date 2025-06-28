@@ -22,31 +22,23 @@ namespace TelegramBotBase.Extensions.ActionManager.Actions
 
         public bool DoesFit(string raw_data)
         {
-            try
-            {
-                var cd = CallbackData.Deserialize(raw_data);
+            if (!CallbackData.TryDeserialize(raw_data, out CallbackData cd))
+                return false;
 
-                if (cd == null)
-                    return false;
+            if (cd == null)
+                return false;
 
-                if (cd.Method != Method)
-                    return false;
+            if (cd.Method != Method)
+                return false;
 
-                Guid g;
+            Guid g;
 
-                if (Guid.TryParse(cd.Value, out g))
-                    _lastValue = g;
+            if (Guid.TryParse(cd.Value, out g))
+                _lastValue = g;
 
-                _lastData = cd;
+            _lastData = cd;
 
-                return true;
-            }
-            catch
-            {
-
-            }
-
-            return false;
+            return true;
         }
 
 
