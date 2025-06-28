@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
@@ -10,36 +12,19 @@ namespace TelegramBotBase.MessageLoops;
 /// <summary>
 ///     This is a minimal message loop which will react to all update types and just calling the Load method.
 /// </summary>
-public class MinimalMessageLoop : IMessageLoopFactory
+public sealed class MinimalMessageLoop : IMessageLoopFactory
 {
-    private static readonly object EvUnhandledCall = new();
-
-    private readonly EventHandlerList _events = new();
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return Update.AllTypes;
+    }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
-        var update = ur.RawData;
-
-
-        mr.Device = session;
-
         var activeForm = session.ActiveForm;
 
         //Loading Event
         await activeForm.Load(mr);
     }
 
-    /// <summary>
-    ///     Will be called if no form handled this call
-    /// </summary>
-    public event EventHandler<UnhandledCallEventArgs> UnhandledCall
-    {
-        add => _events.AddHandler(EvUnhandledCall, value);
-        remove => _events.RemoveHandler(EvUnhandledCall, value);
-    }
-
-    public void OnUnhandledCall(UnhandledCallEventArgs e)
-    {
-        (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-    }
 }

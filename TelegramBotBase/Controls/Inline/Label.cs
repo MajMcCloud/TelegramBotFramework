@@ -89,14 +89,14 @@ public class Label : ControlBase
         //Update ?
         if (MessageId != null)
         {
-            m = await Device.Raw(a => a.EditMessageTextAsync(Device.DeviceId, MessageId.Value, Text, _parseMode));
+            m = await Device.Raw(a => a.EditMessageText(Device.DeviceId, MessageId.Value, Text, _parseMode));
             _renderNecessary = false;
 
             return;
         }
 
         //New Message
-        m = await Device.Raw(a => a.SendTextMessageAsync(Device.DeviceId, Text, disableNotification: true, parseMode: _parseMode));
+        m = await Device.Raw(a => a.SendMessage(Device.DeviceId, Text, disableNotification: true, parseMode: _parseMode));
         if (m != null)
         {
             MessageId = m.MessageId;

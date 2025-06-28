@@ -36,6 +36,8 @@ public class CheckedButtonList : ControlBase
 
     public string PreviousPageLabel = Default.Language["ButtonGrid_PreviousPage"];
 
+    public string PagingInfo = Default.Language["ButtonGrid_CurrentPage"];
+
     public CheckedButtonList()
     {
         DataSource = new ButtonFormDataSource();
@@ -792,7 +794,7 @@ public class CheckedButtonList : ControlBase
             var row = new ButtonRow();
             row.Add(new ButtonBase(PreviousPageLabel, "$previous$"));
             row.Add(new ButtonBase(
-                        string.Format(Default.Language["ButtonGrid_CurrentPage"], CurrentPageIndex + 1, PageCount),
+                        string.Format(PagingInfo, CurrentPageIndex + 1, PageCount),
                         "$site$"));
             row.Add(new ButtonBase(NextPageLabel, "$next$"));
 

@@ -63,7 +63,7 @@ public class JsonStateMachine : IStateMachine
 
             return sc;
         }
-        catch(Exception ex)
+        catch
         {
             
         }

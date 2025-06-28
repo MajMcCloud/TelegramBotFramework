@@ -49,6 +49,8 @@ public class TaggedButtonGrid : MultiView
 
     public string TagIcon = Default.Language["TaggedButtonGrid_TagIcon"];
 
+    public string PagingInfo = Default.Language["ButtonGrid_CurrentPage"];
+
     public TaggedButtonGrid()
     {
         DataSource = new ButtonFormDataSource();
@@ -1024,7 +1026,7 @@ public class TaggedButtonGrid : MultiView
             var row = new ButtonRow();
             row.Add(new ButtonBase(PreviousPageLabel, "$previous$"));
             row.Add(new ButtonBase(
-                        string.Format(Default.Language["ButtonGrid_CurrentPage"], CurrentPageIndex + 1, PageCount),
+                        string.Format(PagingInfo, CurrentPageIndex + 1, PageCount),
                         "$site$"));
 
             if (Tags != null && Tags.Count > 0)

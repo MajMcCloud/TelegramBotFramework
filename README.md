@@ -1,6 +1,6 @@
 # .NET Telegram Bot Framework - Context based addon
 
-[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/vpre/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 [![Telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://www.t.me/tgbotbase)
 
 [![License](https://img.shields.io/github/license/MajMcCloud/telegrambotframework.svg?style=flat-square&maxAge=2592000&label=License)](https://raw.githubusercontent.com/MajMcCloud/TelegramBotFramework/master/LICENCE.md)
@@ -81,7 +81,14 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
     * [As of Now](#as-of-now)
     * [Usage](#usage)
+- [Action Manager (Extension)](#action-manager)
 - [Extensions](#extensions)
+    * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
+    * [TelegramBotBase.Extensions.Images.IronSoftware](#telegrambotbaseextensionsimagesironsoftware)
+    * [TelegramBotBase.Extensions.Serializer.Database.MSSQL](#telegrambotbaseextensionsserializerdatabasemssql)
+    * [TelegramBotBase.Extensions.Serializer.Database.PostgreSql](#telegrambotbaseextensionsserializerdatabasemysql)
+    * [TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson](#telegrambotbaseextensionsserializerlegacynewtonsoftjson)
+    * [TelegramBotBase.Extensions.ActionManager](#telegrambotbaseextensionsactionmanager)
 - [Test Project](#test-project)
 - [Examples](#examples)
 
@@ -761,6 +768,7 @@ The current available languages for controls are:
 - German
 - Persian
 - Russian
+- Ukrainian
 
 You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
 
@@ -1082,6 +1090,22 @@ have given to the constructor at the beginning.*
 
 ---
 
+## Action Manager
+
+The Action Manager is a simple way to manage unhandled action calls in a bot.
+
+As well you can handle notifications with inline buttons, which will be shown to the user from outside of a messageloop.
+
+i.E. you have a bot which is running in a group and you want to notify the user about a new message or event.
+
+
+See [More details](/TelegramBotBase.Extensions.ActionManager/Readme.md)
+
+Source code: [TelegramBotBase.Extensions.ActionManager/](/TelegramBotBase.Extensions.ActionManager/)
+
+
+---
+
 ## Extensions
 
 ### TelegramBotBase.Extensions.Images
@@ -1154,6 +1178,19 @@ Source code: [TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](/Teleg
 Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
 
 Credits: [@Kataane](https://github.com/Kataane)
+
+
+### TelegramBotBase.Extensions.ActionManager
+
+A simple action manager to manage unhandled action calls in a bot.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.ActionManager.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.ActionManager.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager)
+
+Source code: [TelegramBotBase.Extensions.ActionManager/](/TelegramBotBase.Extensions.ActionManager/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/](https://www.nuget.org/packages/TelegramBotBase.Extensions.ActionManager/)
+
 
 ---
 

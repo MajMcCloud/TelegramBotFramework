@@ -1,4 +1,7 @@
-﻿using TelegramBotBase.Interfaces;
+﻿using System;
+using TelegramBotBase.Interfaces;
+using TelegramBotBase.MessageLoops;
+using TelegramBotBase.Interfaces.ExternalActions;
 
 namespace TelegramBotBase.Builder.Interfaces;
 
@@ -9,7 +12,13 @@ public interface IMessageLoopSelectionStage
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    IStartFormSelectionStage DefaultMessageLoop();
+    IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null);
+
+
+    /// <summary>
+    ///     Choses a fully customizable middleware-based message loop.
+    /// </summary>
+    IStartFormSelectionStage MiddlewareMessageLoop(Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration);
 
 
     /// <summary>
@@ -17,6 +26,13 @@ public interface IMessageLoopSelectionStage
     /// </summary>
     /// <returns></returns>
     IStartFormSelectionStage MinimalMessageLoop();
+
+
+    /// <summary>
+    /// Choose a full message loop, which catches all update types and calls all functions.
+    /// </summary>
+    /// <returns></returns>
+    IStartFormSelectionStage FullMessageLoop(IExternalActionManager managerInstance = null);
 
 
     /// <summary>

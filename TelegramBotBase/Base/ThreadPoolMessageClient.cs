@@ -26,9 +26,9 @@ public class ThreadPoolMessageClient : MessageClient
     //     will effectively be set to receive all Telegram.Bot.Types.Updates.
     /// </summary>
 
-    public int ThreadPool_WorkerThreads { get; set; } = 1;
+    public int? ThreadPool_WorkerThreads { get; set; }
 
-    public int ThreadPool_IOThreads { get; set; } = 1;
+    public int? ThreadPool_IOThreads { get; set; }
 
 
     public ThreadPoolMessageClient(string apiKey) : base(apiKey)
@@ -71,11 +71,15 @@ public class ThreadPoolMessageClient : MessageClient
         _cancellationTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions();
+        receiverOptions.AllowedUpdates = AllowedUpdates;
 
-        receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
+        receiverOptions.DropPendingUpdates = DropPendingUpdates;
 
-        ThreadPool.SetMaxThreads(ThreadPool_WorkerThreads, ThreadPool_IOThreads);
-        
+        if (ThreadPool_WorkerThreads != null && ThreadPool_IOThreads != null)
+        {
+            ThreadPool.SetMaxThreads(ThreadPool_WorkerThreads.Value, ThreadPool_IOThreads.Value);
+        }
+
         TelegramClient.StartReceiving(HandleUpdateAsyncThreadPool, HandleErrorAsyncThreadPool, receiverOptions, _cancellationTokenSource.Token);
     }
 

@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
+using TelegramBotBase.Commands;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Interfaces;
@@ -33,8 +35,9 @@ public sealed class BotBase
         SetSetting(ESettings.LogAllMessages, false);
         SetSetting(ESettings.SkipAllMessages, false);
         SetSetting(ESettings.SaveSessionsOnConsoleExit, false);
+        SetSetting(ESettings.HandleRelationChanges, true);
 
-        BotCommandScopes = new Dictionary<BotCommandScope, List<BotCommand>>();
+        BotCommandScopes = new List<BotCommandScopeGroup>();
 
         Sessions = new SessionManager(this);
     }
@@ -54,7 +57,7 @@ public sealed class BotBase
     /// <summary>
     ///     Contains System commands which will be available at everytime and didnt get passed to forms, i.e. /start
     /// </summary>
-    public Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; internal set; }
+    public List<BotCommandScopeGroup> BotCommandScopes { get; internal set; }
 
 
     /// <summary>
@@ -124,6 +127,15 @@ public sealed class BotBase
             e.Device = ds;
 
             var mr = new MessageResult(e.RawData);
+            mr.Device = ds;
+
+            //Check if user blocked or unblocked the bot
+            if (e.RawData.Type == UpdateType.MyChatMember && GetSetting(Enums.ESettings.HandleRelationChanges, true)
+                && e?.RawData?.MyChatMember?.NewChatMember is not null)
+            {
+                OnBotRelationChanged(new BotRelationChangedEventArgs(ds, e, mr));
+                return;
+            }
 
             var i = 0;
 
@@ -185,7 +197,7 @@ public sealed class BotBase
 
         foreach (var s in Sessions.SessionList)
         {
-            await Client.TelegramClient.SendTextMessageAsync(s.Key, message);
+            await Client.TelegramClient.SendMessage(s.Key, message);
         }
     }
 
@@ -228,14 +240,37 @@ public sealed class BotBase
     }
 
 
+
     /// <summary>
-    ///     Will get invoke on an unhandled call.
+    /// Returns a list of all bot commands in all configured scopes.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void MessageLoopFactory_UnhandledCall(object sender, UnhandledCallEventArgs e)
+    /// <returns></returns>
+    public async Task<List<BotCommandScopeGroup>> GetBotCommands()
     {
-        OnUnhandledCall(e);
+        var languages = BotCommandScopes.Select(a => a.Language).Distinct().ToArray();
+
+        return await GetBotCommands(languages);
+    }
+
+    /// <summary>
+    /// Returns a list of all bot commands in all configured scopes and given languages.
+    /// </summary>
+    /// <param name="additional_languages"></param>
+    /// <returns></returns>
+    public async Task<List<BotCommandScopeGroup>> GetBotCommands(params string[] additional_languages)
+    {
+        List<BotCommandScopeGroup> scopes = new List<BotCommandScopeGroup>();
+
+        foreach (var bs in BotCommandScopes)
+        {
+            foreach(var lang in additional_languages)
+            {
+                var commands = await Client.GetBotCommands(bs.Scope, lang);
+                scopes.Add(new BotCommandScopeGroup(bs.Scope, commands, lang));
+            }
+
+        }
+        return scopes;
     }
 
     /// <summary>
@@ -245,15 +280,16 @@ public sealed class BotBase
     {
         foreach (var bs in BotCommandScopes)
         {
-            if (bs.Value != null)
+            if (bs.Remove)
             {
-                await Client.SetBotCommands(bs.Value, bs.Key);
+                await Client.DeleteBotCommands(bs.Scope, bs.Language);
+                continue;
             }
-            else
-            {
-                await Client.DeleteBotCommands(bs.Key);
-            }
+
+            await Client.SetBotCommands(bs.Commands, bs.Scope, bs.Language);
         }
+
+        BotCommandScopes = BotCommandScopes.Where(a => !a.Remove).ToList();
     }
 
     /// <summary>
@@ -265,7 +301,7 @@ public sealed class BotBase
     {
         foreach (var scope in BotCommandScopes)
         {
-            if (scope.Value.Any(a => Constants.Telegram.BotCommandIndicator + a.Command == command))
+            if (scope.HasCommand(command))
             {
                 return true;
             }
@@ -341,9 +377,8 @@ public sealed class BotBase
 
     private static readonly object EvUnhandledCall = new();
 
-    #endregion
+    private static readonly object EvOnBotRelationChanged = new();
 
-    #region "Events"
 
     /// <summary>
     ///     Will be called if a session/context gets started
@@ -414,6 +449,22 @@ public sealed class BotBase
     {
         (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
     }
+
+
+    /// <summary>
+    ///     Will be called if the relation between the bot and the user has changed.
+    /// </summary>
+    public event EventHandler<BotRelationChangedEventArgs> BotRelationChanged
+    {
+        add => _events.AddHandler(EvOnBotRelationChanged, value);
+        remove => _events.RemoveHandler(EvOnBotRelationChanged, value);
+    }
+
+    public void OnBotRelationChanged(BotRelationChangedEventArgs e)
+    {
+        (_events[EvOnBotRelationChanged] as EventHandler<BotRelationChangedEventArgs>)?.Invoke(this, e);
+    }
+
 
     #endregion
 }

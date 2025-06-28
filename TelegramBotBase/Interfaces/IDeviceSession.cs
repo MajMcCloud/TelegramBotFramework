@@ -18,7 +18,7 @@ public interface IDeviceSession : IDeviceSessionMethods
     /// <summary>
     ///     Returns if the messages is posted within a group.
     /// </summary>
-    bool IsGroup { get; }
+    bool IsGroup { get;}
 
     /// <summary>
     ///     Returns if the messages is posted within a channel.

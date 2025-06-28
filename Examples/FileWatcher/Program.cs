@@ -18,7 +18,6 @@ namespace FileWatcher
             if (string.IsNullOrEmpty(Config.APIKey))
             {
                 Console.WriteLine("No API Key set");
-                return;
             }
 
             if (string.IsNullOrEmpty(Config.DirectoryToWatch))
@@ -27,34 +26,56 @@ namespace FileWatcher
                 return;
             }
 
-            FileSystemWatcher watcher = new FileSystemWatcher(Config.DirectoryToWatch);
+            if (Config.FilesToExclude.Count > 0)
+            {
+                Console.WriteLine("Files to exclude: " + string.Join(',', Config.FilesToExclude));
+            }
+
+            FileSystemWatcher watcher = null;
+
+            if (string.IsNullOrEmpty(Config.Filter))
+            {
+                watcher = new FileSystemWatcher(Config.DirectoryToWatch);
+                Console.WriteLine("No filter set, using default *.*");
+            }
+            else
+            {
+                watcher = new FileSystemWatcher(Config.DirectoryToWatch, Config.Filter);
+                Console.WriteLine($"Filter: {Config.Filter}");
+            }
+
             watcher.IncludeSubdirectories = false;
 
             Console.WriteLine($"Directory: {Config.DirectoryToWatch}");
 
+            //start file watcher even without api key for testing
+            if (!string.IsNullOrEmpty(Config.APIKey))
+            {
+                Bot = BotBaseBuilder.Create()
+                    .WithAPIKey(Config.APIKey)
+                    .DefaultMessageLoop()
+                    .WithStartForm<Forms.Start>()
+                    .NoProxy()
+                    .CustomCommands(a =>
+                    {
+                        a.Start("Starts the bot");
+                        a.Add("myid", "Whats my id?");
 
+                    })
+                    .NoSerialization()
+                    .UseGerman()
+                    .UseSingleThread()
+                    .Build();
 
-            Bot = BotBaseBuilder.Create()
-                .WithAPIKey(Config.APIKey)
-                .DefaultMessageLoop()
-                .WithStartForm<Forms.Start>()
-                .NoProxy()
-                .CustomCommands(a =>
+                Bot.BotCommand += Bot_BotCommand;
+
+                Bot.UploadBotCommands();
+
+                if (Config.ListenForCommands)
                 {
-                    a.Start("Starts the bot");
-                    a.Add("myid", "Whats my id?");
-
-                })
-                .NoSerialization()
-                .UseGerman()
-                .UseSingleThread()
-                .Build();
-
-            Bot.BotCommand += Bot_BotCommand;
-
-            Bot.UploadBotCommands();
-
-            Bot.Start();
+                    Bot.Start();
+                }
+            }
 
             watcher.EnableRaisingEvents = true;
 
@@ -69,8 +90,10 @@ namespace FileWatcher
 
             watcher.EnableRaisingEvents = false;
 
-            Bot.Stop();
-
+            if (Config.ListenForCommands)
+            {
+                Bot?.Stop();
+            }
         }
 
 
@@ -93,31 +116,95 @@ namespace FileWatcher
 
         private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Console.WriteLine($"File '{e.Name}' changed");
+            if (Config.FilesToExclude.Count > 0)
+            {
+                var fn = Path.GetFileName(e.Name);
+
+                if (Config.FilesToExclude.Contains(fn))
+                    return;
+            }
+
+            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
+                                             .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
+
+            Console.WriteLine(s);
+
+            if (Bot == null)
+                return;
 
             foreach (var device in Config.DeviceIds)
             {
-                await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' changed");
+                try
+                {
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
+                }
+                catch
+                {
+
+                }
             }
         }
 
         private static async void Watcher_Created(object sender, FileSystemEventArgs e)
         {
-            Console.WriteLine($"File '{e.Name}' created");
+            if (Config.FilesToExclude.Count > 0)
+            {
+                var fn = Path.GetFileName(e.Name);
+
+                if (Config.FilesToExclude.Contains(fn))
+                    return;
+            }
+
+            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
+                                 .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
+
+            Console.WriteLine(s);
+
+            if (Bot == null)
+                return;
 
             foreach (var device in Config.DeviceIds)
             {
-                await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' created");
+                try
+                {
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
+                }
+                catch
+                {
+
+                }
             }
         }
 
         private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
-            Console.WriteLine($"File '{e.Name}' renamed");
+            if (Config.FilesToExclude.Count > 0)
+            {
+                var fn = Path.GetFileName(e.Name);
+
+                if (Config.FilesToExclude.Contains(fn))
+                    return;
+            }
+
+            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
+                                 .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
+
+            Console.WriteLine(s);
+
+            if (Bot == null)
+                return;
 
             foreach (var device in Config.DeviceIds)
             {
-                await Bot.Client.TelegramClient.SendTextMessageAsync(device, $"File '{e.Name}' renamed");
+                try
+                {
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
+                }
+                catch
+                {
+
+                }
+
             }
         }
     }

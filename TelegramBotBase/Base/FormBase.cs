@@ -28,9 +28,17 @@ public class FormBase : IDisposable
 
     public NavigationController NavigationController { get; set; }
 
+    /// <summary>
+    ///    The device which is active in the current context.
+    /// </summary>
     public IDeviceSession Device { get; set; }
 
     public MessageClient Client { get; set; }
+
+    /// <summary>
+    /// Direct access to the Telegram.Bot API
+    /// </summary>
+    public Telegram.Bot.ITelegramBotClient API => Client?.TelegramClient;
 
     IServiceProvider _serviceProvider = null;
 

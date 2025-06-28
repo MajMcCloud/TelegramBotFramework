@@ -35,6 +35,8 @@ public class ButtonGrid : ControlBase
 
     public string SearchLabel = Default.Language["ButtonGrid_SearchFeature"];
 
+    public string PagingInfo = Default.Language["ButtonGrid_CurrentPage"];
+
     public ButtonGrid()
     {
         DataSource = new ButtonFormDataSource();
@@ -687,7 +689,7 @@ public class ButtonGrid : ControlBase
             var row = new ButtonRow();
             row.Add(new ButtonBase(PreviousPageLabel, "$previous$"));
             row.Add(new ButtonBase(
-                        string.Format(Default.Language["ButtonGrid_CurrentPage"], CurrentPageIndex + 1, PageCount),
+                        string.Format(PagingInfo, CurrentPageIndex + 1, PageCount),
                         "$site$"));
             row.Add(new ButtonBase(NextPageLabel, "$next$"));
 

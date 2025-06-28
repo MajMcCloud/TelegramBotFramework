@@ -1,27 +1,29 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Interfaces.ExternalActions;
 
 namespace TelegramBotBase.MessageLoops;
 
 /// <summary>
 ///     This message loop reacts to all update types.
 /// </summary>
-public class FullMessageLoop : IMessageLoopFactory
+public sealed class FullMessageLoop : IMessageLoopFactory
 {
-    private static readonly object EvUnhandledCall = new();
+    public IExternalActionManager ExternalActionManager { get; set; }
 
-    private readonly EventHandlerList _events = new();
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return Update.AllTypes;
+    }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
-        var update = ur.RawData;
-
-
         //Is this a bot command ?
         if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
         {
@@ -35,9 +37,6 @@ public class FullMessageLoop : IMessageLoopFactory
             }
         }
 
-        mr.Device = session;
-        ur.Device = session;
-
         var activeForm = session.ActiveForm;
 
         //Pre Loading Event
@@ -49,6 +48,7 @@ public class FullMessageLoop : IMessageLoopFactory
         //Loading Event
         await activeForm.Load(mr);
 
+        var update = ur.RawData;
 
         //Is Attachment ? (Photo, Audio, Video, Contact, Location, Document) (Ignore Callback Queries)
         if (update.Type == UpdateType.Message)
@@ -82,11 +82,26 @@ public class FullMessageLoop : IMessageLoopFactory
                 await activeForm.Action(mr);
             }
 
+            //Send action to external action manager
+            if (!mr.Handled && ExternalActionManager != null)
+            {
+                mr.Handled = await ExternalActionManager.ManageCall(ur, mr);
+
+                if (mr.Handled)
+                {
+                    if (!session.FormSwitched)
+                    {
+                        return;
+                    }
+                }
+            }
+
             if (!mr.Handled)
             {
                 var uhc = new UnhandledCallEventArgs(ur.Message.Text, mr.RawData, session.DeviceId, mr.MessageId,
                                                      ur.Message, session);
-                OnUnhandledCall(uhc);
+
+                bot.OnUnhandledCall(uhc);
 
                 if (uhc.Handled)
                 {
@@ -108,17 +123,4 @@ public class FullMessageLoop : IMessageLoopFactory
         }
     }
 
-    /// <summary>
-    ///     Will be called if no form handled this call
-    /// </summary>
-    public event EventHandler<UnhandledCallEventArgs> UnhandledCall
-    {
-        add => _events.AddHandler(EvUnhandledCall, value);
-        remove => _events.RemoveHandler(EvUnhandledCall, value);
-    }
-
-    public void OnUnhandledCall(UnhandledCallEventArgs e)
-    {
-        (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-    }
 }

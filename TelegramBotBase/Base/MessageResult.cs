@@ -47,7 +47,10 @@ public class MessageResult : ResultBase
     public override long DeviceId =>
         UpdateData?.Message?.Chat?.Id
         ?? UpdateData?.EditedMessage?.Chat.Id
-        ?? UpdateData?.CallbackQuery.Message?.Chat.Id
+        ?? UpdateData?.BusinessConnection?.UserChatId 
+        ?? UpdateData?.BusinessMessage?.Chat?.Id 
+        ?? UpdateData?.EditedBusinessMessage?.Chat?.Id
+        ?? UpdateData?.CallbackQuery?.Message?.Chat.Id
         ?? Device?.DeviceId
         ?? 0;
 
@@ -58,6 +61,8 @@ public class MessageResult : ResultBase
         UpdateData?.Message?.MessageId
         ?? Message?.MessageId
         ?? UpdateData?.CallbackQuery?.Message?.MessageId
+        ?? UpdateData?.BusinessMessage?.MessageId
+        ?? UpdateData?.EditedBusinessMessage?.MessageId
         ?? 0;
 
     public string Command => UpdateData?.Message?.Text ?? "";
@@ -69,6 +74,8 @@ public class MessageResult : ResultBase
     public override Message Message =>
         UpdateData?.Message
         ?? UpdateData?.EditedMessage
+        ?? UpdateData?.BusinessMessage
+        ?? UpdateData?.EditedBusinessMessage
         ?? UpdateData?.ChannelPost
         ?? UpdateData?.EditedChannelPost
         ?? UpdateData?.CallbackQuery?.Message;

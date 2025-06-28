@@ -5,29 +5,32 @@ using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Interfaces.ExternalActions;
 
 namespace TelegramBotBase.MessageLoops;
 
 /// <summary>
 ///     Thats the default message loop which reacts to Message, EditMessage and CallbackQuery.
 /// </summary>
-public class FormBaseMessageLoop : IMessageLoopFactory
+public sealed class FormBaseMessageLoop : IMessageLoopFactory
 {
-    private static readonly object EvUnhandledCall = new();
+    public IExternalActionManager ExternalActionManager { get; set; }
 
-    private readonly EventHandlerList _events = new();
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return new[]
+        {
+            UpdateType.Message,
+            UpdateType.EditedMessage,
+            UpdateType.BusinessMessage,
+            UpdateType.EditedBusinessMessage,
+            UpdateType.CallbackQuery
+        };
+    }
 
     public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
     {
         var update = ur.RawData;
-
-
-        if (update.Type != UpdateType.Message
-            && update.Type != UpdateType.EditedMessage
-            && update.Type != UpdateType.CallbackQuery)
-        {
-            return;
-        }
 
         //Is this a bot command ?
         if (mr.IsFirstHandler && mr.IsBotCommand && bot.IsKnownBotCommand(mr.BotCommand))
@@ -41,9 +44,6 @@ public class FormBaseMessageLoop : IMessageLoopFactory
                 return;
             }
         }
-
-        mr.Device = session;
-        ur.Device = session;
 
         var activeForm = session.ActiveForm;
 
@@ -72,7 +72,7 @@ public class FormBaseMessageLoop : IMessageLoopFactory
         }
 
         //Message edited ?
-        if(update.Type == UpdateType.EditedMessage)
+        if (update.Type == UpdateType.EditedMessage)
         {
             await activeForm.Edited(mr);
         }
@@ -89,11 +89,25 @@ public class FormBaseMessageLoop : IMessageLoopFactory
                 await activeForm.Action(mr);
             }
 
+            //Send action to external action manager
+            if (!mr.Handled && ExternalActionManager != null)
+            {
+                mr.Handled = await ExternalActionManager.ManageCall(ur, mr);
+
+                if (mr.Handled)
+                {
+                    if (!session.FormSwitched)
+                    {
+                        return;
+                    }
+                }
+            }
+
             if (!mr.Handled)
             {
                 var uhc = new UnhandledCallEventArgs(ur.Message.Text, mr.RawData, session.DeviceId, mr.MessageId,
                                                      ur.Message, session);
-                OnUnhandledCall(uhc);
+                bot.OnUnhandledCall(uhc);
 
                 if (uhc.Handled)
                 {
@@ -115,17 +129,4 @@ public class FormBaseMessageLoop : IMessageLoopFactory
         }
     }
 
-    /// <summary>
-    ///     Will be called if no form handled this call
-    /// </summary>
-    public event EventHandler<UnhandledCallEventArgs> UnhandledCall
-    {
-        add => _events.AddHandler(EvUnhandledCall, value);
-        remove => _events.RemoveHandler(EvUnhandledCall, value);
-    }
-
-    public void OnUnhandledCall(UnhandledCallEventArgs e)
-    {
-        (_events[EvUnhandledCall] as EventHandler<UnhandledCallEventArgs>)?.Invoke(this, e);
-    }
 }

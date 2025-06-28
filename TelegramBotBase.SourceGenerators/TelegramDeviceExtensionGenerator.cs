@@ -52,8 +52,6 @@ namespace TelegramBotBase
             if (telegram_package == null)
                 return;
 
-
-
             //Load only once
             if (xml == null)
             {
@@ -155,7 +153,7 @@ namespace TelegramBotBase
                 }
 
 
-                var returnStatement = "";
+                var returnStatement = string.Empty;
 
                 if (method.ReturnType is INamedTypeSymbol namedType && namedType.IsGenericType && namedType.ConstructedFrom.Name == "Task" && namedType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks")
                 {
@@ -167,7 +165,7 @@ namespace TelegramBotBase
                 }
                 else if (method.ReturnsVoid)
                 {
-                    returnStatement = "";
+                    returnStatement = string.Empty;
                 }
                 else
                 {
@@ -224,7 +222,7 @@ namespace TelegramBotBase
         /// <param name="subCallParameters"></param>
         /// <param name="returnStatement"></param>
         /// <returns></returns>
-        private String GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
+        private String? GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
         {
             //Adding xml comments from embedded xml file (Workaround)
             String xml_comments = xml?.GetDocumentationLinesForSymbol(method);
@@ -232,6 +230,15 @@ namespace TelegramBotBase
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(xml_comments);
+
+            if (method == null)
+                return string.Empty;
+
+            if(method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
+            {
+                sb.AppendLine("[Obsolete]");
+            }
+
 
             sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this IDeviceSession device, {parameters})");
 

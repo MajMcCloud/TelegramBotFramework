@@ -34,7 +34,7 @@ public static class Conversion
         if (f.PropertyType == typeof(Guid))
         {
             Guid g;
-            if (Guid.TryParse(p.Value.ToString(), out g))
+            if(Guid.TryParse(p.Value.ToString(), out g))
             {
                 f.SetValue(form, g);
             }

@@ -10,6 +10,7 @@ using TelegramBotBase.Commands;
 using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Interfaces.ExternalActions;
 using TelegramBotBase.Localizations;
 using TelegramBotBase.MessageLoops;
 using TelegramBotBase.States;
@@ -38,7 +39,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <summary>
     ///     Contains different Botcommands for different areas.
     /// </summary>
-    private Dictionary<BotCommandScope, List<BotCommand>> BotCommandScopes { get; } = new();
+    private List<BotCommandScopeGroup> BotCommandScopes { get; } = new();
 
     /// <summary>
     /// Creates a full BotBase instance with all parameters previously set.
@@ -53,8 +54,6 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             StateMachine = _stateMachine,
             MessageLoopFactory = _messageLoopFactory
         };
-
-        bot.MessageLoopFactory.UnhandledCall += bot.MessageLoopFactory_UnhandledCall;
 
         return bot;
     }
@@ -140,17 +139,39 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 2 (Message Loop)"
 
-    public IStartFormSelectionStage DefaultMessageLoop()
+    public IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null)
     {
-        _messageLoopFactory = new FormBaseMessageLoop();
+        var loop =  new FormBaseMessageLoop();
+        
+        loop.ExternalActionManager = managerInstance;
+
+        _messageLoopFactory = loop;
+
+        return this;
+    }
+
+    public IStartFormSelectionStage MiddlewareMessageLoop(Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
+    {
+        _messageLoopFactory = messageLoopConfiguration(new MiddlewareBaseMessageLoop());
+
+        return this;
+    }
+
+    public IStartFormSelectionStage MinimalMessageLoop()
+    {
+        _messageLoopFactory = new MinimalMessageLoop();
 
         return this;
     }
 
 
-    public IStartFormSelectionStage MinimalMessageLoop()
+    public IStartFormSelectionStage FullMessageLoop(IExternalActionManager managerInstance = null)
     {
-        _messageLoopFactory = new MinimalMessageLoop();
+        var loop = new FullMessageLoop();
+
+        loop.ExternalActionManager = managerInstance;
+
+        _messageLoopFactory = loop;
 
         return this;
     }
@@ -224,7 +245,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)
             },
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -238,7 +259,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -252,7 +273,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -266,7 +287,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -279,7 +300,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
                 Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
             }
         };
-        _client.ThrowPendingUpdates = throwPendingUpdates;
+        _client.DropPendingUpdates = throwPendingUpdates;
         return this;
     }
 
@@ -308,7 +329,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public ISessionSerializationStage CustomCommands(Action<Dictionary<BotCommandScope, List<BotCommand>>> action)
+    public ISessionSerializationStage CustomCommands(Action<List<BotCommandScopeGroup>> action)
     {
         action?.Invoke(BotCommandScopes);
         return this;
@@ -432,6 +453,14 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     {
         Default.Language = new Russian();
         return this;
+        
+    }
+    
+    /// <inheritdoc cref="ILanguageSelectionStage.UseUkrainian"/>
+    public IThreadingStage UseUkrainian()
+    {
+        Default.Language = new Ukrainian();
+        return this;
     }
 
     /// <inheritdoc cref="ILanguageSelectionStage.Custom"/>
@@ -449,16 +478,33 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     public IBuildingStage UseSingleThread()
     {
+        _client.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
+
         return this;
     }
 
-    public IBuildingStage UseThreadPool(int workerThreads = 2, int ioThreads = 1)
+    public IBuildingStage UseThreadPool()
+    {
+        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
+
+        c.DropPendingUpdates = _client.DropPendingUpdates;
+        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
+
+        _client = c;
+
+        return this;
+    }
+
+
+    public IBuildingStage UseThreadPool(int workerThreads, int ioThreads)
     {
         var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
 
         c.ThreadPool_WorkerThreads = workerThreads;
         c.ThreadPool_IOThreads = ioThreads;
-        c.ThrowPendingUpdates = _client.ThrowPendingUpdates;
+
+        c.DropPendingUpdates = _client.DropPendingUpdates;
+        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
 
         _client = c;
 

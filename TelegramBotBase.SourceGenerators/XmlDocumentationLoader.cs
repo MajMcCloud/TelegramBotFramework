@@ -19,6 +19,8 @@ namespace TelegramBotBase.SourceGenerators
             var docElement = xDocument?.Descendants("member")
                 .FirstOrDefault(e => e.Attribute("name")?.Value == GetDocumentationCommentId(symbol));
 
+            if (docElement == null)
+                return "No documentation";
 
             StringBuilder sb = new StringBuilder();
 
@@ -32,7 +34,7 @@ namespace TelegramBotBase.SourceGenerators
                 first = first.NextNode;
 
             } 
-            while (first.NextNode != null);
+            while (first?.NextNode != null);
 
             var lines = sb.ToString().Split('\n');
 
@@ -52,13 +54,13 @@ namespace TelegramBotBase.SourceGenerators
             return sb.ToString().Trim();
         }
 
-        private string GetDocumentationCommentId(ISymbol symbol)
+        private string? GetDocumentationCommentId(ISymbol symbol)
         {
             // Returns the documentation comment ID for a symbol
-            return symbol.GetDocumentationCommentId();
+            return symbol?.GetDocumentationCommentId();
         }
 
-        public XDocument ReadEmbeddedXml(string resourceName)
+        public XDocument? ReadEmbeddedXml(string resourceName)
         {
             // Get the assembly where the resource is embedded
             Assembly assembly = Assembly.GetExecutingAssembly();

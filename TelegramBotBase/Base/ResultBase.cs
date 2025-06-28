@@ -12,7 +12,7 @@ public class ResultBase : EventArgs
 
     public virtual long DeviceId { get; set; }
 
-    public virtual int MessageId => Message.MessageId;
+    public virtual int MessageId => Message?.MessageId ?? 0;
 
     public virtual Message Message { get; set; }
 
@@ -35,8 +35,7 @@ public class ResultBase : EventArgs
     {
         try
         {
-            await Device.Client.TelegramClient.DeleteMessageAsync(DeviceId,
-                                                                  messageId == -1 ? MessageId : messageId);
+            await Device.Client.TelegramClient.DeleteMessage(DeviceId, messageId == -1 ? MessageId : messageId);
         }
         catch
         {

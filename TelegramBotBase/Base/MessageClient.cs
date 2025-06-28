@@ -10,6 +10,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 
 namespace TelegramBotBase.Base;
@@ -30,6 +31,7 @@ public class MessageClient
 
     public ITelegramBotClient TelegramClient { get; set; }
 
+    public UpdateType[] AllowedUpdates { get; set; } = Update.AllTypes;
 
 
     /// <summary>
@@ -38,7 +40,7 @@ public class MessageClient
     //     should be set to not null, otherwise Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates
     //     will effectively be set to receive all Telegram.Bot.Types.Updates.
     /// </summary>
-    public bool ThrowPendingUpdates { get; set; }
+    public bool DropPendingUpdates { get; set; }
 
 
     public MessageClient(string apiKey)
@@ -102,8 +104,9 @@ public class MessageClient
         _cancellationTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions();
+        receiverOptions.AllowedUpdates = AllowedUpdates;
 
-        receiverOptions.ThrowPendingUpdates = ThrowPendingUpdates;
+        receiverOptions.DropPendingUpdates = DropPendingUpdates;
 
         TelegramClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, _cancellationTokenSource.Token);
     }
@@ -135,7 +138,7 @@ public class MessageClient
     /// <returns></returns>
     public async Task<BotCommand[]> GetBotCommands(BotCommandScope scope = null, string languageCode = null)
     {
-        return await TelegramClient.GetMyCommandsAsync(scope, languageCode);
+        return await TelegramClient.GetMyCommands(scope, languageCode);
     }
 
 
@@ -148,7 +151,7 @@ public class MessageClient
     public async Task SetBotCommands(List<BotCommand> botcommands, BotCommandScope scope = null,
                                      string languageCode = null)
     {
-        await TelegramClient.SetMyCommandsAsync(botcommands, scope, languageCode);
+        await TelegramClient.SetMyCommands(botcommands, scope, languageCode);
     }
 
     /// <summary>
@@ -157,7 +160,7 @@ public class MessageClient
     /// <returns></returns>
     public async Task DeleteBotCommands(BotCommandScope scope = null, string languageCode = null)
     {
-        await TelegramClient.DeleteMyCommandsAsync(scope, languageCode);
+        await TelegramClient.DeleteMyCommands(scope, languageCode);
     }
 
     #endregion
