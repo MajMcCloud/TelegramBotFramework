@@ -46,7 +46,8 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [Buttons](#buttons)
     * [Custom controls](#custom-controls)
     * [Forms advanced](#forms-advanced)
-- [Special Forms](#forms)
+- [Message Loops](#message-loops)
+- [Special Forms](#special-forms)
     * [AlertDialog](#alert-dialog)
     * [AutoCleanForm](#autocleanform)
     * [PromptDialog](#prompt-dialog)
@@ -609,7 +610,117 @@ public class PerForm : AutoCleanForm
 different forms. Just for
 imagination of the possibilities.
 
-## Forms
+## Message Loops
+
+Message loops define how incoming updates and messages are processed by the bot. Depending on your requirements, you can choose from several implementations, each offering different levels of complexity and flexibility.
+
+### Overview of available Message Loops
+
+| Name                        | Description                                                                 | UpdateTypes         | Use Case / Special Features                   |
+|-----------------------------|-----------------------------------------------------------------------------|---------------------|-----------------------------------------------|
+| **FormBaseMessageLoop**     | The default loop for most applications. Reacts to messages, edits, and callback queries. | Message, EditedMessage, CallbackQuery, BusinessMessage, EditedBusinessMessage | Full support for form events, actions, attachments, etc. |
+| **MinimalMessageLoop**      | Minimalistic loop, only calls the `Load` event.                             | All                 | For very simple bots or special scenarios     |
+| **MiddlewareBaseMessageLoop** | Flexible, middleware-based loop. Allows custom processing chains.           | All                 | Ideal for complex, modular bots               |
+| **FullMessageLoop**         | Reacts to all update types and triggers all relevant events.                | All                 | For maximum control and special cases         |
+
+---
+
+### FormBaseMessageLoop
+
+The standard loop for most bots. It processes messages, edited messages, and callback queries. Typical events like `PreLoad`, `LoadControls`, `Load`, `Action`, `SentData`, `Edited`, and `Render` are automatically called.
+
+
+---
+
+### MinimalMessageLoop
+
+A very lightweight message loop that only calls the `Load` event of the active form. Ideal for very simple bots or scenarios where no further events are needed.
+
+
+---
+
+### MiddlewareBaseMessageLoop
+
+A message loop based on the middleware principle. You can flexibly add your own processing steps (middlewares). Especially suitable for complex bots that require authentication, logging, or custom routing logic.
+
+#### Available Middleware Options
+
+You can compose your own message processing pipeline using the following extension methods:
+
+| Method                                      | Description                                                                                   |
+|----------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `.Use(Func<MessageContainer, Func<Task>, Task> middleware)` | Add a custom middleware delegate to the pipeline.                                              |
+| `.UseValidUpdateTypes(params UpdateType[])`  | Only continue the pipeline for specific `UpdateType`s.                                        |
+| `.UseBotCommands()`                         | Handles bot commands and triggers the `OnBotCommand` event if a known command is received.    |
+| `.UseForms([IExternalActionManager])`        | Handles all form events (PreLoad, LoadControls, Load, Action, SentData, Render, etc.). Optionally with external action manager. |
+| `.UsePreLoad()`                             | Calls only the `PreLoad` event of the active form.                                            |
+| `.UseLoad()`                                | Calls `LoadControls` and `Load` events of the active form.                                    |
+| `.UseAttachments(params MessageType[])`      | Handles only specific attachment types (Photo, Audio, Video, Contact, Location, Document).    |
+| `.UseAllAttachments()`                      | Handles all supported attachment types.                                                       |
+| `.UseActions()`                             | Handles only action events (e.g., button clicks).                                             |
+| `.UseRender()`                              | Calls the `RenderControls` and `Render` events of the active form.                            |
+| `.UseActionManager(IExternalActionManager)`  | Integrates an external action manager for unhandled actions.                                  |
+
+You can chain these methods to build exactly the message processing pipeline you need.  
+For custom logic, use `.Use(...)` and insert your own delegate.
+
+All extension methods are defined in [`TelegramBotBase.MessageLoops.Extensions.MiddlewareBaseMessageLoopExtensions`](TelegramBotBase/MessageLoops/Extensions/MiddlewareBaseMessageLoopExtensions.cs).
+
+---
+
+### FullMessageLoop
+
+The most comprehensive message loop. Reacts to all update types and triggers all relevant events. Usually only needed for special cases where every type of update should be handled individually.
+
+
+---
+
+### Creating a Custom Message Loop
+
+If you need full control over how updates are processed, you can implement your own message loop by creating a class that implements the `IMessageLoopFactory` interface.
+
+**Example:**
+```csharp
+public class CustomMessageLoop : IMessageLoopFactory
+{
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return Update.AllTypes;
+    }
+
+    public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
+    {
+        var activeForm = session.ActiveForm;
+
+        //Loading Event
+        await activeForm.Load(mr);
+    }
+}
+```
+
+**Usage:**
+```csharp
+var bot = BotBaseBuilder
+        .Create()
+        .WithAPIKey("{YOUR API KEY}")
+        .CustomMessageLoop(new CustomMessageLoop())
+        .WithStartForm<StartForm>()
+        .NoProxy()
+        .DefaultCommands()
+        .NoSerialization()
+        .UseEnglish()
+        .UseThreadPool()
+        .Build();
+
+await bot.Start();
+```
+
+**Note:**  
+The choice of message loop depends on the desired feature set and the complexity of your bot. For most applications, `FormBaseMessageLoop` or the middleware approach is recommended.
+
+For more details and examples, see the [Examples](#examples) section.
+
+## Special Forms
 
 There are some default forms to make the interaction with users easier.
 
