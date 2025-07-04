@@ -46,7 +46,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
     * [Buttons](#buttons)
     * [Custom controls](#custom-controls)
     * [Forms advanced](#forms-advanced)
-- [Special Forms](#forms)
+- [Special Forms](#special-forms)
     * [AlertDialog](#alert-dialog)
     * [AutoCleanForm](#autocleanform)
     * [PromptDialog](#prompt-dialog)
@@ -609,7 +609,7 @@ public class PerForm : AutoCleanForm
 different forms. Just for
 imagination of the possibilities.
 
-## Forms
+## Special Forms
 
 There are some default forms to make the interaction with users easier.
 
