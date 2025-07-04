@@ -1215,14 +1215,19 @@ You can configure the threading model during bot setup using the builder methods
 - `.UseThreadPool(workerThreads, ioThreads)`: Fine-tune the number of worker and I/O threads for advanced scenarios with specific concurrency requirements.
 
 **Example:**
+```csharp
 var bot = BotBaseBuilder
     .Create()
     .WithAPIKey("{YOUR API KEY}")
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .DefaultCommands()
+    .NoSerialization()
+    .UseEnglish()
     .UseThreadPool() // or .UseSingleThread()
     .Build();
+```
 ### Performance Considerations
 
 - **Single-threaded mode** is simple and safe, but may become a bottleneck under heavy load.
