@@ -675,6 +675,46 @@ The most comprehensive message loop. Reacts to all update types and triggers all
 
 ---
 
+### Creating a Custom Message Loop
+
+If you need full control over how updates are processed, you can implement your own message loop by creating a class that implements the `IMessageLoopFactory` interface.
+
+**Example:**
+```csharp
+public class CustomMessageLoop : IMessageLoopFactory
+{
+    public UpdateType[] ConfigureUpdateTypes()
+    {
+        return Update.AllTypes;
+    }
+
+    public async Task MessageLoop(BotBase bot, IDeviceSession session, UpdateResult ur, MessageResult mr)
+    {
+        var activeForm = session.ActiveForm;
+
+        //Loading Event
+        await activeForm.Load(mr);
+    }
+}
+```
+
+**Usage:**
+```csharp
+var bot = BotBaseBuilder
+        .Create()
+        .WithAPIKey("{YOUR API KEY}")
+        .CustomMessageLoop(new CustomMessageLoop())
+        .WithStartForm<StartForm>()
+        .NoProxy()
+        .DefaultCommands()
+        .NoSerialization()
+        .UseEnglish()
+        .UseThreadPool()
+        .Build();
+
+await bot.Start();
+```
+
 **Note:**  
 The choice of message loop depends on the desired feature set and the complexity of your bot. For most applications, `FormBaseMessageLoop` or the middleware approach is recommended.
 
