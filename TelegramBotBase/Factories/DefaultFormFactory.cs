@@ -21,6 +21,21 @@ public class DefaultFormFactory : IFormFactory
 
     public FormBase CreateStartForm()
     {
-        return _startFormClass.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
+        return CreateForm(_startFormClass);
+    }
+
+    public FormBase CreateForm(Type formType)
+    {
+        if (!typeof(FormBase).IsAssignableFrom(formType))
+        {
+            throw new ArgumentException($"{nameof(formType)} argument must be a {nameof(FormBase)} type");
+        }
+
+        return formType.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
+    }
+
+    public FormBase CreateForm<T>() where T : FormBase, new()
+    {
+        return CreateForm(typeof(T));
     }
 }

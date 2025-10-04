@@ -25,11 +25,21 @@ public class ServiceProviderFormFactory : IFormFactory
 
     public FormBase CreateStartForm()
     {
+        return CreateForm(_startFormClass);
+    }
+    
+    public FormBase CreateForm(Type formType)
+    {
+        if (!typeof(FormBase).IsAssignableFrom(formType))
+        {
+            throw new ArgumentException($"{nameof(formType)} argument must be a {nameof(FormBase)} type");
+        }
+
         FormBase fb = null;
 
         try
         {
-            fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, _startFormClass);
+            fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, formType);
         }
         catch(InvalidOperationException ex)
         {
@@ -40,6 +50,11 @@ public class ServiceProviderFormFactory : IFormFactory
         fb.SetServiceProvider(_serviceProvider);
 
         return fb;
+    }
+
+    public FormBase CreateForm<T>() where T : FormBase, new()
+    {
+        return CreateForm(typeof(T));
     }
 }
 
