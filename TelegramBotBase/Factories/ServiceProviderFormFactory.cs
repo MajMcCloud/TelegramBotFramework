@@ -23,7 +23,7 @@ public class ServiceProviderFormFactory : IFormFactory
         _serviceProvider = serviceProvider;
     }
 
-    public FormBase CreateForm()
+    public FormBase CreateStartForm()
     {
         FormBase fb = null;
 

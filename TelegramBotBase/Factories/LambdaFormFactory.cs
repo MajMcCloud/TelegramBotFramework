@@ -14,7 +14,7 @@ public class LambdaFormFactory : IFormFactory
         _lambda = lambda;
     }
 
-    public FormBase CreateForm()
+    public FormBase CreateStartForm()
     {
         return _lambda();
     }

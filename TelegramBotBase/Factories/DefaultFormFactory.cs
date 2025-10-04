@@ -19,7 +19,7 @@ public class DefaultFormFactory : IFormFactory
     }
 
 
-    public FormBase CreateForm()
+    public FormBase CreateStartForm()
     {
         return _startFormClass.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
     }

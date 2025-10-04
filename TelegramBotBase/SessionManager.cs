@@ -59,7 +59,7 @@ public class SessionManager
     /// <returns></returns>
     public async Task<IDeviceSession> StartSession(long deviceId)
     {
-        var start = BotBase.FormFactory.CreateForm();
+        var start = BotBase.FormFactory.CreateStartForm();
 
         start.Client = Client;
 

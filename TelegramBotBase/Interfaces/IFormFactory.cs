@@ -4,5 +4,5 @@ namespace TelegramBotBase.Interfaces;
 
 public interface IFormFactory
 {
-    FormBase CreateForm();
+    FormBase CreateStartForm();
 }
