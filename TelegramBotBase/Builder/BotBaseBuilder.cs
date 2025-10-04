@@ -356,10 +356,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// </summary>
     /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// <returns></returns>
-    public ILanguageSelectionStage UseJSON()
+    public ILanguageSelectionStage UseJSON(Type fallbackForm = null)
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
-        _stateMachine = new JsonStateMachine(path);
+        _stateMachine = new JsonStateMachine(path, fallbackForm);
         return this;
     }
 
@@ -368,9 +368,9 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// </summary>
     /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// <returns></returns>
-    public ILanguageSelectionStage UseJSON(string path)
+    public ILanguageSelectionStage UseJSON(string path, Type fallbackForm = null)
     {
-        _stateMachine = new JsonStateMachine(path);
+        _stateMachine = new JsonStateMachine(path, fallbackForm);
         return this;
     }
 
@@ -378,10 +378,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// Uses the application runtime path to load and write a states.json file.
     /// </summary>
     /// <returns></returns>
-    public ILanguageSelectionStage UseSimpleJSON()
+    public ILanguageSelectionStage UseSimpleJSON(Type fallbackForm = null)
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
-        _stateMachine = new SimpleJsonStateMachine(path);
+        _stateMachine = new SimpleJsonStateMachine(path, fallbackForm);
         return this;
     }
 
@@ -389,9 +389,9 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// Uses the given path to load and write a states.json file.
     /// </summary>
     /// <returns></returns>
-    public ILanguageSelectionStage UseSimpleJSON(string path)
+    public ILanguageSelectionStage UseSimpleJSON(string path, Type fallbackForm = null)
     {
-        _stateMachine = new SimpleJsonStateMachine(path);
+        _stateMachine = new SimpleJsonStateMachine(path, fallbackForm);
         return this;
     }
 
@@ -399,10 +399,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// Uses the application runtime path to load and write a states.xml file.
     /// </summary>
     /// <returns></returns>
-    public ILanguageSelectionStage UseXML()
+    public ILanguageSelectionStage UseXML(Type fallbackForm = null)
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), "states.xml");
-        _stateMachine = new XmlStateMachine(path);
+        _stateMachine = new XmlStateMachine(path, fallbackForm);
         return this;
     }
 
@@ -410,9 +410,9 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// Uses the given path to load and write a states.xml file.
     /// </summary>
     /// <returns></returns>
-    public ILanguageSelectionStage UseXML(string path)
+    public ILanguageSelectionStage UseXML(string path, Type fallbackForm = null)
     {
-        _stateMachine = new XmlStateMachine(path);
+        _stateMachine = new XmlStateMachine(path, fallbackForm);
         return this;
     }
 
