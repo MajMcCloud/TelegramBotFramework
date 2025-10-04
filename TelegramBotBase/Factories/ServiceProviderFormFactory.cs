@@ -52,7 +52,7 @@ public class ServiceProviderFormFactory : IFormFactory
         return fb;
     }
 
-    public FormBase CreateForm<T>() where T : FormBase, new()
+    public FormBase CreateForm<T>() where T : FormBase
     {
         return CreateForm(typeof(T));
     }

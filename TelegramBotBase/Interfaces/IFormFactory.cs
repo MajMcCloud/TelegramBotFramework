@@ -7,5 +7,5 @@ public interface IFormFactory
 {
     FormBase CreateStartForm();
     FormBase CreateForm(Type formType);
-    FormBase CreateForm<T>() where T : FormBase, new();
+    FormBase CreateForm<T>() where T : FormBase;
 }

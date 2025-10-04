@@ -31,10 +31,16 @@ public class DefaultFormFactory : IFormFactory
             throw new ArgumentException($"{nameof(formType)} argument must be a {nameof(FormBase)} type");
         }
 
-        return formType.GetConstructor(new Type[] { })?.Invoke(new object[] { }) as FormBase;
+        // No parameterless constructor
+        if (!(formType.GetConstructor(new Type[] { })?.Invoke(new object[] { }) is FormBase form))
+        {
+            throw new Exception($"{formType} must have a parameterless constructor.");
+        }
+
+        return form;
     }
 
-    public FormBase CreateForm<T>() where T : FormBase, new()
+    public FormBase CreateForm<T>() where T : FormBase
     {
         return CreateForm(typeof(T));
     }

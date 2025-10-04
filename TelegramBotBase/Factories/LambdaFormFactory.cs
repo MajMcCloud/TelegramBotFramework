@@ -28,7 +28,7 @@ public class LambdaFormFactory : IFormFactory
         return _defaultFormFactory.CreateForm(formType);
     }
 
-    public FormBase CreateForm<T>() where T : FormBase, new()
+    public FormBase CreateForm<T>() where T : FormBase
     {
         return CreateForm(typeof(T));
     }
