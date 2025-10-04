@@ -38,8 +38,8 @@ public interface IAPIKeySelectionStage
     ///     Uses: DefaultMessageLoop, NoProxy, OnlyStart, NoSerialization, DefaultLanguage
     /// </summary>
     /// <param name="apiKey"></param>
-    /// <param name="StartFormFactory"></param>
+    /// <param name="formFactory"></param>
     /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IBuildingStage QuickStart(string apiKey, IStartFormFactory StartFormFactory, bool throwPendingUpdates = false);
+    IBuildingStage QuickStart(string apiKey, IFormFactory formFactory, bool throwPendingUpdates = false);
 }

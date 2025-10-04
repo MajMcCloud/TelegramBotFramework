@@ -2,7 +2,7 @@
 
 namespace TelegramBotBase.Interfaces;
 
-public interface IStartFormFactory
+public interface IFormFactory
 {
     FormBase CreateForm();
 }

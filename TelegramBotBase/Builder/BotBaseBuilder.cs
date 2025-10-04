@@ -25,7 +25,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     private MessageClient _client;
 
-    private IStartFormFactory _factory;
+    private IFormFactory _factory;
 
     private IMessageLoopFactory _messageLoopFactory;
 
@@ -49,7 +49,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     {
         var bot = new BotBase(_apiKey, _client)
         {
-            StartFormFactory = _factory,
+            FormFactory = _factory,
             BotCommandScopes = BotCommandScopes,
             StateMachine = _stateMachine,
             MessageLoopFactory = _messageLoopFactory
@@ -75,7 +75,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     public IBuildingStage QuickStart(string apiKey, Type startForm, bool throwPendingUpdates = false)
     {
         _apiKey = apiKey;
-        _factory = new DefaultStartFormFactory(startForm);
+        _factory = new DefaultFormFactory(startForm);
 
         DefaultMessageLoop();
 
@@ -97,7 +97,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         where T : FormBase
     {
         _apiKey = apiKey;
-        _factory = new DefaultStartFormFactory(typeof(T));
+        _factory = new DefaultFormFactory(typeof(T));
 
         DefaultMessageLoop();
 
@@ -114,10 +114,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public IBuildingStage QuickStart(string apiKey, IStartFormFactory startFormFactory, bool throwPendingUpdates = false)
+    public IBuildingStage QuickStart(string apiKey, IFormFactory formFactory, bool throwPendingUpdates = false)
     {
         _apiKey = apiKey;
-        _factory = startFormFactory;
+        _factory = formFactory;
 
         DefaultMessageLoop();
 
@@ -200,31 +200,31 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     public INetworkingSelectionStage WithStartForm(Type startFormClass)
     {
-        _factory = new DefaultStartFormFactory(startFormClass);
+        _factory = new DefaultFormFactory(startFormClass);
         return this;
     }
 
     public INetworkingSelectionStage WithStartForm<T>()
         where T : FormBase, new()
     {
-        _factory = new DefaultStartFormFactory(typeof(T));
+        _factory = new DefaultFormFactory(typeof(T));
         return this;
     }
 
     public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
     {
-        _factory = new ServiceProviderStartFormFactory(startFormClass, serviceProvider);
+        _factory = new ServiceProviderFormFactory(startFormClass, serviceProvider);
         return this;
     }
 
     public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
         where T : FormBase
     {
-        _factory = new ServiceProviderStartFormFactory<T>(serviceProvider);
+        _factory = new ServiceProviderFormFactory<T>(serviceProvider);
         return this;
     }
 
-    public INetworkingSelectionStage WithStartFormFactory(IStartFormFactory factory)
+    public INetworkingSelectionStage WithFormFactory(IFormFactory factory)
     {
         _factory = factory;
         return this;

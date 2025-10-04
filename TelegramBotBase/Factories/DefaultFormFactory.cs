@@ -4,11 +4,11 @@ using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Factories;
 
-public class DefaultStartFormFactory : IStartFormFactory
+public class DefaultFormFactory : IFormFactory
 {
     private readonly Type _startFormClass;
 
-    public DefaultStartFormFactory(Type startFormClass)
+    public DefaultFormFactory(Type startFormClass)
     {
         if (!typeof(FormBase).IsAssignableFrom(startFormClass))
         {

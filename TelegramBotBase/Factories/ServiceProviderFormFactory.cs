@@ -7,12 +7,12 @@ using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Factories;
 
-public class ServiceProviderStartFormFactory : IStartFormFactory
+public class ServiceProviderFormFactory : IFormFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly Type _startFormClass;
 
-    public ServiceProviderStartFormFactory(Type startFormClass, IServiceProvider serviceProvider)
+    public ServiceProviderFormFactory(Type startFormClass, IServiceProvider serviceProvider)
     {
         if (!typeof(FormBase).IsAssignableFrom(startFormClass))
         {
@@ -43,10 +43,10 @@ public class ServiceProviderStartFormFactory : IStartFormFactory
     }
 }
 
-public class ServiceProviderStartFormFactory<T> : ServiceProviderStartFormFactory
+public class ServiceProviderFormFactory<T> : ServiceProviderFormFactory
     where T : FormBase
 {
-    public ServiceProviderStartFormFactory(IServiceProvider serviceProvider) : base(typeof(T), serviceProvider)
+    public ServiceProviderFormFactory(IServiceProvider serviceProvider) : base(typeof(T), serviceProvider)
     {
     }
 }
