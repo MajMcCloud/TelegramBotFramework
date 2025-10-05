@@ -150,7 +150,7 @@ public class SessionManager
 
             if (form == null && statemachine.FallbackStateForm != null)
             {
-                BotBase.FormFactory.CreateForm(statemachine.FallbackStateForm);
+                form = BotBase.FormFactory.CreateForm(statemachine.FallbackStateForm);
             }
 
             if (form == null)
