@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.1;net6</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net8</TargetFrameworks>
         <RepositoryUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images.IronSoftware</RepositoryUrl>
         <PackageProjectUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images.IronSoftware</PackageProjectUrl>
         <Copyright>MIT</Copyright>
