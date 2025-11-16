@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.1;net6;net7;net8;net9</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net7;net8;net9</TargetFrameworks>
         <LangVersion>10</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
