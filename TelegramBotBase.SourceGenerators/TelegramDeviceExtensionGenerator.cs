@@ -194,7 +194,6 @@ namespace TelegramBotBase
             using Telegram.Bot.Types.InlineQueryResults;
             using Telegram.Bot.Types.Payments;
             using Telegram.Bot.Types.ReplyMarkups;
-            using File = Telegram.Bot.Types.File;
 
             #nullable enable
             namespace TelegramBotBase;

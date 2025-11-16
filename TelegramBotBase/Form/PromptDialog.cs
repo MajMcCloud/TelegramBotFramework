@@ -82,7 +82,7 @@ public class PromptDialog : ModalDialog
             {
                 var bf = new ButtonForm();
                 bf.AddButtonRow(new ButtonBase(BackLabel, "back"));
-                await Device.Send(Message, (IReplyMarkup)bf);
+                await Device.Send(Message, (InlineKeyboardMarkup)bf);
                 return;
             }
 
