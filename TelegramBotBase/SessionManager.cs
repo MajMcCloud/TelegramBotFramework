@@ -59,7 +59,7 @@ public class SessionManager
     /// <returns></returns>
     public async Task<IDeviceSession> StartSession(long deviceId)
     {
-        var start = BotBase.StartFormFactory.CreateForm();
+        var start = BotBase.FormFactory.CreateStartForm();
 
         start.Client = Client;
 
@@ -146,27 +146,19 @@ public class SessionManager
                 continue;
             }
 
-            //No default constructor, fallback
-            if (!(t.GetConstructor(new Type[] { })?.Invoke(new object[] { }) is FormBase form))
+            var form = BotBase.FormFactory.CreateForm(t);
+
+            if (form == null && statemachine.FallbackStateForm != null)
             {
-                if (!statemachine.FallbackStateForm.IsSubclassOf(typeof(FormBase)))
-                {
-                    continue;
-                }
-
-                form =
-                    statemachine.FallbackStateForm.GetConstructor(new Type[] { })
-                                ?.Invoke(new object[] { }) as FormBase;
-
-                //Fallback failed, due missing default constructor
-                if (form == null)
-                {
-                    continue;
-                }
+                form = BotBase.FormFactory.CreateForm(statemachine.FallbackStateForm);
             }
 
+            if (form == null)
+            {
+                continue;
+            }
 
-            if (s.Values != null && s.Values.Count > 0)
+            if (t == form.GetType() && s.Values != null && s.Values.Count > 0)
             {
                 var properties = s.Values.Where(a => a.Key.StartsWith("$"));
                 var fields = form.GetType()

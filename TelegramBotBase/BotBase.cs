@@ -68,7 +68,7 @@ public sealed class BotBase
     /// <summary>
     ///     Offers functionality to manage the creation process of the start form.
     /// </summary>
-    public IStartFormFactory StartFormFactory { get; internal set; }
+    public IFormFactory FormFactory { get; internal set; }
 
     /// <summary>
     ///     Contains the message loop factory, which cares about "message-management."

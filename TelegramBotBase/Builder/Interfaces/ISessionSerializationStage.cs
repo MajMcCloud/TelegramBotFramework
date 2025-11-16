@@ -30,10 +30,10 @@ public interface ISessionSerializationStage
     ///     </para>
     ///     <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// </remarks>
-    /// <param name="path"></param>
+    /// <param name="fallbackForm"></param>
     /// <returns></returns>
     /// <seealso cref="UseNewtonsoftJson"/>
-    ILanguageSelectionStage UseJSON();
+    ILanguageSelectionStage UseJSON(Type fallbackForm = null);
 
     /// <summary>
     ///     Using the complex version of .Net JSON, which can serialize all objects.
@@ -47,39 +47,42 @@ public interface ISessionSerializationStage
     ///     <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
     /// </remarks>
     /// <param name="path"></param>
+    /// <param name="fallbackForm"></param>
     /// <returns></returns>
     /// <seealso cref="UseNewtonsoftJson"/>
-    ILanguageSelectionStage UseJSON(string path);
+    ILanguageSelectionStage UseJSON(string path, Type fallbackForm = null);
 
     /// <summary>
     ///     Use the easy version of .Net JSON, which can serialize basic types, but not generics and others.
     ///     Saves in application directory.
     /// </summary>
-    /// <param name="path"></param>
+    /// <param name="fallbackForm"></param>
     /// <returns></returns>
     [Obsolete("Use UseJSON instead.")]
-    ILanguageSelectionStage UseSimpleJSON();
+    ILanguageSelectionStage UseSimpleJSON(Type fallbackForm = null);
 
     /// <summary>
     ///     Use the easy version of .Net JSON, which can serialize basic types, but not generics and others.
     /// </summary>
     /// <param name="path"></param>
+    /// <param name="fallbackForm"></param>
     /// <returns></returns>
     [Obsolete("Use UseJSON instead.")]
-    ILanguageSelectionStage UseSimpleJSON(string path);
+    ILanguageSelectionStage UseSimpleJSON(string path, Type fallbackForm = null);
 
     /// <summary>
     ///     Uses the XML serializer for session serialization.
     ///     Saves in application directory.
     /// </summary>
-    /// <param name="path"></param>
+    /// <param name="fallbackForm"></param>
     /// <returns></returns>
-    ILanguageSelectionStage UseXML();
+    ILanguageSelectionStage UseXML(Type fallbackForm = null);
 
     /// <summary>
     ///     Uses the XML serializer for session serialization.
     /// </summary>
     /// <param name="path"></param>
+    /// <param name="fallbackForm"></param>
     /// <returns></returns>
-    ILanguageSelectionStage UseXML(string path);
+    ILanguageSelectionStage UseXML(string path, Type fallbackForm = null);
 }
