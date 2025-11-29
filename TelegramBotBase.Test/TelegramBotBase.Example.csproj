@@ -8,10 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="TelegramBotBase.Extensions.Images" Version="1.1.2" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <ProjectReference Include="..\TelegramBotBase.Extensions.Images\TelegramBotBase.Extensions.Images.csproj" />
       <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
     </ItemGroup>
 
