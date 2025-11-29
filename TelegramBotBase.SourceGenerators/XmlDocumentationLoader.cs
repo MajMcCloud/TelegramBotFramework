@@ -12,7 +12,7 @@ namespace TelegramBotBase.SourceGenerators
 {
     public class XmlDocumentationLoader
     {
-        XDocument xDocument;
+        XDocument? xDocument = null;
 
         public string GetDocumentationLinesForSymbol(ISymbol symbol)
         {

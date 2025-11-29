@@ -20,7 +20,7 @@ namespace TelegramBotBase
     [Generator(LanguageNames.CSharp)]
     public class TelegramDeviceExtensionGenerator : IIncrementalGenerator
     {
-        static XmlDocumentationLoader xml;
+        static XmlDocumentationLoader? xml = null;
 
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -87,8 +87,8 @@ namespace TelegramBotBase
                 if (method.Name == ".ctor")
                     continue;
 
-                String parameters = "";
-                String subCallParameters = "";
+                string parameters = "";
+                string subCallParameters = "";
                 foreach (var par in method.Parameters)
                 {
                     if (par.Name == "botClient")
@@ -120,7 +120,7 @@ namespace TelegramBotBase
                         // Handle specific default value cases
                         if (defaultValue == null)
                         {
-                            if(par.Name == "cancellationToken")
+                            if (par.Name == "cancellationToken")
                             {
                                 parameters += " = default";
                             }
@@ -129,7 +129,7 @@ namespace TelegramBotBase
                                 parameters += " = null";
                             }
 
-                            
+
                         }
                         else if (defaultValue is string)
                         {
@@ -172,7 +172,7 @@ namespace TelegramBotBase
                     returnStatement = "return ";
                 }
 
-                String tmp = GenerateMethod(method, parameters, subCallParameters, returnStatement);
+                string? tmp = GenerateMethod(method, parameters, subCallParameters, returnStatement);
 
                 sb.Append(tmp);
 
@@ -221,10 +221,13 @@ namespace TelegramBotBase
         /// <param name="subCallParameters"></param>
         /// <param name="returnStatement"></param>
         /// <returns></returns>
-        private String? GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
+        private string? GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
         {
+            if (method == null)
+                return null;
+
             //Adding xml comments from embedded xml file (Workaround)
-            String xml_comments = xml?.GetDocumentationLinesForSymbol(method);
+            string? xml_comments = xml?.GetDocumentationLinesForSymbol(method);
 
             StringBuilder sb = new StringBuilder();
 
@@ -233,7 +236,7 @@ namespace TelegramBotBase
             if (method == null)
                 return string.Empty;
 
-            if(method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
+            if (method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
             {
                 sb.AppendLine("[Obsolete]");
             }
