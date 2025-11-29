@@ -229,9 +229,14 @@ namespace TelegramBotBase
             //Adding xml comments from embedded xml file (Workaround)
             string? xml_comments = xml?.GetDocumentationLinesForSymbol(method);
 
+            xml_comments = CleanupXMLComments(xml_comments, "chatId", "botClient");
+
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(xml_comments);
+            sb.Append(xml_comments);
+
+            //Adding device
+            sb.AppendLine($"    /// <param name=\"device\">Device session</param>");
 
             if (method == null)
                 return string.Empty;
@@ -253,6 +258,25 @@ namespace TelegramBotBase
             sb.AppendLine();
 
             sb.AppendLine();
+
+            return sb.ToString();
+        }
+
+        private string CleanupXMLComments(string raw, params string[] to_remove)
+        {
+            var lines = raw.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var line in lines)
+            {
+                if (to_remove.Any(a => line.Contains($"<param name=\"{a}\">")))
+                    continue;
+
+
+                sb.AppendLine($"{line}");
+            }
+
 
             return sb.ToString();
         }
