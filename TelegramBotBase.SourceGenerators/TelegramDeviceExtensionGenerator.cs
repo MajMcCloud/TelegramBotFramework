@@ -264,6 +264,9 @@ namespace TelegramBotBase
 
         private string CleanupXMLComments(string raw, params string[] to_remove)
         {
+            if (raw == null)
+                return string.Empty;
+
             var lines = raw.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
             StringBuilder sb = new StringBuilder();
