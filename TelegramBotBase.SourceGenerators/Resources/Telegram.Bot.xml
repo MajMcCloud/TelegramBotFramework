@@ -187,7 +187,7 @@
             <summary>Unique message identifier inside this chat. In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent</summary>
         </member>
         <member name="P:Telegram.Bot.Types.Message.MessageThreadId">
-            <summary><em>Optional</em>. Unique identifier of a message thread to which the message belongs; for supergroups only</summary>
+            <summary><em>Optional</em>. Unique identifier of a message thread or forum topic to which the message belongs; for supergroups and private chats only</summary>
         </member>
         <member name="P:Telegram.Bot.Types.Message.DirectMessagesTopic">
             <summary><em>Optional</em>. Information about the direct messages chat topic that contains the message</summary>
@@ -217,7 +217,7 @@
             <summary><em>Optional</em>. Information about the original message for forwarded messages</summary>
         </member>
         <member name="P:Telegram.Bot.Types.Message.IsTopicMessage">
-            <summary><em>Optional</em>. <see langword="true"/>, if the message is sent to a forum topic</summary>
+            <summary><em>Optional</em>. <see langword="true"/>, if the message is sent to a topic in a forum supergroup or a private chat with the bot</summary>
         </member>
         <member name="P:Telegram.Bot.Types.Message.IsAutomaticForward">
             <summary><em>Optional</em>. <see langword="true"/>, if the message is a channel post that was automatically forwarded to the connected discussion group</summary>
@@ -396,6 +396,9 @@
         <member name="P:Telegram.Bot.Types.Message.UniqueGift">
             <summary><em>Optional</em>. Service message: a unique gift was sent or received</summary>
         </member>
+        <member name="P:Telegram.Bot.Types.Message.GiftUpgradeSent">
+            <summary><em>Optional</em>. Service message: upgrade of a gift was purchased after the gift was sent</summary>
+        </member>
         <member name="P:Telegram.Bot.Types.Message.ConnectedWebsite">
             <summary><em>Optional</em>. The domain name of the website on which the user has logged in. <a href="https://core.telegram.org/widgets/login">More about Telegram Login »</a></summary>
         </member>
@@ -567,6 +570,9 @@
         </member>
         <member name="P:Telegram.Bot.Types.User.HasMainWebApp">
             <summary><em>Optional</em>. <see langword="true"/>, if the bot has a main Web App. Returned only in <see cref="M:Telegram.Bot.TelegramBotClientExtensions.GetMe(Telegram.Bot.ITelegramBotClient,System.Threading.CancellationToken)">GetMe</see>.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.User.HasTopicsEnabled">
+            <summary><em>Optional</em>. <see langword="true"/>, if the bot has forum topic mode enabled in private chats. Returned only in <see cref="M:Telegram.Bot.TelegramBotClientExtensions.GetMe(Telegram.Bot.ITelegramBotClient,System.Threading.CancellationToken)">GetMe</see>.</summary>
         </member>
         <member name="T:Telegram.Bot.Types.ChatMember">
             <summary>This object contains information about one member of a chat. Currently, the following 6 types of chat members are supported:<br/><see cref="T:Telegram.Bot.Types.ChatMemberOwner"/>, <see cref="T:Telegram.Bot.Types.ChatMemberAdministrator"/>, <see cref="T:Telegram.Bot.Types.ChatMemberMember"/>, <see cref="T:Telegram.Bot.Types.ChatMemberRestricted"/>, <see cref="T:Telegram.Bot.Types.ChatMemberLeft"/>, <see cref="T:Telegram.Bot.Types.ChatMemberBanned"/></summary>
@@ -2352,6 +2358,9 @@
         <member name="P:Telegram.Bot.Types.AcceptedGiftTypes.PremiumSubscription">
             <summary><see langword="true"/>, if a Telegram Premium subscription is accepted</summary>
         </member>
+        <member name="P:Telegram.Bot.Types.AcceptedGiftTypes.GiftsFromChannels">
+            <summary><see langword="true"/>, if transfers of unique gifts from channels are accepted</summary>
+        </member>
         <member name="T:Telegram.Bot.Types.Animation">
             <summary>This object represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).</summary>
         </member>
@@ -2885,6 +2894,15 @@
         <member name="P:Telegram.Bot.Types.ChatFullInfo.Location">
             <summary><em>Optional</em>. For supergroups, the location to which the supergroup is connected</summary>
         </member>
+        <member name="P:Telegram.Bot.Types.ChatFullInfo.Rating">
+            <summary><em>Optional</em>. For private chats, the rating of the user if any</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.ChatFullInfo.UniqueGiftColors">
+            <summary><em>Optional</em>. The color scheme based on a unique gift that must be used for the chat's name, message replies and link previews</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.ChatFullInfo.PaidMessageStarCount">
+            <summary><em>Optional</em>. The number of Telegram Stars a general user have to pay to send a message to the chat</summary>
+        </member>
         <member name="T:Telegram.Bot.Types.ChatBoost">
             <summary>This object contains information about a chat boost.</summary>
         </member>
@@ -3288,7 +3306,10 @@
             <summary><em>Optional</em>. Special entities that appear in the task text</summary>
         </member>
         <member name="P:Telegram.Bot.Types.ChecklistTask.CompletedByUser">
-            <summary><em>Optional</em>. User that completed the task; omitted if the task wasn't completed</summary>
+            <summary><em>Optional</em>. User that completed the task; omitted if the task wasn't completed by a user</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.ChecklistTask.CompletedByChat">
+            <summary><em>Optional</em>. Chat that completed the task; omitted if the task wasn't completed by a chat</summary>
         </member>
         <member name="P:Telegram.Bot.Types.ChecklistTask.CompletionDate">
             <summary><em>Optional</em>. Point in time when the task was completed; 0 if the task wasn't completed</summary>
@@ -3908,6 +3929,9 @@
         <member name="F:Telegram.Bot.Types.Enums.MessageType.SuggestedPostRefunded">
             <summary>The <see cref="T:Telegram.Bot.Types.Message"/> contains a <see cref="P:Telegram.Bot.Types.Message.SuggestedPostRefunded"/></summary>
         </member>
+        <member name="F:Telegram.Bot.Types.Enums.MessageType.GiftUpgradeSent">
+            <summary>The <see cref="T:Telegram.Bot.Types.Message"/> contains a <see cref="P:Telegram.Bot.Types.Message.GiftUpgradeSent"/></summary>
+        </member>
         <member name="T:Telegram.Bot.Types.Enums.OwnedGiftType">
             <summary>Type of the gift, always <see cref="T:Telegram.Bot.Types.OwnedGift"/></summary>
         </member>
@@ -4445,6 +4469,9 @@
         <member name="P:Telegram.Bot.Types.ForumTopic.IconCustomEmojiId">
             <summary><em>Optional</em>. Unique identifier of the custom emoji shown as the topic icon</summary>
         </member>
+        <member name="P:Telegram.Bot.Types.ForumTopic.IsNameImplicit">
+            <summary><em>Optional</em>. <see langword="true"/>, if the name of the topic wasn't specified explicitly by its creator and likely needs to be changed by the bot</summary>
+        </member>
         <member name="T:Telegram.Bot.Types.ForumTopicClosed">
             <summary>This object represents a service message about a forum topic closed in the chat. Currently holds no information.</summary>
         </member>
@@ -4459,6 +4486,9 @@
         </member>
         <member name="P:Telegram.Bot.Types.ForumTopicCreated.IconCustomEmojiId">
             <summary><em>Optional</em>. Unique identifier of the custom emoji shown as the topic icon</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.ForumTopicCreated.IsNameImplicit">
+            <summary><em>Optional</em>. <see langword="true"/>, if the name of the topic wasn't specified explicitly by its creator and likely needs to be changed by the bot</summary>
         </member>
         <member name="T:Telegram.Bot.Types.ForumTopicEdited">
             <summary>This object represents a service message about an edited forum topic.</summary>
@@ -4526,14 +4556,44 @@
         <member name="P:Telegram.Bot.Types.Gift.UpgradeStarCount">
             <summary><em>Optional</em>. The number of Telegram Stars that must be paid to upgrade the gift to a unique one</summary>
         </member>
+        <member name="P:Telegram.Bot.Types.Gift.IsPremium">
+            <summary><em>Optional</em>. <see langword="true"/>, if the gift can only be purchased by Telegram Premium subscribers</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.Gift.HasColors">
+            <summary><em>Optional</em>. <see langword="true"/>, if the gift can be used (after being upgraded) to customize a user's appearance</summary>
+        </member>
         <member name="P:Telegram.Bot.Types.Gift.TotalCount">
-            <summary><em>Optional</em>. The total number of the gifts of this type that can be sent; for limited gifts only</summary>
+            <summary><em>Optional</em>. The total number of gifts of this type that can be sent by all users; for limited gifts only</summary>
         </member>
         <member name="P:Telegram.Bot.Types.Gift.RemainingCount">
-            <summary><em>Optional</em>. The number of remaining gifts of this type that can be sent; for limited gifts only</summary>
+            <summary><em>Optional</em>. The number of remaining gifts of this type that can be sent by all users; for limited gifts only</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.Gift.PersonalTotalCount">
+            <summary><em>Optional</em>. The total number of gifts of this type that can be sent by the bot; for limited gifts only</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.Gift.PersonalRemainingCount">
+            <summary><em>Optional</em>. The number of remaining gifts of this type that can be sent by the bot; for limited gifts only</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.Gift.Background">
+            <summary><em>Optional</em>. Background of the gift</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.Gift.UniqueGiftVariantCount">
+            <summary><em>Optional</em>. The total number of different unique gifts that can be obtained by upgrading the gift</summary>
         </member>
         <member name="P:Telegram.Bot.Types.Gift.PublisherChat">
             <summary><em>Optional</em>. Information about the chat that published the gift</summary>
+        </member>
+        <member name="T:Telegram.Bot.Types.GiftBackground">
+            <summary>This object describes the background of a gift.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.GiftBackground.CenterColor">
+            <summary>Center color of the background in RGB format</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.GiftBackground.EdgeColor">
+            <summary>Edge color of the background in RGB format</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.GiftBackground.TextColor">
+            <summary>Text color of the background in RGB format</summary>
         </member>
         <member name="T:Telegram.Bot.Types.GiftInfo">
             <summary>Describes a service message about a regular gift that was sent or received.</summary>
@@ -4548,7 +4608,10 @@
             <summary><em>Optional</em>. Number of Telegram Stars that can be claimed by the receiver by converting the gift; omitted if conversion to Telegram Stars is impossible</summary>
         </member>
         <member name="P:Telegram.Bot.Types.GiftInfo.PrepaidUpgradeStarCount">
-            <summary><em>Optional</em>. Number of Telegram Stars that were prepaid by the sender for the ability to upgrade the gift</summary>
+            <summary><em>Optional</em>. Number of Telegram Stars that were prepaid for the ability to upgrade the gift</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.GiftInfo.IsUpgradeSeparate">
+            <summary><em>Optional</em>. <see langword="true"/>, if the gift's upgrade was purchased after the gift was sent</summary>
         </member>
         <member name="P:Telegram.Bot.Types.GiftInfo.CanBeUpgraded">
             <summary><em>Optional</em>. <see langword="true"/>, if the gift can be upgraded to a unique gift</summary>
@@ -4561,6 +4624,9 @@
         </member>
         <member name="P:Telegram.Bot.Types.GiftInfo.IsPrivate">
             <summary><em>Optional</em>. <see langword="true"/>, if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.GiftInfo.UniqueGiftNumber">
+            <summary><em>Optional</em>. Unique number reserved for this gift when upgraded. See the <em>number</em> field in <see cref="T:Telegram.Bot.Types.UniqueGift"/></summary>
         </member>
         <member name="T:Telegram.Bot.Types.GiftList">
             <summary>This object represent a list of gifts.</summary>
@@ -5875,6 +5941,9 @@
         <member name="M:Telegram.Bot.Types.InputFileId.op_Implicit(System.String)~Telegram.Bot.Types.InputFileId">
             <summary>Implicit operator, same as <see cref="M:Telegram.Bot.Types.InputFileId.#ctor(System.String)"/>, but returns null for a null string</summary>
         </member>
+        <member name="M:Telegram.Bot.Types.InputFileId.ToString">
+            <summary>Returns the Id</summary>
+        </member>
         <member name="T:Telegram.Bot.Types.InputFileStream">
             <summary>This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data in the usual way that files are uploaded via the browser</summary>
         </member>
@@ -5898,6 +5967,9 @@
         <member name="M:Telegram.Bot.Types.InputFileStream.op_Implicit(System.IO.Stream)~Telegram.Bot.Types.InputFileStream">
             <summary>Implicit operator, same as <see cref="M:Telegram.Bot.Types.InputFileStream.#ctor(System.IO.Stream,System.String)"/> without given filename</summary>
         </member>
+        <member name="M:Telegram.Bot.Types.InputFileStream.ToString">
+            <summary>Returns "stream://realfilename" for a FileStream content, or "stream://0" otherwise</summary>
+        </member>
         <member name="T:Telegram.Bot.Types.InputFileUrl">
             <summary>This object represents an HTTP URL for the file to be sent</summary>
         </member>
@@ -5920,6 +5992,9 @@
         </member>
         <member name="M:Telegram.Bot.Types.InputFileUrl.op_Implicit(System.String)~Telegram.Bot.Types.InputFileUrl">
             <summary>Implicit operator, same as <see cref="M:Telegram.Bot.Types.InputFileUrl.#ctor(System.String)"/></summary>
+        </member>
+        <member name="M:Telegram.Bot.Types.InputFileUrl.ToString">
+            <summary>Returns the Url</summary>
         </member>
         <member name="T:Telegram.Bot.Types.InputMedia">
             <summary>This object represents the content of a media message to be sent. It should be one of<br/><see cref="T:Telegram.Bot.Types.InputMediaAnimation"/>, <see cref="T:Telegram.Bot.Types.InputMediaDocument"/>, <see cref="T:Telegram.Bot.Types.InputMediaAudio"/>, <see cref="T:Telegram.Bot.Types.InputMediaPhoto"/>, <see cref="T:Telegram.Bot.Types.InputMediaVideo"/></summary>
@@ -6478,10 +6553,16 @@
             <summary><em>Optional</em>. <see langword="true"/>, if the gift was refunded and isn't available anymore</summary>
         </member>
         <member name="P:Telegram.Bot.Types.OwnedGiftRegular.ConvertStarCount">
-            <summary><em>Optional</em>. Number of Telegram Stars that can be claimed by the receiver instead of the gift; omitted if the gift cannot be converted to Telegram Stars</summary>
+            <summary><em>Optional</em>. Number of Telegram Stars that can be claimed by the receiver instead of the gift; omitted if the gift cannot be converted to Telegram Stars; for gifts received on behalf of business accounts only</summary>
         </member>
         <member name="P:Telegram.Bot.Types.OwnedGiftRegular.PrepaidUpgradeStarCount">
-            <summary><em>Optional</em>. Number of Telegram Stars that were paid by the sender for the ability to upgrade the gift</summary>
+            <summary><em>Optional</em>. Number of Telegram Stars that were paid for the ability to upgrade the gift</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.OwnedGiftRegular.IsUpgradeSeparate">
+            <summary><em>Optional</em>. <see langword="true"/>, if the gift's upgrade was purchased after the gift was sent; for gifts received on behalf of business accounts only</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.OwnedGiftRegular.UniqueGiftNumber">
+            <summary><em>Optional</em>. Unique number reserved for this gift when upgraded. See the <em>number</em> field in <see cref="T:Telegram.Bot.Types.UniqueGift"/></summary>
         </member>
         <member name="T:Telegram.Bot.Types.OwnedGiftUnique">
             <summary>Describes a unique gift received and owned by a user or a chat.</summary>
@@ -7048,6 +7129,9 @@
         <member name="T:Telegram.Bot.Types.UniqueGift">
             <summary>This object describes a unique gift that was upgraded from a regular gift.</summary>
         </member>
+        <member name="P:Telegram.Bot.Types.UniqueGift.GiftId">
+            <summary>Identifier of the regular gift from which the gift was upgraded</summary>
+        </member>
         <member name="P:Telegram.Bot.Types.UniqueGift.BaseName">
             <summary>Human-readable name of the regular gift from which this unique gift was upgraded</summary>
         </member>
@@ -7065,6 +7149,15 @@
         </member>
         <member name="P:Telegram.Bot.Types.UniqueGift.Backdrop">
             <summary>Backdrop of the gift</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGift.IsPremium">
+            <summary><em>Optional</em>. <see langword="true"/>, if the original regular gift was exclusively purchaseable by Telegram Premium subscribers</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGift.IsFromBlockchain">
+            <summary><em>Optional</em>. <see langword="true"/>, if the gift is assigned from the TON blockchain and can't be resold or transferred in Telegram</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGift.Colors">
+            <summary><em>Optional</em>. The color scheme that can be used by the gift's owner for the chat's name, replies to messages and link previews; for business account gifts and gifts that are currently on sale only</summary>
         </member>
         <member name="P:Telegram.Bot.Types.UniqueGift.PublisherChat">
             <summary><em>Optional</em>. Information about the chat that published the gift</summary>
@@ -7096,6 +7189,27 @@
         <member name="P:Telegram.Bot.Types.UniqueGiftBackdropColors.TextColor">
             <summary>The color for the text on the backdrop in RGB format</summary>
         </member>
+        <member name="T:Telegram.Bot.Types.UniqueGiftColors">
+            <summary>This object contains information about the color scheme for a user's name, message replies and link previews based on a unique gift.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGiftColors.ModelCustomEmojiId">
+            <summary>Custom emoji identifier of the unique gift's model</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGiftColors.SymbolCustomEmojiId">
+            <summary>Custom emoji identifier of the unique gift's symbol</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGiftColors.LightThemeMainColor">
+            <summary>Main color used in light themes; RGB format</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGiftColors.LightThemeOtherColors">
+            <summary>List of 1-3 additional colors used in light themes; RGB format</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGiftColors.DarkThemeMainColor">
+            <summary>Main color used in dark themes; RGB format</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGiftColors.DarkThemeOtherColors">
+            <summary>List of 1-3 additional colors used in dark themes; RGB format</summary>
+        </member>
         <member name="T:Telegram.Bot.Types.UniqueGiftInfo">
             <summary>Describes a service message about a unique gift that was sent or received.</summary>
         </member>
@@ -7103,10 +7217,13 @@
             <summary>Information about the gift</summary>
         </member>
         <member name="P:Telegram.Bot.Types.UniqueGiftInfo.Origin">
-            <summary>Origin of the gift. Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, or “resale” for gifts bought from other users</summary>
+            <summary>Origin of the gift. Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, “resale” for gifts bought from other users, “GiftedUpgrade” for upgrades purchased after the gift was sent, or “offer” for gifts bought or sold through gift purchase offers</summary>
         </member>
-        <member name="P:Telegram.Bot.Types.UniqueGiftInfo.LastResaleStarCount">
-            <summary><em>Optional</em>. For gifts bought from other users, the price paid for the gift</summary>
+        <member name="P:Telegram.Bot.Types.UniqueGiftInfo.LastResaleCurrency">
+            <summary><em>Optional</em>. For gifts bought from other users, the currency in which the payment for the gift was done. Currently, one of “XTR” for Telegram Stars or “TON” for toncoins.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UniqueGiftInfo.LastResaleAmount">
+            <summary><em>Optional</em>. For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanotoncoins</summary>
         </member>
         <member name="P:Telegram.Bot.Types.UniqueGiftInfo.OwnedGiftId">
             <summary><em>Optional</em>. Unique identifier of the received gift for the bot; only present for gifts received on behalf of business accounts</summary>
@@ -7243,6 +7360,21 @@
         </member>
         <member name="P:Telegram.Bot.Types.UserProfilePhotos.Photos">
             <summary>Requested profile pictures (in up to 4 sizes each)</summary>
+        </member>
+        <member name="T:Telegram.Bot.Types.UserRating">
+            <summary>This object describes the rating of a user based on their Telegram Star spendings.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UserRating.Level">
+            <summary>Current level of the user, indicating their reliability when purchasing digital goods and services. A higher level suggests a more trustworthy customer; a negative level is likely reason for concern.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UserRating.Rating">
+            <summary>Numerical value of the user's rating; the higher the rating, the better</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UserRating.CurrentLevelRating">
+            <summary>The rating value required to get the current level</summary>
+        </member>
+        <member name="P:Telegram.Bot.Types.UserRating.NextLevelRating">
+            <summary><em>Optional</em>. The rating value required to get to the next level; omitted if the maximum level was reached</summary>
         </member>
         <member name="T:Telegram.Bot.Types.UsersShared">
             <summary>This object contains information about the users whose identifiers were shared with the bot using a <see cref="T:Telegram.Bot.Types.ReplyMarkups.KeyboardButtonRequestUsers"/> button.</summary>
@@ -7500,8 +7632,50 @@
             <param name="protectContent">Protects the contents of the sent messages from forwarding and saving</param>
             <param name="businessConnectionId">Unique identifier of the business connection on behalf of which the message will be sent</param>
             <param name="streams">Streams for uploaded media, can be referenced as src="<c>stream://N</c>" or <c>stream:N</c> or just <c>N</c><para/>N being the indice in the streams list (starting with 0), or the filename for <c>FileStream</c>s</param>
-            <returns>The sent <see cref="T:Telegram.Bot.Types.Message"/> is returned. (the first one for media group)</returns>
+            <returns>Array of the sent <see cref="T:Telegram.Bot.Types.Message"/>s</returns>
             <exception cref="T:System.FormatException">Malformed HTML</exception>
+        </member>
+        <member name="M:Telegram.Bot.Extensions.HtmlText.EditHtml(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.Int32,System.String,System.String,System.IO.Stream)">
+            <summary>
+            Helper method to edit a single message via an HTML string with optional (single) media and inline keyboard attached.
+            </summary>
+            <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
+            <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
+            <param name="messageId">Identifier of the message to edit</param>
+            <param name="html">The message in Html, with optional &lt;img&gt;, &lt;video&gt;, &lt;file&gt; tags for media, &lt;preview&gt; for text, and inline/reply &lt;keyboard&gt;</param>
+            <param name="businessConnectionId">Unique identifier of the business connection on behalf of which the message will be sent</param>
+            <param name="stream">Stream for uploaded media, can be referenced as src="<c>stream://N</c>" or <c>stream:N</c> or just <c>N</c><para/>N being 0 (zero), or the filename for <c>FileStream</c>s</param>
+            <returns>The modified <see cref="T:Telegram.Bot.Types.Message"/></returns>
+            <remarks>A media message cannot be converted to a text-only message. But the opposite is possible</remarks>
+            <exception cref="T:System.FormatException">Malformed or incompatible HTML</exception>
+        </member>
+        <member name="M:Telegram.Bot.Extensions.HtmlText.EditHtml(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.Collections.Generic.IList{System.Int32},System.String,System.String,System.Collections.Generic.IList{System.IO.Stream})">
+            <summary>
+            Helper method to edit media group messages via an HTML string with optional (multiple) media.
+            <br/>Inline keyboard cannot be attached to media group.
+            <para>Number of media must match the number of <paramref name="messageIds"/></para>
+            </summary>
+            <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
+            <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
+            <param name="messageIds">Identifiers of the messages to edit (used to edit a media group)</param>
+            <param name="html">The message in Html, with optional &lt;img&gt;, &lt;video&gt;, &lt;file&gt; tags for media, &lt;preview&gt; for text, and inline/reply &lt;keyboard&gt;</param>
+            <param name="businessConnectionId">Unique identifier of the business connection on behalf of which the message will be sent</param>
+            <param name="streams">Streams for uploaded media, can be referenced as src="<c>stream://N</c>" or <c>stream:N</c> or just <c>N</c><para/>N being the indice in the streams list (starting with 0), or the filename for <c>FileStream</c>s</param>
+            <returns>Array of the modified <see cref="T:Telegram.Bot.Types.Message"/>s</returns>
+            <remarks>Some (mix of) media types are unsupported by Telegram in a media group</remarks>
+            <exception cref="T:System.FormatException">Malformed or incompatible HTML</exception>
+        </member>
+        <member name="M:Telegram.Bot.Extensions.HtmlText.EditHtmlInline(Telegram.Bot.ITelegramBotClient,System.String,System.String,System.String,System.IO.Stream)">
+            <summary>
+            Helper method to edit an inline message via an HTML string with optional (single) media and inline keyboard attached.
+            </summary>
+            <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
+            <param name="inlineMessageId">Identifier of the inline message</param>
+            <param name="html">The message in Html, with optional &lt;img&gt;, &lt;video&gt;, &lt;file&gt; tags for media, &lt;preview&gt; for text, and inline/reply &lt;keyboard&gt;</param>
+            <param name="businessConnectionId">Unique identifier of the business connection on behalf of which the message will be sent</param>
+            <param name="stream">Stream for uploaded media, can be referenced as src="<c>stream://N</c>" or <c>stream:N</c> or just <c>N</c><para/>N being 0 (zero), or the filename for <c>FileStream</c>s</param>
+            <remarks>A media message cannot be converted to a text-only message. But the opposite is possible</remarks>
+            <exception cref="T:System.FormatException">Malformed or incompatible HTML</exception>
         </member>
         <member name="T:Telegram.Bot.AuthHelpers">
             <summary>Provides methods to authenticate data coming from Telegram web requests</summary>
@@ -7578,7 +7752,7 @@
             <summary>Provides extension methods for <see cref="T:Telegram.Bot.ITelegramBotClient"/> that allow for <see cref="T:Telegram.Bot.Types.Update"/> polling</summary>
         </member>
         <member name="M:Telegram.Bot.TelegramBotClientExtensions.GetInfoAndDownloadFile(Telegram.Bot.ITelegramBotClient,System.String,System.IO.Stream,System.Threading.CancellationToken)">
-            <summary>Use this method to get basic info about a file download it. For the moment, bots can download filesof up to 20MB in size.</summary>
+            <summary>Use this method to get basic info about a file and download it. For the moment, bots can download filesof up to 20MB in size.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="fileId">File identifier to get info about</param>
             <param name="destination">Destination stream to write file to</param>
@@ -7656,7 +7830,7 @@
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
             <param name="linkPreviewOptions">Link preview generation options for the message</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="entities">A list of special entities that appear in message text, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
@@ -7668,18 +7842,19 @@
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns>The sent <see cref="T:Telegram.Bot.Types.Message"/> is returned.</returns>
         </member>
-        <member name="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.String,System.Threading.CancellationToken)">
             <summary>Use this method to forward messages of any kind. Service messages and messages with protected content can't be forwarded.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
             <param name="fromChatId">Unique identifier for the chat where the original message was sent (or channel username in the format <c>@channelusername</c>)</param>
             <param name="messageId">Message identifier in the chat specified in <paramref name="fromChatId"/></param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the forwarded message from forwarding and saving</param>
             <param name="videoStartTimestamp">New start timestamp for the forwarded video in the message</param>
             <param name="directMessagesTopicId">Identifier of the direct messages topic to which the message will be forwarded; required if the message is forwarded to a direct messages chat</param>
             <param name="suggestedPostParameters">An object containing the parameters of the suggested post to send; for direct messages chats only</param>
+            <param name="messageEffectId">Unique identifier of the message effect to be added to the message; only available when forwarding to private chats</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns>The sent <see cref="T:Telegram.Bot.Types.Message"/> is returned.</returns>
         </member>
@@ -7689,15 +7864,15 @@
             <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
             <param name="fromChatId">Unique identifier for the chat where the original messages were sent (or channel username in the format <c>@channelusername</c>)</param>
             <param name="messageIds">A list of 1-100 identifiers of messages in the chat <paramref name="fromChatId"/> to forward. The identifiers must be specified in a strictly increasing order.</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the messages <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the forwarded messages from forwarding and saving</param>
             <param name="directMessagesTopicId">Identifier of the direct messages topic to which the messages will be forwarded; required if the messages are forwarded to a direct messages chat</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns>An array of <see cref="T:Telegram.Bot.Types.MessageId"/> of the sent messages is returned.</returns>
         </member>
-        <member name="M:Telegram.Bot.TelegramBotClientExtensions.CopyMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.String,Telegram.Bot.Types.Enums.ParseMode,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">
-            <summary>Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz <see cref="T:Telegram.Bot.Types.Poll"/> can be copied only if the value of the field <em>CorrectOptionId</em> is known to the bot. The method is analogous to the method <see cref="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">ForwardMessage</see>, but the copied message doesn't have a link to the original message.</summary>
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.CopyMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.String,Telegram.Bot.Types.Enums.ParseMode,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.String,System.Threading.CancellationToken)">
+            <summary>Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz <see cref="T:Telegram.Bot.Types.Poll"/> can be copied only if the value of the field <em>CorrectOptionId</em> is known to the bot. The method is analogous to the method <see cref="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.String,System.Threading.CancellationToken)">ForwardMessage</see>, but the copied message doesn't have a link to the original message.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
             <param name="fromChatId">Unique identifier for the chat where the original message was sent (or channel username in the format <c>@channelusername</c>)</param>
@@ -7706,7 +7881,7 @@
             <param name="parseMode">Mode for parsing entities in the new caption. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details.</param>
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the new caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="showCaptionAboveMedia">Pass <see langword="true"/>, if the caption must be shown above the message media. Ignored if a new caption isn't specified.</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
@@ -7715,6 +7890,7 @@
             <param name="videoStartTimestamp">New start timestamp for the copied video in the message</param>
             <param name="directMessagesTopicId">Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</param>
             <param name="suggestedPostParameters">An object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.</param>
+            <param name="messageEffectId">Unique identifier of the message effect to be added to the message; only available when copying to private chats</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns>The <see cref="T:Telegram.Bot.Types.MessageId"/> of the sent message on success.</returns>
         </member>
@@ -7725,7 +7901,7 @@
             <param name="fromChatId">Unique identifier for the chat where the original messages were sent (or channel username in the format <c>@channelusername</c>)</param>
             <param name="messageIds">A list of 1-100 identifiers of messages in the chat <paramref name="fromChatId"/> to copy. The identifiers must be specified in a strictly increasing order.</param>
             <param name="removeCaption">Pass <see langword="true"/> to copy the messages without their captions</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the messages <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent messages from forwarding and saving</param>
             <param name="directMessagesTopicId">Identifier of the direct messages topic to which the messages will be sent; required if the messages are sent to a direct messages chat</param>
@@ -7741,7 +7917,7 @@
             <param name="parseMode">Mode for parsing entities in the photo caption. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details.</param>
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="showCaptionAboveMedia">Pass <see langword="true"/>, if the caption must be shown above the message media</param>
             <param name="hasSpoiler">Pass <see langword="true"/> if the photo needs to be covered with a spoiler animation</param>
@@ -7769,7 +7945,7 @@
             <param name="performer">Performer</param>
             <param name="title">Track name</param>
             <param name="thumbnail">Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using <see cref="T:Telegram.Bot.Types.InputFileStream"/>. Thumbnails can't be reused and can be only uploaded as a new file, so you can use <see cref="M:Telegram.Bot.Types.InputFileStream.#ctor(System.IO.Stream,System.String)"/> with a specific filename. <a href="https://core.telegram.org/bots/api#sending-files">More information on Sending Files »</a></param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
@@ -7792,7 +7968,7 @@
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
             <param name="thumbnail">Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using <see cref="T:Telegram.Bot.Types.InputFileStream"/>. Thumbnails can't be reused and can be only uploaded as a new file, so you can use <see cref="M:Telegram.Bot.Types.InputFileStream.#ctor(System.IO.Stream,System.String)"/> with a specific filename. <a href="https://core.telegram.org/bots/api#sending-files">More information on Sending Files »</a></param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="disableContentTypeDetection">Disables automatic server-side content type detection for files uploaded using <see cref="T:Telegram.Bot.Types.InputFileStream"/></param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
@@ -7819,7 +7995,7 @@
             <param name="width">Video width</param>
             <param name="height">Video height</param>
             <param name="thumbnail">Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using <see cref="T:Telegram.Bot.Types.InputFileStream"/>. Thumbnails can't be reused and can be only uploaded as a new file, so you can use <see cref="M:Telegram.Bot.Types.InputFileStream.#ctor(System.IO.Stream,System.String)"/> with a specific filename. <a href="https://core.telegram.org/bots/api#sending-files">More information on Sending Files »</a></param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="showCaptionAboveMedia">Pass <see langword="true"/>, if the caption must be shown above the message media</param>
             <param name="hasSpoiler">Pass <see langword="true"/> if the video needs to be covered with a spoiler animation</param>
@@ -7850,7 +8026,7 @@
             <param name="width">Animation width</param>
             <param name="height">Animation height</param>
             <param name="thumbnail">Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using <see cref="T:Telegram.Bot.Types.InputFileStream"/>. Thumbnails can't be reused and can be only uploaded as a new file, so you can use <see cref="M:Telegram.Bot.Types.InputFileStream.#ctor(System.IO.Stream,System.String)"/> with a specific filename. <a href="https://core.telegram.org/bots/api#sending-files">More information on Sending Files »</a></param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="showCaptionAboveMedia">Pass <see langword="true"/>, if the caption must be shown above the message media</param>
             <param name="hasSpoiler">Pass <see langword="true"/> if the animation needs to be covered with a spoiler animation</param>
@@ -7875,7 +8051,7 @@
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
             <param name="duration">Duration of the voice message in seconds</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
@@ -7897,7 +8073,7 @@
             <param name="duration">Duration of sent video in seconds</param>
             <param name="length">Video width and height, i.e. diameter of the video message</param>
             <param name="thumbnail">Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using <see cref="T:Telegram.Bot.Types.InputFileStream"/>. Thumbnails can't be reused and can be only uploaded as a new file, so you can use <see cref="M:Telegram.Bot.Types.InputFileStream.#ctor(System.IO.Stream,System.String)"/> with a specific filename. <a href="https://core.telegram.org/bots/api#sending-files">More information on Sending Files »</a></param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -7912,14 +8088,14 @@
             <summary>Use this method to send paid media.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>). If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance. Otherwise, they will be credited to the bot's balance.</param>
-            <param name="starCount">The number of Telegram Stars that must be paid to buy access to the media; 1-10000</param>
+            <param name="starCount">The number of Telegram Stars that must be paid to buy access to the media; 1-25000</param>
             <param name="media">A array describing the media to be sent; up to 10 items</param>
             <param name="caption">Media caption, 0-1024 characters after entities parsing</param>
             <param name="parseMode">Mode for parsing entities in the media caption. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details.</param>
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
             <param name="payload">Bot-defined paid media payload, 0-128 bytes. This will not be displayed to the user, use it for your internal processes.</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="showCaptionAboveMedia">Pass <see langword="true"/>, if the caption must be shown above the message media</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
@@ -7937,7 +8113,7 @@
             <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
             <param name="media">A array describing messages to be sent, must include 2-10 items</param>
             <param name="replyParameters">Description of the message to reply to</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends messages <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent messages from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -7959,7 +8135,7 @@
             <param name="livePeriod">Period in seconds during which the location will be updated (see <a href="https://telegram.org/blog/live-locations">Live Locations</a>, should be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely.</param>
             <param name="heading">For live locations, a direction in which the user is moving, in degrees. Must be between 1 and 360 if specified.</param>
             <param name="proximityAlertRadius">For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters. Must be between 1 and 100000 if specified.</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -7984,7 +8160,7 @@
             <param name="foursquareType">Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)</param>
             <param name="googlePlaceId">Google Places identifier of the venue</param>
             <param name="googlePlaceType">Google Places type of the venue. (See <a href="https://developers.google.com/places/web-service/supported_types">supported types</a>.)</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -8005,7 +8181,7 @@
             <param name="vcard">Additional data about the contact in the form of a <a href="https://en.wikipedia.org/wiki/VCard">vCard</a>, 0-2048 bytes</param>
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -8036,7 +8212,7 @@
             <param name="openPeriod">Amount of time in seconds the poll will be active after creation, 5-600. Can't be used together with <paramref name="closeDate"/>.</param>
             <param name="closeDate">Point in time when the poll will be automatically closed. Must be at least 5 and no more than 600 seconds in the future. Can't be used together with <paramref name="openPeriod"/>.</param>
             <param name="isClosed">Pass <see langword="true"/> if the poll needs to be immediately closed. This can be useful for poll preview.</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -8066,7 +8242,7 @@
             <param name="emoji">Emoji on which the dice throw animation is based. Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”. Dice can have values 1-6 for “🎲”, “🎯” and “🎳”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”. Defaults to “🎲”</param>
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -8077,13 +8253,24 @@
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns>The sent <see cref="T:Telegram.Bot.Types.Message"/> is returned.</returns>
         </member>
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.SendMessageDraft(Telegram.Bot.ITelegramBotClient,System.Int64,System.Int32,System.String,System.Nullable{System.Int32},Telegram.Bot.Types.Enums.ParseMode,System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Threading.CancellationToken)">
+            <summary>Use this method to stream a partial message to a user while the message is being generated; supported only for bots with forum topic mode enabled.</summary>
+            <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
+            <param name="chatId">Unique identifier for the target private chat</param>
+            <param name="draftId">Unique identifier of the message draft; must be non-zero. Changes of drafts with the same identifier are animated</param>
+            <param name="text">Text of the message to be sent, 1-4096 characters after entities parsing</param>
+            <param name="messageThreadId">Unique identifier for the target message thread</param>
+            <param name="parseMode">Mode for parsing entities in the message text. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details.</param>
+            <param name="entities">A list of special entities that appear in message text, which can be specified instead of <paramref name="parseMode"/></param>
+            <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
+        </member>
         <member name="M:Telegram.Bot.TelegramBotClientExtensions.SendChatAction(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.Enums.ChatAction,System.Nullable{System.Int32},System.String,System.Threading.CancellationToken)">
             <summary>Use this method when you need to tell the user that something is happening on the bot's side. The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).<br/>We only recommend using this method when a response from the bot will take a <b>noticeable</b> amount of time to arrive.</summary>
             <remarks>Example: The <a href="https://t.me/imagebot">ImageBot</a> needs some time to process a request and upload the image. Instead of sending a text message along the lines of “Retrieving image, please wait…”, the bot may use <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendChatAction(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.Enums.ChatAction,System.Nullable{System.Int32},System.String,System.Threading.CancellationToken)">SendChatAction</see> with <paramref name="action"/> = <em>UploadPhoto</em>. The user will see a “sending photo” status for the bot.</remarks>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>). Channel chats and channel direct messages chats aren't supported.</param>
             <param name="action">Type of action to broadcast. Choose one, depending on what the user is about to receive: <em>typing</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.String,Telegram.Bot.Types.Enums.ParseMode,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,Telegram.Bot.Types.LinkPreviewOptions,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Boolean,System.Boolean,System.String,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">text messages</see>, <em>UploadPhoto</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendPhoto(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.InputFile,System.String,Telegram.Bot.Types.Enums.ParseMode,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">photos</see>, <em>RecordVideo</em> or <em>UploadVideo</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendVideo(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.InputFile,System.String,Telegram.Bot.Types.Enums.ParseMode,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},Telegram.Bot.Types.InputFile,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String,System.String,System.Boolean,Telegram.Bot.Types.InputFile,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">videos</see>, <em>RecordVoice</em> or <em>UploadVoice</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendVoice(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.InputFile,System.String,Telegram.Bot.Types.Enums.ParseMode,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Boolean,System.Boolean,System.String,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">voice notes</see>, <em>UploadDocument</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendDocument(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.InputFile,System.String,Telegram.Bot.Types.Enums.ParseMode,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,Telegram.Bot.Types.InputFile,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{Telegram.Bot.Types.MessageEntity},System.Boolean,System.Boolean,System.Boolean,System.String,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">general files</see>, <em>ChooseSticker</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendSticker(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.InputFile,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.String,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.String,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">stickers</see>, <em>FindLocation</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendLocation(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.Double,System.Double,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.Nullable{System.Double},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.String,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">location data</see>, <em>RecordVideoNote</em> or <em>UploadVideoNote</em> for <see cref="M:Telegram.Bot.TelegramBotClientExtensions.SendVideoNote(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.InputFile,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.ReplyMarkup,System.Nullable{System.Int32},System.Nullable{System.Int32},Telegram.Bot.Types.InputFile,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.String,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">video notes</see>.</param>
-            <param name="messageThreadId">Unique identifier for the target message thread; for supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread or topic of a forum; for supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="businessConnectionId">Unique identifier of the business connection on behalf of which the action will be sent</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
         </member>
@@ -8161,7 +8348,7 @@
             <param name="canEditStories">Pass <see langword="true"/> if the administrator can edit stories posted by other users, post stories to the chat page, pin chat stories, and access the chat's story archive</param>
             <param name="canDeleteStories">Pass <see langword="true"/> if the administrator can delete stories posted by other users</param>
             <param name="canManageVideoChats">Pass <see langword="true"/> if the administrator can manage video chats</param>
-            <param name="canRestrictMembers">Pass <see langword="true"/> if the administrator can restrict, ban or unban chat members, or access supergroup statistics</param>
+            <param name="canRestrictMembers">Pass <see langword="true"/> if the administrator can restrict, ban or unban chat members, or access supergroup statistics. For backward compatibility, defaults to <see langword="true"/> for promotions of channel administrators</param>
             <param name="canPromoteMembers">Pass <see langword="true"/> if the administrator can add new administrators with a subset of their own privileges or demote administrators that they have promoted, directly or indirectly (promoted by administrators that were appointed by him)</param>
             <param name="canChangeInfo">Pass <see langword="true"/> if the administrator can change chat title, photo and other settings</param>
             <param name="canInviteUsers">Pass <see langword="true"/> if the administrator can invite new users to the chat</param>
@@ -8387,7 +8574,7 @@
             <returns>Information about the created topic as a <see cref="T:Telegram.Bot.Types.ForumTopic"/> object.</returns>
         </member>
         <member name="M:Telegram.Bot.TelegramBotClientExtensions.EditForumTopic(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.Int32,System.String,System.String,System.Threading.CancellationToken)">
-            <summary>Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>CanManageTopics</em> administrator rights, unless it is the creator of the topic.</summary>
+            <summary>Use this method to edit name and icon of a topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanManageTopics</em> administrator rights, unless it is the creator of the topic.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>)</param>
             <param name="messageThreadId">Unique identifier for the target message thread of the forum topic</param>
@@ -8410,14 +8597,14 @@
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
         </member>
         <member name="M:Telegram.Bot.TelegramBotClientExtensions.DeleteForumTopic(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.Int32,System.Threading.CancellationToken)">
-            <summary>Use this method to delete a forum topic along with all its messages in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>CanDeleteMessages</em> administrator rights.</summary>
+            <summary>Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanDeleteMessages</em> administrator rights.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>)</param>
             <param name="messageThreadId">Unique identifier for the target message thread of the forum topic</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
         </member>
         <member name="M:Telegram.Bot.TelegramBotClientExtensions.UnpinAllForumTopicMessages(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.Int32,System.Threading.CancellationToken)">
-            <summary>Use this method to clear the list of pinned messages in a forum topic. The bot must be an administrator in the chat for this to work and must have the <em>CanPinMessages</em> administrator right in the supergroup.</summary>
+            <summary>Use this method to clear the list of pinned messages in a forum topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanPinMessages</em> administrator right in the supergroup.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>)</param>
             <param name="messageThreadId">Unique identifier for the target message thread of the forum topic</param>
@@ -8589,7 +8776,7 @@
             <summary>Sends a gift to the given user or channel chat. The gift can't be converted to Telegram Stars by the receiver.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier of the target user, chat or username of the channel (in the format <c>@channelusername</c>) that will receive the gift.</param>
-            <param name="giftId">Identifier of the gift</param>
+            <param name="giftId">Identifier of the gift; limited gifts can't be sent to channel chats</param>
             <param name="text">Text that will be shown along with the gift; 0-128 characters</param>
             <param name="textParseMode">Mode for parsing entities in the text. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details. Entities other than <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Bold">Bold</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Italic">Italic</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Underline">Underline</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Strikethrough">Strikethrough</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Spoiler">Spoiler</see>, and <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.CustomEmoji">CustomEmoji</see> are ignored.</param>
             <param name="textEntities">A list of special entities that appear in the gift text. It can be specified instead of <paramref name="textParseMode"/>. Entities other than <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Bold">Bold</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Italic">Italic</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Underline">Underline</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Strikethrough">Strikethrough</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Spoiler">Spoiler</see>, and <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.CustomEmoji">CustomEmoji</see> are ignored.</param>
@@ -8707,17 +8894,51 @@
             <param name="starCount">Number of Telegram Stars to transfer; 1-10000</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
         </member>
-        <member name="M:Telegram.Bot.TelegramBotClientExtensions.GetBusinessAccountGifts(Telegram.Bot.ITelegramBotClient,System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String,System.Nullable{System.Int32},System.Threading.CancellationToken)">
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.GetBusinessAccountGifts(Telegram.Bot.ITelegramBotClient,System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String,System.Nullable{System.Int32},System.Threading.CancellationToken)">
             <summary>Returns the gifts received and owned by a managed business account. Requires the <em>CanViewGiftsAndStars</em> business bot right.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="businessConnectionId">Unique identifier of the business connection</param>
             <param name="excludeUnsaved">Pass <see langword="true"/> to exclude gifts that aren't saved to the account's profile page</param>
             <param name="excludeSaved">Pass <see langword="true"/> to exclude gifts that are saved to the account's profile page</param>
             <param name="excludeUnlimited">Pass <see langword="true"/> to exclude gifts that can be purchased an unlimited number of times</param>
-            <param name="excludeLimited">Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times</param>
+            <param name="excludeLimitedUpgradable">Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can be upgraded to unique</param>
+            <param name="excludeLimitedNonUpgradable">Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique</param>
+            <param name="excludeFromBlockchain">Pass <see langword="true"/> to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram</param>
             <param name="excludeUnique">Pass <see langword="true"/> to exclude unique gifts</param>
             <param name="sortByPrice">Pass <see langword="true"/> to sort results by gift price instead of send date. Sorting is applied before pagination.</param>
             <param name="offset">Offset of the first entry to return as received from the previous request; use empty string to get the first chunk of results</param>
+            <param name="limit">The maximum number of gifts to be returned; 1-100. Defaults to 100</param>
+            <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
+            <returns><see cref="T:Telegram.Bot.Types.OwnedGifts"/> on success.</returns>
+        </member>
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.GetUserGifts(Telegram.Bot.ITelegramBotClient,System.Int64,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String,System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>Returns the gifts owned and hosted by a user.</summary>
+            <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
+            <param name="userId">Unique identifier of the user</param>
+            <param name="excludeUnlimited">Pass <see langword="true"/> to exclude gifts that can be purchased an unlimited number of times</param>
+            <param name="excludeLimitedUpgradable">Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can be upgraded to unique</param>
+            <param name="excludeLimitedNonUpgradable">Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique</param>
+            <param name="excludeFromBlockchain">Pass <see langword="true"/> to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram</param>
+            <param name="excludeUnique">Pass <see langword="true"/> to exclude unique gifts</param>
+            <param name="sortByPrice">Pass <see langword="true"/> to sort results by gift price instead of send date. Sorting is applied before pagination.</param>
+            <param name="offset">Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results</param>
+            <param name="limit">The maximum number of gifts to be returned; 1-100. Defaults to 100</param>
+            <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
+            <returns><see cref="T:Telegram.Bot.Types.OwnedGifts"/> on success.</returns>
+        </member>
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.GetChatGifts(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String,System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>Returns the gifts owned by a chat.</summary>
+            <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
+            <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
+            <param name="excludeUnsaved">Pass <see langword="true"/> to exclude gifts that aren't saved to the chat's profile page. Always <see langword="true"/>, unless the bot has the <em>CanPostMessages</em> administrator right in the channel.</param>
+            <param name="excludeSaved">Pass <see langword="true"/> to exclude gifts that are saved to the chat's profile page. Always <see langword="false"/>, unless the bot has the <em>CanPostMessages</em> administrator right in the channel.</param>
+            <param name="excludeUnlimited">Pass <see langword="true"/> to exclude gifts that can be purchased an unlimited number of times</param>
+            <param name="excludeLimitedUpgradable">Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can be upgraded to unique</param>
+            <param name="excludeLimitedNonUpgradable">Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique</param>
+            <param name="excludeFromBlockchain">Pass <see langword="true"/> to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram</param>
+            <param name="excludeUnique">Pass <see langword="true"/> to exclude unique gifts</param>
+            <param name="sortByPrice">Pass <see langword="true"/> to sort results by gift price instead of send date. Sorting is applied before pagination.</param>
+            <param name="offset">Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results</param>
             <param name="limit">The maximum number of gifts to be returned; 1-100. Defaults to 100</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns><see cref="T:Telegram.Bot.Types.OwnedGifts"/> on success.</returns>
@@ -8757,6 +8978,18 @@
             <param name="parseMode">Mode for parsing entities in the story caption. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details.</param>
             <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>
             <param name="areas">A list of clickable areas to be shown on the story</param>
+            <param name="postToChatPage">Pass <see langword="true"/> to keep the story accessible after it expires</param>
+            <param name="protectContent">Pass <see langword="true"/> if the content of the story must be protected from forwarding and screenshotting</param>
+            <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
+            <returns><see cref="T:Telegram.Bot.Types.Story"/> on success.</returns>
+        </member>
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.RepostStory(Telegram.Bot.ITelegramBotClient,System.String,System.Int64,System.Int32,System.Int32,System.Boolean,System.Boolean,System.Threading.CancellationToken)">
+            <summary>Reposts a story on behalf of a business account from another business account. Both business accounts must be managed by the same bot, and the story on the source account must have been posted (or reposted) by the bot. Requires the <em>CanManageStories</em> business bot right for both business accounts.</summary>
+            <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
+            <param name="businessConnectionId">Unique identifier of the business connection</param>
+            <param name="fromChatId">Unique identifier of the chat which posted the story that should be reposted</param>
+            <param name="fromStoryId">Unique identifier of the story that should be reposted</param>
+            <param name="activePeriod">Period after which the story is moved to the archive, in seconds; must be one of <c>6 * 3600</c>, <c>12 * 3600</c>, <c>86400</c>, or <c>2 * 86400</c></param>
             <param name="postToChatPage">Pass <see langword="true"/> to keep the story accessible after it expires</param>
             <param name="protectContent">Pass <see langword="true"/> if the content of the story must be protected from forwarding and screenshotting</param>
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
@@ -8979,7 +9212,7 @@
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
             <param name="emoji">Emoji associated with the sticker; only for just uploaded stickers</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -9135,7 +9368,7 @@
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns>A <see cref="T:Telegram.Bot.Types.PreparedInlineMessage"/> object.</returns>
         </member>
-        <member name="M:Telegram.Bot.TelegramBotClientExtensions.SendInvoice(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.String,System.String,System.String,System.String,System.Collections.Generic.IEnumerable{Telegram.Bot.Types.Payments.LabeledPrice},System.String,System.String,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup,System.String,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.SendInvoice(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,System.String,System.String,System.String,System.String,System.Collections.Generic.IEnumerable{Telegram.Bot.Types.Payments.LabeledPrice},System.String,System.String,System.Nullable{System.Int64},System.Collections.Generic.IEnumerable{System.Int32},System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,Telegram.Bot.Types.ReplyParameters,Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup,System.String,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.String,System.Boolean,System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">
             <summary>Use this method to send invoices.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="chatId">Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</param>
@@ -9162,7 +9395,7 @@
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>. If empty, one 'Pay <c>total price</c>' button will be shown. If not empty, the first button must be a Pay button.</param>
             <param name="startParameter">Unique deep-linking parameter. If left empty, <b>forwarded copies</b> of the sent message will have a <em>Pay</em> button, allowing multiple users to pay directly from the forwarded message, using the same invoice. If non-empty, forwarded copies of the sent message will have a <em>URL</em> button with a deep link to the bot (instead of a <em>Pay</em> button), with the value used as the start parameter</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -9172,7 +9405,7 @@
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation</param>
             <returns>The sent <see cref="T:Telegram.Bot.Types.Message"/> is returned.</returns>
         </member>
-        <member name="M:Telegram.Bot.TelegramBotClientExtensions.CreateInvoiceLink(Telegram.Bot.ITelegramBotClient,System.String,System.String,System.String,System.String,System.Collections.Generic.IEnumerable{Telegram.Bot.Types.Payments.LabeledPrice},System.String,System.String,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Nullable{System.Int32},System.String,System.Threading.CancellationToken)">
+        <member name="M:Telegram.Bot.TelegramBotClientExtensions.CreateInvoiceLink(Telegram.Bot.ITelegramBotClient,System.String,System.String,System.String,System.String,System.Collections.Generic.IEnumerable{Telegram.Bot.Types.Payments.LabeledPrice},System.String,System.String,System.Nullable{System.Int64},System.Collections.Generic.IEnumerable{System.Int32},System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Nullable{System.Int32},System.String,System.Threading.CancellationToken)">
             <summary>Use this method to create a link for an invoice.</summary>
             <param name="botClient">An instance of <see cref="T:Telegram.Bot.ITelegramBotClient"/></param>
             <param name="title">Product name, 1-32 characters</param>
@@ -9258,7 +9491,7 @@
             <param name="gameShortName">Short name of the game, serves as the unique identifier for the game. Set up your games via <a href="https://t.me/botfather">@BotFather</a>.</param>
             <param name="replyParameters">Description of the message to reply to</param>
             <param name="replyMarkup">An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>. If empty, one 'Play GameTitle' button will be shown. If not empty, the first button must launch the game.</param>
-            <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
+            <param name="messageThreadId">Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</param>
             <param name="disableNotification">Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</param>
             <param name="protectContent">Protects the contents of the sent message from forwarding and saving</param>
             <param name="messageEffectId">Unique identifier of the message effect to be added to the message; for private chats only</param>
@@ -9494,45 +9727,6 @@
             If set to <see langword="true"/> <see cref="P:Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates"/> should be set to not <see langword="null"/>,
             otherwise <see cref="P:Telegram.Bot.Polling.ReceiverOptions.AllowedUpdates"/> will effectively be set to receive all <see cref="T:Telegram.Bot.Types.Update"/>s.</summary>
         </member>
-        <member name="T:Telegram.Bot.Polling.BlockingUpdateReceiver">
-            <summary>Supports asynchronous iteration over <see cref="T:Telegram.Bot.Types.Update"/>s.</summary>
-            <remarks>Constructs a new <see cref="T:Telegram.Bot.Polling.BlockingUpdateReceiver"/> with the specified <see cref="T:Telegram.Bot.ITelegramBotClient"/></remarks>
-            <param name="botClient">The <see cref="T:Telegram.Bot.ITelegramBotClient"/> used for making GetUpdates calls</param>
-            <param name="receiverOptions"></param>
-            <param name="pollingErrorHandler">The function used to handle <see cref="T:System.Exception"/>s thrown by GetUpdates requests</param>
-        </member>
-        <member name="M:Telegram.Bot.Polling.BlockingUpdateReceiver.#ctor(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Polling.ReceiverOptions,System.Func{System.Exception,System.Threading.CancellationToken,System.Threading.Tasks.Task})">
-            <summary>Supports asynchronous iteration over <see cref="T:Telegram.Bot.Types.Update"/>s.</summary>
-            <remarks>Constructs a new <see cref="T:Telegram.Bot.Polling.BlockingUpdateReceiver"/> with the specified <see cref="T:Telegram.Bot.ITelegramBotClient"/></remarks>
-            <param name="botClient">The <see cref="T:Telegram.Bot.ITelegramBotClient"/> used for making GetUpdates calls</param>
-            <param name="receiverOptions"></param>
-            <param name="pollingErrorHandler">The function used to handle <see cref="T:System.Exception"/>s thrown by GetUpdates requests</param>
-        </member>
-        <member name="M:Telegram.Bot.Polling.BlockingUpdateReceiver.GetAsyncEnumerator(System.Threading.CancellationToken)">
-            <summary>Gets the <see cref="T:System.Collections.Generic.IAsyncEnumerator`1"/>. This method may only be called once.</summary>
-            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> with which you can stop receiving</param>
-        </member>
-        <member name="T:Telegram.Bot.Polling.QueuedUpdateReceiver">
-            <summary>Supports asynchronous iteration over <see cref="T:Telegram.Bot.Types.Update"/>s./// <para>Updates are received on a different thread and enqueued.</para></summary>
-            <remarks>Constructs a new <see cref="T:Telegram.Bot.Polling.QueuedUpdateReceiver"/> with the specified <see cref="T:Telegram.Bot.ITelegramBotClient"/></remarks>
-            <param name="botClient">The <see cref="T:Telegram.Bot.ITelegramBotClient"/> used for making GetUpdates calls</param>
-            <param name="receiverOptions">Options used to configure getUpdates requests</param>
-            <param name="pollingErrorHandler">The function used to handle <see cref="T:System.Exception"/>s thrown by GetUpdates requests</param>
-        </member>
-        <member name="M:Telegram.Bot.Polling.QueuedUpdateReceiver.#ctor(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Polling.ReceiverOptions,System.Func{System.Exception,System.Threading.CancellationToken,System.Threading.Tasks.Task})">
-            <summary>Supports asynchronous iteration over <see cref="T:Telegram.Bot.Types.Update"/>s./// <para>Updates are received on a different thread and enqueued.</para></summary>
-            <remarks>Constructs a new <see cref="T:Telegram.Bot.Polling.QueuedUpdateReceiver"/> with the specified <see cref="T:Telegram.Bot.ITelegramBotClient"/></remarks>
-            <param name="botClient">The <see cref="T:Telegram.Bot.ITelegramBotClient"/> used for making GetUpdates calls</param>
-            <param name="receiverOptions">Options used to configure getUpdates requests</param>
-            <param name="pollingErrorHandler">The function used to handle <see cref="T:System.Exception"/>s thrown by GetUpdates requests</param>
-        </member>
-        <member name="P:Telegram.Bot.Polling.QueuedUpdateReceiver.PendingUpdates">
-            <summary>Indicates how many <see cref="T:Telegram.Bot.Types.Update"/>s are ready to be returned the enumerator</summary>
-        </member>
-        <member name="M:Telegram.Bot.Polling.QueuedUpdateReceiver.GetAsyncEnumerator(System.Threading.CancellationToken)">
-            <summary>Gets the <see cref="T:System.Collections.Generic.IAsyncEnumerator`1"/>. This method may only be called once.</summary>
-            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> with which you can stop receiving</param>
-        </member>
         <member name="T:Telegram.Bot.Polling.DefaultUpdateHandler">
             <summary>A very simple <see cref="T:Telegram.Bot.Polling.IUpdateHandler"/> implementation</summary>
             <remarks>Constructs a new <see cref="T:Telegram.Bot.Polling.DefaultUpdateHandler"/> with the specified callback functions</remarks>
@@ -9744,18 +9938,6 @@
         <member name="P:Telegram.Bot.Requests.SetMyShortDescriptionRequest.LanguageCode">
             <summary>A two-letter ISO 639-1 language code. If empty, the short description will be applied to all users for whose language there is no dedicated short description.</summary>
         </member>
-        <member name="T:Telegram.Bot.Requests.ConvertGiftToStarsRequest">
-            <summary>Converts a given regular gift to Telegram Stars. Requires the <em>CanConvertGiftsToStars</em> business bot right.</summary>
-        </member>
-        <member name="M:Telegram.Bot.Requests.ConvertGiftToStarsRequest.#ctor">
-            <summary>Converts a given regular gift to Telegram Stars. Requires the <em>CanConvertGiftsToStars</em> business bot right.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.ConvertGiftToStarsRequest.BusinessConnectionId">
-            <summary>Unique identifier of the business connection</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.ConvertGiftToStarsRequest.OwnedGiftId">
-            <summary>Unique identifier of the regular gift that should be converted to Telegram Stars</summary>
-        </member>
         <member name="T:Telegram.Bot.Requests.DeleteBusinessMessagesRequest">
             <summary>Delete messages on behalf of a business account. Requires the <em>CanDeleteSentMessages</em> business bot right to delete messages sent by the bot itself, or the <em>CanDeleteAllMessages</em> business bot right to delete any message.</summary>
         </member>
@@ -9825,11 +10007,17 @@
         <member name="P:Telegram.Bot.Requests.GetBusinessAccountGiftsRequest.ExcludeUnlimited">
             <summary>Pass <see langword="true"/> to exclude gifts that can be purchased an unlimited number of times</summary>
         </member>
-        <member name="P:Telegram.Bot.Requests.GetBusinessAccountGiftsRequest.ExcludeLimited">
-            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times</summary>
+        <member name="P:Telegram.Bot.Requests.GetBusinessAccountGiftsRequest.ExcludeLimitedUpgradable">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can be upgraded to unique</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetBusinessAccountGiftsRequest.ExcludeLimitedNonUpgradable">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.GetBusinessAccountGiftsRequest.ExcludeUnique">
             <summary>Pass <see langword="true"/> to exclude unique gifts</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetBusinessAccountGiftsRequest.ExcludeFromBlockchain">
+            <summary>Pass <see langword="true"/> to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.GetBusinessAccountGiftsRequest.SortByPrice">
             <summary>Pass <see langword="true"/> to sort results by gift price instead of send date. Sorting is applied before pagination.</summary>
@@ -9847,6 +10035,15 @@
             <summary>Returns the amount of Telegram Stars owned by a managed business account. Requires the <em>CanViewGiftsAndStars</em> business bot right.<para>Returns: <see cref="T:Telegram.Bot.Types.StarAmount"/> on success.</para></summary>
         </member>
         <member name="P:Telegram.Bot.Requests.GetBusinessAccountStarBalanceRequest.BusinessConnectionId">
+            <summary>Unique identifier of the business connection</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.GetBusinessConnectionRequest">
+            <summary>Use this method to get information about the connection of the bot with a business account.<para>Returns: A <see cref="T:Telegram.Bot.Types.BusinessConnection"/> object on success.</para></summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.GetBusinessConnectionRequest.#ctor">
+            <summary>Use this method to get information about the connection of the bot with a business account.<para>Returns: A <see cref="T:Telegram.Bot.Types.BusinessConnection"/> object on success.</para></summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetBusinessConnectionRequest.BusinessConnectionId">
             <summary>Unique identifier of the business connection</summary>
         </member>
         <member name="T:Telegram.Bot.Requests.PostStoryRequest">
@@ -9911,6 +10108,30 @@
         </member>
         <member name="P:Telegram.Bot.Requests.RemoveBusinessAccountProfilePhotoRequest.IsPublic">
             <summary>Pass <see langword="true"/> to remove the public photo, which is visible even if the main photo is hidden by the business account's privacy settings. After the main photo is removed, the previous profile photo (if present) becomes the main photo.</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.RepostStoryRequest">
+            <summary>Reposts a story on behalf of a business account from another business account. Both business accounts must be managed by the same bot, and the story on the source account must have been posted (or reposted) by the bot. Requires the <em>CanManageStories</em> business bot right for both business accounts.<para>Returns: <see cref="T:Telegram.Bot.Types.Story"/> on success.</para></summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.RepostStoryRequest.#ctor">
+            <summary>Reposts a story on behalf of a business account from another business account. Both business accounts must be managed by the same bot, and the story on the source account must have been posted (or reposted) by the bot. Requires the <em>CanManageStories</em> business bot right for both business accounts.<para>Returns: <see cref="T:Telegram.Bot.Types.Story"/> on success.</para></summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.RepostStoryRequest.BusinessConnectionId">
+            <summary>Unique identifier of the business connection</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.RepostStoryRequest.FromChatId">
+            <summary>Unique identifier of the chat which posted the story that should be reposted</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.RepostStoryRequest.FromStoryId">
+            <summary>Unique identifier of the story that should be reposted</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.RepostStoryRequest.ActivePeriod">
+            <summary>Period after which the story is moved to the archive, in seconds; must be one of <c>6 * 3600</c>, <c>12 * 3600</c>, <c>86400</c>, or <c>2 * 86400</c></summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.RepostStoryRequest.PostToChatPage">
+            <summary>Pass <see langword="true"/> to keep the story accessible after it expires</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.RepostStoryRequest.ProtectContent">
+            <summary>Pass <see langword="true"/> if the content of the story must be protected from forwarding and screenshotting</summary>
         </member>
         <member name="T:Telegram.Bot.Requests.SetBusinessAccountBioRequest">
             <summary>Changes the bio of a managed business account. Requires the <em>CanChangeBio</em> business bot right.</summary>
@@ -9993,42 +10214,6 @@
         <member name="P:Telegram.Bot.Requests.TransferBusinessAccountStarsRequest.StarCount">
             <summary>Number of Telegram Stars to transfer; 1-10000</summary>
         </member>
-        <member name="T:Telegram.Bot.Requests.TransferGiftRequest">
-            <summary>Transfers an owned unique gift to another user. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Requires <em>CanTransferStars</em> business bot right if the transfer is paid.</summary>
-        </member>
-        <member name="M:Telegram.Bot.Requests.TransferGiftRequest.#ctor">
-            <summary>Transfers an owned unique gift to another user. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Requires <em>CanTransferStars</em> business bot right if the transfer is paid.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.BusinessConnectionId">
-            <summary>Unique identifier of the business connection</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.OwnedGiftId">
-            <summary>Unique identifier of the regular gift that should be transferred</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.NewOwnerChatId">
-            <summary>Unique identifier of the chat which will own the gift. The chat must be active in the last 24 hours.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.StarCount">
-            <summary>The amount of Telegram Stars that will be paid for the transfer from the business account balance. If positive, then the <em>CanTransferStars</em> business bot right is required.</summary>
-        </member>
-        <member name="T:Telegram.Bot.Requests.UpgradeGiftRequest">
-            <summary>Upgrades a given regular gift to a unique gift. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Additionally requires the <em>CanTransferStars</em> business bot right if the upgrade is paid.</summary>
-        </member>
-        <member name="M:Telegram.Bot.Requests.UpgradeGiftRequest.#ctor">
-            <summary>Upgrades a given regular gift to a unique gift. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Additionally requires the <em>CanTransferStars</em> business bot right if the upgrade is paid.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.BusinessConnectionId">
-            <summary>Unique identifier of the business connection</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.OwnedGiftId">
-            <summary>Unique identifier of the regular gift that should be upgraded to a unique one</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.KeepOriginalDetails">
-            <summary>Pass <see langword="true"/> to keep the original gift text, sender and receiver in the upgraded gift</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.StarCount">
-            <summary>The amount of Telegram Stars that will be paid for the upgrade from the business account balance. If <c>gift.PrepaidUpgradeStarCount &gt; 0</c>, then pass 0, otherwise, the <em>CanTransferStars</em> business bot right is required and <c>gift.UpgradeStarCount</c> must be passed.</summary>
-        </member>
         <member name="T:Telegram.Bot.Requests.FileRequestBase`1">
             <summary>Represents an API request with a file</summary>
             <typeparam name="TResponse">Type of result expected in result</typeparam>
@@ -10092,7 +10277,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendGameRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendGameRequest.DisableNotification">
             <summary>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</summary>
@@ -10242,6 +10427,159 @@
         </member>
         <member name="P:Telegram.Bot.Requests.SetWebhookRequest.SecretToken">
             <summary>A secret token to be sent in a header “X-Telegram-Bot-Api-Secret-Token” in every webhook request, 1-256 characters. Only characters <c>A-Z</c>, <c>a-z</c>, <c>0-9</c>, <c>_</c> and <c>-</c> are allowed. The header is useful to ensure that the request comes from a webhook set by you.</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.ConvertGiftToStarsRequest">
+            <summary>Converts a given regular gift to Telegram Stars. Requires the <em>CanConvertGiftsToStars</em> business bot right.</summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.ConvertGiftToStarsRequest.#ctor">
+            <summary>Converts a given regular gift to Telegram Stars. Requires the <em>CanConvertGiftsToStars</em> business bot right.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.ConvertGiftToStarsRequest.BusinessConnectionId">
+            <summary>Unique identifier of the business connection</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.ConvertGiftToStarsRequest.OwnedGiftId">
+            <summary>Unique identifier of the regular gift that should be converted to Telegram Stars</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.GetAvailableGiftsRequest">
+            <summary>Returns the list of gifts that can be sent by the bot to users and channel chats.<para>Returns: A <see cref="T:Telegram.Bot.Types.GiftList"/> object.</para></summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.GetAvailableGiftsRequest.#ctor">
+            <summary>Returns the list of gifts that can be sent by the bot to users and channel chats.<para>Returns: A <see cref="T:Telegram.Bot.Types.GiftList"/> object.</para></summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.GetChatGiftsRequest">
+            <summary>Returns the gifts owned by a chat.<para>Returns: <see cref="T:Telegram.Bot.Types.OwnedGifts"/> on success.</para></summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.GetChatGiftsRequest.#ctor">
+            <summary>Returns the gifts owned by a chat.<para>Returns: <see cref="T:Telegram.Bot.Types.OwnedGifts"/> on success.</para></summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ChatId">
+            <summary>Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ExcludeUnsaved">
+            <summary>Pass <see langword="true"/> to exclude gifts that aren't saved to the chat's profile page. Always <see langword="true"/>, unless the bot has the <em>CanPostMessages</em> administrator right in the channel.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ExcludeSaved">
+            <summary>Pass <see langword="true"/> to exclude gifts that are saved to the chat's profile page. Always <see langword="false"/>, unless the bot has the <em>CanPostMessages</em> administrator right in the channel.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ExcludeUnlimited">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased an unlimited number of times</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ExcludeLimitedUpgradable">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can be upgraded to unique</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ExcludeLimitedNonUpgradable">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ExcludeFromBlockchain">
+            <summary>Pass <see langword="true"/> to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.ExcludeUnique">
+            <summary>Pass <see langword="true"/> to exclude unique gifts</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.SortByPrice">
+            <summary>Pass <see langword="true"/> to sort results by gift price instead of send date. Sorting is applied before pagination.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.Offset">
+            <summary>Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetChatGiftsRequest.Limit">
+            <summary>The maximum number of gifts to be returned; 1-100. Defaults to 100</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.GetUserGiftsRequest">
+            <summary>Returns the gifts owned and hosted by a user.<para>Returns: <see cref="T:Telegram.Bot.Types.OwnedGifts"/> on success.</para></summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.GetUserGiftsRequest.#ctor">
+            <summary>Returns the gifts owned and hosted by a user.<para>Returns: <see cref="T:Telegram.Bot.Types.OwnedGifts"/> on success.</para></summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.UserId">
+            <summary>Unique identifier of the user</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.ExcludeUnlimited">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased an unlimited number of times</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.ExcludeLimitedUpgradable">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can be upgraded to unique</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.ExcludeLimitedNonUpgradable">
+            <summary>Pass <see langword="true"/> to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.ExcludeFromBlockchain">
+            <summary>Pass <see langword="true"/> to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.ExcludeUnique">
+            <summary>Pass <see langword="true"/> to exclude unique gifts</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.SortByPrice">
+            <summary>Pass <see langword="true"/> to sort results by gift price instead of send date. Sorting is applied before pagination.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.Offset">
+            <summary>Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.GetUserGiftsRequest.Limit">
+            <summary>The maximum number of gifts to be returned; 1-100. Defaults to 100</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.SendGiftRequest">
+            <summary>Sends a gift to the given user or channel chat. The gift can't be converted to Telegram Stars by the receiver.</summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.SendGiftRequest.#ctor">
+            <summary>Sends a gift to the given user or channel chat. The gift can't be converted to Telegram Stars by the receiver.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendGiftRequest.GiftId">
+            <summary>Identifier of the gift; limited gifts can't be sent to channel chats</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendGiftRequest.UserId">
+            <summary>Required if <see cref="P:Telegram.Bot.Requests.SendGiftRequest.ChatId">ChatId</see> is not specified. Unique identifier of the target user who will receive the gift.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendGiftRequest.ChatId">
+            <summary>Required if <see cref="P:Telegram.Bot.Requests.SendGiftRequest.UserId">UserId</see> is not specified. Unique identifier for the chat or username of the channel (in the format <c>@channelusername</c>) that will receive the gift.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendGiftRequest.PayForUpgrade">
+            <summary>Pass <see langword="true"/> to pay for the gift upgrade from the bot's balance, thereby making the upgrade free for the receiver</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendGiftRequest.Text">
+            <summary>Text that will be shown along with the gift; 0-128 characters</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendGiftRequest.TextParseMode">
+            <summary>Mode for parsing entities in the text. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details. Entities other than <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Bold">Bold</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Italic">Italic</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Underline">Underline</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Strikethrough">Strikethrough</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Spoiler">Spoiler</see>, and <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.CustomEmoji">CustomEmoji</see> are ignored.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendGiftRequest.TextEntities">
+            <summary>A list of special entities that appear in the gift text. It can be specified instead of <see cref="P:Telegram.Bot.Requests.SendGiftRequest.TextParseMode">TextParseMode</see>. Entities other than <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Bold">Bold</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Italic">Italic</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Underline">Underline</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Strikethrough">Strikethrough</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Spoiler">Spoiler</see>, and <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.CustomEmoji">CustomEmoji</see> are ignored.</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.TransferGiftRequest">
+            <summary>Transfers an owned unique gift to another user. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Requires <em>CanTransferStars</em> business bot right if the transfer is paid.</summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.TransferGiftRequest.#ctor">
+            <summary>Transfers an owned unique gift to another user. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Requires <em>CanTransferStars</em> business bot right if the transfer is paid.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.BusinessConnectionId">
+            <summary>Unique identifier of the business connection</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.OwnedGiftId">
+            <summary>Unique identifier of the regular gift that should be transferred</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.NewOwnerChatId">
+            <summary>Unique identifier of the chat which will own the gift. The chat must be active in the last 24 hours.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.TransferGiftRequest.StarCount">
+            <summary>The amount of Telegram Stars that will be paid for the transfer from the business account balance. If positive, then the <em>CanTransferStars</em> business bot right is required.</summary>
+        </member>
+        <member name="T:Telegram.Bot.Requests.UpgradeGiftRequest">
+            <summary>Upgrades a given regular gift to a unique gift. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Additionally requires the <em>CanTransferStars</em> business bot right if the upgrade is paid.</summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.UpgradeGiftRequest.#ctor">
+            <summary>Upgrades a given regular gift to a unique gift. Requires the <em>CanTransferAndUpgradeGifts</em> business bot right. Additionally requires the <em>CanTransferStars</em> business bot right if the upgrade is paid.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.BusinessConnectionId">
+            <summary>Unique identifier of the business connection</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.OwnedGiftId">
+            <summary>Unique identifier of the regular gift that should be upgraded to a unique one</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.KeepOriginalDetails">
+            <summary>Pass <see langword="true"/> to keep the original gift text, sender and receiver in the upgraded gift</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.UpgradeGiftRequest.StarCount">
+            <summary>The amount of Telegram Stars that will be paid for the upgrade from the business account balance. If <c>gift.PrepaidUpgradeStarCount &gt; 0</c>, then pass 0, otherwise, the <em>CanTransferStars</em> business bot right is required and <c>gift.UpgradeStarCount</c> must be passed.</summary>
         </member>
         <member name="T:Telegram.Bot.Requests.AnswerInlineQueryRequest">
             <summary>Use this method to send answers to an inline query<br/>No more than <b>50</b> results per query are allowed.</summary>
@@ -10660,7 +10998,7 @@
             <summary>Pass <see langword="true"/> if the administrator can manage video chats</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.PromoteChatMemberRequest.CanRestrictMembers">
-            <summary>Pass <see langword="true"/> if the administrator can restrict, ban or unban chat members, or access supergroup statistics</summary>
+            <summary>Pass <see langword="true"/> if the administrator can restrict, ban or unban chat members, or access supergroup statistics. For backward compatibility, defaults to <see langword="true"/> for promotions of channel administrators</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.PromoteChatMemberRequest.CanPromoteMembers">
             <summary>Pass <see langword="true"/> if the administrator can add new administrators with a subset of their own privileges or demote administrators that they have promoted, directly or indirectly (promoted by administrators that were appointed by him)</summary>
@@ -10741,10 +11079,10 @@
             <summary>Unique identifier of the custom emoji shown as the topic icon. Use <see cref="M:Telegram.Bot.TelegramBotClientExtensions.GetForumTopicIconStickers(Telegram.Bot.ITelegramBotClient,System.Threading.CancellationToken)">GetForumTopicIconStickers</see> to get all allowed custom emoji identifiers.</summary>
         </member>
         <member name="T:Telegram.Bot.Requests.DeleteForumTopicRequest">
-            <summary>Use this method to delete a forum topic along with all its messages in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>CanDeleteMessages</em> administrator rights.</summary>
+            <summary>Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanDeleteMessages</em> administrator rights.</summary>
         </member>
         <member name="M:Telegram.Bot.Requests.DeleteForumTopicRequest.#ctor">
-            <summary>Use this method to delete a forum topic along with all its messages in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>CanDeleteMessages</em> administrator rights.</summary>
+            <summary>Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanDeleteMessages</em> administrator rights.</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.DeleteForumTopicRequest.ChatId">
             <summary>Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>)</summary>
@@ -10753,10 +11091,10 @@
             <summary>Unique identifier for the target message thread of the forum topic</summary>
         </member>
         <member name="T:Telegram.Bot.Requests.EditForumTopicRequest">
-            <summary>Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>CanManageTopics</em> administrator rights, unless it is the creator of the topic.</summary>
+            <summary>Use this method to edit name and icon of a topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanManageTopics</em> administrator rights, unless it is the creator of the topic.</summary>
         </member>
         <member name="M:Telegram.Bot.Requests.EditForumTopicRequest.#ctor">
-            <summary>Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>CanManageTopics</em> administrator rights, unless it is the creator of the topic.</summary>
+            <summary>Use this method to edit name and icon of a topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanManageTopics</em> administrator rights, unless it is the creator of the topic.</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.EditForumTopicRequest.ChatId">
             <summary>Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>)</summary>
@@ -10822,10 +11160,10 @@
             <summary>Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>)</summary>
         </member>
         <member name="T:Telegram.Bot.Requests.UnpinAllForumTopicMessagesRequest">
-            <summary>Use this method to clear the list of pinned messages in a forum topic. The bot must be an administrator in the chat for this to work and must have the <em>CanPinMessages</em> administrator right in the supergroup.</summary>
+            <summary>Use this method to clear the list of pinned messages in a forum topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanPinMessages</em> administrator right in the supergroup.</summary>
         </member>
         <member name="M:Telegram.Bot.Requests.UnpinAllForumTopicMessagesRequest.#ctor">
-            <summary>Use this method to clear the list of pinned messages in a forum topic. The bot must be an administrator in the chat for this to work and must have the <em>CanPinMessages</em> administrator right in the supergroup.</summary>
+            <summary>Use this method to clear the list of pinned messages in a forum topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>CanPinMessages</em> administrator right in the supergroup.</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.UnpinAllForumTopicMessagesRequest.ChatId">
             <summary>Unique identifier for the target chat or username of the target supergroup (in the format <c>@supergroupusername</c>)</summary>
@@ -10916,15 +11254,6 @@
         <member name="P:Telegram.Bot.Requests.AnswerCallbackQueryRequest.CacheTime">
             <summary>The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram apps will support caching starting in version 3.14. Defaults to 0.</summary>
         </member>
-        <member name="T:Telegram.Bot.Requests.GetBusinessConnectionRequest">
-            <summary>Use this method to get information about the connection of the bot with a business account.<para>Returns: A <see cref="T:Telegram.Bot.Types.BusinessConnection"/> object on success.</para></summary>
-        </member>
-        <member name="M:Telegram.Bot.Requests.GetBusinessConnectionRequest.#ctor">
-            <summary>Use this method to get information about the connection of the bot with a business account.<para>Returns: A <see cref="T:Telegram.Bot.Types.BusinessConnection"/> object on success.</para></summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.GetBusinessConnectionRequest.BusinessConnectionId">
-            <summary>Unique identifier of the business connection</summary>
-        </member>
         <member name="T:Telegram.Bot.Requests.GetFileRequest">
             <summary>Use this method to get basic information about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size.<para>Returns: A <see cref="T:Telegram.Bot.Types.TGFile"/> object is returned. The file can then be downloaded via <see cref="M:Telegram.Bot.TelegramBotClient.DownloadFile(Telegram.Bot.Types.TGFile,System.IO.Stream,System.Threading.CancellationToken)">DownloadFile</see>, where <c>&lt;FilePath&gt;</c> is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling <see cref="M:Telegram.Bot.TelegramBotClientExtensions.GetFile(Telegram.Bot.ITelegramBotClient,System.String,System.Threading.CancellationToken)">GetFile</see> again.<br/><b>Note:</b> This function may not preserve the original file name and MIME type. You should save the file's MIME type and name (if available) when the File object is received.</para></summary>
         </member>
@@ -10992,6 +11321,33 @@
             <summary>An object for an inline keyboard</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendChecklistRequest.Telegram#Bot#Requests#Abstractions#IChatTargetable#ChatId">
+            <inheritdoc/>
+        </member>
+        <member name="T:Telegram.Bot.Requests.SendMessageDraftRequest">
+            <summary>Use this method to stream a partial message to a user while the message is being generated; supported only for bots with forum topic mode enabled.</summary>
+        </member>
+        <member name="M:Telegram.Bot.Requests.SendMessageDraftRequest.#ctor">
+            <summary>Use this method to stream a partial message to a user while the message is being generated; supported only for bots with forum topic mode enabled.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendMessageDraftRequest.ChatId">
+            <summary>Unique identifier for the target private chat</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendMessageDraftRequest.DraftId">
+            <summary>Unique identifier of the message draft; must be non-zero. Changes of drafts with the same identifier are animated</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendMessageDraftRequest.Text">
+            <summary>Text of the message to be sent, 1-4096 characters after entities parsing</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendMessageDraftRequest.MessageThreadId">
+            <summary>Unique identifier for the target message thread</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendMessageDraftRequest.ParseMode">
+            <summary>Mode for parsing entities in the message text. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details.</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendMessageDraftRequest.Entities">
+            <summary>A list of special entities that appear in message text, which can be specified instead of <see cref="P:Telegram.Bot.Requests.SendMessageDraftRequest.ParseMode">ParseMode</see></summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.SendMessageDraftRequest.Telegram#Bot#Requests#Abstractions#IChatTargetable#ChatId">
             <inheritdoc/>
         </member>
         <member name="T:Telegram.Bot.Requests.SetMessageReactionRequest">
@@ -11226,7 +11582,7 @@
             <summary>Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendInvoiceRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendInvoiceRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11338,10 +11694,10 @@
             <inheritdoc/>
         </member>
         <member name="T:Telegram.Bot.Requests.CopyMessageRequest">
-            <summary>Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz <see cref="T:Telegram.Bot.Types.Poll"/> can be copied only if the value of the field <em>CorrectOptionId</em> is known to the bot. The method is analogous to the method <see cref="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">ForwardMessage</see>, but the copied message doesn't have a link to the original message.<para>Returns: The <see cref="P:Telegram.Bot.Requests.CopyMessageRequest.MessageId"/> of the sent message on success.</para></summary>
+            <summary>Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz <see cref="T:Telegram.Bot.Types.Poll"/> can be copied only if the value of the field <em>CorrectOptionId</em> is known to the bot. The method is analogous to the method <see cref="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.String,System.Threading.CancellationToken)">ForwardMessage</see>, but the copied message doesn't have a link to the original message.<para>Returns: The <see cref="P:Telegram.Bot.Requests.CopyMessageRequest.MessageId"/> of the sent message on success.</para></summary>
         </member>
         <member name="M:Telegram.Bot.Requests.CopyMessageRequest.#ctor">
-            <summary>Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz <see cref="T:Telegram.Bot.Types.Poll"/> can be copied only if the value of the field <em>CorrectOptionId</em> is known to the bot. The method is analogous to the method <see cref="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.Threading.CancellationToken)">ForwardMessage</see>, but the copied message doesn't have a link to the original message.<para>Returns: The <see cref="P:Telegram.Bot.Requests.CopyMessageRequest.MessageId"/> of the sent message on success.</para></summary>
+            <summary>Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz <see cref="T:Telegram.Bot.Types.Poll"/> can be copied only if the value of the field <em>CorrectOptionId</em> is known to the bot. The method is analogous to the method <see cref="M:Telegram.Bot.TelegramBotClientExtensions.ForwardMessage(Telegram.Bot.ITelegramBotClient,Telegram.Bot.Types.ChatId,Telegram.Bot.Types.ChatId,System.Int32,System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int64},Telegram.Bot.Types.SuggestedPostParameters,System.String,System.Threading.CancellationToken)">ForwardMessage</see>, but the copied message doesn't have a link to the original message.<para>Returns: The <see cref="P:Telegram.Bot.Requests.CopyMessageRequest.MessageId"/> of the sent message on success.</para></summary>
         </member>
         <member name="P:Telegram.Bot.Requests.CopyMessageRequest.ChatId">
             <summary>Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>)</summary>
@@ -11353,7 +11709,7 @@
             <summary>Message identifier in the chat specified in <see cref="P:Telegram.Bot.Requests.CopyMessageRequest.FromChatId">FromChatId</see></summary>
         </member>
         <member name="P:Telegram.Bot.Requests.CopyMessageRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.CopyMessageRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11382,6 +11738,9 @@
         <member name="P:Telegram.Bot.Requests.CopyMessageRequest.AllowPaidBroadcast">
             <summary>Pass <see langword="true"/> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance</summary>
         </member>
+        <member name="P:Telegram.Bot.Requests.CopyMessageRequest.MessageEffectId">
+            <summary>Unique identifier of the message effect to be added to the message; only available when copying to private chats</summary>
+        </member>
         <member name="P:Telegram.Bot.Requests.CopyMessageRequest.SuggestedPostParameters">
             <summary>An object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.</summary>
         </member>
@@ -11407,7 +11766,7 @@
             <summary>A list of 1-100 identifiers of messages in the chat <see cref="P:Telegram.Bot.Requests.CopyMessagesRequest.FromChatId">FromChatId</see> to copy. The identifiers must be specified in a strictly increasing order.</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.CopyMessagesRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.CopyMessagesRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the messages will be sent; required if the messages are sent to a direct messages chat</summary>
@@ -11437,7 +11796,7 @@
             <summary>Message identifier in the chat specified in <see cref="P:Telegram.Bot.Requests.ForwardMessageRequest.FromChatId">FromChatId</see></summary>
         </member>
         <member name="P:Telegram.Bot.Requests.ForwardMessageRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.ForwardMessageRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be forwarded; required if the message is forwarded to a direct messages chat</summary>
@@ -11450,6 +11809,9 @@
         </member>
         <member name="P:Telegram.Bot.Requests.ForwardMessageRequest.ProtectContent">
             <summary>Protects the contents of the forwarded message from forwarding and saving</summary>
+        </member>
+        <member name="P:Telegram.Bot.Requests.ForwardMessageRequest.MessageEffectId">
+            <summary>Unique identifier of the message effect to be added to the message; only available when forwarding to private chats</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.ForwardMessageRequest.SuggestedPostParameters">
             <summary>An object containing the parameters of the suggested post to send; for direct messages chats only</summary>
@@ -11470,7 +11832,7 @@
             <summary>A list of 1-100 identifiers of messages in the chat <see cref="P:Telegram.Bot.Requests.ForwardMessagesRequest.FromChatId">FromChatId</see> to forward. The identifiers must be specified in a strictly increasing order.</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.ForwardMessagesRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.ForwardMessagesRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the messages will be forwarded; required if the messages are forwarded to a direct messages chat</summary>
@@ -11499,7 +11861,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendAnimationRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendAnimationRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11570,7 +11932,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendAudioRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendAudioRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11635,7 +11997,7 @@
             <summary>Unique identifier of the business connection on behalf of which the action will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendChatActionRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread; for supergroups only</summary>
+            <summary>Unique identifier for the target message thread or topic of a forum; for supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="T:Telegram.Bot.Requests.SendContactRequest">
             <summary>Use this method to send phone contacts.<para>Returns: The sent <see cref="T:Telegram.Bot.Types.Message"/> is returned.</para></summary>
@@ -11656,7 +12018,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendContactRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendContactRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11701,7 +12063,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendDiceRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendDiceRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11748,7 +12110,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendDocumentRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendDocumentRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11808,7 +12170,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendLocationRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendLocationRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11862,7 +12224,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendMediaGroupRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendMediaGroupRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the messages will be sent; required if the messages are sent to a direct messages chat</summary>
@@ -11898,7 +12260,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendMessageRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendMessageRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -11943,7 +12305,7 @@
             <summary>Unique identifier for the target chat or username of the target channel (in the format <c>@channelusername</c>). If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance. Otherwise, they will be credited to the bot's balance.</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPaidMediaRequest.StarCount">
-            <summary>The number of Telegram Stars that must be paid to buy access to the media; 1-10000</summary>
+            <summary>The number of Telegram Stars that must be paid to buy access to the media; 1-25000</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPaidMediaRequest.Media">
             <summary>A array describing the media to be sent; up to 10 items</summary>
@@ -11952,7 +12314,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPaidMediaRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPaidMediaRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -12006,7 +12368,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPhotoRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPhotoRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -12066,7 +12428,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPollRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendPollRequest.QuestionParseMode">
             <summary>Mode for parsing entities in the question. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details. Currently, only custom emoji entities are allowed</summary>
@@ -12147,7 +12509,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVenueRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVenueRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -12201,7 +12563,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVideoNoteRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVideoNoteRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -12254,7 +12616,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVideoRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVideoRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -12334,7 +12696,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVoiceRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendVoiceRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -12429,12 +12791,6 @@
         <member name="P:Telegram.Bot.Requests.DeleteStickerSetRequest.Name">
             <summary>Sticker set name</summary>
         </member>
-        <member name="T:Telegram.Bot.Requests.GetAvailableGiftsRequest">
-            <summary>Returns the list of gifts that can be sent by the bot to users and channel chats.<para>Returns: A <see cref="T:Telegram.Bot.Types.GiftList"/> object.</para></summary>
-        </member>
-        <member name="M:Telegram.Bot.Requests.GetAvailableGiftsRequest.#ctor">
-            <summary>Returns the list of gifts that can be sent by the bot to users and channel chats.<para>Returns: A <see cref="T:Telegram.Bot.Types.GiftList"/> object.</para></summary>
-        </member>
         <member name="T:Telegram.Bot.Requests.GetCustomEmojiStickersRequest">
             <summary>Use this method to get information about custom emoji stickers by their identifiers.<para>Returns: An Array of <see cref="T:Telegram.Bot.Types.Sticker"/> objects.</para></summary>
         </member>
@@ -12495,33 +12851,6 @@
         <member name="P:Telegram.Bot.Requests.ReplaceStickerInSetRequest.Sticker">
             <summary>An object with information about the added sticker. If exactly the same sticker had already been added to the set, then the set remains unchanged.</summary>
         </member>
-        <member name="T:Telegram.Bot.Requests.SendGiftRequest">
-            <summary>Sends a gift to the given user or channel chat. The gift can't be converted to Telegram Stars by the receiver.</summary>
-        </member>
-        <member name="M:Telegram.Bot.Requests.SendGiftRequest.#ctor">
-            <summary>Sends a gift to the given user or channel chat. The gift can't be converted to Telegram Stars by the receiver.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.SendGiftRequest.GiftId">
-            <summary>Identifier of the gift</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.SendGiftRequest.UserId">
-            <summary>Required if <see cref="P:Telegram.Bot.Requests.SendGiftRequest.ChatId">ChatId</see> is not specified. Unique identifier of the target user who will receive the gift.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.SendGiftRequest.ChatId">
-            <summary>Required if <see cref="P:Telegram.Bot.Requests.SendGiftRequest.UserId">UserId</see> is not specified. Unique identifier for the chat or username of the channel (in the format <c>@channelusername</c>) that will receive the gift.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.SendGiftRequest.PayForUpgrade">
-            <summary>Pass <see langword="true"/> to pay for the gift upgrade from the bot's balance, thereby making the upgrade free for the receiver</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.SendGiftRequest.Text">
-            <summary>Text that will be shown along with the gift; 0-128 characters</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.SendGiftRequest.TextParseMode">
-            <summary>Mode for parsing entities in the text. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details. Entities other than <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Bold">Bold</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Italic">Italic</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Underline">Underline</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Strikethrough">Strikethrough</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Spoiler">Spoiler</see>, and <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.CustomEmoji">CustomEmoji</see> are ignored.</summary>
-        </member>
-        <member name="P:Telegram.Bot.Requests.SendGiftRequest.TextEntities">
-            <summary>A list of special entities that appear in the gift text. It can be specified instead of <see cref="P:Telegram.Bot.Requests.SendGiftRequest.TextParseMode">TextParseMode</see>. Entities other than <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Bold">Bold</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Italic">Italic</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Underline">Underline</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Strikethrough">Strikethrough</see>, <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.Spoiler">Spoiler</see>, and <see cref="F:Telegram.Bot.Types.Enums.MessageEntityType.CustomEmoji">CustomEmoji</see> are ignored.</summary>
-        </member>
         <member name="T:Telegram.Bot.Requests.SendStickerRequest">
             <summary>Use this method to send static .WEBP, <a href="https://telegram.org/blog/animated-stickers">animated</a> .TGS, or <a href="https://telegram.org/blog/video-stickers-better-reactions">video</a> .WEBM stickers.<para>Returns: The sent <see cref="T:Telegram.Bot.Types.Message"/> is returned.</para></summary>
         </member>
@@ -12538,7 +12867,7 @@
             <summary>Unique identifier of the business connection on behalf of which the message will be sent</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendStickerRequest.MessageThreadId">
-            <summary>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</summary>
+            <summary>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</summary>
         </member>
         <member name="P:Telegram.Bot.Requests.SendStickerRequest.DirectMessagesTopicId">
             <summary>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</summary>
@@ -13264,6 +13593,11 @@
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
         </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.ApiResponse">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.AddStickerToSetRequest">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
@@ -13559,6 +13893,11 @@
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
         </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.GetChatGiftsRequest">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.GetChatMemberCountRequest">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
@@ -13659,6 +13998,11 @@
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
         </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.GetUserGiftsRequest">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.GetUserProfilePhotosRequest">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
@@ -13744,6 +14088,11 @@
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
         </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.RepostStoryRequest">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.RestrictChatMemberRequest">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
@@ -13815,6 +14164,11 @@
             </summary>
         </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.SendMediaGroupRequest">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.SendMessageDraftRequest">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
@@ -14875,6 +15229,11 @@
             </summary>
         </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.GiftArray">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.GiftBackground">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
@@ -15954,6 +16313,11 @@
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
         </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.UniqueGiftColors">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.UniqueGiftInfo">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
@@ -15995,6 +16359,11 @@
             </summary>
         </member>
         <member name="P:Telegram.Bot.JsonBotSerializerContext.UserProfilePhotos">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Telegram.Bot.JsonBotSerializerContext.UserRating">
             <summary>
             Defines the source generated JSON serialization contract metadata for a given type.
             </summary>
