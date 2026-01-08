@@ -7,12 +7,12 @@ using TelegramBotBase.Interfaces;
 
 namespace TelegramBotBase.Factories;
 
-public class ServiceProviderStartFormFactory : IStartFormFactory
+public class ServiceProviderFormFactory : IFormFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly Type _startFormClass;
 
-    public ServiceProviderStartFormFactory(Type startFormClass, IServiceProvider serviceProvider)
+    public ServiceProviderFormFactory(Type startFormClass, IServiceProvider serviceProvider)
     {
         if (!typeof(FormBase).IsAssignableFrom(startFormClass))
         {
@@ -23,13 +23,23 @@ public class ServiceProviderStartFormFactory : IStartFormFactory
         _serviceProvider = serviceProvider;
     }
 
-    public FormBase CreateForm()
+    public FormBase CreateStartForm()
     {
+        return CreateForm(_startFormClass);
+    }
+    
+    public FormBase CreateForm(Type formType)
+    {
+        if (!typeof(FormBase).IsAssignableFrom(formType))
+        {
+            throw new ArgumentException($"{nameof(formType)} argument must be a {nameof(FormBase)} type");
+        }
+
         FormBase fb = null;
 
         try
         {
-            fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, _startFormClass);
+            fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, formType);
         }
         catch(InvalidOperationException ex)
         {
@@ -41,12 +51,17 @@ public class ServiceProviderStartFormFactory : IStartFormFactory
 
         return fb;
     }
+
+    public FormBase CreateForm<T>() where T : FormBase
+    {
+        return CreateForm(typeof(T));
+    }
 }
 
-public class ServiceProviderStartFormFactory<T> : ServiceProviderStartFormFactory
+public class ServiceProviderFormFactory<T> : ServiceProviderFormFactory
     where T : FormBase
 {
-    public ServiceProviderStartFormFactory(IServiceProvider serviceProvider) : base(typeof(T), serviceProvider)
+    public ServiceProviderFormFactory(IServiceProvider serviceProvider) : base(typeof(T), serviceProvider)
     {
     }
 }

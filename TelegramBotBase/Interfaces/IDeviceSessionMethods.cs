@@ -38,7 +38,7 @@ namespace TelegramBotBase.Interfaces
                                         bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                         bool markdownV2AutoEscape = true);
 
-        Task<Message> Send(string text, IReplyMarkup markup, int replyTo = 0,
+        Task<Message> Send(string text, ReplyMarkup markup, int replyTo = 0,
                                         bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                         bool markdownV2AutoEscape = true);
 

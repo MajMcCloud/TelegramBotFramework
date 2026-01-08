@@ -1,6 +1,6 @@
 # .NET Telegram Bot Framework - Context based addon
 
-[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/vpre/TelegramBotBase.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase/)
 [![Telegram chat](https://img.shields.io/badge/Support_Chat-Telegram-blue.svg?style=flat-square)](https://www.t.me/tgbotbase)
 
 [![License](https://img.shields.io/github/license/MajMcCloud/telegrambotframework.svg?style=flat-square&maxAge=2592000&label=License)](https://raw.githubusercontent.com/MajMcCloud/TelegramBotFramework/master/LICENCE.md)
@@ -82,6 +82,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
     * [As of Now](#as-of-now)
     * [Usage](#usage)
+- [Threading & Performance](#threading--performance)
 - [Action Manager (Extension)](#action-manager)
 - [Extensions](#extensions)
     * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
@@ -1198,6 +1199,52 @@ is
 again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the controller automatically with the root form
 you
 have given to the constructor at the beginning.*
+
+---
+
+## Threading & Performance
+
+Efficient threading and task management are essential for building responsive and scalable Telegram bots. The framework provides flexible options to control how updates and messages are processed, allowing you to balance simplicity and performance according to your needs.
+
+### Threading Options
+
+You can configure the threading model during bot setup using the builder methods:
+
+- `.UseSingleThread()`: Processes all updates sequentially on a single thread. This is the default and is recommended for simple bots, bots with non-thread-safe resources, or when strict message order is required.
+- `.UseThreadPool()`: Enables concurrent processing of updates using the .NET thread pool. This improves throughput and responsiveness for high-traffic bots or when handling long-running operations.
+- `.UseThreadPool(workerThreads, ioThreads)`: Fine-tune the number of worker and I/O threads for advanced scenarios with specific concurrency requirements.
+
+**Example:**
+```csharp
+var bot = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .DefaultCommands()
+    .NoSerialization()
+    .UseEnglish()
+    .UseThreadPool() // or .UseSingleThread()
+    .Build();
+```
+### Performance Considerations
+
+- **Single-threaded mode** is simple and safe, but may become a bottleneck under heavy load.
+- **Thread pool mode** allows multiple updates to be processed in parallel, increasing scalability. However, ensure your code is thread-safe and avoid shared mutable state.
+- Use `async`/`await` for all I/O-bound operations (such as network calls or database access) to prevent blocking threads and improve overall throughput.
+- Avoid blocking calls like `Thread.Sleep` or `.Result`/`.Wait()` on tasks, as these can degrade performance and cause deadlocks.
+- For CPU-bound work, consider offloading to background tasks using `Task.Run` if needed.
+
+### Best Practices
+
+- Prefer `async` methods throughout your forms and message handlers.
+- Minimize shared state or protect it with proper synchronization (e.g., locks) if using thread pool mode.
+- Test your bot under expected load to choose the optimal threading model.
+- For most bots, start with `UseSingleThread()` and switch to `UseThreadPool()` if you observe performance issues.
+
+
+
 
 ---
 

@@ -29,7 +29,7 @@ public class ButtonForm
     }
 
 
-    public IReplyMarkup Markup { get; set; }
+    public ReplyMarkup Markup { get; set; }
 
     public ControlBase DependencyControl { get; set; }
 

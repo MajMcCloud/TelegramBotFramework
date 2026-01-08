@@ -68,7 +68,7 @@ public class DataForm : AutoCleanForm
                 var photo = InputFile.FromString(data.Photos.Last().FileId);
 
                 await Device.Send("Your image: ", replyTo: data.MessageId);
-                await Client.TelegramClient.SendPhotoAsync(Device.DeviceId, photo);
+                await Client.TelegramClient.SendPhoto(Device.DeviceId, photo);
 
                 break;
 

@@ -12,7 +12,7 @@ namespace TelegramBotBase.SourceGenerators
 {
     public class XmlDocumentationLoader
     {
-        XDocument xDocument;
+        XDocument? xDocument = null;
 
         public string GetDocumentationLinesForSymbol(ISymbol symbol)
         {
@@ -20,7 +20,7 @@ namespace TelegramBotBase.SourceGenerators
                 .FirstOrDefault(e => e.Attribute("name")?.Value == GetDocumentationCommentId(symbol));
 
             if (docElement == null)
-                return "No documentation";
+                return "/// <summary>No documentation</summary>";
 
             StringBuilder sb = new StringBuilder();
 

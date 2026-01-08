@@ -332,7 +332,7 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo"></param>
     /// <param name="disableNotification"></param>
     /// <returns></returns>
-    public async Task<Message> Send(string text, IReplyMarkup markup, int replyTo = 0,
+    public async Task<Message> Send(string text, ReplyMarkup markup, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
     {
@@ -350,7 +350,6 @@ public class DeviceSession : IDeviceSession
         {
             text = text.MarkdownV2Escape();
         }
-
 
         var t = Api(a => a.SendMessage(DeviceId, text, parseMode, replyParameters: new ReplyParameters() { MessageId = replyTo },
                                                 replyMarkup: markup, disableNotification: disableNotification));
@@ -814,7 +813,7 @@ public class DeviceSession : IDeviceSession
     public virtual async Task KickUser(long userId, DateTime until = default)
     {
 
-        await Api(a => a.BanChatMemberAsync(DeviceId, userId, until));
+        await Api(a => a.BanChatMember(DeviceId, userId, until));
 
     }
 

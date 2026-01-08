@@ -20,7 +20,7 @@ namespace TelegramBotBase
     [Generator(LanguageNames.CSharp)]
     public class TelegramDeviceExtensionGenerator : IIncrementalGenerator
     {
-        static XmlDocumentationLoader xml;
+        static XmlDocumentationLoader? xml = null;
 
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -87,8 +87,8 @@ namespace TelegramBotBase
                 if (method.Name == ".ctor")
                     continue;
 
-                String parameters = "";
-                String subCallParameters = "";
+                string parameters = "";
+                string subCallParameters = "";
                 foreach (var par in method.Parameters)
                 {
                     if (par.Name == "botClient")
@@ -120,7 +120,7 @@ namespace TelegramBotBase
                         // Handle specific default value cases
                         if (defaultValue == null)
                         {
-                            if(par.Name == "cancellationToken")
+                            if (par.Name == "cancellationToken")
                             {
                                 parameters += " = default";
                             }
@@ -129,7 +129,7 @@ namespace TelegramBotBase
                                 parameters += " = null";
                             }
 
-                            
+
                         }
                         else if (defaultValue is string)
                         {
@@ -172,7 +172,7 @@ namespace TelegramBotBase
                     returnStatement = "return ";
                 }
 
-                String tmp = GenerateMethod(method, parameters, subCallParameters, returnStatement);
+                string? tmp = GenerateMethod(method, parameters, subCallParameters, returnStatement);
 
                 sb.Append(tmp);
 
@@ -194,7 +194,6 @@ namespace TelegramBotBase
             using Telegram.Bot.Types.InlineQueryResults;
             using Telegram.Bot.Types.Payments;
             using Telegram.Bot.Types.ReplyMarkups;
-            using File = Telegram.Bot.Types.File;
 
             #nullable enable
             namespace TelegramBotBase;
@@ -222,19 +221,27 @@ namespace TelegramBotBase
         /// <param name="subCallParameters"></param>
         /// <param name="returnStatement"></param>
         /// <returns></returns>
-        private String? GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
+        private string? GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
         {
+            if (method == null)
+                return null;
+
             //Adding xml comments from embedded xml file (Workaround)
-            String xml_comments = xml?.GetDocumentationLinesForSymbol(method);
+            string? xml_comments = xml?.GetDocumentationLinesForSymbol(method);
+
+            xml_comments = CleanupXMLComments(xml_comments, "chatId", "botClient");
 
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(xml_comments);
+            sb.Append(xml_comments);
+
+            //Adding device
+            sb.AppendLine($"    /// <param name=\"device\">Device session</param>");
 
             if (method == null)
                 return string.Empty;
 
-            if(method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
+            if (method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
             {
                 sb.AppendLine("[Obsolete]");
             }
@@ -251,6 +258,28 @@ namespace TelegramBotBase
             sb.AppendLine();
 
             sb.AppendLine();
+
+            return sb.ToString();
+        }
+
+        private string CleanupXMLComments(string raw, params string[] to_remove)
+        {
+            if (raw == null)
+                return string.Empty;
+
+            var lines = raw.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var line in lines)
+            {
+                if (to_remove.Any(a => line.Contains($"<param name=\"{a}\">")))
+                    continue;
+
+
+                sb.AppendLine($"{line}");
+            }
+
 
             return sb.ToString();
         }
