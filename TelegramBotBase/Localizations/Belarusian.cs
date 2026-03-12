@@ -13,10 +13,10 @@ public sealed class Belarusian : Localization
         Values["ButtonGrid_SearchFeature"] = "💡 Напішыце паведамленне для фільтра. Націсніце 🔍, каб скінуць фільтр.";
         Values["ButtonGrid_Back"] = "Назад";
         Values["TaggedButtonGrid_TotalTags"] = "Усяго: {0}";
-        Values["TaggedButtonGrid_CheckedTags"] = "Выбрана: {0}";
+        Values["TaggedButtonGrid_CheckedTags"] = "Абрана: {0}";
         Values["TaggedButtonGrid_CheckAll"] = "Адзначыць усё";
         Values["TaggedButtonGrid_UncheckAll"] = "Зняць усё";
-        Values["CalendarPicker_Title"] = "Выберыце дату";
+        Values["CalendarPicker_Title"] = "Абярыце дату";
         Values["CalendarPicker_PreviousPage"] = "◀️";
         Values["CalendarPicker_NextPage"] = "▶️";
         Values["TreeView_Title"] = "Выберыце вузел";
