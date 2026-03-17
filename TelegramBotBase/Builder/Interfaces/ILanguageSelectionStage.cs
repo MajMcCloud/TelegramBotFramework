@@ -42,6 +42,12 @@ public interface ILanguageSelectionStage
     /// </summary>
     /// <returns>The next stage in the building process.</returns>
     IThreadingStage UseUkrainian();
+
+    /// <summary>
+    ///     Selects belarusian as the default language for control labels.
+    /// </summary>
+    /// <returns>The next stage in the building process.</returns>
+    IThreadingStage UseBelarusian();
     
     /// <summary>
     ///     Selects a custom language as the default language for control labels.

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.1;net8</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net8;net9</TargetFrameworks>
         <RepositoryUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images.IronSoftware</RepositoryUrl>
         <PackageProjectUrl>https://github.com/MajMcCloud/TelegramBotFramework/tree/development/TelegramBotBase.Extensions.Images.IronSoftware</PackageProjectUrl>
         <Copyright>MIT</Copyright>
@@ -14,19 +14,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IronSoftware.System.Drawing" Version="2024.5.1" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+        <PackageReference Include="IronSoftware.System.Drawing" Version="2026.1.2" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="TelegramBotBase" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Properties\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
     </ItemGroup>
 
 </Project>
