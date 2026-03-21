@@ -44,6 +44,16 @@ namespace FileWatcher
                 Console.WriteLine($"Filter: {Config.Filter}");
             }
 
+            if (Config.ListenForCommands)
+            {
+                Console.WriteLine("Listening for commands enabled");
+
+            }
+            else
+            {
+                Console.WriteLine("Listening for commands disabled");
+            }
+
             watcher.IncludeSubdirectories = false;
 
             Console.WriteLine($"Directory: {Config.DirectoryToWatch}");
