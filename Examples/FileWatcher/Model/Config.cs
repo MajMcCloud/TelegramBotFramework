@@ -28,11 +28,13 @@ namespace FileWatcher.Model
         public const string FilenamePlaceholder = "%filename%";
         public const string ActionPlaceholder = "%action%";
 
+        public static string DefaultConfigPath => Path.Combine(Directory.GetCurrentDirectory(), "config.json");
+
         public static Config Load()
         {
-            Config config = new Config();
+            Config config = null;
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "config.json");
+            var path = DefaultConfigPath;
 
             try
             {
@@ -56,9 +58,7 @@ namespace FileWatcher.Model
 
         public void Save()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "config.json");
-
-            Save(path);
+            Save(DefaultConfigPath);
         }
 
         public void Save(String path)

@@ -15,6 +15,29 @@ namespace FileWatcher
 
             Config = Model.Config.Load();
 
+            if (Config == null)
+            {
+                if(File.Exists(Model.Config.DefaultConfigPath))
+                {
+                    Console.WriteLine("Config file is invalid.");
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("No config file found, creating default config.");
+                    Config = new Model.Config
+                    {
+                        APIKey = "",
+                        DirectoryToWatch = "",
+                        ListenForCommands = false,
+                        DeviceIds = new List<long>(),
+                        Filter = "*.*",
+                        FilesToExclude = new List<string>(),
+                    };
+                    Config.Save();
+                }
+            }
+
             if (string.IsNullOrEmpty(Config.APIKey))
             {
                 Console.WriteLine("No API Key set");
