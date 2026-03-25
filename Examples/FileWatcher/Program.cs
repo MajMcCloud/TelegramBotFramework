@@ -10,6 +10,8 @@ namespace FileWatcher
 
         public static TelegramBotBase.BotBase Bot { get; set; }
 
+        private static MessageBatcher? Batcher { get; set; }
+
         static void Main(string[] args)
         {
 
@@ -33,6 +35,7 @@ namespace FileWatcher
                         DeviceIds = new List<long>(),
                         Filter = "*.*",
                         FilesToExclude = new List<string>(),
+                        BatchIntervalSeconds = 5,
                     };
                     Config.Save();
                 }
@@ -112,9 +115,19 @@ namespace FileWatcher
 
             watcher.EnableRaisingEvents = true;
 
-            watcher.Created += Watcher_Created;
-            watcher.Changed += Watcher_Changed;
-            watcher.Renamed += Watcher_Renamed;
+            // Initialize the message batcher
+            Batcher = new MessageBatcher(Config.BatchIntervalSeconds, SendToAllDevicesAsync);
+
+            if (!string.IsNullOrEmpty(Config.ServerName))
+            {
+                Console.WriteLine($"Server name: {Config.ServerName}");
+            }
+
+            Console.WriteLine($"Batch interval: {Config.BatchIntervalSeconds}s");
+
+            watcher.Created += Watcher_FileEvent;
+            watcher.Changed += Watcher_FileEvent;
+            watcher.Renamed += Watcher_FileEvent;
 
             Console.WriteLine("Bot started.");
 
@@ -147,21 +160,24 @@ namespace FileWatcher
             }
         }
 
-        private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
+        private static string FormatMessage(string? filename, string action)
         {
-            if (Config.FilesToExclude.Count > 0)
-            {
-                var fn = Path.GetFileName(e.Name);
+            var s = Config.MessageTemplate
+                .Replace(Model.Config.FilenamePlaceholder, filename)
+                .Replace(Model.Config.ActionPlaceholder, action)
+                .Replace(Model.Config.ServerNamePlaceholder, Config.ServerName);
 
-                if (Config.FilesToExclude.Contains(fn))
-                    return;
+            if (!string.IsNullOrEmpty(Config.ServerName)
+                && !Config.MessageTemplate.Contains(Model.Config.ServerNamePlaceholder))
+            {
+                s = $"[{Config.ServerName}] {s}";
             }
 
-            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
-                                             .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
+            return s;
+        }
 
-            Console.WriteLine(s);
-
+        private static async Task SendToAllDevicesAsync(string message)
+        {
             if (Bot == null)
                 return;
 
@@ -169,16 +185,15 @@ namespace FileWatcher
             {
                 try
                 {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
+                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, message);
                 }
                 catch
                 {
-
                 }
             }
         }
 
-        private static async void Watcher_Created(object sender, FileSystemEventArgs e)
+        private static void Watcher_FileEvent(object sender, FileSystemEventArgs e)
         {
             if (Config.FilesToExclude.Count > 0)
             {
@@ -187,58 +202,12 @@ namespace FileWatcher
                 if (Config.FilesToExclude.Contains(fn))
                     return;
             }
-
-            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
-                                 .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
-
-            Console.WriteLine(s);
-
-            if (Bot == null)
-                return;
-
-            foreach (var device in Config.DeviceIds)
-            {
-                try
-                {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
-                }
-                catch
-                {
-
-                }
-            }
-        }
-
-        private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
-        {
-            if (Config.FilesToExclude.Count > 0)
-            {
-                var fn = Path.GetFileName(e.Name);
-
-                if (Config.FilesToExclude.Contains(fn))
-                    return;
-            }
-
-            String s = Config.MessageTemplate.Replace(Model.Config.FilenamePlaceholder, e.Name)
-                                 .Replace(Model.Config.ActionPlaceholder, e.ChangeType.ToString());
+            
+            var s = FormatMessage(e.Name, e.ChangeType.ToString());
 
             Console.WriteLine(s);
 
-            if (Bot == null)
-                return;
-
-            foreach (var device in Config.DeviceIds)
-            {
-                try
-                {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, s);
-                }
-                catch
-                {
-
-                }
-
-            }
+            Batcher?.Enqueue(s);
         }
     }
 }
