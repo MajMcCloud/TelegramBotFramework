@@ -30,6 +30,8 @@ public class TestForm2 : FormBase
     public override async Task Action(MessageResult message)
     {
         var call = message.GetData<CallbackData>();
+        if (call == null)
+            return;
 
         await message.ConfirmAction();
 
