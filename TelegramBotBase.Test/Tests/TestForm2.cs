@@ -35,6 +35,10 @@ public class TestForm2 : FormBase
 
         await message.ConfirmAction();
 
+        //Skip invalid data
+        if (call.Method != "navigate")
+            return;
+
         await message.DeleteMessage();
 
         message.Handled = true;
