@@ -10,6 +10,12 @@ public class ModalDialog : FormBase
     /// </summary>
     public FormBase ParentForm { get; set; }
 
+
+    /// <summary>
+    /// Gets a value indicating whether the current form is displayed as a modal dialog.
+    /// </summary>
+    public bool IsDisplayedAsModal => ParentForm != null;
+
     /// <summary>
     ///     This is a modal only function and does everything to close this form.
     /// </summary>
@@ -20,6 +26,15 @@ public class ModalDialog : FormBase
         await OnClosed(EventArgs.Empty);
 
 
-        await ParentForm?.ReturnFromModal(this);
+        if (IsDisplayedAsModal)
+            await ParentForm.ReturnFromModal(this);
+    }
+
+    public override Task NavigateTo(FormBase newForm, params object[] args)
+    {
+        if(IsDisplayedAsModal)
+            throw new InvalidOperationException("Cannot navigate to another form from a modal dialog. Please close the modal dialog first.");
+
+        return base.NavigateTo(newForm, args);
     }
 }

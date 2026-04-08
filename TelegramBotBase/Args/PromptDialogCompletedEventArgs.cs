@@ -1,6 +1,8 @@
-﻿namespace TelegramBotBase.Args;
+﻿using System;
 
-public class PromptDialogCompletedEventArgs
+namespace TelegramBotBase.Args;
+
+public class PromptDialogCompletedEventArgs : EventArgs
 {
     public object Tag { get; set; }
 

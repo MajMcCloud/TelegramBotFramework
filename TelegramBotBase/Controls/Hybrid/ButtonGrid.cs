@@ -704,11 +704,12 @@ public class ButtonGrid : ControlBase
         }
     }
 
-    public override Task Hidden(bool formClose)
+    public override async Task Hidden(bool formClose)
     {
         //Prepare for opening Modal, and comming back
         if (!formClose)
         {
+            await Cleanup();
             Updated();
         }
         else
@@ -716,8 +717,6 @@ public class ButtonGrid : ControlBase
         {
             Device.MessageDeleted -= Device_MessageDeleted;
         }
-
-        return Task.CompletedTask;
     }
 
     /// <summary>
