@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TelegramBotBase.DependencyInjection;
 using TelegramBotBase.Exceptions;
@@ -45,6 +46,7 @@ public class ServiceProviderFormFactory : IFormFactory
         }
         catch(InvalidOperationException ex)
         {
+            Task.Run(async () => await scope.DisposeAsync());
             throw new InvalidServiceProviderConfiguration(ex.Message, ex);
         }
 
