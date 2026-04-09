@@ -63,13 +63,13 @@ namespace TelegramBotBase.DependencyInjection
         }
 
         /// <summary>
-        /// Sets the internal service provider field.
+        /// Sets the internal service scope field.
         /// </summary>
         /// <param name="form"></param>
-        /// <param name="serviceProvider"></param>
-        public static void SetServiceProvider(this FormBase form, IServiceProvider serviceProvider)
+        /// <param name="serviceScope"></param>
+        public static void SetServiceScope(this FormBase form, IServiceScope serviceScope)
         {
-            _ServiceProviderField?.SetValue(form, serviceProvider);
+            _ServiceScopeField?.SetValue(form, serviceScope);
         }
 
         /// <summary>
