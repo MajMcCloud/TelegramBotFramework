@@ -10,7 +10,7 @@ namespace TelegramBotBase.DependencyInjection
 {
     public static class Extensions
     {
-        internal static FieldInfo _ServiceScopeField = typeof(FormBase).GetField("_serviceScope", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        internal static FieldInfo _DiEscortField = typeof(FormBase).GetField("_diEscort", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
         /// <summary>
         /// Use Dependency Injection to create new form and inject parameters. (Main variant)
@@ -48,7 +48,7 @@ namespace TelegramBotBase.DependencyInjection
             if (!typeof(FormBase).IsAssignableFrom(formBaseType))
                 throw new ArgumentException($"{nameof(formBaseType)} argument must be a {nameof(FormBase)} type");
 
-            var _serviceProvider = current_form.GetServiceProvider();
+            var scope = current_form.GetServiceScope();
 
             var instance = ActivatorUtilities.CreateInstance(_serviceProvider, formBaseType) as FormBase;
 
@@ -63,23 +63,23 @@ namespace TelegramBotBase.DependencyInjection
         }
 
         /// <summary>
-        /// Sets the internal service scope field.
+        /// Sets the internal di escort field.
         /// </summary>
         /// <param name="form"></param>
-        /// <param name="serviceScope"></param>
-        public static void SetServiceScope(this FormBase form, IServiceScope serviceScope)
+        /// <param name="diEscort"></param>
+        public static void SetDiEscort(this FormBase form, FormDiEscort diEscort)
         {
-            _ServiceScopeField?.SetValue(form, serviceScope);
+            _DiEscortField?.SetValue(form, diEscort);
         }
 
         /// <summary>
-        /// Gets the internal service scope field value.
+        /// Gets the internal di escort field value.
         /// </summary>
         /// <param name="form"></param>
         /// <returns></returns>
-        public static IServiceScope GetServiceScope(this FormBase form)
+        public static FormDiEscort GetDiEscort(this FormBase form)
         {
-            var ss = _ServiceScopeField?.GetValue(form) as IServiceScope;
+            var ss = _DiEscortField?.GetValue(form) as FormDiEscort;
             return ss;
         }
     }
