@@ -36,18 +36,20 @@ public class ServiceProviderFormFactory : IFormFactory
         }
 
         FormBase fb = null;
-
+        var scope = _serviceProvider.CreateAsyncScope();
+        var scopeServiceProvider = scope.ServiceProvider;
+        
         try
         {
-            fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, formType);
+            fb = (FormBase)ActivatorUtilities.CreateInstance(scopeServiceProvider, formType);
         }
         catch(InvalidOperationException ex)
         {
             throw new InvalidServiceProviderConfiguration(ex.Message, ex);
         }
 
-        //Sets an internal field for future ServiceProvider navigation
-        fb.SetServiceProvider(_serviceProvider);
+        //Sets an internal field for dispose scoped dependencies on navigation
+        fb.SetServiceScope(scope);
 
         return fb;
     }
