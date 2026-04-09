@@ -40,8 +40,8 @@ public class DefaultFormFactory : IFormFactory
         return form;
     }
 
-    public FormBase CreateForm<T>() where T : FormBase
+    public T CreateForm<T>() where T : FormBase
     {
-        return CreateForm(typeof(T));
+        return (T)CreateForm(typeof(T));
     }
 }
