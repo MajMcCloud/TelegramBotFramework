@@ -73,14 +73,14 @@ namespace TelegramBotBase.DependencyInjection
         }
 
         /// <summary>
-        /// Gets the internal service provider field value.
+        /// Gets the internal service scope field value.
         /// </summary>
         /// <param name="form"></param>
         /// <returns></returns>
-        public static IServiceProvider GetServiceProvider(this FormBase form)
+        public static IServiceScope GetServiceScope(this FormBase form)
         {
-            var sp = _ServiceProviderField?.GetValue(form) as IServiceProvider;
-            return sp;
+            var ss = _ServiceScopeField?.GetValue(form) as IServiceScope;
+            return ss;
         }
     }
 }
