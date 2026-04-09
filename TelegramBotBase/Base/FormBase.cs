@@ -68,6 +68,9 @@ public class FormBase : IAsyncDisposable
     {
         Client = null;
         Device = null;
+
+        await DisposeDiEscort();
+        
         IsDisposed = true;
     }
 
