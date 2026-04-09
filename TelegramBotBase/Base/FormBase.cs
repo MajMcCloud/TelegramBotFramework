@@ -16,7 +16,7 @@ namespace TelegramBotBase.Form;
 /// <summary>
 ///     Base class for forms
 /// </summary>
-public class FormBase : IDisposable
+public class FormBase : IAsyncDisposable
 {
     private static readonly object EvInit = new();
 
@@ -64,7 +64,7 @@ public class FormBase : IDisposable
     /// <summary>
     ///     Cleanup
     /// </summary>
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         Client = null;
         Device = null;
@@ -464,5 +464,4 @@ public class FormBase : IDisposable
     /// Returns if this instance is a subclass of AutoCleanForm. Necessary to prevent message deletion if not necessary.
     /// </summary>
     public bool IsAutoCleanForm() => this.GetType().IsSubclassOf(typeof(AutoCleanForm));
-
 }
