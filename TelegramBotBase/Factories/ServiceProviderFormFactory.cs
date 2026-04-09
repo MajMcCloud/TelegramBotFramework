@@ -50,8 +50,12 @@ public class ServiceProviderFormFactory : IFormFactory
             throw new InvalidServiceProviderConfiguration(ex.Message, ex);
         }
 
-        //Sets an internal field for dispose scoped dependencies on navigation
-        fb.SetServiceScope(scope);
+        //Sets an internal di escort field that used on navigation
+        fb.SetDiEscort(new FormDiEscort
+        {
+            ServiceScope = scope,
+            FormFactory = this
+        });
 
         return fb;
     }
