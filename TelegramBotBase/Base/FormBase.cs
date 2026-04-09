@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form.Navigation;
@@ -40,7 +41,7 @@ public class FormBase : IDisposable
     /// </summary>
     public Telegram.Bot.ITelegramBotClient API => Client?.TelegramClient;
 
-    IServiceProvider _serviceProvider = null;
+    private IServiceScope _serviceScope = null;
 
     /// <summary>
     ///     has this formular already been disposed ?
