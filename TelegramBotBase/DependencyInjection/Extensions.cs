@@ -10,7 +10,7 @@ namespace TelegramBotBase.DependencyInjection
 {
     public static class Extensions
     {
-        internal static FieldInfo _ServiceProviderField = typeof(FormBase).GetField("_serviceProvider", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        internal static FieldInfo _ServiceScopeField = typeof(FormBase).GetField("_serviceScope", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
         /// <summary>
         /// Use Dependency Injection to create new form and inject parameters. (Main variant)
