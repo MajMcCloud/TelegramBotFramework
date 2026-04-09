@@ -89,6 +89,7 @@ public class FormBase : IAsyncDisposable
 
         _diEscort.ServiceScope = null;
         _diEscort.FormFactory = null;
+        _diEscort = null;
     }
 
 
