@@ -71,6 +71,23 @@ public class FormBase : IAsyncDisposable
         IsDisposed = true;
     }
 
+    private async ValueTask DisposeDiEscort()
+    {
+        if (_diEscort == null) return;
+        
+        if (_diEscort.ServiceScope is IAsyncDisposable ad)
+        {
+            await ad.DisposeAsync();
+        }
+        else
+        {
+            _diEscort.ServiceScope.Dispose();
+        }
+
+        _diEscort.ServiceScope = null;
+        _diEscort.FormFactory = null;
+    }
+
 
     public async Task OnInit(InitEventArgs e)
     {
