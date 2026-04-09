@@ -144,15 +144,15 @@ public class FormBase : IAsyncDisposable
     public async Task OnClosed(EventArgs e)
     {
         var handler = Events[EvClosed]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
-        if (handler == null)
+        if (handler != null)
         {
-            return;
+            foreach (var h in handler)
+            {
+                await h.InvokeAllAsync(this, e);
+            }
         }
 
-        foreach (var h in handler)
-        {
-            await h.InvokeAllAsync(this, e);
-        }
+        await DisposeAsync();
     }
 
 
