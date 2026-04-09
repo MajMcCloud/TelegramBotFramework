@@ -19,18 +19,7 @@ namespace TelegramBotBase.DependencyInjection
         public static async Task<NewForm> NavigateTo<NewForm>(this FormBase current_form, params object[] args)
             where NewForm : FormBase
         {
-            var _serviceProvider = current_form.GetServiceProvider();
-
-            var instance = ActivatorUtilities.CreateInstance(_serviceProvider, typeof(NewForm)) as NewForm;
-
-            if (instance == null)
-                return null; //throw new Exception("Could not instantiate new form via DI.");
-
-            instance.SetServiceProvider(_serviceProvider);
-
-            await current_form.NavigateTo(instance, args);
-
-            return instance;
+            return await NavigateTo(current_form, typeof(NewForm), args) as NewForm;
         }
 
         /// <summary>
@@ -43,23 +32,19 @@ namespace TelegramBotBase.DependencyInjection
         /// <exception cref="ArgumentException"></exception>
         public static async Task<FormBase> NavigateTo(this FormBase current_form, Type formBaseType, params object[] args)
         {
-            if (!typeof(FormBase).IsAssignableFrom(formBaseType))
-                throw new ArgumentException($"{nameof(formBaseType)} argument must be a {nameof(FormBase)} type");
+            var diEscort = current_form.GetDiEscort();
+            var factory = diEscort.FormFactory;
 
-            var scope = current_form.GetServiceScope();
-
-            var instance = ActivatorUtilities.CreateInstance(_serviceProvider, formBaseType) as FormBase;
-
+            var instance = factory.CreateForm(formBaseType);
+            
             if (instance == null)
                 return null; //throw new Exception("Could not instantiate new form via DI.");
-
-            instance.SetServiceProvider(_serviceProvider);
 
             await current_form.NavigateTo(instance, args);
 
             return instance;
         }
-
+        
         /// <summary>
         /// Sets the internal di escort field.
         /// </summary>
