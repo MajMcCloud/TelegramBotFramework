@@ -69,27 +69,10 @@ public class FormBase : IAsyncDisposable
         Client = null;
         Device = null;
 
-        await DisposeDiEscort();
+        if (_diEscort != null) await _diEscort.DisposeAsync();
+        _diEscort = null;
         
         IsDisposed = true;
-    }
-
-    private async ValueTask DisposeDiEscort()
-    {
-        if (_diEscort == null) return;
-        
-        if (_diEscort.ServiceScope is IAsyncDisposable ad)
-        {
-            await ad.DisposeAsync();
-        }
-        else
-        {
-            _diEscort.ServiceScope.Dispose();
-        }
-
-        _diEscort.ServiceScope = null;
-        _diEscort.FormFactory = null;
-        _diEscort = null;
     }
 
 
