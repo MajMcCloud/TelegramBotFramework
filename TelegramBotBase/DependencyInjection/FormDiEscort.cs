@@ -14,17 +14,24 @@ public sealed class FormDiEscort : IAsyncDisposable
     {
         FormFactory = null;
 
-        if (ServiceScope == null) return;
+        switch (ServiceScope)
+        {
+            case null:
+            {
+                return;
+            }
+            case IAsyncDisposable ad:
+            {
+                await ad.DisposeAsync();
+                break;
+            }
+            default:
+            {
+                ServiceScope.Dispose();
+                break;
+            }
+        }
 
-        if (ServiceScope is IAsyncDisposable ad)
-        {
-            await ad.DisposeAsync();
-        }
-        else
-        {
-            ServiceScope.Dispose();
-        }
-        
         ServiceScope = null;
     }
 }
