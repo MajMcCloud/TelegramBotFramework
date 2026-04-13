@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
+using TelegramBotBase.DependencyInjection;
 using TelegramBotBase.Form.Navigation;
 using TelegramBotBase.Interfaces;
 using static TelegramBotBase.Base.Async;
@@ -40,7 +42,7 @@ public class FormBase : IAsyncDisposable
     /// </summary>
     public Telegram.Bot.ITelegramBotClient API => Client?.TelegramClient;
 
-    IServiceProvider _serviceProvider = null;
+    private FormDiEscort _diEscort = null;
 
     /// <summary>
     ///     has this formular already been disposed ?
@@ -66,6 +68,10 @@ public class FormBase : IAsyncDisposable
     {
         Client = null;
         Device = null;
+
+        if (_diEscort != null) await _diEscort.DisposeAsync();
+        _diEscort = null;
+        
         IsDisposed = true;
     }
 
@@ -122,15 +128,15 @@ public class FormBase : IAsyncDisposable
     public async Task OnClosed(EventArgs e)
     {
         var handler = Events[EvClosed]?.GetInvocationList().Cast<AsyncEventHandler<EventArgs>>();
-        if (handler == null)
+        if (handler != null)
         {
-            return;
+            foreach (var h in handler)
+            {
+                await h.InvokeAllAsync(this, e);
+            }
         }
 
-        foreach (var h in handler)
-        {
-            await h.InvokeAllAsync(this, e);
-        }
+        await DisposeAsync();
     }
 
 
@@ -462,5 +468,4 @@ public class FormBase : IAsyncDisposable
     /// Returns if this instance is a subclass of AutoCleanForm. Necessary to prevent message deletion if not necessary.
     /// </summary>
     public bool IsAutoCleanForm() => this.GetType().IsSubclassOf(typeof(AutoCleanForm));
-
 }
