@@ -14,8 +14,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IronSoftware.System.Drawing" Version="2026.1.2" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103">
+        <PackageReference Include="IronSoftware.System.Drawing" Version="2026.4.1" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.203">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
