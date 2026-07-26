@@ -752,7 +752,7 @@ There are some default forms to make the interaction with users easier.
   get redirected to a different form, depending on the click.
 
 > **Note**: 
-Please check out the ModalDialogNavigation example in the [TelegramBotBase.Test/Examples/ModalDialogNavigation.cs](TelegramBotBase.Test/Examples/ModalDialogNavigation.cs) file. 
+Please check out the ModalDialogNavigation example in the [Examples/ModalDialogNavigation](Examples/ModalDialogNavigation) file. 
 
 
 ### Alert Dialog
