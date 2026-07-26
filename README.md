@@ -125,6 +125,15 @@ await bot.UploadBotCommands();
 await bot.Start();
 ```
 
+> **Note:**  
+> Never store your API key as plain text in your project sources. Prefer secure alternatives like
+> [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets), environment variables or an
+> `appsettings.json` that is excluded from source control.
+
+> **Note:**  
+> `UploadBotCommands()` only needs to be called when your bot commands actually change. It is not required on every
+> startup, so you can skip it once your commands are registered with BotFather.
+
 The `BotBase` class will manage a lot of things for you, like bot commands, action events and so on.
 `StartForm` is your first form which every user will get internally redirected to, *just like a start page*.
 It needs to be a subclass of `FormBase` you will find in namespace `TelegramBotBase.Base`
@@ -282,7 +291,7 @@ bot.BotCommand += async (s, en) =>
     }
 };
 
-await bot.UploadBotCommands() 
+await bot.UploadBotCommands();
 
 await bot.Start();
 ```
@@ -716,14 +725,15 @@ var bot = BotBaseBuilder
 await bot.Start();
 ```
 
-**Note:**  
-The choice of message loop depends on the desired feature set and the complexity of your bot. For most applications, `FormBaseMessageLoop` or the middleware approach is recommended.
-
-For more details and examples, see the [Examples](#examples) section.
+>**Note:**  
+>The choice of message loop depends on the desired feature set and the complexity of your bot. For most applications, `FormBaseMessageLoop` or the middleware approach is recommended.
+>
+>For more details and examples, see the [Examples](#examples) section.
 
 ## Special Forms
 
 There are some default forms to make the interaction with users easier.
+
 
 - [AlertDialog](#alert-dialog)
   Just a simple dialog with one Button.
@@ -740,6 +750,10 @@ There are some default forms to make the interaction with users easier.
 - [ConfirmDialog](#confirm-dialog)
   A simple dialog which is able to show multiple buttons and a text message. The user could select one option and will
   get redirected to a different form, depending on the click.
+
+> **Note**: 
+Please check out the ModalDialogNavigation example in the [TelegramBotBase.Test/Examples/ModalDialogNavigation.cs](TelegramBotBase.Test/Examples/ModalDialogNavigation.cs) file. 
+
 
 ### Alert Dialog
 
@@ -1002,6 +1016,10 @@ the important session data in a reusable structure like JSON or XML.
 
 Is easy to use and useful for simple structures like basic datatypes. Won't work for complex ones like generics.
 
+> **Note:**  
+> `SimpleJSONStateMachine` only supports simple/basic datatypes. For complex types (e.g. generics or objects that
+> require type information), use [`JSONStateMachine`](#jsonstatemachine) or [`XMLStateMachine`](#xmlstatemachine) instead.
+
 ```csharp
 var bot = BotBaseBuilder
     .Create()
@@ -1194,13 +1212,13 @@ When you want to go back one Form on the stack use `PopAsync`:
 await this.NavigationController.PopAsync();
 ```
 
-**Notice**: *By default the `NavigationController` has `ForceCleanupOnLastPop` enabled, which means that when the stack
+> **Notice**: *By default the `NavigationController` has `ForceCleanupOnLastPop` enabled, which means that when the stack
 is
 again at 1 (due to `PopAsync` or `PopToRootAsync` calls) it will replace the controller automatically with the root form
 you
 have given to the constructor at the beginning.*
 
----
+
 
 ## Threading & Performance
 
@@ -1213,6 +1231,10 @@ You can configure the threading model during bot setup using the builder methods
 - `.UseSingleThread()`: Processes all updates sequentially on a single thread. This is the default and is recommended for simple bots, bots with non-thread-safe resources, or when strict message order is required.
 - `.UseThreadPool()`: Enables concurrent processing of updates using the .NET thread pool. This improves throughput and responsiveness for high-traffic bots or when handling long-running operations.
 - `.UseThreadPool(workerThreads, ioThreads)`: Fine-tune the number of worker and I/O threads for advanced scenarios with specific concurrency requirements.
+
+> **Warning:**  
+> When using `.UseThreadPool()`, updates may be processed in parallel and the original message order is no longer
+> guaranteed. Make sure your forms and handlers are thread-safe and avoid shared mutable state without synchronization.
 
 **Example:**
 ```csharp
@@ -1285,6 +1307,10 @@ Extends the base package with some additional image methods like SendPhoto (usin
 
 Important: This extension uses the IronSoftware drawing library.
 
+> **Note:**  
+> IronSoftware is a third-party product with its own licensing terms and may require a commercial license for
+> production use. Please review the [IronSoftware licensing](https://ironsoftware.com/) before deploying this extension.
+
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware)
 
@@ -1297,19 +1323,6 @@ Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.IronSo
 ---
 
 Project: [open source](TelegramBotBase.Extensions.Images/)
-
-### TelegramBotBase.Extensions.Images.IronSoftware
-
-Extends the base package with some additional image methods like SendPhoto (using Bitmap)
-
-Important: This extension uses the IronSoftware drawing library.
-
-[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
-[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Images.IronSoftware.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware)
-
-[https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Images.IronSoftware/)
-
-Project: [open source](TelegramBotBase.Extensions.Images.IronSoftware/)
 
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
