@@ -40,6 +40,10 @@ namespace ModalDialogNavigation.Forms.Navigation
 
             _mButtons.ButtonClicked += Bg_ButtonClicked;
 
+            _mButtons.Title = "Version 3 - ButtonGrid, Non-Modal Prompt Dialog";
+            _mButtons.Title += "\r\n\r\nThis form uses a ButtonGrid control. 'Open Prompt' opens a PromptDialog via NavigateTo (NON-modal), so this form gets disposed while the dialog is open.";
+            _mButtons.Title += "\r\n\r\nExpected: the greeting and any follow-up navigation must be done from the PromptDialog context (its Completed handler), because this form no longer exists. It then navigates back to a fresh Version 3.";
+
             AddControl(_mButtons);
             return Task.CompletedTask;
         }
@@ -82,11 +86,16 @@ namespace ModalDialogNavigation.Forms.Navigation
 
         private async Task Pd_Completed(object sender, PromptDialogCompletedEventArgs e)
         {
-            await Device.Send("Hello " + e.Value); 
+            //This form has been disposed already due to Navigating "away" in line 79, need context from PromptDialog for further steps and/or navigation
+            if (!(sender is PromptDialog pd))
+                return;
+
+           
+            await pd.Device.Send("Hello " + e.Value); 
             
             var v3 = new Version3(); 
             
-            await NavigateTo(v3);
+            await pd.NavigateTo(v3);
         }
     }
 }

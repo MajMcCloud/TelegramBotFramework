@@ -5,6 +5,7 @@ using System.Text;
 using Telegram.Bot.Types.Enums;
 using TelegramBotBase.Base;
 using TelegramBotBase.Form;
+using TelegramBotBase.Markdown;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ModalDialogNavigation.Forms.Navigation
@@ -33,7 +34,8 @@ namespace ModalDialogNavigation.Forms.Navigation
             {
                 var pd = new PromptDialog("Please tell me your name ?");
 
-                pd.Completed += async (s, en) => { await Device.Send("Hello " + pd.Value); };
+                //Add a delay, cause this methods belongs to the context of this form, which means modal messages gets deleted on navigation as well.
+                pd.Completed += async (s, en) => { await Device.Send("Hello " + pd.Value); await Task.Delay(3000); };
 
                 await OpenModal(pd);
             }
@@ -54,7 +56,11 @@ namespace ModalDialogNavigation.Forms.Navigation
             btn.AddButtonRow(new ButtonBase("Back to menu", CallbackData.Create("navigate", "back")));
 
 
-            await Device.Send("Choose your option", btn);
+            var text = "Version 1 - No controls, Modal Prompt Dialog".Bold();
+            text += "\r\n\r\nThis form uses no ButtonGrid control. Pressing 'Open Prompt' opens a PromptDialog as a MODAL dialog (OpenModal).";
+            text += "\r\n\r\nExpected: after entering your name you receive a greeting. As the dialog is modal, its messages are cleaned up together with this form on navigation, so a short delay keeps the greeting visible.";
+
+            await Device.Send(text, btn);
         }
 
 

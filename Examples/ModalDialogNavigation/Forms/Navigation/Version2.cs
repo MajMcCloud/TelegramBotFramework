@@ -40,6 +40,10 @@ namespace ModalDialogNavigation.Forms.Navigation
 
             _mButtons.ButtonClicked += Bg_ButtonClicked;
 
+            _mButtons.Title = "Version 2 - ButtonGrid, Modal Prompt Dialog";
+            _mButtons.Title += "\r\n\r\nThis form uses a ButtonGrid control. 'Open Prompt' opens a PromptDialog as a MODAL dialog (OpenModal).";
+            _mButtons.Title += "\r\n\r\nExpected: after entering your name you get a greeting and stay on this form. The control state (e.g. the switched keyboard type) is preserved. Use 'Switch Keyboard' to toggle Inline/Reply keyboard.";
+
             AddControl(_mButtons);
             return Task.CompletedTask;
         }

@@ -42,8 +42,9 @@ namespace ModalDialogNavigation.Forms.Navigation
 
 
             //Add a title to about version 4 and this should not be allowed to call NavigateTo cause it has been opened as a modal dialog
-            _mButtons.Title = "Version 4 - Modal Dialog Navigation";
-            _mButtons.Title += "\n\nThis is a modal dialog, you can not navigate to another form from here, but you can switch the keyboard type. Try it out !";
+            _mButtons.Title = "Version 4 - ButtonGrid, Modal Prompt Dialog + illegal NavigateTo";
+            _mButtons.Title += "\r\n\r\n'Open Prompt' opens a PromptDialog as a MODAL dialog (OpenModal). Its Completed handler then tries to call NavigateTo from the modal context.";
+            _mButtons.Title += "\r\n\r\nExpected: an InvalidOperationException is thrown on purpose. You must not navigate away from a modal dialog context, only from the parent form. The bot reports whether the exception was raised correctly. You can also switch the keyboard type - try it out!";
 
             AddControl(_mButtons);
             return Task.CompletedTask;
