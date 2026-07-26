@@ -28,4 +28,8 @@
       <Folder Include="Properties\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
+    </ItemGroup>
+
 </Project>
