@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
+using Telegram.Bot;
 using TelegramBotBase.Args;
 using TelegramBotBase.Builder;
 using TelegramBotBase.Commands;
@@ -50,12 +52,38 @@ internal class Program
 
         await bot.Start();
 
-        Console.WriteLine("Telegram Bot started...");
-        Console.WriteLine("Press q to quit application.");
 
-        Console.ReadLine();
+        do
+        {
+            Console.Clear();
 
-        await bot.Stop();
+            Console.WriteLine("Telegram Bot started...");
+
+            Console.WriteLine("Press w to open bot in browser.");
+            Console.WriteLine("Press q to quit application.");
+
+            switch (Console.ReadKey().Key)
+            {
+                case ConsoleKey.W:
+                    var me = await bot.Client.TelegramClient.GetMe();
+                    //Open Website in default browser
+                    var url = $"https://t.me/{me.Username}";
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                    continue;
+                default:
+
+                    await bot.Stop();
+
+                    return;
+
+            }
+
+        } while (true);
+
     }
 
     private static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
