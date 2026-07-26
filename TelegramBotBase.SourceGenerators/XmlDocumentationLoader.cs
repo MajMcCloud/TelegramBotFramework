@@ -25,16 +25,13 @@ namespace TelegramBotBase.SourceGenerators
             StringBuilder sb = new StringBuilder();
 
             XNode first = docElement.FirstNode;
-            do
+
+            while (first != null)
             {
                 sb.AppendLine(first.ToString());
 
-
-
                 first = first.NextNode;
-
-            } 
-            while (first?.NextNode != null);
+            }
 
             var lines = sb.ToString().Split('\n');
 
