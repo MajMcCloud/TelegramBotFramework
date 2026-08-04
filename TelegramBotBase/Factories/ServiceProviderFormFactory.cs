@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TelegramBotBase.DependencyInjection;
 using TelegramBotBase.Exceptions;
@@ -36,25 +37,32 @@ public class ServiceProviderFormFactory : IFormFactory
         }
 
         FormBase fb = null;
-
+        var scope = _serviceProvider.CreateAsyncScope();
+        var scopeServiceProvider = scope.ServiceProvider;
+        
         try
         {
-            fb = (FormBase)ActivatorUtilities.CreateInstance(_serviceProvider, formType);
+            fb = (FormBase)ActivatorUtilities.CreateInstance(scopeServiceProvider, formType);
         }
         catch(InvalidOperationException ex)
         {
+            Task.Run(async () => await scope.DisposeAsync());
             throw new InvalidServiceProviderConfiguration(ex.Message, ex);
         }
 
-        //Sets an internal field for future ServiceProvider navigation
-        fb.SetServiceProvider(_serviceProvider);
+        //Sets an internal di escort field that used on navigation
+        fb.SetDiEscort(new FormDiEscort
+        {
+            ServiceScope = scope,
+            FormFactory = this
+        });
 
         return fb;
     }
 
-    public FormBase CreateForm<T>() where T : FormBase
+    public T CreateForm<T>() where T : FormBase
     {
-        return CreateForm(typeof(T));
+        return (T)CreateForm(typeof(T));
     }
 }
 

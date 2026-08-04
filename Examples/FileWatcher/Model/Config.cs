@@ -23,16 +23,23 @@ namespace FileWatcher.Model
 
         public List<string> FilesToExclude { get; set; } = new List<string>() { "anything.txt" , "others.txt" };
 
-        public string MessageTemplate { get; set; } = "File '%filename%' %action%";
+        public string ServerName { get; set; } = null!;
+
+        public int BatchIntervalSeconds { get; set; } = 5;
+
+        public string MessageTemplate { get; set; } = "%servername% File '%filename%' %action%";
 
         public const string FilenamePlaceholder = "%filename%";
         public const string ActionPlaceholder = "%action%";
+        public const string ServerNamePlaceholder = "%servername%";
+
+        public static string DefaultConfigPath => Path.Combine(Directory.GetCurrentDirectory(), "config.json");
 
         public static Config Load()
         {
-            Config config = new Config();
+            Config config = null;
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "config.json");
+            var path = DefaultConfigPath;
 
             try
             {
@@ -56,9 +63,7 @@ namespace FileWatcher.Model
 
         public void Save()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "config.json");
-
-            Save(path);
+            Save(DefaultConfigPath);
         }
 
         public void Save(String path)

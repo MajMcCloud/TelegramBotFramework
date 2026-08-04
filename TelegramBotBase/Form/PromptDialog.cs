@@ -6,6 +6,7 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Localizations;
+using static TelegramBotBase.Base.Async;
 
 namespace TelegramBotBase.Form;
 
@@ -93,20 +94,25 @@ public class PromptDialog : ModalDialog
 
         message.Handled = true;
 
-        OnCompleted(new PromptDialogCompletedEventArgs { Tag = Tag, Value = Value });
+        await OnCompleted(new PromptDialogCompletedEventArgs { Tag = Tag, Value = Value });
 
-        await CloseForm();
+        if (IsDisplayedAsModal)
+            await CloseForm();
     }
 
 
-    public event EventHandler<PromptDialogCompletedEventArgs> Completed
+    public event AsyncEventHandler<PromptDialogCompletedEventArgs> Completed
     {
         add => Events.AddHandler(EvCompleted, value);
         remove => Events.RemoveHandler(EvCompleted, value);
     }
 
-    public void OnCompleted(PromptDialogCompletedEventArgs e)
+    public async Task OnCompleted(PromptDialogCompletedEventArgs e)
     {
-        (Events[EvCompleted] as EventHandler<PromptDialogCompletedEventArgs>)?.Invoke(this, e);
+        var handler = Events[EvCompleted] as AsyncEventHandler<PromptDialogCompletedEventArgs>;
+        if (handler != null)
+        {
+            await handler.Invoke(this, e);
+        }
     }
 }

@@ -30,8 +30,14 @@ public class TestForm2 : FormBase
     public override async Task Action(MessageResult message)
     {
         var call = message.GetData<CallbackData>();
+        if (call == null)
+            return;
 
         await message.ConfirmAction();
+
+        //Skip invalid data
+        if (call.Method != "navigate")
+            return;
 
         await message.DeleteMessage();
 
@@ -77,6 +83,11 @@ public class TestForm2 : FormBase
 
             await OpenModal(pd);
         }
+        else if(call.Value == "back")
+        {
+            var mn = new Menu();
+            await NavigateTo(mn);
+        }
     }
 
     public override async Task Render(MessageResult message)
@@ -94,13 +105,13 @@ public class TestForm2 : FormBase
 
         var btn = new ButtonForm();
 
-        //btn.AddButtonRow(new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")), new ButtonBase("Zum Testformular 1", CallbackData.Create("navigate", "testform1")));
-
         btn.AddButtonRow(new ButtonBase("Information Prompt", CallbackData.Create("navigate", "alert")));
 
         btn.AddButtonRow(new ButtonBase("Confirmation Prompt with event", CallbackData.Create("navigate", "confirm")));
 
         btn.AddButtonRow(new ButtonBase("Request Prompt", CallbackData.Create("navigate", "prompt")));
+
+        btn.AddButtonRow(new ButtonBase("Back to menu", CallbackData.Create("navigate", "back")));
 
 
         await Device.SendPhoto(bmp, "Test", "", btn);

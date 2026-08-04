@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11626.173 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotBase", "TelegramBotBase\TelegramBotBase.csproj", "{0BD16FB9-7ED4-4CCB-83EB-5CEE538E1B6C}"
 EndProject
@@ -47,6 +47,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson", "TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson\TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson.csproj", "{21C44B20-1ED8-4BE6-A629-C2EC737C06E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Extensions.ActionManager", "TelegramBotBase.Extensions.ActionManager\TelegramBotBase.Extensions.ActionManager.csproj", "{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModalDialogNavigation", "Examples\ModalDialogNavigation\ModalDialogNavigation.csproj", "{3008791F-4B41-43C5-BF09-E0DE637CE81B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,10 @@ Global
 		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3008791F-4B41-43C5-BF09-E0DE637CE81B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3008791F-4B41-43C5-BF09-E0DE637CE81B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3008791F-4B41-43C5-BF09-E0DE637CE81B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3008791F-4B41-43C5-BF09-E0DE637CE81B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +152,7 @@ Global
 		{CB2B4543-7304-4549-B0BB-BCC5CCB75DD6} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 		{21C44B20-1ED8-4BE6-A629-C2EC737C06E0} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
 		{40711F3A-1CE8-44BD-BFBF-E0C6E46EF64F} = {E3193182-6FDA-4FA3-AD26-A487291E7681}
+		{3008791F-4B41-43C5-BF09-E0DE637CE81B} = {BFA71E3F-31C0-4FC1-A320-4DCF704768C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59CB40E1-9FA7-4867-A56F-4F418286F057}

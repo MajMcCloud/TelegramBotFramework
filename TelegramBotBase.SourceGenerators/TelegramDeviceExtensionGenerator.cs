@@ -87,12 +87,25 @@ namespace TelegramBotBase
                 if (method.Name == ".ctor")
                     continue;
 
+
+
                 string parameters = "";
                 string subCallParameters = "";
                 foreach (var par in method.Parameters)
                 {
                     if (par.Name == "botClient")
                         continue;
+
+                    if (par.Name == "chatId")
+                    {
+                        if(method.Parameters.IndexOf(par) != 1)
+                        {
+                            subCallParameters += ", ";
+                        }
+
+                        subCallParameters += $"device.DeviceId";
+                        continue;
+                    }
 
                     if (!string.IsNullOrEmpty(parameters))
                     {
@@ -102,12 +115,6 @@ namespace TelegramBotBase
                     if (!string.IsNullOrEmpty(subCallParameters))
                     {
                         subCallParameters += ", ";
-                    }
-
-                    if (par.Name == "chatId")
-                    {
-                        subCallParameters += $"device.DeviceId";
-                        continue;
                     }
 
                     subCallParameters += $"{par.Name}";
