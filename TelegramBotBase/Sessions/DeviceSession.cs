@@ -92,7 +92,7 @@ public class DeviceSession : IDeviceSession
     public string ChatTitle { get; set; }
 
     /// <summary>
-    ///     When did any last action happend (message received or button clicked)
+    ///     When did any last action happen (message received or button clicked)
     /// </summary>
     public DateTime LastAction { get; set; }
 
@@ -107,7 +107,7 @@ public class DeviceSession : IDeviceSession
     public FormBase PreviousForm { get; set; }
 
     /// <summary>
-    ///     contains if the form has been switched (navigated)
+    ///     Contains if the form has been switched (navigated)
     /// </summary>
     public bool FormSwitched { get; set; } = false;
 
@@ -127,8 +127,11 @@ public class DeviceSession : IDeviceSession
     /// <summary>
     ///     Confirm incoming action (i.e. Button click)
     /// </summary>
-    /// <param name="message"></param>
-    /// <returns></returns>
+    /// <param name="callbackQueryId">The unique identifier of the callback query to answer</param>
+    /// <param name="message">Optional notification text to show to the user</param>
+    /// <param name="showAlert">If true, an alert is shown instead of a notification at the top of the chat</param>
+    /// <param name="urlToOpen">Optional URL to open instead of, or in addition to, showing the message</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ConfirmAction(string callbackQueryId, string message = "", bool showAlert = false,
                                     string urlToOpen = null)
     {
@@ -138,12 +141,15 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Edits the text message
+    ///     Edits the message text
     /// </summary>
-    /// <param name="messageId"></param>
-    /// <param name="text"></param>
-    /// <param name="buttons"></param>
-    /// <returns></returns>
+    /// <param name="messageId">The identifier of the message to edit</param>
+    /// <param name="text">The new text content for the message</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <returns>A task whose result contains the edited message</returns>
+    /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Edit(int messageId, string text, ButtonForm buttons = null,
                                     ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
@@ -165,12 +171,15 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Edits the text message
+    ///     Edits the message text
     /// </summary>
-    /// <param name="messageId"></param>
-    /// <param name="text"></param>
-    /// <param name="buttons"></param>
-    /// <returns></returns>
+    /// <param name="messageId">The identifier of the message to edit</param>
+    /// <param name="text">The new text content for the message</param>
+    /// <param name="markup">The inline keyboard markup to attach to the message</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <returns>A task whose result contains the edited message</returns>
+    /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Edit(int messageId, string text, InlineKeyboardMarkup markup,
                                     ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
@@ -190,12 +199,14 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Edits the text message
+    ///     Edits the text message of an existing message, using its current text and identifier
     /// </summary>
-    /// <param name="messageId"></param>
-    /// <param name="text"></param>
-    /// <param name="buttons"></param>
-    /// <returns></returns>
+    /// <param name="message">The message to edit, whose <see cref="Message.MessageId"/> and <see cref="Message.Text"/> are used for the update</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in  <paramref name="message"/>'s text</param>
+    /// <returns>A task whose result contains the edited message</returns>
+    /// <exception cref="MessageTooLongException">Thrown when the text of <paramref name="message"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Edit(Message message, ButtonForm buttons = null,
                                     ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
@@ -219,9 +230,9 @@ public class DeviceSession : IDeviceSession
     /// <summary>
     ///     Edits the reply keyboard markup (buttons)
     /// </summary>
-    /// <param name="messageId"></param>
-    /// <param name="bf"></param>
-    /// <returns></returns>
+    /// <param name="messageId">The identifier of the message to edit</param>
+    /// <param name="bf">Inline keyboard buttons to attach to the message</param>
+    /// <returns>A task whose result contains the edited message</returns>
     public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf)
     {
 
@@ -229,13 +240,17 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends a simple text message
+    ///     Sends a simple text message to certain device id
     /// </summary>
-    /// <param name="text"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="deviceId">The identifier of the device to send the message to</param>
+    /// <param name="text">The text content of the message</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
+    /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(long deviceId, string text, ButtonForm buttons = null, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
@@ -272,13 +287,16 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends a simple text message
+    ///     Sends a simple text message to self device id
     /// </summary>
-    /// <param name="text"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="text">The text content of the message</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
+    /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(string text, ButtonForm buttons = null, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
@@ -287,13 +305,16 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends a simple text message
+    ///     Sends a simple text message to self device id
     /// </summary>
-    /// <param name="text"></param>
-    /// <param name="markup"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="text">The text content of the message</param>
+    /// <param name="markup">The inline keyboard markup to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
+    /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(string text, InlineKeyboardMarkup markup, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
@@ -325,13 +346,16 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends a simple text message
+    ///     Sends a simple text message to self device id
     /// </summary>
-    /// <param name="text"></param>
-    /// <param name="markup"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="text">The text content of the message</param>
+    /// <param name="markup">The reply markup to attach to the message, such as an <see cref="InlineKeyboardMarkup"/> or <see cref="ReplyKeyboardMarkup"/></param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
+    /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(string text, ReplyMarkup markup, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
                                     bool markdownV2AutoEscape = true)
@@ -364,11 +388,13 @@ public class DeviceSession : IDeviceSession
     /// <summary>
     ///     Sends an image
     /// </summary>
-    /// <param name="file"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="file">The photo file to send</param>
+    /// <param name="caption">Optional caption text for the photo</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the caption text</param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendPhoto(InputFile file, string caption = null, ButtonForm buttons = null,
                                          int replyTo = 0, bool disableNotification = false,
                                          ParseMode parseMode = ParseMode.Markdown)
@@ -392,13 +418,15 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends an video
+    ///     Sends a video
     /// </summary>
-    /// <param name="file"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="file">The video file to send</param>
+    /// <param name="caption">Optional caption text for the video</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the caption text</param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendVideo(InputFile file, string caption = null, ButtonForm buttons = null,
                                          int replyTo = 0, bool disableNotification = false,
                                          ParseMode parseMode = ParseMode.Markdown)
@@ -423,13 +451,14 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends an video
+    ///     Sends a video from a URL
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="url">The URL of the video to send</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the caption text</param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendVideo(string url, ButtonForm buttons = null, int replyTo = 0,
                                          bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
     {
@@ -453,14 +482,15 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends an video
+    ///     Sends a video from raw byte data
     /// </summary>
-    /// <param name="filename"></param>
-    /// <param name="video"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="filename">The filename to associate with the video data</param>
+    /// <param name="video">The raw byte content of the video to send</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendVideo(string filename, byte[] video, ButtonForm buttons = null, int replyTo = 0,
                                          bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
     {
@@ -487,14 +517,14 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends an local file as video
+    ///     Sends a video from a local file
     /// </summary>
-    /// <param name="filename"></param>
-    /// <param name="video"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="filepath">The local file path of the video to send</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendLocalVideo(string filepath, ButtonForm buttons = null, int replyTo = 0,
                                               bool disableNotification = false,
                                               ParseMode parseMode = ParseMode.Markdown)
@@ -524,15 +554,15 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends an document
+    ///     Sends a document from raw byte data
     /// </summary>
-    /// <param name="filename"></param>
-    /// <param name="document"></param>
-    /// <param name="caption"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="filename">The filename to associate with the document data</param>
+    /// <param name="document">The raw byte content of the document to send</param>
+    /// <param name="caption">Optional caption text for the document</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> SendDocument(string filename, byte[] document, string caption = "",
                                             ButtonForm buttons = null, int replyTo = 0,
                                             bool disableNotification = false)
@@ -545,16 +575,16 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Generates a Textfile from scratch with the specified encoding. (Default is UTF8)
+    ///     Sends a text file created from a string
     /// </summary>
-    /// <param name="filename"></param>
-    /// <param name="textcontent"></param>
-    /// <param name="encoding">Default is UTF8</param>
-    /// <param name="caption"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="filename">The filename to associate with the generated text file</param>
+    /// <param name="textcontent">The text content to write into the file</param>
+    /// <param name="encoding">The character encoding used to write the text content. Defaults to UTF-8 if <see langword="null"/></param>
+    /// <param name="caption">Optional caption text for the document</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> SendTextFile(string filename, string textcontent, Encoding encoding = null,
                                             string caption = "", ButtonForm buttons = null, int replyTo = 0,
                                             bool disableNotification = false)
@@ -573,14 +603,14 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Sends an document
+    ///     Sends a document
     /// </summary>
-    /// <param name="document"></param>
-    /// <param name="caption"></param>
-    /// <param name="buttons"></param>
-    /// <param name="replyTo"></param>
-    /// <param name="disableNotification"></param>
-    /// <returns></returns>
+    /// <param name="document">The document file to send</param>
+    /// <param name="caption">Optional caption text for the document</param>
+    /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
+    /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
+    /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> SendDocument(InputFile document, string caption = "",
                                             ButtonForm buttons = null, int replyTo = 0,
                                             bool disableNotification = false)
@@ -605,20 +635,20 @@ public class DeviceSession : IDeviceSession
     /// <summary>
     ///     Set a chat action (showed to the user)
     /// </summary>
-    /// <param name="action"></param>
-    /// <returns></returns>
+    /// <param name="action">The chat action to display</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SetAction(ChatAction action)
     {
         await Api(a => a.SendChatAction(DeviceId, action));
     }
 
     /// <summary>
-    ///     Requests the contact from the user.
+    ///     Sends a message requesting the user's contact via a reply keyboard button
     /// </summary>
-    /// <param name="buttonText"></param>
-    /// <param name="requestMessage"></param>
-    /// <param name="oneTimeOnly"></param>
-    /// <returns></returns>
+    /// <param name="buttonText">The text displayed on the request-contact button</param>
+    /// <param name="requestMessage">The message text shown alongside the button</param>
+    /// <param name="oneTimeOnly">If true, hides the keyboard after it is used once</param>
+    /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> RequestContact(string buttonText = "Send your contact",
                                               string requestMessage = "Give me your phone number!",
                                               bool oneTimeOnly = true)
@@ -631,12 +661,12 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Requests the location from the user.
+    ///     Sends a message requesting the user's location via a reply keyboard button
     /// </summary>
-    /// <param name="buttonText"></param>
-    /// <param name="requestMessage"></param>
-    /// <param name="oneTimeOnly"></param>
-    /// <returns></returns>
+    /// <param name="buttonText">The text displayed on the request-location button</param>
+    /// <param name="requestMessage">The message text shown alongside the button</param>
+    /// <param name="oneTimeOnly">If true, hides the keyboard after it is used once</param>
+    /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> RequestLocation(string buttonText = "Send your location",
                                                string requestMessage = "Give me your location!",
                                                bool oneTimeOnly = true)
@@ -648,6 +678,12 @@ public class DeviceSession : IDeviceSession
         return await Api(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rcl));
     }
 
+    /// <summary>
+    ///     Hides the current reply keyboard by sending a temporary message with a keyboard removal markup
+    /// </summary>
+    /// <param name="closedMsg">The text of the temporary message sent to trigger the keyboard removal</param>
+    /// <param name="autoDeleteResponse">If true, automatically deletes the temporary message after sending</param>
+    /// <returns>A task whose result contains the sent message, or the deleted message if <paramref name="autoDeleteResponse"/> is true</returns>
     public async Task<Message> HideReplyKeyboard(string closedMsg = "Closed", bool autoDeleteResponse = true)
     {
 
@@ -663,10 +699,10 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Deletes a message
+    ///     Deletes a message from the chat
     /// </summary>
-    /// <param name="messageId"></param>
-    /// <returns></returns>
+    /// <param name="messageId">The identifier of the message to delete</param>
+    /// <returns>A task whose result indicates whether the deletion completed</returns>
     public virtual async Task<bool> DeleteMessage(int messageId = -1)
     {
         await Raw(a => a.DeleteMessage(DeviceId, messageId));
@@ -677,16 +713,21 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Deletes the given message
+    ///     Deletes a message from the chat
     /// </summary>
-    /// <param name="message"></param>
-    /// <returns></returns>
+    /// <param name="message">The message to delete</param>
+    /// <returns>A task whose result indicates whether the deletion completed</returns>
     public virtual async Task<bool> DeleteMessage(Message message)
     {
         return await DeleteMessage(message.MessageId);
     }
 
 
+    /// <summary>
+    ///     Changes the chat permissions for members
+    /// </summary>
+    /// <param name="permissions">The permissions to apply to the chat</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ChangeChatPermissions(ChatPermissions permissions)
     {
 
@@ -713,22 +754,22 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     Gives access to the original TelegramClient without any Exception catchings.
+    ///     Executes a raw call against the underlying Telegram bot client and returns its result
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="call"></param>
-    /// <returns></returns>
+    /// <typeparam name="T">The return type of the call</typeparam>
+    /// <param name="call">A function that invokes an operation on the Telegram bot client</param>
+    /// <returns>The result returned by the call</returns>
     public T Raw<T>(Func<ITelegramBotClient, T> call)
     {
         return call(Client.TelegramClient);
     }
 
     /// <summary>
-    ///     This will call a function on the TelegramClient and automatically Retry if an limit has been exceeded.
+    ///     Executes an asynchronous call against the underlying Telegram bot client, retrying on rate-limit (429) errors
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="call"></param>
-    /// <returns></returns>
+    /// <typeparam name="T">The return type of the call</typeparam>
+    /// <param name="call">A function that invokes an asynchronous operation on the Telegram bot client</param>
+    /// <returns>A task whose result contains the value returned by the call, or the default value of <typeparamref name="T"/> if the maximum number of retries is exceeded</returns>
     public async Task<T> Api<T>(Func<ITelegramBotClient, Task<T>> call)
     {
         var numberOfTries = 0;
@@ -758,10 +799,10 @@ public class DeviceSession : IDeviceSession
     }
 
     /// <summary>
-    ///     This will call a function on the TelegramClient and automatically Retry if an limit has been exceeded.
+    ///     Executes an asynchronous call against the underlying Telegram bot client, retrying on rate-limit (429) errors
     /// </summary>
-    /// <param name="call"></param>
-    /// <returns></returns>
+    /// <param name="call">A function that invokes an asynchronous operation on the Telegram bot client</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public async Task Api(Func<ITelegramBotClient, Task> call)
     {
         var numberOfTries = 0;
@@ -791,6 +832,14 @@ public class DeviceSession : IDeviceSession
 
     #region "Users"
 
+    /// <summary>
+    ///     Restricts a chat member's permissions until a specified time
+    /// </summary>
+    /// <param name="userId">The identifier of the user to restrict</param>
+    /// <param name="permissions">The permissions to apply to the user</param>
+    /// <param name="useIndependentGroupPermission">If true, applies permissions independently of the chat's default permissions</param>
+    /// <param name="until">The date and time until which the restriction applies, or default for no expiration</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RestrictUser(long userId, ChatPermissions permissions, bool useIndependentGroupPermission = false, DateTime until = default)
     {
         try
@@ -802,6 +851,11 @@ public class DeviceSession : IDeviceSession
         }
     }
 
+    /// <summary>
+    ///     Gets information about a member of the chat
+    /// </summary>
+    /// <param name="userId">The identifier of the user to retrieve</param>
+    /// <returns>A task whose result contains the chat member information</returns>
     public virtual async Task<ChatMember> GetChatUser(long userId)
     {
 
@@ -817,6 +871,12 @@ public class DeviceSession : IDeviceSession
 
     }
 
+    /// <summary>
+    ///     Bans a user from the chat until a specified time
+    /// </summary>
+    /// <param name="userId">The identifier of the user to ban</param>
+    /// <param name="until">The date and time until which the ban applies, or default for a permanent ban</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task BanUser(long userId, DateTime until = default)
     {
 
@@ -824,6 +884,11 @@ public class DeviceSession : IDeviceSession
 
     }
 
+    /// <summary>
+    ///     Unbans a previously banned user from the chat
+    /// </summary>
+    /// <param name="userId">The identifier of the user to unban</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UnbanUser(long userId)
     {
 
