@@ -122,8 +122,7 @@ public class DeviceSession : IDeviceSession
                ?? LastMessage?.Chat.FirstName
                ?? ChatTitle;
     }
-
-
+    
     /// <summary>
     ///     Confirm incoming action (i.e. Button click)
     /// </summary>
@@ -135,9 +134,7 @@ public class DeviceSession : IDeviceSession
     public async Task ConfirmAction(string callbackQueryId, string message = "", bool showAlert = false,
                                     string urlToOpen = null)
     {
-
         await Client.TelegramClient.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen);
-
     }
 
     /// <summary>
@@ -165,8 +162,7 @@ public class DeviceSession : IDeviceSession
         {
             text = text.MarkdownV2Escape();
         }
-
-
+        
         return await Api(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
     }
 
@@ -195,7 +191,6 @@ public class DeviceSession : IDeviceSession
         }
 
         return await Api(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
-
     }
 
     /// <summary>
@@ -235,7 +230,6 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result contains the edited message</returns>
     public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf)
     {
-
         return await Api(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf));
     }
 
@@ -271,19 +265,16 @@ public class DeviceSession : IDeviceSession
         {
             text = text.MarkdownV2Escape();
         }
-
-
         
-
-        var t = Api(a => a.SendMessage(deviceId, text, parseMode, replyParameters: new ReplyParameters() { MessageId = replyTo},
-                                                replyMarkup: markup, disableNotification: disableNotification));
+        var t = Api(a => a.SendMessage(deviceId, text, parseMode, 
+                                        replyParameters: new ReplyParameters() { MessageId = replyTo}, 
+                                        replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
 
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -333,16 +324,15 @@ public class DeviceSession : IDeviceSession
         {
             text = text.MarkdownV2Escape();
         }
-
-
-        var t = Api(a => a.SendMessage(DeviceId, text, parseMode, replyParameters: new ReplyParameters() { MessageId = replyTo },
-                                                replyMarkup: markup, disableNotification: disableNotification));
+        
+        var t = Api(a => a.SendMessage(DeviceId, text, parseMode, 
+                                        replyParameters: new ReplyParameters { MessageId = replyTo },
+                                        replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -375,14 +365,14 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
 
-        var t = Api(a => a.SendMessage(DeviceId, text, parseMode, replyParameters: new ReplyParameters() { MessageId = replyTo },
-                                                replyMarkup: markup, disableNotification: disableNotification));
+        var t = Api(a => a.SendMessage(DeviceId, text, parseMode, 
+                                        replyParameters: new ReplyParameters() { MessageId = replyTo }, 
+                                        replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -406,15 +396,14 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-
-        var t = Api(a => a.SendPhoto(DeviceId, file, caption, parseMode, replyParameters: new ReplyParameters() { MessageId = replyTo },
-                                          replyMarkup: markup, disableNotification: disableNotification));
+        var t = Api(a => a.SendPhoto(DeviceId, file, caption, parseMode, 
+                                        replyParameters: new ReplyParameters() { MessageId = replyTo }, 
+                                        replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -438,16 +427,14 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-
         var t = Api(a => a.SendVideo(DeviceId, file, caption: caption, parseMode: parseMode,
-                                          replyParameters: new ReplyParameters() { MessageId = replyTo }, replyMarkup: markup,
-                                          disableNotification: disableNotification));
+                                          replyParameters: new ReplyParameters() { MessageId = replyTo }, 
+                                          replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -469,16 +456,14 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-
         var t = Api(a => a.SendVideo(DeviceId, InputFile.FromUri(url), parseMode: parseMode,
-                                          replyParameters: new ReplyParameters() { MessageId = replyTo }, replyMarkup: markup,
-                                          disableNotification: disableNotification));
+                                          replyParameters: new ReplyParameters() { MessageId = replyTo }, 
+                                          replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -501,19 +486,18 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-
         var ms = new MemoryStream(video);
 
         var fts = InputFile.FromStream(ms, filename);
 
-        var t = Api(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, replyParameters: new ReplyParameters() { MessageId = replyTo },
-                                          replyMarkup: markup, disableNotification: disableNotification));
+        var t = Api(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
+                                        replyParameters: new ReplyParameters { MessageId = replyTo }, 
+                                        replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -536,21 +520,20 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-
         var fs = new FileStream(filepath, FileMode.Open);
 
         var filename = Path.GetFileName(filepath);
 
         var fts = InputFile.FromStream(fs, filename);
 
-        var t = Api(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, replyParameters: new ReplyParameters() { MessageId = replyTo },
-                                          replyMarkup: markup, disableNotification: disableNotification));
+        var t = Api(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
+                                        replyParameters: new ReplyParameters() { MessageId = replyTo }, 
+                                        replyMarkup: markup, disableNotification: disableNotification));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -620,16 +603,15 @@ public class DeviceSession : IDeviceSession
         {
             markup = buttons;
         }
-
-
+        
         var t = Api(a => a.SendDocument(DeviceId, document, caption, replyMarkup: markup,
-                                             disableNotification: disableNotification, replyParameters: new ReplyParameters() { MessageId = replyTo }));
+                                        disableNotification: disableNotification, 
+                                        replyParameters: new ReplyParameters { MessageId = replyTo }));
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
 
         return await t;
-
     }
 
     /// <summary>
@@ -657,6 +639,7 @@ public class DeviceSession : IDeviceSession
         {
             OneTimeKeyboard = oneTimeOnly
         };
+        
         return await Api(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rck));
     }
 
@@ -675,6 +658,7 @@ public class DeviceSession : IDeviceSession
         {
             OneTimeKeyboard = oneTimeOnly
         };
+        
         return await Api(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rcl));
     }
 
@@ -686,7 +670,6 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result contains the sent message, or the deleted message if <paramref name="autoDeleteResponse"/> is true</returns>
     public async Task<Message> HideReplyKeyboard(string closedMsg = "Closed", bool autoDeleteResponse = true)
     {
-
         var m = await Send(closedMsg, new ReplyKeyboardRemove());
 
         if (autoDeleteResponse && m != null)
@@ -695,7 +678,6 @@ public class DeviceSession : IDeviceSession
         }
 
         return m;
-
     }
 
     /// <summary>
@@ -721,8 +703,7 @@ public class DeviceSession : IDeviceSession
     {
         return await DeleteMessage(message.MessageId);
     }
-
-
+    
     /// <summary>
     ///     Changes the chat permissions for members
     /// </summary>
@@ -730,9 +711,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ChangeChatPermissions(ChatPermissions permissions)
     {
-
         await Api(a => a.SetChatPermissions(DeviceId, permissions));
-
     }
 
     private Type GetOrigin(StackTrace stackTrace)
@@ -740,8 +719,6 @@ public class DeviceSession : IDeviceSession
         for (var i = 0; i < stackTrace.FrameCount; i++)
         {
             var methodBase = stackTrace.GetFrame(i).GetMethod();
-
-            //Debug.WriteLine(methodBase.Name);
 
             if (methodBase.DeclaringType.IsSubclassOf(typeof(FormBase)) |
                 methodBase.DeclaringType.IsSubclassOf(typeof(ControlBase)))
@@ -858,17 +835,13 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result contains the chat member information</returns>
     public virtual async Task<ChatMember> GetChatUser(long userId)
     {
-
         return await Api(a => a.GetChatMember(DeviceId, userId));
-
     }
 
     [Obsolete("User BanUser instead.")]
     public virtual async Task KickUser(long userId, DateTime until = default)
     {
-
         await Api(a => a.BanChatMember(DeviceId, userId, until));
-
     }
 
     /// <summary>
@@ -879,9 +852,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task BanUser(long userId, DateTime until = default)
     {
-
         await Api(a => a.BanChatMember(DeviceId, userId, until));
-
     }
 
     /// <summary>
@@ -891,14 +862,11 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UnbanUser(long userId)
     {
-
         await Api(a => a.UnbanChatMember(DeviceId, userId));
-
     }
 
     #endregion
-
-
+    
     #region "Events"
 
     /// <summary>
@@ -909,8 +877,7 @@ public class DeviceSession : IDeviceSession
         add => _events.AddHandler(EvMessageSent, value);
         remove => _events.RemoveHandler(EvMessageSent, value);
     }
-
-
+    
     public async Task OnMessageSent(MessageSentEventArgs e)
     {
         if (e.Message == null)
