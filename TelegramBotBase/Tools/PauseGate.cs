@@ -15,6 +15,8 @@ public class PauseGate
     /// Blocks until the current pause (if any) expires. Re-checks after waiting,
     /// since pause can be extended while waiting
     /// </summary>
+    /// <param name="ct">A token to cancel the wait operation</param>
+    /// <returns>A task that completes once the pause has expired or cancellation is requested</returns>
     public async Task WaitIfPaused(CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
@@ -35,6 +37,7 @@ public class PauseGate
     /// <summary>
     /// Extends the pause. Never shortens it
     /// </summary>
+    /// <param name="duration">The duration to pause for, measured from now</param>
     public void TriggerPause(TimeSpan duration)
     {
         var newPausedUntilTicks = DateTime.UtcNow.Add(duration).Ticks;
