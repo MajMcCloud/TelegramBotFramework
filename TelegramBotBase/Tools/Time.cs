@@ -20,6 +20,19 @@ public static class Time
         return int.TryParse(src, out resultYear) && resultYear >= 0 && resultYear <= DateTime.MaxValue.Year;
     }
 
+    public static bool IsExpired(long ticks, TimeSpan duration, out TimeSpan estimated, DateTimeKind kind = DateTimeKind.Utc)
+    {
+        return new DateTime(ticks, kind).IsExpired(duration, out estimated);
+    }
+
+    public static bool IsExpired(this DateTime dt, TimeSpan duration, out TimeSpan estimated)
+    {
+        var elapsed = DateTime.UtcNow - dt;
+        estimated = duration - elapsed;
+        
+        return estimated <= TimeSpan.Zero;
+    }
+
     public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
     {
         var diff = dt.DayOfWeek - startOfWeek;
