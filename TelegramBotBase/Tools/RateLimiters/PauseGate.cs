@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TelegramBotBase.Tools;
+namespace TelegramBotBase.Tools.RateLimiters;
 
 /// <summary>
 /// A thread-safe, lock-free gate for coordinating a shared "pause until" deadline across concurrent callers
