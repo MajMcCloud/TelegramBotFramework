@@ -30,7 +30,6 @@ public sealed class BotBase
 
         SystemSettings = new Dictionary<ESettings, uint>();
 
-        SetSetting(ESettings.MaxNumberOfRetries, 5);
         SetSetting(ESettings.NavigationMaximum, 10);
         SetSetting(ESettings.LogAllMessages, false);
         SetSetting(ESettings.SkipAllMessages, false);
@@ -104,8 +103,6 @@ public sealed class BotBase
             // should be waited until finish
             Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
         }
-
-        DeviceSession.MaxNumberOfRetries = GetSetting(ESettings.MaxNumberOfRetries, 5);
 
         Client.StartReceiving();
     }
