@@ -28,6 +28,11 @@ public static class Time
             _ => DateTime.Now
         };
     }
+    
+    public static TimeSpan GetElapsedTime(DateTime dt)
+    {
+        return GetNowLike(dt) - dt;
+    }
 
     public static bool IsExpired(long ticks, TimeSpan duration, out TimeSpan estimated, DateTimeKind kind = DateTimeKind.Utc)
     {
@@ -36,7 +41,7 @@ public static class Time
 
     public static bool IsExpired(this DateTime dt, TimeSpan duration, out TimeSpan estimated)
     {
-        var elapsed = DateTime.UtcNow - dt;
+        var elapsed = GetElapsedTime(dt);
         estimated = duration - elapsed;
         
         return estimated <= TimeSpan.Zero;
