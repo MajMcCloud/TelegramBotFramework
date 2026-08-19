@@ -19,6 +19,15 @@ public static class Time
     {
         return int.TryParse(src, out resultYear) && resultYear >= 0 && resultYear <= DateTime.MaxValue.Year;
     }
+    
+    public static DateTime GetNowLike(DateTime dt)
+    {
+        return dt.Kind switch
+        {
+            DateTimeKind.Utc => DateTime.UtcNow,
+            _ => DateTime.Now
+        };
+    }
 
     public static bool IsExpired(long ticks, TimeSpan duration, out TimeSpan estimated, DateTimeKind kind = DateTimeKind.Utc)
     {
