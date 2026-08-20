@@ -16,6 +16,7 @@ using TelegramBotBase.Exceptions;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Markdown;
+using TelegramBotBase.RequestDispatchers;
 
 namespace TelegramBotBase.Sessions;
 
@@ -31,18 +32,18 @@ public class DeviceSession : IDeviceSession
 
     private readonly EventHandlerList _events = new();
 
-    public DeviceSession()
+    public DeviceSession(IRequestDispatcher dispatcher)
     {
+        Dispatcher = dispatcher;
     }
 
-    public DeviceSession(long deviceId)
+    public DeviceSession(long deviceId, IRequestDispatcher dispatcher) : this(dispatcher)
     {
         DeviceId = deviceId;
     }
 
-    public DeviceSession(long deviceId, FormBase startForm)
+    public DeviceSession(long deviceId, IRequestDispatcher dispatcher, FormBase startForm) : this(deviceId, dispatcher)
     {
-        DeviceId = deviceId;
         ActiveForm = startForm;
         ActiveForm.Device = this;
     }
@@ -58,6 +59,8 @@ public class DeviceSession : IDeviceSession
     public Message LastMessage { get; set; }
 
     public MessageClient Client => ActiveForm.Client;
+
+    public readonly IRequestDispatcher Dispatcher;
 
     /// <summary>
     ///     Returns if the messages is posted within a group.
