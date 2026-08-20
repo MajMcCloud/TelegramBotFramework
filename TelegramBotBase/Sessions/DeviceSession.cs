@@ -166,7 +166,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
         
-        return await Api(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
 
-        return await Api(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
     }
 
     /// <summary>
@@ -221,7 +221,7 @@ public class DeviceSession : IDeviceSession
             message.Text = message.Text.MarkdownV2Escape();
         }
 
-        return await Api(a => a.EditMessageText(DeviceId, message.MessageId, message.Text, parseMode,
+        return await this.Dispatch(a => a.EditMessageText(DeviceId, message.MessageId, message.Text, parseMode,
                                                     replyMarkup: markup));
     }
 
@@ -233,7 +233,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result contains the edited message</returns>
     public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf)
     {
-        return await Api(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf));
+        return await this.Dispatch(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf));
     }
 
     /// <summary>
@@ -269,7 +269,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
         
-        var t = Api(a => a.SendMessage(deviceId, text, parseMode, 
+        var t = this.Dispatch(a => a.SendMessage(deviceId, text, parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo}, 
                                         replyMarkup: markup, disableNotification: disableNotification));
 
@@ -328,7 +328,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
         
-        var t = Api(a => a.SendMessage(DeviceId, text, parseMode, 
+        var t = this.Dispatch(a => a.SendMessage(DeviceId, text, parseMode, 
                                         replyParameters: new ReplyParameters { MessageId = replyTo },
                                         replyMarkup: markup, disableNotification: disableNotification));
 
@@ -368,7 +368,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
 
-        var t = Api(a => a.SendMessage(DeviceId, text, parseMode, 
+        var t = this.Dispatch(a => a.SendMessage(DeviceId, text, parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo }, 
                                         replyMarkup: markup, disableNotification: disableNotification));
 
@@ -399,7 +399,7 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-        var t = Api(a => a.SendPhoto(DeviceId, file, caption, parseMode, 
+        var t = this.Dispatch(a => a.SendPhoto(DeviceId, file, caption, parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo }, 
                                         replyMarkup: markup, disableNotification: disableNotification));
 
@@ -430,7 +430,7 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-        var t = Api(a => a.SendVideo(DeviceId, file, caption: caption, parseMode: parseMode,
+        var t = this.Dispatch(a => a.SendVideo(DeviceId, file, caption: caption, parseMode: parseMode,
                                           replyParameters: new ReplyParameters() { MessageId = replyTo }, 
                                           replyMarkup: markup, disableNotification: disableNotification));
 
@@ -459,7 +459,7 @@ public class DeviceSession : IDeviceSession
 
         InlineKeyboardMarkup markup = buttons;
 
-        var t = Api(a => a.SendVideo(DeviceId, InputFile.FromUri(url), parseMode: parseMode,
+        var t = this.Dispatch(a => a.SendVideo(DeviceId, InputFile.FromUri(url), parseMode: parseMode,
                                           replyParameters: new ReplyParameters() { MessageId = replyTo }, 
                                           replyMarkup: markup, disableNotification: disableNotification));
 
@@ -493,7 +493,7 @@ public class DeviceSession : IDeviceSession
 
         var fts = InputFile.FromStream(ms, filename);
 
-        var t = Api(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
+        var t = this.Dispatch(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
                                         replyParameters: new ReplyParameters { MessageId = replyTo }, 
                                         replyMarkup: markup, disableNotification: disableNotification));
 
@@ -529,7 +529,7 @@ public class DeviceSession : IDeviceSession
 
         var fts = InputFile.FromStream(fs, filename);
 
-        var t = Api(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
+        var t = this.Dispatch(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo }, 
                                         replyMarkup: markup, disableNotification: disableNotification));
 
@@ -607,7 +607,7 @@ public class DeviceSession : IDeviceSession
             markup = buttons;
         }
         
-        var t = Api(a => a.SendDocument(DeviceId, document, caption, replyMarkup: markup,
+        var t = this.Dispatch(a => a.SendDocument(DeviceId, document, caption, replyMarkup: markup,
                                         disableNotification: disableNotification, 
                                         replyParameters: new ReplyParameters { MessageId = replyTo }));
 
@@ -624,7 +624,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SetAction(ChatAction action)
     {
-        await Api(a => a.SendChatAction(DeviceId, action));
+        await this.Dispatch(a => a.SendChatAction(DeviceId, action));
     }
 
     /// <summary>
@@ -643,7 +643,7 @@ public class DeviceSession : IDeviceSession
             OneTimeKeyboard = oneTimeOnly
         };
         
-        return await Api(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rck));
+        return await this.Dispatch(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rck));
     }
 
     /// <summary>
@@ -662,7 +662,7 @@ public class DeviceSession : IDeviceSession
             OneTimeKeyboard = oneTimeOnly
         };
         
-        return await Api(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rcl));
+        return await this.Dispatch(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rcl));
     }
 
     /// <summary>
@@ -690,7 +690,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result indicates whether the deletion completed</returns>
     public virtual async Task<bool> DeleteMessage(int messageId = -1)
     {
-        await Raw(a => a.DeleteMessage(DeviceId, messageId));
+        await this.Dispatch(a => a.DeleteMessage(DeviceId, messageId));
 
         OnMessageDeleted(new MessageDeletedEventArgs(messageId));
 
@@ -714,7 +714,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ChangeChatPermissions(ChatPermissions permissions)
     {
-        await Api(a => a.SetChatPermissions(DeviceId, permissions));
+        await this.Dispatch(a => a.SetChatPermissions(DeviceId, permissions));
     }
 
     private Type GetOrigin(StackTrace stackTrace)
@@ -750,7 +750,7 @@ public class DeviceSession : IDeviceSession
     /// <typeparam name="T">The return type of the call</typeparam>
     /// <param name="call">A function that invokes an asynchronous operation on the Telegram bot client</param>
     /// <returns>A task whose result contains the value returned by the call, or the default value of <typeparamref name="T"/> if the maximum number of retries is exceeded</returns>
-    [Obsolete("Use Dispatcher field instead")]
+    [Obsolete("Use this.Dispatch instead")]
     public async Task<T> Api<T>(Func<ITelegramBotClient, Task<T>> call)
     {
         var numberOfTries = 0;
@@ -784,7 +784,7 @@ public class DeviceSession : IDeviceSession
     /// </summary>
     /// <param name="call">A function that invokes an asynchronous operation on the Telegram bot client</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    [Obsolete("Use Dispatcher field instead")]
+    [Obsolete("Use this.Dispatch field instead")]
     public async Task Api(Func<ITelegramBotClient, Task> call)
     {
         var numberOfTries = 0;
@@ -826,7 +826,7 @@ public class DeviceSession : IDeviceSession
     {
         try
         {
-            await Api(a => a.RestrictChatMember(DeviceId, userId, permissions, useIndependentGroupPermission, until));
+            await this.Dispatch(a => a.RestrictChatMember(DeviceId, userId, permissions, useIndependentGroupPermission, until));
         }
         catch
         {
@@ -840,13 +840,13 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result contains the chat member information</returns>
     public virtual async Task<ChatMember> GetChatUser(long userId)
     {
-        return await Api(a => a.GetChatMember(DeviceId, userId));
+        return await this.Dispatch(a => a.GetChatMember(DeviceId, userId));
     }
 
     [Obsolete("User BanUser instead.")]
     public virtual async Task KickUser(long userId, DateTime until = default)
     {
-        await Api(a => a.BanChatMember(DeviceId, userId, until));
+        await this.Dispatch(a => a.BanChatMember(DeviceId, userId, until));
     }
 
     /// <summary>
@@ -857,7 +857,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task BanUser(long userId, DateTime until = default)
     {
-        await Api(a => a.BanChatMember(DeviceId, userId, until));
+        await this.Dispatch(a => a.BanChatMember(DeviceId, userId, until));
     }
 
     /// <summary>
@@ -867,7 +867,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UnbanUser(long userId)
     {
-        await Api(a => a.UnbanChatMember(DeviceId, userId));
+        await this.Dispatch(a => a.UnbanChatMember(DeviceId, userId));
     }
 
     #endregion
