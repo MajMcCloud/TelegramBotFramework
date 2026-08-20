@@ -5,7 +5,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using TelegramBotBase.Base;
 using TelegramBotBase.Constants;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 using TelegramBotBase.Tools.RateLimiters;
 
 namespace TelegramBotBase.RequestDispatchers;
@@ -30,12 +30,12 @@ public class DefaultRequestDispatcher : IRequestDispatcher
         Client = client;
         ConcurrencyLimiter = new SemaphoreSlim(Settings.MaxConcurrentRequests, Settings.MaxConcurrentRequests);
     }
-    
+
     /// <summary>Executes a Telegram API request with no return value, with throttling and retry</summary>
     /// <param name="ds">Device session the request is being sent for</param>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
-    public virtual Task Dispatch(DeviceSession ds, Func<ITelegramBotClient, Task> request, 
+    public virtual Task Dispatch(IDeviceSession ds, Func<ITelegramBotClient, Task> request,
         CancellationToken ct = default)
     {
         return Dispatch(ds, 
@@ -57,7 +57,7 @@ public class DefaultRequestDispatcher : IRequestDispatcher
     /// <param name="ct">Cancellation token</param>
     /// <returns>The result of <paramref name="request"/>, or <c>default</c> if all retries are exhausted</returns>
     /// <exception cref="ApiRequestException">Thrown on error code not equal to <see cref="Http.TooManyRequests"/></exception>
-    public virtual async Task<T> Dispatch<T>(DeviceSession ds, Func<ITelegramBotClient, Task<T>> request, 
+    public virtual async Task<T> Dispatch<T>(IDeviceSession ds, Func<ITelegramBotClient, Task<T>> request,
         CancellationToken ct = default)
     {
         var numberOfRetry = 0;
@@ -96,12 +96,12 @@ public class DefaultRequestDispatcher : IRequestDispatcher
         return default;
     }
 
-    protected virtual async Task OccupySpot(DeviceSession ds, CancellationToken ct = default)
+    protected virtual async Task OccupySpot(IDeviceSession ds, CancellationToken ct = default)
     {
         await ConcurrencyLimiter.WaitAsync(ct);
     }
 
-    protected virtual void ReleaseSpot(DeviceSession ds)
+    protected virtual void ReleaseSpot(IDeviceSession ds)
     {
         ConcurrencyLimiter.Release();
     }

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using TelegramBotBase.Base;
-using TelegramBotBase.Sessions;
+using TelegramBotBase.Interfaces;
 using TelegramBotBase.Tools.RateLimiters;
 
 namespace TelegramBotBase.RequestDispatchers;
@@ -28,7 +28,7 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
         GroupSemaphoreCache = new MemoryCache(new MemoryCacheOptions());
     }
 
-    protected override async Task OccupySpot(DeviceSession ds, CancellationToken ct = default)
+    protected override async Task OccupySpot(IDeviceSession ds, CancellationToken ct = default)
     {
         await base.OccupySpot(ds, ct);
         
@@ -41,7 +41,7 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
         }
     }
 
-    protected override void ReleaseSpot(DeviceSession ds)
+    protected override void ReleaseSpot(IDeviceSession ds)
     {
         GlobalSemaphore.Release();
         GetChatSemaphore(ds.DeviceId).Release();
