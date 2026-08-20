@@ -50,8 +50,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     /// <returns></returns>
     public BotBase Build()
     {
-        // In terms if request dispatcher selection stage is skipped 
-        _requestDispatcher ??= new DefaultRequestDispatcher(new RequestDispatcherSettings(), _client);
+        CompleteSkippedStagesWithDefaultValues();
         
         var bot = new BotBase(_apiKey, _client)
         {
@@ -65,6 +64,11 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return bot;
     }
 
+    private void CompleteSkippedStagesWithDefaultValues()
+    {
+        UseDefaultRequestDispatcher();
+    }
+    
     public static IAPIKeySelectionStage Create()
     {
         return new BotBaseBuilder();
