@@ -12,6 +12,7 @@ using TelegramBotBase.Commands;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.RequestDispatchers;
 using TelegramBotBase.Sessions;
 using Console = TelegramBotBase.Tools.Console;
 
@@ -74,6 +75,8 @@ public sealed class BotBase
     /// </summary>
     public IMessageLoopFactory MessageLoopFactory { get; internal set; }
 
+    public IRequestDispatcher RequestDispatcher { get; internal set; }
+    
     /// <summary>
     ///     All internal used settings.
     /// </summary>
