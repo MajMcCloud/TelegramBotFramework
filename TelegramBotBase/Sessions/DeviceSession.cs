@@ -750,6 +750,7 @@ public class DeviceSession : IDeviceSession
     /// <typeparam name="T">The return type of the call</typeparam>
     /// <param name="call">A function that invokes an asynchronous operation on the Telegram bot client</param>
     /// <returns>A task whose result contains the value returned by the call, or the default value of <typeparamref name="T"/> if the maximum number of retries is exceeded</returns>
+    [Obsolete("Use Dispatcher field instead")]
     public async Task<T> Api<T>(Func<ITelegramBotClient, Task<T>> call)
     {
         var numberOfTries = 0;
@@ -783,6 +784,7 @@ public class DeviceSession : IDeviceSession
     /// </summary>
     /// <param name="call">A function that invokes an asynchronous operation on the Telegram bot client</param>
     /// <returns>A task that represents the asynchronous operation</returns>
+    [Obsolete("Use Dispatcher field instead")]
     public async Task Api(Func<ITelegramBotClient, Task> call)
     {
         var numberOfTries = 0;
