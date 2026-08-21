@@ -1280,14 +1280,18 @@ var bot = BotBaseBuilder
 
 Every outgoing call to the Telegram Bot API (sending, editing, deleting messages, and so on) is routed through a
 request dispatcher before it reaches Telegram. The dispatcher is responsible for keeping the bot within Telegram's
-rate limits, retrying automatically on `429 Too Many Requests` responses, and bounding how many requests are in
+rate limits, retrying automatically on `HTTP 429 Too Many Requests` responses, and bounding how many requests are in
 flight at once.
+
+> **Note:**  
+> If none of the request dispatchers is selected, `DefaultRequestDispatcher` is used.
+
 
 ### Overview of available Dispatchers
 
 | Name                        | Description                                                                 | Rate Limiting                                              | Use Case                                                  |
 |------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------|--------------------------------------------------------------|
-| **DefaultRequestDispatcher** | Bounds concurrency and retries automatically on `429` responses.             | Concurrency limit + global pause on `429`                     | Lightweight bots, low/moderate traffic                       |
+| **DefaultRequestDispatcher** | Bounds concurrency and retries automatically on `HTTP 429` responses.             | Concurrency limit + global pause on `HTTP 429`                     | Lightweight bots, low/moderate traffic                       |
 | **FullRequestDispatcher**    | Extends `DefaultRequestDispatcher` with global, per-chat, and per-group throttling. | Global msgs/sec, per-chat msgs/sec, per-group msgs/min | Bots that broadcast to many chats or post frequently in groups |
 | **Custom dispatcher**        | Your own `IRequestDispatcher` implementation.                                | Whatever you implement                                        | Custom backoff strategies, metrics, priority queues, etc.     |
 
@@ -1300,34 +1304,55 @@ All built-in dispatchers are configured through a single `RequestDispatcherSetti
 ```csharp
 public class RequestDispatcherSettings
 {
-    // Concurrency and retry, used by every dispatcher
+    // --- Concurrency and retry: used by every dispatcher (Default and Full) ---
+
+    // Max Bot API requests allowed in flight at once (protects your app, not Telegram's servers)
     public int MaxConcurrentRequests { get; set; } = 10;
+
+    // How many times a request is retried after a HTTP 429 before giving up
     public int MaxRetryAttempts { get; set; } = 3;
+
+    // If true, waits exactly as long as Telegram's retry_after value says; if false, uses FallbackRetryAfter
     public bool RespectRetryAfterHeader { get; set; } = true;
+
+    // Wait time used before a retry when no retry_after value is available
     public TimeSpan FallbackRetryAfter { get; set; } = TimeSpan.FromSeconds(1);
+
+    // If true, a HTTP 429 pauses ALL outgoing requests bot-wide for retry_after seconds, not just the offending chat
     public bool GlobalPauseOn429 { get; set; } = true;
 
-    // Rate limiting, used by FullRequestDispatcher only
+    // --- Rate limiting: used by FullRequestDispatcher only ---
+
+    // Max requests per second across all chats combined (Telegram's global limit, ~30/sec)
     public int MaxRequestsPerSecond { get; set; } = 30;
+
+    // Max requests per second to a single chat (Telegram's per-chat limit, ~1/sec)
     public int MaxRequestsPerSecondPerChat { get; set; } = 1;
+
+    // How long an idle chat's rate limiter stays cached before being evicted to free memory
     public TimeSpan ChatLimiterCacheTimeout { get; set; } = TimeSpan.FromMinutes(5);
+
+    // Max requests per minute to a single group/supergroup (Telegram's per-group limit, ~20/min)
     public int MaxRequestsPerMinutePerGroup { get; set; } = 20;
+
+    // Same as ChatLimiterCacheTimeout, but for per-group rate limiters
     public TimeSpan GroupLimiterCacheTimeout { get; set; } = TimeSpan.FromMinutes(10);
 }
 ```
 
 > **Note:**  
-> Telegram does not officially publish exact rate-limit numbers; the defaults above reflect widely observed
-> community values (roughly 30 messages/sec globally, 1/sec per chat, and 20/min per group). If your bot has been
-> granted higher limits by [@BotSupport](https://t.me/BotSupport), adjust the settings accordingly.
+> Telegram's official guidance recommends avoiding more than 1 message per second in a single chat, 
+> allows bots up to about 20 messages per minute in a group, and caps bulk broadcasts at roughly 
+> 30 messages per second unless paid broadcasts are enabled (see the [Bots FAQ]((https://core.telegram.org/bots/faq#broadcasting-to-users)) for details). 
+> If your bot has been granted higher limits, adjust the settings accordingly.
 
 ---
 
 ### DefaultRequestDispatcher
 
 Wraps every outgoing call in a concurrency limiter sized to `MaxConcurrentRequests`, and retries automatically when
-Telegram responds with `429`, honoring the `retry_after` value it returns. When `GlobalPauseOn429` is enabled
-(the default), a `429` pauses *all* outgoing traffic for `retry_after` seconds rather than only the offending chat,
+Telegram responds with `HTTP 429`, honoring the `retry_after` value it returns. When `GlobalPauseOn429` is enabled
+(the default), a `HTTP 429` pauses *all* outgoing traffic for `retry_after` seconds rather than only the offending chat,
 matching Telegram's actual behavior.
 
 ```csharp
@@ -1392,7 +1417,7 @@ With custom settings:
 
 > **Warning:**  
 > If you disable `RespectRetryAfterHeader` or set aggressive custom limits above Telegram's actual limits, your bot
-> may still receive `429` responses. `FullRequestDispatcher` reduces the *likelihood* of hitting them, it does not
+> may still receive `HTTP 429` responses. `FullRequestDispatcher` reduces the *likelihood* of hitting them, it does not
 > eliminate the need for retry handling.
 
 ---
@@ -1452,11 +1477,6 @@ You can also pass a pre-built dispatcher instance directly instead of a factory:
 ```csharp
 .UseCustomRequestDispatcher(myDispatcherInstance)
 ```
-
->**Note:**  
->The choice of dispatcher depends on your bot's traffic pattern. For most bots, `FullRequestDispatcher` is
->recommended, since it keeps you within Telegram's limits automatically. Use `DefaultRequestDispatcher` if you're
->enforcing your own throttling elsewhere, and a custom dispatcher for advanced scenarios.
 
 ---
 
