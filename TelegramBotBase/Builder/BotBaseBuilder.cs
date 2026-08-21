@@ -66,7 +66,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     private void CompleteSkippedStagesWithDefaultValues()
     {
-        UseDefaultRequestDispatcher();
+        if (_requestDispatcher is null)
+        {
+            UseDefaultRequestDispatcher();
+        }
     }
     
     public static IAPIKeySelectionStage Create()
