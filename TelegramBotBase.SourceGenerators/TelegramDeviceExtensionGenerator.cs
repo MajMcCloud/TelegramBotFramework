@@ -233,37 +233,28 @@ namespace TelegramBotBase
             if (method == null)
                 return null;
 
-            //Adding xml comments from embedded xml file (Workaround)
             string? xml_comments = xml?.GetDocumentationLinesForSymbol(method);
-
             xml_comments = CleanupXMLComments(xml_comments, "chatId", "botClient");
 
             StringBuilder sb = new StringBuilder();
-
             sb.Append(xml_comments);
-
-            //Adding device
             sb.AppendLine($"    /// <param name=\"device\">Device session</param>");
-
-            if (method == null)
-                return string.Empty;
 
             if (method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
             {
                 sb.AppendLine("[Obsolete]");
             }
 
-
             sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this IDeviceSession device, {parameters})");
-
             sb.AppendLine($"    {{");
 
-            sb.AppendLine($"        {returnStatement} device.Client.TelegramClient.{method.Name}({subCallParameters});");
+            var hasCancellationToken = method.Parameters.Any(p => p.Name == "cancellationToken");
+            var dispatchCtArg = hasCancellationToken ? ", cancellationToken" : "";
+
+            sb.AppendLine($"        {returnStatement} device.Dispatch(tgClient => tgClient.{method.Name}({subCallParameters}){dispatchCtArg});");
 
             sb.AppendLine($"    }}");
-
             sb.AppendLine();
-
             sb.AppendLine();
 
             return sb.ToString();
