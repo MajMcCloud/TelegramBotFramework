@@ -87,6 +87,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
   * [RequestDispatcherSettings](#requestdispatchersettings)
   * [DefaultRequestDispatcher](#defaultrequestdispatcher)
   * [FullRequestDispatcher](#fullrequestdispatcher)
+  * [Direct Dispatcher](#direct-dispatcher)
   * [Creating a Custom Dispatcher](#creating-a-custom-dispatcher)
 - [Action Manager (Extension)](#action-manager)
 - [Extensions](#extensions)
@@ -1426,6 +1427,28 @@ With custom settings:
 > If you disable `RespectRetryAfterHeader` or set aggressive custom limits above Telegram's actual limits, your bot
 > may still receive `HTTP 429` responses. `FullRequestDispatcher` reduces the *likelihood* of hitting them, it does not
 > eliminate the need for retry handling.
+
+---
+
+### Direct Dispatcher
+
+Does not perform any rate limiting or retry logic. Use this only if you want to handle concurrency and retries yourself.
+
+```csharp
+var bot = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .UseDirectDispatcher()
+    .DefaultCommands()
+    .NoSerialization()
+    .UseEnglish()
+    .UseSingleThread()
+    .Build();
+```
+
 
 ---
 
