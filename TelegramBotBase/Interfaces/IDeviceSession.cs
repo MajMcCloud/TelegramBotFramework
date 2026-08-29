@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Telegram.Bot.Types.Enums;
+using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramBotBase.Form;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
-using Telegram.Bot;
+using TelegramBotBase.Form;
+using TelegramBotBase.RequestDispatchers;
 using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Interfaces;
@@ -60,5 +61,9 @@ public interface IDeviceSession : IDeviceSessionMethods
     /// </summary>
     bool FormSwitched { get; set; }
 
+    /// <summary>
+    /// Returns the request dispatcher for this device session.
+    /// </summary>
+    IRequestDispatcher Dispatcher { get; }  
 
 }
