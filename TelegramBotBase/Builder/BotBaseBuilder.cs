@@ -93,6 +93,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultMessageLoop();
 
+        UseDefaultRequestDispatcher();
+
         NoProxy(throwPendingUpdates);
 
         OnlyStart();
@@ -115,6 +117,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         DefaultMessageLoop();
 
+        UseDefaultRequestDispatcher();
+
         NoProxy(throwPendingUpdates);
 
         OnlyStart();
@@ -134,6 +138,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         _factory = formFactory;
 
         DefaultMessageLoop();
+
+        UseDefaultRequestDispatcher();
 
         NoProxy(throwPendingUpdates);
 
