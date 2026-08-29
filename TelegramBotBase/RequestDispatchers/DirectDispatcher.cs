@@ -21,7 +21,6 @@ public class DirectDispatcher : IRequestDispatcher
     protected readonly DeviceSession GlobalSession;
 
     /// <summary>Initializes the dispatcher and sizes the concurrency limiter from settings</summary>
-    /// <param name="settings">Throttling and retry configuration</param>
     /// <param name="client">Telegram message client used to send requests</param>
     public DirectDispatcher(MessageClient client)
     {
@@ -34,7 +33,7 @@ public class DirectDispatcher : IRequestDispatcher
     }
 
     /// <summary>Executes a Telegram API request with no return value, with no throttling or retry logic</summary>
-    /// <param name="ds">Device session the request is being sent for</param>
+    /// <param name="ds">This field will not be used</param>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
     public virtual async Task Dispatch(IDeviceSession ds, Func<ITelegramBotClient, Task> request,
@@ -48,10 +47,10 @@ public class DirectDispatcher : IRequestDispatcher
     /// Executes a Telegram API request with no throttling or retry logic
     /// </summary>
     /// <typeparam name="T">Return type of the Telegram API call</typeparam>
-    /// <param name="ds">Device session the request is being sent for</param>
+    /// <param name="ds">This field will not be used</param>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
-    /// <returns>The result of <paramref name="request"/>, or <c>default</c> if all retries are exhausted</returns>
+    /// <returns>The result of <paramref name="request"/></returns>
     /// <exception cref="ApiRequestException">Thrown on error code not equal to <see cref="Http.TooManyRequests"/></exception>
     public virtual async Task<T> Dispatch<T>(IDeviceSession ds, Func<ITelegramBotClient, Task<T>> request,
         CancellationToken ct = default)
@@ -76,7 +75,7 @@ public class DirectDispatcher : IRequestDispatcher
     /// <typeparam name="T">Return type of the Telegram API call</typeparam>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
-    /// <returns>The result of <paramref name="request"/>, or <c>default</c> if all retries are exhausted</returns>
+    /// <returns>The result of <paramref name="request"/></returns>
     public virtual async Task<T> Dispatch<T>(Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default)
     {
         return await Dispatch(GlobalSession, request, ct);
