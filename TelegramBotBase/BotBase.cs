@@ -12,6 +12,7 @@ using TelegramBotBase.Commands;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Exceptions;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.RequestDispatchers;
 using TelegramBotBase.Sessions;
 using Console = TelegramBotBase.Tools.Console;
 
@@ -30,7 +31,6 @@ public sealed class BotBase
 
         SystemSettings = new Dictionary<ESettings, uint>();
 
-        SetSetting(ESettings.MaxNumberOfRetries, 5);
         SetSetting(ESettings.NavigationMaximum, 10);
         SetSetting(ESettings.LogAllMessages, false);
         SetSetting(ESettings.SkipAllMessages, false);
@@ -75,6 +75,8 @@ public sealed class BotBase
     /// </summary>
     public IMessageLoopFactory MessageLoopFactory { get; internal set; }
 
+    public IRequestDispatcher RequestDispatcher { get; internal set; }
+    
     /// <summary>
     ///     All internal used settings.
     /// </summary>
@@ -104,8 +106,6 @@ public sealed class BotBase
             // should be waited until finish
             Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
         }
-
-        DeviceSession.MaxNumberOfRetries = GetSetting(ESettings.MaxNumberOfRetries, 5);
 
         Client.StartReceiving();
     }
@@ -250,6 +250,33 @@ public sealed class BotBase
         var languages = BotCommandScopes.Select(a => a.Language).Distinct().ToArray();
 
         return await GetBotCommands(languages);
+    }
+
+    /// <summary>
+    ///    Returns a list of all bot commands in all configured scopes and given languages. 
+    ///    
+    /// </summary>
+    /// <remarks>Can take time, because it will request all scopes and languages from the botfather!</remarks>
+    /// <returns></returns>
+    public async Task<List<BotCommandScopeGroup>> GetAllBotCommands()
+    {
+        List<BotCommandScopeGroup> scopes = new List<BotCommandScopeGroup>();
+
+        foreach (var scope in new BotCommandScope[] { BotCommandScope.Default(), BotCommandScope.AllPrivateChats(), BotCommandScope.AllChatAdministrators(), BotCommandScope.AllGroupChats() })
+        {
+            var result = await RequestDispatcher.Dispatch(c => c.GetMyCommands(scope));
+            scopes.Add(new BotCommandScopeGroup(scope, result, null));
+        }
+
+
+        foreach (var session in Sessions.SessionList)
+        {
+            var result = await RequestDispatcher.Dispatch(c => c.GetMyCommands(BotCommandScope.Chat(session.Key)));
+            scopes.Add(new BotCommandScopeGroup(BotCommandScope.Chat(session.Key), result, null));
+        }
+
+
+        return scopes;
     }
 
     /// <summary>

@@ -19,6 +19,33 @@ public static class Time
     {
         return int.TryParse(src, out resultYear) && resultYear >= 0 && resultYear <= DateTime.MaxValue.Year;
     }
+    
+    public static DateTime GetNowLike(DateTime dt)
+    {
+        return dt.Kind switch
+        {
+            DateTimeKind.Utc => DateTime.UtcNow,
+            _ => DateTime.Now
+        };
+    }
+    
+    public static TimeSpan GetElapsedTime(DateTime dt)
+    {
+        return GetNowLike(dt) - dt;
+    }
+
+    public static bool IsExpired(long ticks, TimeSpan duration, out TimeSpan estimated, DateTimeKind kind = DateTimeKind.Utc)
+    {
+        return new DateTime(ticks, kind).IsExpired(duration, out estimated);
+    }
+
+    public static bool IsExpired(this DateTime dt, TimeSpan duration, out TimeSpan estimated)
+    {
+        var elapsed = GetElapsedTime(dt);
+        estimated = duration - elapsed;
+        
+        return estimated <= TimeSpan.Zero;
+    }
 
     public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
     {

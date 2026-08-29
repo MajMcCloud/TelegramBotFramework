@@ -63,7 +63,7 @@ public class SessionManager
 
         start.Client = Client;
 
-        var ds = new DeviceSession(deviceId, start);
+        var ds = new DeviceSession(deviceId, BotBase.RequestDispatcher, start);
 
         start.Device = ds;
         await start.OnInit(new InitEventArgs());
@@ -198,7 +198,7 @@ public class SessionManager
             }
 
             form.Client = Client;
-            var device = new DeviceSession(s.DeviceId, form)
+            var device = new DeviceSession(s.DeviceId, BotBase.RequestDispatcher, form)
             {
                 ChatTitle = s.ChatTitle
             };

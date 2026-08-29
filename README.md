@@ -41,56 +41,62 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 - [Quick start](#quick-start)
 - [Simplified builder](#simplified-builder)
 - [Features](#features)
-    * [System calls & bot commands](#system-calls--bot-commands)
-    * [Text messages handling](#text-messages)
-    * [Buttons](#buttons)
-    * [Custom controls](#custom-controls)
-    * [Forms advanced](#forms-advanced)
+  * [System calls & bot commands](#system-calls--bot-commands)
+  * [Text messages handling](#text-messages)
+  * [Buttons](#buttons)
+  * [Custom controls](#custom-controls)
+  * [Forms advanced](#forms-advanced)
 - [Message Loops](#message-loops)
 - [Special Forms](#special-forms)
-    * [AlertDialog](#alert-dialog)
-    * [AutoCleanForm](#autocleanform)
-    * [PromptDialog](#prompt-dialog)
-    * [ConfirmDialog](#confirm-dialog)
+  * [AlertDialog](#alert-dialog)
+  * [AutoCleanForm](#autocleanform)
+  * [PromptDialog](#prompt-dialog)
+  * [ConfirmDialog](#confirm-dialog)
 - [Controls](#controls)
-    * [Label](#label)
-    * [ProgressBar](#progress-bar)
-    * [CalendarPicker](#calendar-picker)
-    * [MonthPicker](#month-picker)
-    * [TreeView](#tree-view)
-    * [ToggleButton](#toggle-button)
-    * [ButtonGrid](#button-grid)
-        * [Paging and Searching](#paging--searching)
-    * [TaggedButtonGrid](#tagged-button-grid)
-    * [CheckedButtonList](#checked-button-list)
-    * [MultiToggleButton](#multi-toggle-button)
+  * [Label](#label)
+  * [ProgressBar](#progress-bar)
+  * [CalendarPicker](#calendar-picker)
+  * [MonthPicker](#month-picker)
+  * [TreeView](#tree-view)
+  * [ToggleButton](#toggle-button)
+  * [ButtonGrid](#button-grid)
+    * [Paging and Searching](#paging--searching)
+  * [TaggedButtonGrid](#tagged-button-grid)
+  * [CheckedButtonList](#checked-button-list)
+  * [MultiToggleButton](#multi-toggle-button)
 - [Localizations](#localizations)
 - [Groups](#groups)
-    * [SplitterForm](#splitter-form)
-    * [GroupForm](#group-form)
+  * [SplitterForm](#splitter-form)
+  * [GroupForm](#group-form)
 - [State Machine and Session Serialization (v3.0.0)](#statemachine-and-sessions)
-    * [StateMachines](#statemachines)
-        * [SimpleJSONStateMachine](#simplejsonstatemachine)
-        * [JSONStateMachine](#jsonstatemachine)
-        * [XMLStateMachine](#xmlstatemachine)
-    * [Interfaces](#interfaces)
-        * [IStateMachine](#istatemachine)
-        * [IStateForm](#istateform)
-    * [Attributes](#attributes)
-        * [SaveState](#savestate)
-        * [IgnoreState](#ignorestate)
+  * [StateMachines](#statemachines)
+    * [SimpleJSONStateMachine](#simplejsonstatemachine)
+    * [JSONStateMachine](#jsonstatemachine)
+    * [XMLStateMachine](#xmlstatemachine)
+  * [Interfaces](#interfaces)
+    * [IStateMachine](#istatemachine)
+    * [IStateForm](#istateform)
+  * [Attributes](#attributes)
+    * [SaveState](#savestate)
+    * [IgnoreState](#ignorestate)
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
-    * [As of Now](#as-of-now)
-    * [Usage](#usage)
+  * [As of Now](#as-of-now)
+  * [Usage](#usage)
 - [Threading & Performance](#threading--performance)
+- [Request Dispatcher](#request-dispatcher)
+  * [RequestDispatcherSettings](#requestdispatchersettings)
+  * [DefaultRequestDispatcher](#defaultrequestdispatcher)
+  * [FullRequestDispatcher](#fullrequestdispatcher)
+  * [Direct Dispatcher](#direct-dispatcher)
+  * [Creating a Custom Dispatcher](#creating-a-custom-dispatcher)
 - [Action Manager (Extension)](#action-manager)
 - [Extensions](#extensions)
-    * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
-    * [TelegramBotBase.Extensions.Images.IronSoftware](#telegrambotbaseextensionsimagesironsoftware)
-    * [TelegramBotBase.Extensions.Serializer.Database.MSSQL](#telegrambotbaseextensionsserializerdatabasemssql)
-    * [TelegramBotBase.Extensions.Serializer.Database.PostgreSql](#telegrambotbaseextensionsserializerdatabasemysql)
-    * [TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson](#telegrambotbaseextensionsserializerlegacynewtonsoftjson)
-    * [TelegramBotBase.Extensions.ActionManager](#telegrambotbaseextensionsactionmanager)
+  * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
+  * [TelegramBotBase.Extensions.Images.IronSoftware](#telegrambotbaseextensionsimagesironsoftware)
+  * [TelegramBotBase.Extensions.Serializer.Database.MSSQL](#telegrambotbaseextensionsserializerdatabasemssql)
+  * [TelegramBotBase.Extensions.Serializer.Database.PostgreSql](#telegrambotbaseextensionsserializerdatabasemysql)
+  * [TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson](#telegrambotbaseextensionsserializerlegacynewtonsoftjson)
+  * [TelegramBotBase.Extensions.ActionManager](#telegrambotbaseextensionsactionmanager)
 - [Test Project](#test-project)
 - [Examples](#examples)
 
@@ -109,6 +115,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -258,6 +265,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<Start>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -716,6 +724,7 @@ var bot = BotBaseBuilder
         .CustomMessageLoop(new CustomMessageLoop())
         .WithStartForm<StartForm>()
         .NoProxy()
+        .UseDefaultRequestDispatcher()
         .DefaultCommands()
         .NoSerialization()
         .UseEnglish()
@@ -890,11 +899,12 @@ Check the example project [TelegramBotBase.Test/Tests/Controls/MultiToggleButton
 
 The current available languages for controls are:
 
-- English
+- English (Default)
 - German
 - Persian
 - Russian
 - Ukrainian
+- Belarusian
 
 You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
 
@@ -1027,6 +1037,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -1051,6 +1062,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -1074,6 +1086,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -1244,6 +1257,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .DefaultCommands()
     .NoSerialization()
     .UseEnglish()
@@ -1267,6 +1281,232 @@ var bot = BotBaseBuilder
 
 
 
+
+---
+
+## Request Dispatcher
+
+Every outgoing call to the Telegram Bot API (sending, editing, deleting messages, and so on) is routed through a
+request dispatcher before it reaches Telegram. The dispatcher is responsible for keeping the bot within Telegram's
+rate limits, retrying automatically on `HTTP 429 Too Many Requests` responses, and bounding how many requests are in
+flight at once.
+
+> **Note:**  
+> If none of the request dispatchers is selected, `DefaultRequestDispatcher` is used.
+
+
+### Overview of available Dispatchers
+
+| Name                        | Description                                                                 | Rate Limiting                                              | Use Case                                                  |
+|------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------|--------------------------------------------------------------|
+| **DefaultRequestDispatcher** | Bounds concurrency and retries automatically on `HTTP 429` responses.             | Concurrency limit + global pause on `HTTP 429`                     | Lightweight bots, low/moderate traffic                       |
+| **FullRequestDispatcher**    | Extends `DefaultRequestDispatcher` with global, per-chat, and per-group throttling. | Global msgs/sec, per-chat msgs/sec, per-group msgs/min | Bots that broadcast to many chats or post frequently in groups |
+| **Custom dispatcher**        | Your own `IRequestDispatcher` implementation.                                | Whatever you implement                                        | Custom backoff strategies, metrics, priority queues, etc.     |
+
+---
+
+### RequestDispatcherSettings
+
+All built-in dispatchers are configured through a single `RequestDispatcherSettings` object:
+
+```csharp
+public class RequestDispatcherSettings
+{
+    // --- Concurrency and retry: used by every dispatcher (Default and Full) ---
+
+    // Max Bot API requests allowed in flight at once (protects your app, not Telegram's servers)
+    public int MaxConcurrentRequests { get; set; } = 10;
+
+    // How many times a request is retried after a HTTP 429 before giving up
+    public int MaxRetryAttempts { get; set; } = 3;
+
+    // If true, waits exactly as long as Telegram's retry_after value says; if false, uses FallbackRetryAfter
+    public bool RespectRetryAfterHeader { get; set; } = true;
+
+    // Wait time used before a retry when no retry_after value is available
+    public TimeSpan FallbackRetryAfter { get; set; } = TimeSpan.FromSeconds(1);
+
+    // If true, a HTTP 429 pauses ALL outgoing requests bot-wide for retry_after seconds, not just the offending chat
+    public bool GlobalPauseOn429 { get; set; } = true;
+
+    // --- Rate limiting: used by FullRequestDispatcher only ---
+
+    // Max requests per second across all chats combined (Telegram's global limit, ~30/sec)
+    public int MaxRequestsPerSecond { get; set; } = 30;
+
+    // Max requests per second to a single chat (Telegram's per-chat limit, ~1/sec)
+    public int MaxRequestsPerSecondPerChat { get; set; } = 1;
+
+    // How long an idle chat's rate limiter stays cached before being evicted to free memory
+    public TimeSpan ChatLimiterCacheTimeout { get; set; } = TimeSpan.FromMinutes(5);
+
+    // Max requests per minute to a single group/supergroup (Telegram's per-group limit, ~20/min)
+    public int MaxRequestsPerMinutePerGroup { get; set; } = 20;
+
+    // Same as ChatLimiterCacheTimeout, but for per-group rate limiters
+    public TimeSpan GroupLimiterCacheTimeout { get; set; } = TimeSpan.FromMinutes(10);
+}
+```
+
+> **Note:**  
+> Telegram's official guidance recommends avoiding more than 1 message per second in a single chat, 
+> allows bots up to about 20 messages per minute in a group, and caps bulk broadcasts at roughly 
+> 30 messages per second unless paid broadcasts are enabled (see the [Bots FAQ]((https://core.telegram.org/bots/faq#broadcasting-to-users)) for details). 
+> If your bot has been granted higher limits, adjust the settings accordingly.
+
+---
+
+### DefaultRequestDispatcher
+
+Wraps every outgoing call in a concurrency limiter sized to `MaxConcurrentRequests`, and retries automatically when
+Telegram responds with `HTTP 429`, honoring the `retry_after` value it returns. When `GlobalPauseOn429` is enabled
+(the default), a `HTTP 429` pauses *all* outgoing traffic for `retry_after` seconds rather than only the offending chat,
+matching Telegram's actual behavior.
+
+```csharp
+var bot = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .UseDefaultRequestDispatcher() // uses default settings
+    .DefaultCommands()
+    .NoSerialization()
+    .UseEnglish()
+    .UseSingleThread()
+    .Build();
+```
+
+With custom settings:
+
+```csharp
+.UseDefaultRequestDispatcher(new RequestDispatcherSettings
+{
+    MaxConcurrentRequests = 20,
+    MaxRetryAttempts = 5
+})
+```
+
+---
+
+### FullRequestDispatcher
+
+Extends `DefaultRequestDispatcher` with global, per-chat, and per-group throttling, keeping the bot within
+Telegram's documented and community-observed limits. Per-chat and per-group limiter instances are cached and
+evicted after `ChatLimiterCacheTimeout`/`GroupLimiterCacheTimeout` of inactivity, so memory usage stays bounded even
+as the bot talks to more and more chats over time.
+
+```csharp
+var bot = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .UseFullRequestDispatcher() // uses default settings
+    .DefaultCommands()
+    .NoSerialization()
+    .UseEnglish()
+    .UseSingleThread()
+    .Build();
+```
+
+With custom settings:
+
+```csharp
+.UseFullRequestDispatcher(new RequestDispatcherSettings
+{
+    MaxRequestsPerSecond = 30,
+    MaxRequestsPerSecondPerChat = 1,
+    MaxRequestsPerMinutePerGroup = 20
+})
+```
+
+> **Warning:**  
+> If you disable `RespectRetryAfterHeader` or set aggressive custom limits above Telegram's actual limits, your bot
+> may still receive `HTTP 429` responses. `FullRequestDispatcher` reduces the *likelihood* of hitting them, it does not
+> eliminate the need for retry handling.
+
+---
+
+### Direct Dispatcher
+
+Does not perform any rate limiting or retry logic. Use this only if you want to handle concurrency and retries yourself.
+
+```csharp
+var bot = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .UseDirectDispatcher()
+    .DefaultCommands()
+    .NoSerialization()
+    .UseEnglish()
+    .UseSingleThread()
+    .Build();
+```
+
+
+---
+
+### Creating a Custom Dispatcher
+
+If you need custom behavior, such as logging, metrics, priority queues, or a different backoff strategy, implement
+your own dispatcher by creating a class that implements the `IRequestDispatcher` interface. Wrapping an existing
+dispatcher, as below, lets you add behavior without reimplementing rate limiting from scratch.
+
+**Example:**
+```csharp
+public class LoggingRequestDispatcher : IRequestDispatcher
+{
+    private readonly IRequestDispatcher _inner;
+
+    public LoggingRequestDispatcher(IRequestDispatcher inner)
+    {
+        _inner = inner;
+    }
+
+    public async Task Dispatch(DeviceSession ds, Func<ITelegramBotClient, Task> request, CancellationToken ct = default)
+    {
+        await _inner.Dispatch(ds, request, ct);
+    }
+
+    public async Task<T> Dispatch<T>(DeviceSession ds, Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default)
+    {
+        Console.WriteLine($"Dispatching request for chat {ds.DeviceId}");
+
+        return await _inner.Dispatch(ds, request, ct);
+    }
+}
+```
+
+**Usage:**
+```csharp
+var bot = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .UseCustomRequestDispatcher(client => new LoggingRequestDispatcher(
+        new FullRequestDispatcher(new RequestDispatcherSettings(), client)))
+    .DefaultCommands()
+    .NoSerialization()
+    .UseEnglish()
+    .UseSingleThread()
+    .Build();
+
+await bot.Start();
+```
+
+You can also pass a pre-built dispatcher instance directly instead of a factory:
+
+```csharp
+.UseCustomRequestDispatcher(myDispatcherInstance)
+```
 
 ---
 

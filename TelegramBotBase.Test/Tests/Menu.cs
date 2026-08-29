@@ -224,6 +224,14 @@ public class Menu : AutoCleanForm
 
                 break;
 
+            case "dispatcher":
+
+                var dt = new DispatcherTest();
+
+                await NavigateTo(dt);
+
+                break;
+
             default:
 
                 message.Handled = false;
@@ -281,6 +289,8 @@ public class Menu : AutoCleanForm
         btn.AddButtonRow(new ButtonBase("#20 Label", new CallbackData("a", "label").Serialize()));
 
         btn.AddButtonRow(new ButtonBase("#21 ArrayPromptDialogTest", new CallbackData("a", "arraypromptdialog").Serialize()));
+
+        btn.AddButtonRow(new ButtonBase("#22 Request Dispatcher Test", new CallbackData("a", "dispatcher").Serialize()));
 
         await Device.Send("Choose your test:", btn);
     }

@@ -13,15 +13,20 @@ namespace TelegramBotBase.Example;
 
 internal class Program
 {
+    public static BotBase bot = null;
+
+    static Tasks.WelcomeTask welcomeTask = null;
+
     private static async Task Main(string[] args)
     {
-        var bot = BotBaseBuilder
+        bot = BotBaseBuilder
                  .Create()
                  .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
                              throw new Exception("API_KEY is not set"))
                  .DefaultMessageLoop()
                  .WithStartForm<Start>()
                  .NoProxy()
+                 .UseDefaultRequestDispatcher()
                  .CustomCommands(a =>
                  {
                      a.Start("Starts the bot");
@@ -49,6 +54,11 @@ internal class Program
         {
             Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
         };
+
+        //Start welcome task
+        welcomeTask = new Tasks.WelcomeTask();
+
+        welcomeTask.RunAsync();
 
         await bot.Start();
 

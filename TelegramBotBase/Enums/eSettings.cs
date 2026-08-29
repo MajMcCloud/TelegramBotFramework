@@ -1,4 +1,6 @@
-﻿namespace TelegramBotBase.Enums;
+﻿using System;
+
+namespace TelegramBotBase.Enums;
 
 public enum ESettings
 {
@@ -30,6 +32,7 @@ public enum ESettings
     ///     Indicates the maximum number of times a request that received error
     ///     429 will be sent again after a timeout until it receives code 200 or an error code not equal to 429.
     /// </summary>
+    [Obsolete("Use request dispatcher settings instead.")]
     MaxNumberOfRetries = 5,
 
 
