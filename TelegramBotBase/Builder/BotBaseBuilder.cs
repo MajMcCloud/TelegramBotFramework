@@ -358,6 +358,12 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
+    public IBotCommandsStage UseDirectDispatcher()
+    {
+        _requestDispatcher = new DirectDispatcher(_client);
+        return this;
+    }
+
     #endregion
 
     #region "Step 6 (Bot Commands)"

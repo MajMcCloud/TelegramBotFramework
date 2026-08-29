@@ -25,4 +25,10 @@ public interface IRequestDispatcherSelectionStage
     /// <param name="dispatcher">The dispatcher instance to use</param>
     /// <returns>The next builder stage</returns>
     IBotCommandsStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher);
+
+    /// <summary>
+    /// Configures the bot to use a direct dispatcher that sends requests to Telegram with no throttling or retry logic. This is useful for testing or when you want to run the bot without any rate limiting.
+    /// </summary>
+    /// <returns>The next builder stage</returns>
+    IBotCommandsStage UseDirectDispatcher();
 }
