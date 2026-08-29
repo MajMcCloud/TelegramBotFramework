@@ -15,6 +15,8 @@ internal class Program
 {
     public static BotBase bot = null;
 
+    static Tasks.WelcomeTask welcomeTask = null;
+
     private static async Task Main(string[] args)
     {
         bot = BotBaseBuilder
@@ -52,6 +54,11 @@ internal class Program
         {
             Console.WriteLine(en.DeviceId + " " + en.Message.MessageText + " " + (en.Message.RawData ?? ""));
         };
+
+        //Start welcome task
+        welcomeTask = new Tasks.WelcomeTask();
+
+        welcomeTask.RunAsync();
 
         await bot.Start();
 
