@@ -59,11 +59,24 @@ public class DirectDispatcher : IRequestDispatcher
         return await request(Client.TelegramClient);
     }
 
+    /// <summary>
+    /// Executes a Telegram API request with no return value, with no throttling or retry logic
+    /// </summary>
+    /// <param name="request">The Telegram API call to execute</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns></returns>
     public virtual async Task Dispatch(Func<ITelegramBotClient, Task> request, CancellationToken ct = default)
     {
         await Dispatch(GlobalSession, request, ct);
     }
 
+    /// <summary>
+    /// Executes a Telegram API request with no throttling or retry logic
+    /// </summary>
+    /// <typeparam name="T">Return type of the Telegram API call</typeparam>
+    /// <param name="request">The Telegram API call to execute</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>The result of <paramref name="request"/>, or <c>default</c> if all retries are exhausted</returns>
     public virtual async Task<T> Dispatch<T>(Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default)
     {
         return await Dispatch(GlobalSession, request, ct);
