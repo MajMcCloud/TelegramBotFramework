@@ -11,14 +11,14 @@ public interface IStartFormSelectionStage
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    INetworkingSelectionStage WithStartForm(Type startFormClass);
+    IRequestDispatcherSelectionStage WithStartForm(Type startFormClass);
 
     /// <summary>
     ///     Chooses a generic start form which will be used for new sessions.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    INetworkingSelectionStage WithStartForm<T>() where T : FormBase, new();
+    IRequestDispatcherSelectionStage WithStartForm<T>() where T : FormBase, new();
 
     /// <summary>
     ///     Chooses a FormFactory which will be use for new sessions.
@@ -26,7 +26,7 @@ public interface IStartFormSelectionStage
     /// <param name="startFormClass"></param>
     /// <param name="serviceProvider"></param>
     /// <returns></returns>
-    INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider);
+    IRequestDispatcherSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider);
 
     /// <summary>
     ///     Chooses a FormFactory which will be use for new sessions.
@@ -34,12 +34,12 @@ public interface IStartFormSelectionStage
     /// <param name="serviceProvider"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider) where T : FormBase;
+    IRequestDispatcherSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider) where T : FormBase;
 
     /// <summary>
     ///     Chooses a FormFactory which will be use for new sessions.
     /// </summary>
     /// <param name="factory"></param>
     /// <returns></returns>
-    INetworkingSelectionStage WithFormFactory(IFormFactory factory);
+    IRequestDispatcherSelectionStage WithFormFactory(IFormFactory factory);
 }

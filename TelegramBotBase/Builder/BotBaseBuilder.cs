@@ -18,9 +18,9 @@ using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder;
 
-public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage,
+public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBotCommandsStage,
                               IBuildingStage, INetworkingSelectionStage, ISessionSerializationStage,
-                              ILanguageSelectionStage, IThreadingStage, IPostNetworkingSelectionStage
+                              ILanguageSelectionStage, IThreadingStage, IRequestDispatcherSelectionStage
 {
     private string _apiKey;
 
@@ -31,7 +31,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     private IMessageLoopFactory _messageLoopFactory;
 
     private IStateMachine _stateMachine;
-    
+
     private IRequestDispatcher _requestDispatcher;
 
     private BotBaseBuilder()
@@ -51,7 +51,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     public BotBase Build()
     {
         CompleteSkippedStagesWithDefaultValues();
-        
+
         var bot = new BotBase(_apiKey, _client)
         {
             FormFactory = _factory,
@@ -71,7 +71,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             UseDefaultRequestDispatcher();
         }
     }
-    
+
     public static IAPIKeySelectionStage Create()
     {
         return new BotBaseBuilder();
@@ -161,8 +161,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     public IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null)
     {
-        var loop =  new FormBaseMessageLoop();
-        
+        var loop = new FormBaseMessageLoop();
+
         loop.ExternalActionManager = managerInstance;
 
         _messageLoopFactory = loop;
@@ -218,33 +218,33 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 3 (Start Form/Factory)"
 
-    public INetworkingSelectionStage WithStartForm(Type startFormClass)
+    public IRequestDispatcherSelectionStage WithStartForm(Type startFormClass)
     {
         _factory = new DefaultFormFactory(startFormClass);
         return this;
     }
 
-    public INetworkingSelectionStage WithStartForm<T>()
+    public IRequestDispatcherSelectionStage WithStartForm<T>()
         where T : FormBase, new()
     {
         _factory = new DefaultFormFactory(typeof(T));
         return this;
     }
 
-    public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+    public IRequestDispatcherSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
     {
         _factory = new ServiceProviderFormFactory(startFormClass, serviceProvider);
         return this;
     }
 
-    public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
+    public IRequestDispatcherSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
         where T : FormBase
     {
         _factory = new ServiceProviderFormFactory<T>(serviceProvider);
         return this;
     }
 
-    public INetworkingSelectionStage WithFormFactory(IFormFactory factory)
+    public IRequestDispatcherSelectionStage WithFormFactory(IFormFactory factory)
     {
         _factory = factory;
         return this;
@@ -252,10 +252,44 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #endregion
 
+    #region "Step 4 (Request Dispatcher)"
 
-    #region "Step 4 (Network Settings)"
+    /// <inheritdoc />
+    public INetworkingSelectionStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null)
+    {
+        settings ??= new RequestDispatcherSettings();
+        _requestDispatcher = new DefaultRequestDispatcher(settings, _client);
+        return this;
+    }
 
-    public IPostNetworkingSelectionStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    /// <inheritdoc />
+    public INetworkingSelectionStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
+    {
+        settings ??= new RequestDispatcherSettings();
+        _requestDispatcher = new FullRequestDispatcher(settings, _client);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public INetworkingSelectionStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
+    {
+        _requestDispatcher = factory(_client);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public INetworkingSelectionStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
+    {
+        _requestDispatcher = dispatcher;
+        return this;
+    }
+
+    #endregion
+
+
+    #region "Step 5 (Network Settings)"
+
+    public IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         var url = new Uri(proxyAddress);
         _client = new MessageClient(_apiKey, url)
@@ -270,7 +304,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IPostNetworkingSelectionStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IBotCommandsStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey)
         {
@@ -284,7 +318,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IPostNetworkingSelectionStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
@@ -298,7 +332,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IPostNetworkingSelectionStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, proxyHost, proxyPort)
         {
@@ -311,7 +345,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public IPostNetworkingSelectionStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IBotCommandsStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
@@ -326,39 +360,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #endregion
 
-    #region "Step 5 (Request Dispatcher)"
-
-    /// <inheritdoc />
-    public IBotCommandsStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null)
-    {
-        settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new DefaultRequestDispatcher(settings, _client);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IBotCommandsStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
-    {
-        settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new FullRequestDispatcher(settings, _client);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IBotCommandsStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
-    {
-        _requestDispatcher = factory(_client);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IBotCommandsStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
-    {
-        _requestDispatcher = dispatcher;
-        return this;
-    }
-
-    #endregion
+    
 
     #region "Step 6 (Bot Commands)"
 
@@ -506,16 +508,16 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     {
         Default.Language = new Russian();
         return this;
-        
+
     }
-    
+
     /// <inheritdoc cref="ILanguageSelectionStage.UseUkrainian"/>
     public IThreadingStage UseUkrainian()
     {
         Default.Language = new Ukrainian();
         return this;
     }
-    
+
     /// <inheritdoc cref="ILanguageSelectionStage.UseBelarusian"/>
     public IThreadingStage UseBelarusian()
     {

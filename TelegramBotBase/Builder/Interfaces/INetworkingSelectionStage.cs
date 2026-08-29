@@ -11,14 +11,14 @@ public interface INetworkingSelectionStage
     /// <param name="proxyAddress"></param>
     /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IPostNetworkingSelectionStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
+    IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
 
     /// <summary>
     ///     Do not choose a proxy as network configuration.
     /// </summary>
     /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IPostNetworkingSelectionStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60);
+    IBotCommandsStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60);
 
 
     /// <summary>
@@ -27,7 +27,7 @@ public interface INetworkingSelectionStage
     /// <param name="client"></param>
     /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IPostNetworkingSelectionStage WithBotClient(TelegramBotClient client, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
+    IBotCommandsStage WithBotClient(TelegramBotClient client, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
 
 
     /// <summary>
@@ -37,7 +37,7 @@ public interface INetworkingSelectionStage
     /// <param name="Port"></param>
     /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IPostNetworkingSelectionStage WithHostAndPort(string proxyHost, int Port, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
+    IBotCommandsStage WithHostAndPort(string proxyHost, int Port, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
 
     /// <summary>
     ///     Uses a custom http client.
@@ -45,5 +45,5 @@ public interface INetworkingSelectionStage
     /// <param name="client"></param>
     /// <param name="throwPendingUpdates">Indicates if all pending Telegram.Bot.Types.Updates should be thrown out before start polling.</param>
     /// <returns></returns>
-    IPostNetworkingSelectionStage WithHttpClient(HttpClient client, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
+    IBotCommandsStage WithHttpClient(HttpClient client, bool throwPendingUpdates = false, int timeoutInSeconds = 60);
 }
