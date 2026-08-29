@@ -253,6 +253,33 @@ public sealed class BotBase
     }
 
     /// <summary>
+    ///    Returns a list of all bot commands in all configured scopes and given languages. 
+    ///    
+    /// </summary>
+    /// <remarks>Can take time, because it will request all scopes and languages from the botfather!</remarks>
+    /// <returns></returns>
+    public async Task<List<BotCommandScopeGroup>> GetAllBotCommands()
+    {
+        List<BotCommandScopeGroup> scopes = new List<BotCommandScopeGroup>();
+
+        foreach (var scope in new BotCommandScope[] { BotCommandScope.Default(), BotCommandScope.AllPrivateChats(), BotCommandScope.AllChatAdministrators(), BotCommandScope.AllGroupChats() })
+        {
+            var result = await RequestDispatcher.Dispatch(c => c.GetMyCommands(scope));
+            scopes.Add(new BotCommandScopeGroup(scope, result, null));
+        }
+
+
+        foreach (var session in Sessions.SessionList)
+        {
+            var result = await RequestDispatcher.Dispatch(c => c.GetMyCommands(BotCommandScope.Chat(session.Key)));
+            scopes.Add(new BotCommandScopeGroup(BotCommandScope.Chat(session.Key), result, null));
+        }
+
+
+        return scopes;
+    }
+
+    /// <summary>
     /// Returns a list of all bot commands in all configured scopes and given languages.
     /// </summary>
     /// <param name="additional_languages"></param>
