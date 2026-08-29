@@ -21,8 +21,8 @@ internal class Program
                              throw new Exception("API_KEY is not set"))
                  .DefaultMessageLoop()
                  .WithStartForm<Start>()
-                 .UseDefaultRequestDispatcher()
                  .NoProxy()
+                 .UseDefaultRequestDispatcher()
                  .CustomCommands(a =>
                  {
                      a.Start("Starts the bot");
