@@ -60,7 +60,7 @@ public class DeviceSession : IDeviceSession
 
     public MessageClient Client => ActiveForm.Client;
 
-    public readonly IRequestDispatcher Dispatcher;
+    public IRequestDispatcher Dispatcher { get; }
 
     /// <summary>
     ///     Returns if the messages is posted within a group.
