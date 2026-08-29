@@ -114,6 +114,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -263,6 +264,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<Start>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -721,6 +723,7 @@ var bot = BotBaseBuilder
         .CustomMessageLoop(new CustomMessageLoop())
         .WithStartForm<StartForm>()
         .NoProxy()
+        .UseDefaultRequestDispatcher()
         .DefaultCommands()
         .NoSerialization()
         .UseEnglish()
@@ -1033,6 +1036,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -1057,6 +1061,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -1080,6 +1085,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -1250,6 +1256,7 @@ var bot = BotBaseBuilder
     .DefaultMessageLoop()
     .WithStartForm<StartForm>()
     .NoProxy()
+    .UseDefaultRequestDispatcher()
     .DefaultCommands()
     .NoSerialization()
     .UseEnglish()
