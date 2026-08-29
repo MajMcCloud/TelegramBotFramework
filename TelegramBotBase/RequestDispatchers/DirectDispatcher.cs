@@ -6,6 +6,7 @@ using Telegram.Bot.Exceptions;
 using TelegramBotBase.Base;
 using TelegramBotBase.Constants;
 using TelegramBotBase.Interfaces;
+using TelegramBotBase.Sessions;
 using TelegramBotBase.Tools.RateLimiters;
 
 namespace TelegramBotBase.RequestDispatchers;
@@ -17,12 +18,19 @@ public class DirectDispatcher : IRequestDispatcher
 {
     protected readonly MessageClient Client;
 
+    protected readonly DeviceSession GlobalSession;
+
     /// <summary>Initializes the dispatcher and sizes the concurrency limiter from settings</summary>
     /// <param name="settings">Throttling and retry configuration</param>
     /// <param name="client">Telegram message client used to send requests</param>
     public DirectDispatcher(MessageClient client)
     {
         Client = client;
+
+        GlobalSession = new DeviceSession(this)
+        {
+            DeviceId = 0
+        };
     }
 
     /// <summary>Executes a Telegram API request with no return value, with no throttling or retry logic</summary>
@@ -34,6 +42,7 @@ public class DirectDispatcher : IRequestDispatcher
     {
         await request(Client.TelegramClient);
     }
+
 
     /// <summary>
     /// Executes a Telegram API request with no throttling or retry logic
@@ -50,4 +59,13 @@ public class DirectDispatcher : IRequestDispatcher
         return await request(Client.TelegramClient);
     }
 
+    public virtual async Task Dispatch(Func<ITelegramBotClient, Task> request, CancellationToken ct = default)
+    {
+        await Dispatch(GlobalSession, request, ct);
+    }
+
+    public virtual async Task<T> Dispatch<T>(Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default)
+    {
+        return await Dispatch(GlobalSession, request, ct);
+    }
 }
