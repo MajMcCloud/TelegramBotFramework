@@ -13,9 +13,11 @@ namespace TelegramBotBase.Example;
 
 internal class Program
 {
+    public static BotBase bot = null;
+
     private static async Task Main(string[] args)
     {
-        var bot = BotBaseBuilder
+        bot = BotBaseBuilder
                  .Create()
                  .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
                              throw new Exception("API_KEY is not set"))
