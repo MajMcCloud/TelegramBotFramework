@@ -9,20 +9,20 @@ public interface IRequestDispatcherSelectionStage
     /// <summary>Configures the bot to use <see cref="DefaultRequestDispatcher"/> (concurrency + 429 retry only)</summary>
     /// <param name="settings">Dispatcher configuration; defaults are used if omitted</param>
     /// <returns>The next builder stage</returns>
-    INetworkingSelectionStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null);
+    IBotCommandsStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null);
 
     /// <summary>Configures the bot to use <see cref="FullRequestDispatcher"/> (adds global/per-chat/per-group rate limiting)</summary>
     /// <param name="settings">Dispatcher configuration; defaults are used if omitted</param>
     /// <returns>The next builder stage</returns>
-    INetworkingSelectionStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null);
+    IBotCommandsStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null);
 
     /// <summary>Configures the bot to use a custom dispatcher built from the given <see cref="MessageClient"/></summary>
     /// <param name="factory">Factory that creates the dispatcher from the bot's message client</param>
     /// <returns>The next builder stage</returns>
-    INetworkingSelectionStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory);
+    IBotCommandsStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory);
 
     /// <summary>Configures the bot to use a pre-built custom dispatcher instance</summary>
     /// <param name="dispatcher">The dispatcher instance to use</param>
     /// <returns>The next builder stage</returns>
-    INetworkingSelectionStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher);
+    IBotCommandsStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher);
 }

@@ -218,33 +218,33 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 3 (Start Form/Factory)"
 
-    public IRequestDispatcherSelectionStage WithStartForm(Type startFormClass)
+    public INetworkingSelectionStage WithStartForm(Type startFormClass)
     {
         _factory = new DefaultFormFactory(startFormClass);
         return this;
     }
 
-    public IRequestDispatcherSelectionStage WithStartForm<T>()
+    public INetworkingSelectionStage WithStartForm<T>()
         where T : FormBase, new()
     {
         _factory = new DefaultFormFactory(typeof(T));
         return this;
     }
 
-    public IRequestDispatcherSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+    public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
     {
         _factory = new ServiceProviderFormFactory(startFormClass, serviceProvider);
         return this;
     }
 
-    public IRequestDispatcherSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
+    public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
         where T : FormBase
     {
         _factory = new ServiceProviderFormFactory<T>(serviceProvider);
         return this;
     }
 
-    public IRequestDispatcherSelectionStage WithFormFactory(IFormFactory factory)
+    public INetworkingSelectionStage WithFormFactory(IFormFactory factory)
     {
         _factory = factory;
         return this;
@@ -252,44 +252,10 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #endregion
 
-    #region "Step 4 (Request Dispatcher)"
 
-    /// <inheritdoc />
-    public INetworkingSelectionStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null)
-    {
-        settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new DefaultRequestDispatcher(settings, _client);
-        return this;
-    }
+    #region "Step 4 (Network Settings)"
 
-    /// <inheritdoc />
-    public INetworkingSelectionStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
-    {
-        settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new FullRequestDispatcher(settings, _client);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public INetworkingSelectionStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
-    {
-        _requestDispatcher = factory(_client);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public INetworkingSelectionStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
-    {
-        _requestDispatcher = dispatcher;
-        return this;
-    }
-
-    #endregion
-
-
-    #region "Step 5 (Network Settings)"
-
-    public IBotCommandsStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IRequestDispatcherSelectionStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         var url = new Uri(proxyAddress);
         _client = new MessageClient(_apiKey, url)
@@ -304,7 +270,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBotCommandsStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IRequestDispatcherSelectionStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey)
         {
@@ -318,7 +284,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBotCommandsStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IRequestDispatcherSelectionStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
@@ -332,7 +298,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBotCommandsStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IRequestDispatcherSelectionStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, proxyHost, proxyPort)
         {
@@ -345,7 +311,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return this;
     }
 
-    public IBotCommandsStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    public IRequestDispatcherSelectionStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
     {
         _client = new MessageClient(_apiKey, tgclient)
         {
@@ -360,7 +326,39 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #endregion
 
-    
+    #region "Step 5 (Request Dispatcher)"
+
+    /// <inheritdoc />
+    public IBotCommandsStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null)
+    {
+        settings ??= new RequestDispatcherSettings();
+        _requestDispatcher = new DefaultRequestDispatcher(settings, _client);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IBotCommandsStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
+    {
+        settings ??= new RequestDispatcherSettings();
+        _requestDispatcher = new FullRequestDispatcher(settings, _client);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IBotCommandsStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
+    {
+        _requestDispatcher = factory(_client);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IBotCommandsStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
+    {
+        _requestDispatcher = dispatcher;
+        return this;
+    }
+
+    #endregion
 
     #region "Step 6 (Bot Commands)"
 
