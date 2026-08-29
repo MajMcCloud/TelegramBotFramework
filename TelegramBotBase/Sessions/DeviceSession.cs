@@ -137,7 +137,7 @@ public class DeviceSession : IDeviceSession
     public async Task ConfirmAction(string callbackQueryId, string message = "", bool showAlert = false,
                                     string urlToOpen = null)
     {
-        await Client.TelegramClient.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen);
+        await this.Dispatch(a => a.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen));
     }
 
     /// <summary>
