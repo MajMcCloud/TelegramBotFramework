@@ -10,6 +10,7 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
+using TelegramBotBase.Sessions;
 
 namespace TelegramBotBase.Form;
 
@@ -130,15 +131,14 @@ public class AutoCleanForm : FormBase
         OldMessages.RemoveAt(OldMessages.Count - 1);
     }
 
-    private Task AutoCleanForm_Closed(object sender, EventArgs e)
+    private async Task AutoCleanForm_Closed(object sender, EventArgs e)
     {
         if (DeleteMode != EDeleteMode.OnLeavingForm)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        MessageCleanup().Wait();
-        return Task.CompletedTask;
+        await MessageCleanup();
     }
 
     /// <summary>
@@ -147,92 +147,19 @@ public class AutoCleanForm : FormBase
     /// <returns></returns>
     public async Task MessageCleanup()
     {
-        var oldMessages = OldMessages.AsEnumerable();
+        var old_messages = OldMessages.ToList();
 
-#if !NETSTANDARD2_0
-            while (oldMessages.Any())
-            {
-                using var cts = new CancellationTokenSource();
-                var deletedMessages = new ConcurrentBag<int>();
-                var parallelQuery = OldMessages.AsParallel()
-                                                .WithCancellation(cts.Token);
-                Task retryAfterTask = null;
-                try
-                {
-                    parallelQuery.ForAll(i =>
-                    {
-                        try
-                        {
-                            Device.DeleteMessage(i).GetAwaiter().GetResult();
-                            deletedMessages.Add(i);
-                        }
-                        catch (ApiRequestException req) when (req.ErrorCode == 400)
-                        {
-                            deletedMessages.Add(i);
-                        }
-                    });
-                }
-                catch (AggregateException ex)
-                {
-                    cts.Cancel();
-
-                    var retryAfterSeconds = ex.InnerExceptions
-                        .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
-                        .Max(e => ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
-                    retryAfterTask = Task.Delay(retryAfterSeconds * 1000);
-                }
-
-                //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
-
-                oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
-                if (retryAfterTask != null)
-                    await retryAfterTask;
-            }
-#else
-        while (oldMessages.Any())
+        foreach (var m in old_messages)
         {
-            using (var cts = new CancellationTokenSource())
+            try
             {
-                var deletedMessages = new ConcurrentBag<int>();
-                var parallelQuery = OldMessages.AsParallel()
-                                               .WithCancellation(cts.Token);
-                Task retryAfterTask = null;
-                try
-                {
-                    parallelQuery.ForAll(i =>
-                    {
-                        try
-                        {
-                            Device.DeleteMessage(i).GetAwaiter().GetResult();
-                            deletedMessages.Add(i);
-                        }
-                        catch (ApiRequestException req) when (req.ErrorCode == 400)
-                        {
-                            deletedMessages.Add(i);
-                        }
-                    });
-                }
-                catch (AggregateException ex)
-                {
-                    cts.Cancel();
-
-                    var retryAfterSeconds = ex.InnerExceptions
-                                              .Where(e => e is ApiRequestException apiEx && apiEx.ErrorCode == 429)
-                                              .Max(e => ((ApiRequestException)e).Parameters.RetryAfter) ?? 0;
-                    retryAfterTask = Task.Delay(retryAfterSeconds * 1000, cts.Token);
-                }
-
-                //deletedMessages.AsParallel().ForAll(i => Device.OnMessageDeleted(new MessageDeletedEventArgs(i)));
-                oldMessages = oldMessages.Where(x => !deletedMessages.Contains(x));
-                if (retryAfterTask != null)
-                {
-                    await retryAfterTask;
-                }
+                await Device.Dispatch(a => Device.DeleteMessage(m));
+            }
+            catch (ApiRequestException req) when (req.ErrorCode == 400)
+            {
+                // Message already deleted, ignore
             }
         }
-
-
-#endif
 
         OldMessages.Clear();
     }
