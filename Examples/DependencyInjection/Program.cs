@@ -22,6 +22,7 @@ namespace DependencyInjection
                                     .DefaultMessageLoop()
                                     .WithServiceProvider<StartForm>(serviceProvider)
                                     .NoProxy()
+                                    .UseDefaultRequestDispatcher()
                                     .NoCommands()
                                     .NoSerialization()
                                     .DefaultLanguage()
