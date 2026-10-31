@@ -88,6 +88,8 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
   * [DefaultRequestDispatcher](#defaultrequestdispatcher)
   * [FullRequestDispatcher](#fullrequestdispatcher)
   * [Direct Dispatcher](#direct-dispatcher)
+  * [Request Priority](#request-priority)
+  * [Calling Telegram API Methods](#calling-telegram-api-methods)
   * [Creating a Custom Dispatcher](#creating-a-custom-dispatcher)
 - [Action Manager (Extension)](#action-manager)
 - [Extensions](#extensions)
@@ -1289,7 +1291,8 @@ var bot = BotBaseBuilder
 Every outgoing call to the Telegram Bot API (sending, editing, deleting messages, and so on) is routed through a
 request dispatcher before it reaches Telegram. The dispatcher is responsible for keeping the bot within Telegram's
 rate limits, retrying automatically on `HTTP 429 Too Many Requests` responses, and bounding how many requests are in
-flight at once.
+flight at once. When requests have to wait, the built-in throttling dispatchers serve them by
+[priority](#request-priority), so UI updates are not stuck behind bulk traffic.
 
 > **Note:**  
 > If none of the request dispatchers is selected, `DefaultRequestDispatcher` is used.
@@ -1299,9 +1302,10 @@ flight at once.
 
 | Name                        | Description                                                                 | Rate Limiting                                              | Use Case                                                  |
 |------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------|--------------------------------------------------------------|
-| **DefaultRequestDispatcher** | Bounds concurrency and retries automatically on `HTTP 429` responses.             | Concurrency limit + global pause on `HTTP 429`                     | Lightweight bots, low/moderate traffic                       |
+| **DefaultRequestDispatcher** | Bounds concurrency and retries automatically on `HTTP 429` responses. Waiting requests are served by priority. | Concurrency limit + global pause on `HTTP 429`                     | Lightweight bots, low/moderate traffic                       |
 | **FullRequestDispatcher**    | Extends `DefaultRequestDispatcher` with global, per-chat, and per-group throttling. | Global msgs/sec, per-chat msgs/sec, per-group msgs/min | Bots that broadcast to many chats or post frequently in groups |
-| **Custom dispatcher**        | Your own `IRequestDispatcher` implementation.                                | Whatever you implement                                        | Custom backoff strategies, metrics, priority queues, etc.     |
+| **DirectDispatcher**         | Sends every request immediately. Priority is ignored.                         | None                                                          | Bots that handle limits and retries themselves                |
+| **Custom dispatcher**        | Your own `IRequestDispatcher` implementation.                                | Whatever you implement                                        | Custom backoff strategies, metrics, etc.                      |
 
 ---
 
@@ -1324,10 +1328,14 @@ public class RequestDispatcherSettings
     public bool RespectRetryAfterHeader { get; set; } = true;
 
     // Wait time used before a retry when no retry_after value is available
-    public TimeSpan FallbackRetryAfter { get; set; } = TimeSpan.FromSeconds(1);
+    public TimeSpan FallbackRetryAfter { get; set; } = TimeSpan.FromSeconds(3);
 
     // If true, a HTTP 429 pauses ALL outgoing requests bot-wide for retry_after seconds, not just the offending chat
     public bool GlobalPauseOn429 { get; set; } = true;
+
+    // How long a queued request waits before it is promoted by one priority level, so low priorities cannot starve.
+    // Promotion never goes above UI. Zero or negative disables aging
+    public TimeSpan PriorityAgingInterval { get; set; } = TimeSpan.FromSeconds(2);
 
     // --- Rate limiting: used by FullRequestDispatcher only ---
 
@@ -1452,11 +1460,110 @@ var bot = BotBaseBuilder
 
 ---
 
+### Request Priority
+
+Every request has a `RequestPriority`. Priority only matters while requests are waiting, i.e. when the concurrency
+limit or a rate limit is exhausted: the next free slot goes to the highest priority, and requests of the same
+priority keep their arrival order.
+
+| Priority     | Meant for                                                        |
+|--------------|------------------------------------------------------------------|
+| `Critical`   | Requests with a hard deadline, e.g. answering callback queries   |
+| `UI`         | Interactive updates the user is waiting for: edits, deletes, chat actions |
+| `Normal`     | Default for everything else                                      |
+| `Background` | Bulk or non-urgent traffic such as broadcasts                    |
+
+How waiting requests are scheduled by `DefaultRequestDispatcher` and `FullRequestDispatcher`:
+
+- A request blocked only by its *own* chat or group limit is skipped, so one busy chat never holds up the others.
+- A request that waited longer than `PriorityAgingInterval` is promoted one level, so `Background` traffic cannot
+  starve. Promotion never goes above `UI`, which keeps `Critical` ahead of everything.
+- A request retried after `HTTP 429` keeps its original place in the queue.
+- A cancelled request leaves the queue immediately.
+
+`DirectDispatcher` has no queue and ignores priority.
+
+Framework methods already use sensible defaults, for example `ConfirmAction` is `Critical`, and `Edit`,
+`EditReplyMarkup`, `DeleteMessage`, `SetAction` and `HideReplyKeyboard` are `UI`. Every `DeviceSession` method that
+sends a request accepts an optional `priority` parameter to override it:
+
+```csharp
+// A form update the user is looking at
+await Device.Send("Saved!", priority: RequestPriority.UI);
+
+// A broadcast that may wait
+foreach (var session in bot.Sessions.SessionList.Values)
+{
+    await session.Send("Weekly digest", priority: RequestPriority.Background);
+}
+
+// Raw calls through the dispatcher
+await Device.Dispatch(c => c.SendPoll(Device.DeviceId, "Lunch?", options), priority: RequestPriority.Normal);
+```
+
+---
+
+### Calling Telegram API Methods
+
+Besides the framework's own `DeviceSession` methods, every request method of the `Telegram.Bot` client is available
+as an extension method. They are generated at compile time from the referenced `Telegram.Bot` version, route through
+the request dispatcher (throttling, `HTTP 429` retry and priority), and take an optional `priority` as their last
+parameter. They live in the `TelegramBotBase` namespace, so add `using TelegramBotBase;` if your code is outside it.
+
+**Chat methods** (the Telegram method takes a `chatId`) are extensions on `IDeviceSession`. `chatId` is filled in
+with the session's `DeviceId`:
+
+```csharp
+await Device.SendPoll("Lunch?", new InputPollOption[] { "Pizza", "Sushi" });
+await Device.PinChatMessage(messageId, priority: RequestPriority.UI);
+```
+
+**User methods** (the Telegram method takes a `userId` but no `chatId`) are also extensions on `IDeviceSession`.
+`userId` is filled in with `DeviceId`, so they only work in private chats and throw `InvalidOperationException` in
+groups and channels:
+
+```csharp
+await Device.VerifyUser("Verified customer");
+var photos = await Device.GetUserProfilePhotos();
+```
+
+To call one for a group member, dispatch it with their user id:
+
+```csharp
+await Device.Dispatcher.Dispatch(c => c.VerifyUser(memberUserId, "Verified customer"));
+```
+
+**Bot-level methods** (not bound to a chat or user, e.g. `GetMe`, `SetMyCommands`, `AnswerInlineQuery`,
+`GetStickerSet`, or inline-message edits) are extensions on `IRequestDispatcher`:
+
+```csharp
+var me = await bot.RequestDispatcher.GetMe();
+await bot.RequestDispatcher.AnswerInlineQuery(query.Id, results); // Critical by default
+```
+
+Default priorities follow the table above: query answers (`AnswerCallbackQuery`, `AnswerInlineQuery`,
+`AnswerPreCheckoutQuery`, `AnswerShippingQuery`, `AnswerWebAppQuery`) are `Critical`; `EditMessageText`,
+`EditMessageCaption`, `EditMessageMedia`, `EditMessageReplyMarkup`, `DeleteMessage`, `DeleteMessages` and
+`SendChatAction` are `UI`; everything else is `Normal`.
+
+> **Note:**  
+> Update polling (`ReceiveAsync`, `StartReceiving`, `GetUpdates`, `DropPendingUpdates`), file downloads
+> (`GetInfoAndDownloadFile`, `DownloadAndDecryptPassportFileAsync`), `Close` and `LogOut` are not wrapped. A long
+> poll would hold a dispatcher slot for its whole timeout. Call them on the client directly.
+
+> **Tip:**  
+> The generated code is not written to disk by default. Browse it in your IDE under
+> *Dependencies → Analyzers → TelegramBotBase.SourceGenerators*, or build with
+> `-p:EmitCompilerGeneratedFiles=true` and look in `obj/.../generated/`.
+
+---
+
 ### Creating a Custom Dispatcher
 
-If you need custom behavior, such as logging, metrics, priority queues, or a different backoff strategy, implement
+If you need custom behavior, such as logging, metrics, or a different backoff strategy, implement
 your own dispatcher by creating a class that implements the `IRequestDispatcher` interface. Wrapping an existing
-dispatcher, as below, lets you add behavior without reimplementing rate limiting from scratch.
+dispatcher, as below, lets you add behavior without reimplementing rate limiting and priority scheduling from scratch.
+Pass `priority` through to the inner dispatcher, or the requests lose their priority.
 
 **Example:**
 ```csharp
@@ -1469,19 +1576,41 @@ public class LoggingRequestDispatcher : IRequestDispatcher
         _inner = inner;
     }
 
-    public async Task Dispatch(DeviceSession ds, Func<ITelegramBotClient, Task> request, CancellationToken ct = default)
+    public Task Dispatch(IDeviceSession ds, Func<ITelegramBotClient, Task> request, CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
     {
-        await _inner.Dispatch(ds, request, ct);
+        Console.WriteLine($"Dispatching {priority} request for chat {ds.DeviceId}");
+
+        return _inner.Dispatch(ds, request, ct, priority);
     }
 
-    public async Task<T> Dispatch<T>(DeviceSession ds, Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default)
+    public Task<T> Dispatch<T>(IDeviceSession ds, Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
     {
-        Console.WriteLine($"Dispatching request for chat {ds.DeviceId}");
+        Console.WriteLine($"Dispatching {priority} request for chat {ds.DeviceId}");
 
-        return await _inner.Dispatch(ds, request, ct);
+        return _inner.Dispatch(ds, request, ct, priority);
+    }
+
+    public Task Dispatch(Func<ITelegramBotClient, Task> request, CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
+    {
+        return _inner.Dispatch(request, ct, priority);
+    }
+
+    public Task<T> Dispatch<T>(Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
+    {
+        return _inner.Dispatch(request, ct, priority);
     }
 }
 ```
+
+To change the limits themselves instead of wrapping, derive from `DefaultRequestDispatcher` or
+`FullRequestDispatcher` and override `TryOccupySpot`/`ReleaseSpot`. `TryOccupySpot` must not block: return
+`SlotAttempt.Acquired`, `SlotAttempt.BlockedForSession` (only this chat is limited) or `SlotAttempt.BlockedGlobally`
+(nothing can start), and call `SignalSlotAvailable()` whenever a limit frees up outside of `ReleaseSpot`, so waiting
+requests are re-checked.
 
 **Usage:**
 ```csharp
