@@ -114,10 +114,18 @@ namespace TelegramBotBase
                 if (chatId != null)
                 {
                     targets.Add(Target.DeviceChat);
+
+                    //Optional chatId (null = bot-wide default) also keeps a variant where the caller decides
+                    if (chatId.HasExplicitDefaultValue)
+                        targets.Add(Target.Dispatcher);
                 }
                 else if (userId != null && !NotDeviceUser.Contains(method.Name))
                 {
                     targets.Add(Target.DeviceUser);
+                }
+                else
+                {
+                    targets.Add(Target.Dispatcher);
                 }
 
                 foreach (var target in targets)
