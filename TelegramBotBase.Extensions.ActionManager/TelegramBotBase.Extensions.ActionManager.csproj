@@ -10,6 +10,8 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<!-- Consumes TelegramBotBase through the TBB_UseLocalProjectReferences switch (see Directory.Build.props). -->
+		<TBB_ReferencesTelegramBotBase>true</TBB_ReferencesTelegramBotBase>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,6 +19,13 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+	</ItemGroup>
+
+	<!-- Local project reference for solution builds; NuGet package only when packing. -->
+	<ItemGroup Condition="'$(TBB_UseLocalProjectReferences)' == 'true'">
+		<ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TBB_UseLocalProjectReferences)' != 'true'">
 		<PackageReference Include="TelegramBotBase" Version="7.0.0" />
 	</ItemGroup>
 

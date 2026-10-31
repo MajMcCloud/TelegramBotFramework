@@ -1,0 +1,39 @@
+<Project>
+
+  <!--
+	============================================================================
+	TBB_UseLocalProjectReferences - how the extension packages consume TelegramBotBase
+	============================================================================
+
+	Default (local development / solution build):
+		The extension projects reference ..\TelegramBotBase\TelegramBotBase.csproj
+		as a ProjectReference, so they always compile against the current source.
+
+	When publishing an extension package to NuGet:
+		dotnet pack -p:TBB_UseLocalProjectReferences=false
+		The extension projects then use <PackageReference Include="TelegramBotBase" ... />
+		so the generated package declares a proper NuGet dependency.
+
+	Why this switch exists:
+		TelegramBotBase pins its AssemblyVersion in Properties/AssemblyInfo.cs (6.0.0.0),
+		and the published TelegramBotBase 7.0.0 package ships an assembly with that very
+		same version. If an extension pulls the NuGet package while the consuming app uses
+		a ProjectReference, MSBuild resolves the duplicate identity to the *package*
+		(both are 6.0.0.0, so there is no MSB3277 warning and no error) and the app
+		silently compiles and runs against the released package instead of local source.
+	============================================================================
+  -->
+  <PropertyGroup>
+	<TBB_UseLocalProjectReferences Condition="'$(TBB_UseLocalProjectReferences)' == ''">true</TBB_UseLocalProjectReferences>
+  </PropertyGroup>
+
+  <!-- Safety net: warn when an extension project that is wired for this switch is packed
+	   while still using the local project reference (the resulting package would carry a
+	   bogus dependency on the local project instead of a NuGet version range). -->
+  <Target Name="TBB_WarnOnPackWithLocalProjectReference" BeforeTargets="GenerateNuspec"
+		  Condition="'$(TBB_ReferencesTelegramBotBase)' == 'true' and '$(TBB_UseLocalProjectReferences)' == 'true'">
+	<Warning Code="TBB1001"
+			 Text="Packing $(MSBuildProjectName) with a ProjectReference to TelegramBotBase. Use 'dotnet pack -p:TBB_UseLocalProjectReferences=false' to produce a package with a NuGet dependency." />
+  </Target>
+
+</Project>

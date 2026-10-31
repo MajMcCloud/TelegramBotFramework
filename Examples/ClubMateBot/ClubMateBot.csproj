@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<OutputType>Exe</OutputType>
+	<!--
+	  net8.0 is the common denominator: TelegramBotBase.Extensions.ActionManager targets net7;net8;net9 and
+	  TelegramBotBase.Extensions.Images.IronSoftware targets netcoreapp3.1;net8;net9.
+	-->
+	<TargetFramework>net8.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+	<RootNamespace>ClubMateBot</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+	Local project references on purpose - see Directory.Build.props at the repository root.
+	The library pins AssemblyVersion 6.0.0.0 while the published package is 7.0.0, so a PackageReference
+	anywhere in the graph silently wins over a ProjectReference (same assembly identity, no MSB3277).
+	TBB_UseLocalProjectReferences=true (the default) keeps the whole graph on local source.
+
+	If you want to build this example against the released packages instead, use:
+	  <PackageReference Include="TelegramBotBase" Version="7.0.0" />
+	  <PackageReference Include="TelegramBotBase.Extensions.ActionManager" Version="7.0.0" />
+	  <PackageReference Include="TelegramBotBase.Extensions.Images.IronSoftware" Version="7.0.0" />
+	and build with -p:TBB_UseLocalProjectReferences=false so the extensions resolve consistently.
+  -->
+  <ItemGroup>
+	<ProjectReference Include="..\..\TelegramBotBase\TelegramBotBase.csproj" />
+	<ProjectReference Include="..\..\TelegramBotBase.Extensions.ActionManager\TelegramBotBase.Extensions.ActionManager.csproj" />
+	<ProjectReference Include="..\..\TelegramBotBase.Extensions.Images.IronSoftware\TelegramBotBase.Extensions.Images.IronSoftware.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<!-- Matches the version TelegramBotBase itself pulls in (DependencyInjection.Abstractions 10.0.10). -->
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
+  </ItemGroup>
+
+</Project>
