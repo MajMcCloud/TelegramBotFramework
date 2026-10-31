@@ -137,7 +137,7 @@ public class DeviceSession : IDeviceSession
     public async Task ConfirmAction(string callbackQueryId, string message = "", bool showAlert = false,
                                     string urlToOpen = null)
     {
-        await this.Dispatch(a => a.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen));
+        await this.Dispatch(a => a.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen), priority: RequestPriority.Critical);
     }
 
     /// <summary>
@@ -166,7 +166,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
         
-        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup), priority: RequestPriority.UI);
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
 
-        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup), priority: RequestPriority.UI);
     }
 
     /// <summary>
@@ -222,7 +222,7 @@ public class DeviceSession : IDeviceSession
         }
 
         return await this.Dispatch(a => a.EditMessageText(DeviceId, message.MessageId, message.Text, parseMode,
-                                                    replyMarkup: markup));
+                                                    replyMarkup: markup), priority: RequestPriority.UI);
     }
 
     /// <summary>
@@ -233,7 +233,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result contains the edited message</returns>
     public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf)
     {
-        return await this.Dispatch(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf));
+        return await this.Dispatch(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf), priority: RequestPriority.UI);
     }
 
     /// <summary>
@@ -690,7 +690,7 @@ public class DeviceSession : IDeviceSession
     /// <returns>A task whose result indicates whether the deletion completed</returns>
     public virtual async Task<bool> DeleteMessage(int messageId = -1)
     {
-        await this.Dispatch(a => a.DeleteMessage(DeviceId, messageId));
+        await this.Dispatch(a => a.DeleteMessage(DeviceId, messageId), priority: RequestPriority.UI);
 
         OnMessageDeleted(new MessageDeletedEventArgs(messageId));
 
