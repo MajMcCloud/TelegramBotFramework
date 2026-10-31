@@ -19,6 +19,12 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
+        if (args.Length > 0 && args[0] == "probe-limits")
+        {
+            Environment.ExitCode = await LimitProbe.RunAsync(args);
+            return;
+        }
+
         bot = BotBaseBuilder
                  .Create()
                  .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
@@ -75,7 +81,7 @@ internal class Program
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.W:
-                    var me = await bot.Client.TelegramClient.GetMe();
+                    var me = await bot.RequestDispatcher.GetMe();
                     //Open Website in default browser
                     var url = $"https://t.me/{me.Username}";
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo

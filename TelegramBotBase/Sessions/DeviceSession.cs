@@ -133,11 +133,12 @@ public class DeviceSession : IDeviceSession
     /// <param name="message">Optional notification text to show to the user</param>
     /// <param name="showAlert">If true, an alert is shown instead of a notification at the top of the chat</param>
     /// <param name="urlToOpen">Optional URL to open instead of, or in addition to, showing the message</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ConfirmAction(string callbackQueryId, string message = "", bool showAlert = false,
-                                    string urlToOpen = null)
+                                    string urlToOpen = null, RequestPriority priority = RequestPriority.Critical)
     {
-        await this.Dispatch(a => a.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen));
+        await this.Dispatch(a => a.AnswerCallbackQuery(callbackQueryId, message, showAlert, urlToOpen), priority: priority);
     }
 
     /// <summary>
@@ -148,11 +149,12 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
     /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the edited message</returns>
     /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Edit(int messageId, string text, ButtonForm buttons = null,
                                     ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = true)
+                                    bool markdownV2AutoEscape = true, RequestPriority priority = RequestPriority.UI)
     {
         InlineKeyboardMarkup markup = buttons;
 
@@ -166,7 +168,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
         
-        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup), priority: priority);
     }
 
     /// <summary>
@@ -177,11 +179,12 @@ public class DeviceSession : IDeviceSession
     /// <param name="markup">The inline keyboard markup to attach to the message</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
     /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the edited message</returns>
     /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Edit(int messageId, string text, InlineKeyboardMarkup markup,
                                     ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = true)
+                                    bool markdownV2AutoEscape = true, RequestPriority priority = RequestPriority.UI)
     {
         if (text.Length > Constants.Telegram.MaxMessageLength)
         {
@@ -193,7 +196,7 @@ public class DeviceSession : IDeviceSession
             text = text.MarkdownV2Escape();
         }
 
-        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup));
+        return await this.Dispatch(a => a.EditMessageText(DeviceId, messageId, text, parseMode, replyMarkup: markup), priority: priority);
     }
 
     /// <summary>
@@ -203,11 +206,12 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
     /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in  <paramref name="message"/>'s text</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the edited message</returns>
     /// <exception cref="MessageTooLongException">Thrown when the text of <paramref name="message"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Edit(Message message, ButtonForm buttons = null,
                                     ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = true)
+                                    bool markdownV2AutoEscape = true, RequestPriority priority = RequestPriority.UI)
     {
         InlineKeyboardMarkup markup = buttons;
 
@@ -222,7 +226,7 @@ public class DeviceSession : IDeviceSession
         }
 
         return await this.Dispatch(a => a.EditMessageText(DeviceId, message.MessageId, message.Text, parseMode,
-                                                    replyMarkup: markup));
+                                                    replyMarkup: markup), priority: priority);
     }
 
     /// <summary>
@@ -230,10 +234,11 @@ public class DeviceSession : IDeviceSession
     /// </summary>
     /// <param name="messageId">The identifier of the message to edit</param>
     /// <param name="bf">Inline keyboard buttons to attach to the message</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the edited message</returns>
-    public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf)
+    public async Task<Message> EditReplyMarkup(int messageId, ButtonForm bf, RequestPriority priority = RequestPriority.UI)
     {
-        return await this.Dispatch(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf));
+        return await this.Dispatch(a => a.EditMessageReplyMarkup(DeviceId, messageId, bf), priority: priority);
     }
 
     /// <summary>
@@ -246,11 +251,12 @@ public class DeviceSession : IDeviceSession
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
     /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(long deviceId, string text, ButtonForm buttons = null, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = true)
+                                    bool markdownV2AutoEscape = true, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -271,7 +277,7 @@ public class DeviceSession : IDeviceSession
         
         var t = this.Dispatch(a => a.SendMessage(deviceId, text, parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo}, 
-                                        replyMarkup: markup, disableNotification: disableNotification));
+                                        replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
 
@@ -289,13 +295,14 @@ public class DeviceSession : IDeviceSession
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
     /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(string text, ButtonForm buttons = null, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = true)
+                                    bool markdownV2AutoEscape = true, RequestPriority priority = RequestPriority.Normal)
     {
-        return await Send(DeviceId, text, buttons, replyTo, disableNotification, parseMode, markdownV2AutoEscape);
+        return await Send(DeviceId, text, buttons, replyTo, disableNotification, parseMode, markdownV2AutoEscape, priority: priority);
     }
 
     /// <summary>
@@ -307,11 +314,12 @@ public class DeviceSession : IDeviceSession
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
     /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(string text, InlineKeyboardMarkup markup, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = true)
+                                    bool markdownV2AutoEscape = true, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -330,7 +338,7 @@ public class DeviceSession : IDeviceSession
         
         var t = this.Dispatch(a => a.SendMessage(DeviceId, text, parseMode, 
                                         replyParameters: new ReplyParameters { MessageId = replyTo },
-                                        replyMarkup: markup, disableNotification: disableNotification));
+                                        replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -347,11 +355,12 @@ public class DeviceSession : IDeviceSession
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
     /// <param name="markdownV2AutoEscape">If true and <paramref name="parseMode"/> is <see cref="ParseMode.MarkdownV2"/>, automatically escapes reserved characters in <paramref name="text"/></param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     /// <exception cref="MessageTooLongException">Thrown when <paramref name="text"/> exceeds the maximum allowed message length specified at <see cref="Constants.Telegram.MaxMessageLength"/></exception>
     public async Task<Message> Send(string text, ReplyMarkup markup, int replyTo = 0,
                                     bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown,
-                                    bool markdownV2AutoEscape = true)
+                                    bool markdownV2AutoEscape = true, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -370,7 +379,7 @@ public class DeviceSession : IDeviceSession
 
         var t = this.Dispatch(a => a.SendMessage(DeviceId, text, parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo }, 
-                                        replyMarkup: markup, disableNotification: disableNotification));
+                                        replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -387,10 +396,11 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the caption text</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendPhoto(InputFile file, string caption = null, ButtonForm buttons = null,
                                          int replyTo = 0, bool disableNotification = false,
-                                         ParseMode parseMode = ParseMode.Markdown)
+                                         ParseMode parseMode = ParseMode.Markdown, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -401,7 +411,7 @@ public class DeviceSession : IDeviceSession
 
         var t = this.Dispatch(a => a.SendPhoto(DeviceId, file, caption, parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo }, 
-                                        replyMarkup: markup, disableNotification: disableNotification));
+                                        replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -418,10 +428,11 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the caption text</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendVideo(InputFile file, string caption = null, ButtonForm buttons = null,
                                          int replyTo = 0, bool disableNotification = false,
-                                         ParseMode parseMode = ParseMode.Markdown)
+                                         ParseMode parseMode = ParseMode.Markdown, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -432,7 +443,7 @@ public class DeviceSession : IDeviceSession
 
         var t = this.Dispatch(a => a.SendVideo(DeviceId, file, caption: caption, parseMode: parseMode,
                                           replyParameters: new ReplyParameters() { MessageId = replyTo }, 
-                                          replyMarkup: markup, disableNotification: disableNotification));
+                                          replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -448,9 +459,10 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the caption text</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendVideo(string url, ButtonForm buttons = null, int replyTo = 0,
-                                         bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+                                         bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -461,7 +473,7 @@ public class DeviceSession : IDeviceSession
 
         var t = this.Dispatch(a => a.SendVideo(DeviceId, InputFile.FromUri(url), parseMode: parseMode,
                                           replyParameters: new ReplyParameters() { MessageId = replyTo }, 
-                                          replyMarkup: markup, disableNotification: disableNotification));
+                                          replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -478,9 +490,10 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendVideo(string filename, byte[] video, ButtonForm buttons = null, int replyTo = 0,
-                                         bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown)
+                                         bool disableNotification = false, ParseMode parseMode = ParseMode.Markdown, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -495,7 +508,7 @@ public class DeviceSession : IDeviceSession
 
         var t = this.Dispatch(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
                                         replyParameters: new ReplyParameters { MessageId = replyTo }, 
-                                        replyMarkup: markup, disableNotification: disableNotification));
+                                        replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -511,10 +524,11 @@ public class DeviceSession : IDeviceSession
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
     /// <param name="parseMode">The formatting mode used to parse the message text</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or <see langword="null"/> if there is no active form</returns>
     public async Task<Message> SendLocalVideo(string filepath, ButtonForm buttons = null, int replyTo = 0,
                                               bool disableNotification = false,
-                                              ParseMode parseMode = ParseMode.Markdown)
+                                              ParseMode parseMode = ParseMode.Markdown, RequestPriority priority = RequestPriority.Normal)
     {
         if (ActiveForm == null)
         {
@@ -531,7 +545,7 @@ public class DeviceSession : IDeviceSession
 
         var t = this.Dispatch(a => a.SendVideo(DeviceId, fts, parseMode: parseMode, 
                                         replyParameters: new ReplyParameters() { MessageId = replyTo }, 
-                                        replyMarkup: markup, disableNotification: disableNotification));
+                                        replyMarkup: markup, disableNotification: disableNotification), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -548,16 +562,17 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> SendDocument(string filename, byte[] document, string caption = "",
                                             ButtonForm buttons = null, int replyTo = 0,
-                                            bool disableNotification = false)
+                                            bool disableNotification = false, RequestPriority priority = RequestPriority.Normal)
     {
         var ms = new MemoryStream(document);
 
         var fts = InputFile.FromStream(ms, filename);
 
-        return await SendDocument(fts, caption, buttons, replyTo, disableNotification);
+        return await SendDocument(fts, caption, buttons, replyTo, disableNotification, priority: priority);
     }
 
     /// <summary>
@@ -570,10 +585,11 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> SendTextFile(string filename, string textcontent, Encoding encoding = null,
                                             string caption = "", ButtonForm buttons = null, int replyTo = 0,
-                                            bool disableNotification = false)
+                                            bool disableNotification = false, RequestPriority priority = RequestPriority.Normal)
     {
         encoding = encoding ?? Encoding.UTF8;
 
@@ -585,7 +601,7 @@ public class DeviceSession : IDeviceSession
 
         var content = ms.ToArray();
 
-        return await SendDocument(filename, content, caption, buttons, replyTo, disableNotification);
+        return await SendDocument(filename, content, caption, buttons, replyTo, disableNotification, priority: priority);
     }
 
     /// <summary>
@@ -596,10 +612,11 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttons">Optional inline keyboard buttons to attach to the message</param>
     /// <param name="replyTo">Optional identifier of the message to reply to, or 0 for no reply</param>
     /// <param name="disableNotification">If true, sends the message silently without triggering a notification</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> SendDocument(InputFile document, string caption = "",
                                             ButtonForm buttons = null, int replyTo = 0,
-                                            bool disableNotification = false)
+                                            bool disableNotification = false, RequestPriority priority = RequestPriority.Normal)
     {
         InlineKeyboardMarkup markup = null;
         if (buttons != null)
@@ -609,7 +626,7 @@ public class DeviceSession : IDeviceSession
         
         var t = this.Dispatch(a => a.SendDocument(DeviceId, document, caption, replyMarkup: markup,
                                         disableNotification: disableNotification, 
-                                        replyParameters: new ReplyParameters { MessageId = replyTo }));
+                                        replyParameters: new ReplyParameters { MessageId = replyTo }), priority: priority);
 
         var o = GetOrigin(new StackTrace());
         await OnMessageSent(new MessageSentEventArgs(await t, o));
@@ -621,10 +638,11 @@ public class DeviceSession : IDeviceSession
     ///     Set a chat action (showed to the user)
     /// </summary>
     /// <param name="action">The chat action to display</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    public async Task SetAction(ChatAction action)
+    public async Task SetAction(ChatAction action, RequestPriority priority = RequestPriority.UI)
     {
-        await this.Dispatch(a => a.SendChatAction(DeviceId, action));
+        await this.Dispatch(a => a.SendChatAction(DeviceId, action), priority: priority);
     }
 
     /// <summary>
@@ -633,17 +651,18 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttonText">The text displayed on the request-contact button</param>
     /// <param name="requestMessage">The message text shown alongside the button</param>
     /// <param name="oneTimeOnly">If true, hides the keyboard after it is used once</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> RequestContact(string buttonText = "Send your contact",
                                               string requestMessage = "Give me your phone number!",
-                                              bool oneTimeOnly = true)
+                                              bool oneTimeOnly = true, RequestPriority priority = RequestPriority.Normal)
     {
         var rck = new ReplyKeyboardMarkup(KeyboardButton.WithRequestContact(buttonText))
         {
             OneTimeKeyboard = oneTimeOnly
         };
         
-        return await this.Dispatch(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rck));
+        return await this.Dispatch(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rck), priority: priority);
     }
 
     /// <summary>
@@ -652,17 +671,18 @@ public class DeviceSession : IDeviceSession
     /// <param name="buttonText">The text displayed on the request-location button</param>
     /// <param name="requestMessage">The message text shown alongside the button</param>
     /// <param name="oneTimeOnly">If true, hides the keyboard after it is used once</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message</returns>
     public async Task<Message> RequestLocation(string buttonText = "Send your location",
                                                string requestMessage = "Give me your location!",
-                                               bool oneTimeOnly = true)
+                                               bool oneTimeOnly = true, RequestPriority priority = RequestPriority.Normal)
     {
         var rcl = new ReplyKeyboardMarkup(KeyboardButton.WithRequestLocation(buttonText))
         {
             OneTimeKeyboard = oneTimeOnly
         };
         
-        return await this.Dispatch(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rcl));
+        return await this.Dispatch(a => a.SendMessage(DeviceId, requestMessage, replyMarkup: rcl), priority: priority);
     }
 
     /// <summary>
@@ -670,14 +690,15 @@ public class DeviceSession : IDeviceSession
     /// </summary>
     /// <param name="closedMsg">The text of the temporary message sent to trigger the keyboard removal</param>
     /// <param name="autoDeleteResponse">If true, automatically deletes the temporary message after sending</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the sent message, or the deleted message if <paramref name="autoDeleteResponse"/> is true</returns>
-    public async Task<Message> HideReplyKeyboard(string closedMsg = "Closed", bool autoDeleteResponse = true)
+    public async Task<Message> HideReplyKeyboard(string closedMsg = "Closed", bool autoDeleteResponse = true, RequestPriority priority = RequestPriority.UI)
     {
-        var m = await Send(closedMsg, new ReplyKeyboardRemove());
+        var m = await Send(closedMsg, new ReplyKeyboardRemove(), priority: priority);
 
         if (autoDeleteResponse && m != null)
         {
-            await DeleteMessage(m);
+            await DeleteMessage(m, priority: priority);
         }
 
         return m;
@@ -687,10 +708,11 @@ public class DeviceSession : IDeviceSession
     ///     Deletes a message from the chat
     /// </summary>
     /// <param name="messageId">The identifier of the message to delete</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result indicates whether the deletion completed</returns>
-    public virtual async Task<bool> DeleteMessage(int messageId = -1)
+    public virtual async Task<bool> DeleteMessage(int messageId = -1, RequestPriority priority = RequestPriority.UI)
     {
-        await this.Dispatch(a => a.DeleteMessage(DeviceId, messageId));
+        await this.Dispatch(a => a.DeleteMessage(DeviceId, messageId), priority: priority);
 
         OnMessageDeleted(new MessageDeletedEventArgs(messageId));
 
@@ -701,20 +723,22 @@ public class DeviceSession : IDeviceSession
     ///     Deletes a message from the chat
     /// </summary>
     /// <param name="message">The message to delete</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result indicates whether the deletion completed</returns>
-    public virtual async Task<bool> DeleteMessage(Message message)
+    public virtual async Task<bool> DeleteMessage(Message message, RequestPriority priority = RequestPriority.UI)
     {
-        return await DeleteMessage(message.MessageId);
+        return await DeleteMessage(message.MessageId, priority: priority);
     }
     
     /// <summary>
     ///     Changes the chat permissions for members
     /// </summary>
     /// <param name="permissions">The permissions to apply to the chat</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    public virtual async Task ChangeChatPermissions(ChatPermissions permissions)
+    public virtual async Task ChangeChatPermissions(ChatPermissions permissions, RequestPriority priority = RequestPriority.Normal)
     {
-        await this.Dispatch(a => a.SetChatPermissions(DeviceId, permissions));
+        await this.Dispatch(a => a.SetChatPermissions(DeviceId, permissions), priority: priority);
     }
 
     private Type GetOrigin(StackTrace stackTrace)
@@ -821,12 +845,13 @@ public class DeviceSession : IDeviceSession
     /// <param name="permissions">The permissions to apply to the user</param>
     /// <param name="useIndependentGroupPermission">If true, applies permissions independently of the chat's default permissions</param>
     /// <param name="until">The date and time until which the restriction applies, or default for no expiration</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    public virtual async Task RestrictUser(long userId, ChatPermissions permissions, bool useIndependentGroupPermission = false, DateTime until = default)
+    public virtual async Task RestrictUser(long userId, ChatPermissions permissions, bool useIndependentGroupPermission = false, DateTime until = default, RequestPriority priority = RequestPriority.Normal)
     {
         try
         {
-            await this.Dispatch(a => a.RestrictChatMember(DeviceId, userId, permissions, useIndependentGroupPermission, until));
+            await this.Dispatch(a => a.RestrictChatMember(DeviceId, userId, permissions, useIndependentGroupPermission, until), priority: priority);
         }
         catch
         {
@@ -837,10 +862,11 @@ public class DeviceSession : IDeviceSession
     ///     Gets information about a member of the chat
     /// </summary>
     /// <param name="userId">The identifier of the user to retrieve</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task whose result contains the chat member information</returns>
-    public virtual async Task<ChatMember> GetChatUser(long userId)
+    public virtual async Task<ChatMember> GetChatUser(long userId, RequestPriority priority = RequestPriority.Normal)
     {
-        return await this.Dispatch(a => a.GetChatMember(DeviceId, userId));
+        return await this.Dispatch(a => a.GetChatMember(DeviceId, userId), priority: priority);
     }
 
     [Obsolete("User BanUser instead.")]
@@ -854,20 +880,22 @@ public class DeviceSession : IDeviceSession
     /// </summary>
     /// <param name="userId">The identifier of the user to ban</param>
     /// <param name="until">The date and time until which the ban applies, or default for a permanent ban</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    public virtual async Task BanUser(long userId, DateTime until = default)
+    public virtual async Task BanUser(long userId, DateTime until = default, RequestPriority priority = RequestPriority.Normal)
     {
-        await this.Dispatch(a => a.BanChatMember(DeviceId, userId, until));
+        await this.Dispatch(a => a.BanChatMember(DeviceId, userId, until), priority: priority);
     }
 
     /// <summary>
     ///     Unbans a previously banned user from the chat
     /// </summary>
     /// <param name="userId">The identifier of the user to unban</param>
+    /// <param name="priority">Order in which this request is served relative to other waiting requests</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    public virtual async Task UnbanUser(long userId)
+    public virtual async Task UnbanUser(long userId, RequestPriority priority = RequestPriority.Normal)
     {
-        await this.Dispatch(a => a.UnbanChatMember(DeviceId, userId));
+        await this.Dispatch(a => a.UnbanChatMember(DeviceId, userId), priority: priority);
     }
 
     #endregion

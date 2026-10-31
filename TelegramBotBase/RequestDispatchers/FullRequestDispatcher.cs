@@ -24,29 +24,54 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
     public FullRequestDispatcher(RequestDispatcherSettings settings, MessageClient client) : base(settings, client)
     {
         GlobalSemaphore = new CooldownSemaphore(settings.MaxRequestsPerSecond, TimeSpan.FromSeconds(1));
+        GlobalSemaphore.SlotAvailable += SignalSlotAvailable;
         ChatSemaphoreCache = new MemoryCache(new MemoryCacheOptions());
         GroupSemaphoreCache = new MemoryCache(new MemoryCacheOptions());
     }
 
-    protected override async Task OccupySpot(IDeviceSession ds, CancellationToken ct = default)
+    protected override SlotAttempt TryOccupySpot(IDeviceSession ds)
     {
-        await base.OccupySpot(ds, ct);
-        
-        await GlobalSemaphore.Wait(ct);
-        await GetChatSemaphore(ds.DeviceId).Wait(ct);
-
-        if (ds.IsGroup)
+        var baseAttempt = base.TryOccupySpot(ds);
+        if (baseAttempt != SlotAttempt.Acquired)
         {
-            await GetGroupSemaphore(ds.DeviceId).Wait(ct);
+            return baseAttempt;
         }
+
+        if (!GlobalSemaphore.TryWait())
+        {
+            ConcurrencyLimiter.Release();
+            return SlotAttempt.BlockedGlobally;
+        }
+
+        var isGroup = IsGroupChat(ds);
+
+        var chat = GetChatSemaphore(ds.DeviceId, isGroup);
+        if (!chat.TryWait())
+        {
+            GlobalSemaphore.ReleaseImmediately();
+            ConcurrencyLimiter.Release();
+            return SlotAttempt.BlockedForSession;
+        }
+
+        if (isGroup && !GetGroupSemaphore(ds.DeviceId).TryWait())
+        {
+            chat.ReleaseImmediately();
+            GlobalSemaphore.ReleaseImmediately();
+            ConcurrencyLimiter.Release();
+            return SlotAttempt.BlockedForSession;
+        }
+
+        return SlotAttempt.Acquired;
     }
 
     protected override void ReleaseSpot(IDeviceSession ds)
     {
-        GlobalSemaphore.Release();
-        GetChatSemaphore(ds.DeviceId).Release();
+        var isGroup = IsGroupChat(ds);
 
-        if (ds.IsGroup)
+        GlobalSemaphore.Release();
+        GetChatSemaphore(ds.DeviceId, isGroup).Release();
+
+        if (isGroup)
         {
             GetGroupSemaphore(ds.DeviceId).Release();
         }
@@ -54,12 +79,25 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
         base.ReleaseSpot(ds);
     }
     
-    protected CooldownSemaphore GetChatSemaphore(long chatId)
+    /// <summary>
+    /// Whether <paramref name="ds"/> is subject to the group limits. Telegram gives groups, supergroups and channels
+    /// negative chat ids, so the id decides even for sessions that have not received a message yet
+    /// (where <see cref="IDeviceSession.IsGroup"/> is still false)
+    /// </summary>
+    protected virtual bool IsGroupChat(IDeviceSession ds)
+    {
+        return ds.DeviceId < 0 || ds.IsGroup || ds.IsChannel;
+    }
+
+    protected CooldownSemaphore GetChatSemaphore(long chatId, bool isGroup)
     {
         return ChatSemaphoreCache.GetOrCreate(chatId, entry =>
             {
                 entry.SlidingExpiration = Settings.ChatLimiterCacheTimeout;
-                return new CooldownSemaphore(Settings.MaxRequestsPerSecondPerChat, TimeSpan.FromSeconds(1));
+                var perSecond = isGroup ? Settings.MaxRequestsPerSecondPerGroup : Settings.MaxRequestsPerSecondPerChat;
+                var semaphore = new CooldownSemaphore(perSecond, TimeSpan.FromSeconds(1));
+                semaphore.SlotAvailable += SignalSlotAvailable;
+                return semaphore;
             }
         );
     }
@@ -69,7 +107,9 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
         return GroupSemaphoreCache.GetOrCreate(chatId, entry =>
             {
                 entry.SlidingExpiration = Settings.GroupLimiterCacheTimeout;
-                return new CooldownSemaphore(Settings.MaxRequestsPerMinutePerGroup, TimeSpan.FromMinutes(1));
+                var semaphore = new CooldownSemaphore(Settings.MaxRequestsPerMinutePerGroup, TimeSpan.FromMinutes(1));
+                semaphore.SlotAvailable += SignalSlotAvailable;
+                return semaphore;
             }
         );
     }

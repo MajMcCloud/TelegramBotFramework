@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using TelegramBotBase.RequestDispatchers;
 
 namespace TelegramBotBase.Example.Tasks
 {
@@ -31,10 +32,10 @@ namespace TelegramBotBase.Example.Tasks
             foreach (var user in users)
             {
 
-                await dispatcher.Dispatch(user, async (session) =>
-                {
-                    await session.SendMessage(user.DeviceId, "Welcome to the bot! This is a welcome message sent every 5 minutes.");
-                }); 
+                // Periodic broadcast: Background so it never delays interactive form updates
+                await dispatcher.Dispatch(user,
+                    client => client.SendMessage(user.DeviceId, "Welcome to the bot! This is a welcome message sent every 5 minutes."),
+                    priority: RequestPriority.Background);
 
             }
         }

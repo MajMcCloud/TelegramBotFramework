@@ -1,52 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+using System.Globalization;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Resources;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using TelegramBotBase.SourceGenerators;
 
 namespace TelegramBotBase
 {
-
+    /// <summary>
+    /// Wraps every Telegram.Bot client method so it goes through the request dispatcher
+    /// (throttling, 429 retry and priority):
+    /// <list type="bullet">
+    /// <item>Chat methods (a <c>chatId</c> parameter) become <c>IDeviceSession</c> extensions, with <c>chatId</c> = <c>DeviceId</c></item>
+    /// <item>User methods (a <c>userId</c> parameter, no <c>chatId</c>) become <c>IDeviceSession</c> extensions, with <c>userId</c> = <c>DeviceId</c>; private chats only</item>
+    /// <item>Everything else becomes an <c>IRequestDispatcher</c> extension</item>
+    /// </list>
+    /// </summary>
     [Generator(LanguageNames.CSharp)]
     public class TelegramDeviceExtensionGenerator : IIncrementalGenerator
     {
         static XmlDocumentationLoader? xml = null;
 
+        /// <summary>Not regular API requests: update polling, file downloads and bot lifecycle</summary>
+        private static readonly HashSet<string> Excluded = new()
+        {
+            "ReceiveAsync", "StartReceiving", "GetUpdates", "DropPendingUpdates",
+            "GetInfoAndDownloadFile", "DownloadAndDecryptPassportFileAsync",
+            "Close", "LogOut"
+        };
+
+        /// <summary>Their <c>userId</c> is the managed bot's id, not the chat user, so it must stay a parameter</summary>
+        private static readonly HashSet<string> NotDeviceUser = new()
+        {
+            "GetManagedBotToken", "ReplaceManagedBotToken", "GetManagedBotAccessSettings", "SetManagedBotAccessSettings"
+        };
+
+        /// <summary>Default priority per method; anything not listed is Normal</summary>
+        private static readonly Dictionary<string, string> DefaultPriority = new()
+        {
+            ["AnswerCallbackQuery"] = "Critical",
+            ["AnswerInlineQuery"] = "Critical",
+            ["AnswerPreCheckoutQuery"] = "Critical",
+            ["AnswerShippingQuery"] = "Critical",
+            ["AnswerWebAppQuery"] = "Critical",
+            ["EditMessageText"] = "UI",
+            ["EditMessageCaption"] = "UI",
+            ["EditMessageMedia"] = "UI",
+            ["EditMessageReplyMarkup"] = "UI",
+            ["DeleteMessage"] = "UI",
+            ["DeleteMessages"] = "UI",
+            ["SendChatAction"] = "UI",
+        };
+
+        private enum Target
+        {
+            DeviceChat,
+            DeviceUser,
+            Dispatcher
+        }
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            var provider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: (c, _) => c is ClassDeclarationSyntax,
-                transform: (n, _) => (ClassDeclarationSyntax)n.Node)
-                .Where(a => a is not null);
-
-
-            var compilation = context.CompilationProvider;
-
-            context.RegisterSourceOutput(compilation, (spc, source) => Execute(spc, source));
-
-
-
+            context.RegisterSourceOutput(context.CompilationProvider, (spc, source) => Execute(spc, source));
         }
-
 
         private void Execute(SourceProductionContext context, Compilation compilation)
         {
-            //if (!Debugger.IsAttached) Debugger.Launch();
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine();
-
             //Search for reference library
             var telegram_package = compilation.References.FirstOrDefault(a => a.Display != null && a.Display.Contains("Telegram.Bot"));
             if (telegram_package == null)
@@ -59,9 +80,7 @@ namespace TelegramBotBase
                 xml.ReadEmbeddedXml("Telegram.Bot.xml");
             }
 
-            var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(telegram_package) as IAssemblySymbol;
-
-            if (assemblySymbol == null)
+            if (compilation.GetAssemblyOrModuleSymbol(telegram_package) is not IAssemblySymbol assemblySymbol)
                 return;
 
             if (assemblySymbol.Name != "Telegram.Bot")
@@ -72,127 +91,86 @@ namespace TelegramBotBase
             if (apiClass == null)
                 return;
 
-            //Get existing list of methods
-            var methods = apiClass.GetMembers().OfType<IMethodSymbol>().ToList();
+            var device = new StringBuilder();
+            var dispatcher = new StringBuilder();
+            var signatures = new HashSet<string>();
+            var skipped = new List<string>();
 
-
-            foreach (var method in methods)
+            foreach (var method in apiClass.GetMembers().OfType<IMethodSymbol>())
             {
+                if (method.MethodKind != MethodKind.Ordinary || method.IsGenericMethod)
+                    continue;
+
                 if (!method.Parameters.Any(a => a.Type.Name == "ITelegramBotClient"))
                     continue;
 
-                if (!method.Parameters.Any(a => a.Type.Name == "ChatId"))
+                if (Excluded.Contains(method.Name) || ReturnStatement(method) == null)
                     continue;
 
-                if (method.Name == ".ctor")
-                    continue;
+                var chatId = method.Parameters.FirstOrDefault(p => p.Name == "chatId");
+                var userId = method.Parameters.FirstOrDefault(p => p.Name == "userId" && p.Type.SpecialType == SpecialType.System_Int64);
 
-
-
-                string parameters = "";
-                string subCallParameters = "";
-                foreach (var par in method.Parameters)
+                var targets = new List<Target>();
+                if (chatId != null)
                 {
-                    if (par.Name == "botClient")
-                        continue;
+                    targets.Add(Target.DeviceChat);
 
-                    if (par.Name == "chatId")
-                    {
-                        if(method.Parameters.IndexOf(par) != 1)
-                        {
-                            subCallParameters += ", ";
-                        }
-
-                        subCallParameters += $"device.DeviceId";
-                        continue;
-                    }
-
-                    if (!string.IsNullOrEmpty(parameters))
-                    {
-                        parameters += ", ";
-                    }
-
-                    if (!string.IsNullOrEmpty(subCallParameters))
-                    {
-                        subCallParameters += ", ";
-                    }
-
-                    subCallParameters += $"{par.Name}";
-                    parameters += $"{par.Type.ToDisplayString()} {par.Name}";
-
-                    if (par.HasExplicitDefaultValue)
-                    {
-                        var defaultValue = par.ExplicitDefaultValue;
-
-                        // Handle specific default value cases
-                        if (defaultValue == null)
-                        {
-                            if (par.Name == "cancellationToken")
-                            {
-                                parameters += " = default";
-                            }
-                            else
-                            {
-                                parameters += " = null";
-                            }
-
-
-                        }
-                        else if (defaultValue is string)
-                        {
-                            parameters += $" = \"{defaultValue}\""; // Add quotes around string default values
-                        }
-                        else if (defaultValue is bool)
-                        {
-                            parameters += $" = {defaultValue.ToString().ToLower()}"; // Use lower case for booleans (true/false)
-                        }
-                        else if (defaultValue is char)
-                        {
-                            parameters += $" = '{defaultValue}'"; // Use single quotes for char
-                        }
-                        else
-                        {
-                            parameters += $" = {defaultValue}"; // General case for other types (numbers, enums, etc.)
-                        }
-                    }
-
-
+                    //Optional chatId (null = bot-wide default) also keeps a variant where the caller decides
+                    if (chatId.HasExplicitDefaultValue)
+                        targets.Add(Target.Dispatcher);
                 }
-
-
-                var returnStatement = string.Empty;
-
-                if (method.ReturnType is INamedTypeSymbol namedType && namedType.IsGenericType && namedType.ConstructedFrom.Name == "Task" && namedType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks")
+                else if (userId != null && !NotDeviceUser.Contains(method.Name))
                 {
-                    returnStatement = "return await";
-                }
-                else if (method.ReturnType.Name == "Task" && method.ReturnType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks")
-                {
-                    returnStatement = "await";
-                }
-                else if (method.ReturnsVoid)
-                {
-                    returnStatement = string.Empty;
+                    targets.Add(Target.DeviceUser);
                 }
                 else
                 {
-                    returnStatement = "return ";
+                    targets.Add(Target.Dispatcher);
                 }
 
-                string? tmp = GenerateMethod(method, parameters, subCallParameters, returnStatement);
+                foreach (var target in targets)
+                {
+                    var substituted = target switch
+                    {
+                        Target.DeviceChat => "chatId",
+                        Target.DeviceUser => "userId",
+                        _ => null
+                    };
 
-                sb.Append(tmp);
+                    var receiver = target == Target.Dispatcher ? "IRequestDispatcher" : "IDeviceSession";
 
+                    //Removing a parameter can make two overloads identical; keep the first
+                    var signature = receiver + "." + method.Name + "(" + string.Join(",",
+                        method.Parameters.Where(p => p.Name != "botClient" && p.Name != substituted)
+                              .Select(p => p.Type.ToDisplayString())) + ")";
+
+                    if (!signatures.Add(signature))
+                    {
+                        skipped.Add(signature);
+                        continue;
+                    }
+
+                    var code = GenerateMethod(method, target, substituted);
+                    (target == Target.Dispatcher ? dispatcher : device).Append(code);
+                }
             }
 
+            var skippedComment = skipped.Count == 0
+                ? ""
+                : "// Skipped (identical signature to an earlier overload once the mapped parameter is removed):\n"
+                  + string.Join("\n", skipped.Select(s => "//   " + s)) + "\n";
 
+            context.AddSource("DeviceExtensions.g.cs", SourceText.From(WrapClass("DeviceExtensions", device.ToString(), skippedComment), Encoding.UTF8));
+            context.AddSource("DispatcherExtensions.g.cs", SourceText.From(WrapClass("DispatcherExtensions", dispatcher.ToString(), ""), Encoding.UTF8));
+        }
 
-
-            //The generated source
+        private static string WrapClass(string className, string body, string header)
+        {
             var sourceCode = $$"""
             using System;
             using System.Threading.Tasks;
             using TelegramBotBase.Interfaces;
+            using TelegramBotBase.RequestDispatchers;
             using TelegramBotBase.Sessions;
             using Telegram.Bot;
             using Telegram.Bot.Extensions;
@@ -204,80 +182,146 @@ namespace TelegramBotBase
 
             #nullable enable
             namespace TelegramBotBase;
-        
-            public static class DeviceExtensions
+
+            {{header}}
+            public static class {{className}}
             {
-                {{sb.ToString()}}
+            {{body}}
             }
-            
+
             """;
 
             //Cleanup
-            sourceCode = sourceCode.Replace("System.Threading.Tasks.", "");
-
-
-            context.AddSource("DeviceExtensions.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
-
+            return sourceCode.Replace("System.Threading.Tasks.", "");
         }
 
-        /// <summary>
-        /// Test
-        /// </summary>
-        /// <param name="method"></param>
-        /// <param name="parameters"></param>
-        /// <param name="subCallParameters"></param>
-        /// <param name="returnStatement"></param>
-        /// <returns></returns>
-        private string? GenerateMethod(IMethodSymbol? method, string parameters, string subCallParameters, string returnStatement)
+        private static string? ReturnStatement(IMethodSymbol method)
         {
-            if (method == null)
+            if (method.ReturnType is not INamedTypeSymbol type || type.ContainingNamespace.ToDisplayString() != "System.Threading.Tasks")
                 return null;
 
-            string? xml_comments = xml?.GetDocumentationLinesForSymbol(method);
-            xml_comments = CleanupXMLComments(xml_comments, "chatId", "botClient");
+            if (type.Name != "Task")
+                return null;
 
-            StringBuilder sb = new StringBuilder();
-            sb.Append(xml_comments);
-            sb.AppendLine($"    /// <param name=\"device\">Device session</param>");
+            return type.IsGenericType ? "return await" : "await";
+        }
 
-            if (method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
+        private string GenerateMethod(IMethodSymbol method, Target target, string? substituted)
+        {
+            var receiverName = target == Target.Dispatcher ? "dispatcher" : "device";
+            var receiverType = target == Target.Dispatcher ? "IRequestDispatcher" : "IDeviceSession";
+            var priority = DefaultPriority.TryGetValue(method.Name, out var p) ? p : "Normal";
+
+            var parameters = new List<string> { $"this {receiverType} {receiverName}" };
+            var arguments = new List<string>();
+
+            foreach (var par in method.Parameters)
             {
-                sb.AppendLine("[Obsolete]");
+                if (par.Name == "botClient")
+                    continue;
+
+                if (par.Name == substituted)
+                {
+                    arguments.Add("device.DeviceId");
+                    continue;
+                }
+
+                arguments.Add(par.Name);
+                parameters.Add($"{par.Type.ToDisplayString()} {par.Name}{DefaultValue(par)}");
             }
 
-            sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}(this IDeviceSession device, {parameters})");
-            sb.AppendLine($"    {{");
+            parameters.Add($"RequestPriority priority = RequestPriority.{priority}");
 
-            var hasCancellationToken = method.Parameters.Any(p => p.Name == "cancellationToken");
-            var dispatchCtArg = hasCancellationToken ? ", cancellationToken" : "";
+            var hasCancellationToken = method.Parameters.Any(a => a.Name == "cancellationToken");
+            var ct = hasCancellationToken ? "cancellationToken" : "default";
 
-            sb.AppendLine($"        {returnStatement} device.Dispatch(tgClient => tgClient.{method.Name}({subCallParameters}){dispatchCtArg});");
+            var removedDocs = new List<string> { "botClient" };
+            if (substituted != null)
+                removedDocs.Add(substituted);
 
-            sb.AppendLine($"    }}");
+            var sb = new StringBuilder();
+            sb.Append(CleanupXMLComments(xml?.GetDocumentationLinesForSymbol(method), removedDocs.ToArray()));
+            sb.AppendLine(target == Target.Dispatcher
+                ? "    /// <param name=\"dispatcher\">Request dispatcher the call is sent through</param>"
+                : "    /// <param name=\"device\">Device session</param>");
+            sb.AppendLine("    /// <param name=\"priority\">Order in which this request is served relative to other waiting requests</param>");
+
+            if (target == Target.DeviceUser)
+                sb.AppendLine("    /// <exception cref=\"InvalidOperationException\">Thrown when the device is a group or channel, since its id is not a user id</exception>");
+
+            if (method.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute"))
+                sb.AppendLine("    [Obsolete]");
+
+            sb.AppendLine($"    public static async {method.ReturnType.ToDisplayString()} {method.Name}({string.Join(", ", parameters)})");
+            sb.AppendLine("    {");
+
+            if (target == Target.DeviceUser)
+            {
+                sb.AppendLine("        if (device.DeviceId <= 0)");
+                sb.AppendLine($"            throw new InvalidOperationException($\"{method.Name} needs a private chat session, but device {{device.DeviceId}} is not a user\");");
+                sb.AppendLine();
+            }
+
+            sb.AppendLine($"        {ReturnStatement(method)} {receiverName}.Dispatch(tgClient => tgClient.{method.Name}({string.Join(", ", arguments)}), {ct}, priority);");
+            sb.AppendLine("    }");
             sb.AppendLine();
             sb.AppendLine();
 
             return sb.ToString();
         }
 
-        private string CleanupXMLComments(string raw, params string[] to_remove)
+        private static string DefaultValue(IParameterSymbol par)
+        {
+            if (!par.HasExplicitDefaultValue)
+                return "";
+
+            var value = par.ExplicitDefaultValue;
+
+            switch (value)
+            {
+                case null:
+                    return " = default";
+                case string s:
+                    return $" = \"{s.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
+                case bool b:
+                    return b ? " = true" : " = false";
+                case char c:
+                    return $" = '{c}'";
+            }
+
+            //Enums: cast so non-zero defaults stay valid
+            var type = par.Type is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } nullable
+                ? nullable.TypeArguments[0]
+                : par.Type;
+
+            if (type.TypeKind == TypeKind.Enum)
+                return $" = ({type.ToDisplayString()}){Convert.ToString(value, CultureInfo.InvariantCulture)}";
+
+            return value switch
+            {
+                float f => $" = {f.ToString("R", CultureInfo.InvariantCulture)}f",
+                double d => $" = {d.ToString("R", CultureInfo.InvariantCulture)}d",
+                decimal m => $" = {m.ToString(CultureInfo.InvariantCulture)}m",
+                _ => $" = {Convert.ToString(value, CultureInfo.InvariantCulture)}"
+            };
+        }
+
+        private static string CleanupXMLComments(string? raw, params string[] to_remove)
         {
             if (raw == null)
                 return string.Empty;
 
             var lines = raw.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             foreach (var line in lines)
             {
                 if (to_remove.Any(a => line.Contains($"<param name=\"{a}\">")))
                     continue;
 
-
-                sb.AppendLine($"{line}");
+                sb.AppendLine(line);
             }
-
 
             return sb.ToString();
         }
