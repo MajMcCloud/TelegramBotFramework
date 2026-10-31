@@ -11,7 +11,8 @@ namespace TelegramBotBase.Example.Tests;
 /// Test form for comparing <see cref="DefaultRequestDispatcher"/> and <see cref="FullRequestDispatcher"/>
 /// behavior. For the selected dispatcher, sends, edits, and deletes a user-specified number of messages
 /// through that same dispatcher instance and reports elapsed time per phase, so throttling differences
-/// are visible in practice
+/// are visible in practice. The priority test queues a burst of <see cref="RequestPriority.Background"/>
+/// messages and shows that a <see cref="RequestPriority.UI"/> message sent afterwards still goes out first
 /// </summary>
 public class DispatcherTest : AutoCleanForm
 {
@@ -27,6 +28,7 @@ public class DispatcherTest : AutoCleanForm
     private const string CallbackGroup = "dt";
     private const string ActionDefault = "default";
     private const string ActionFull = "full";
+    private const string ActionPriority = "priority";
     private const string ActionBack = "back";
 
     // Which dispatcher the next plain-text message should be interpreted as a burst count for
@@ -70,6 +72,10 @@ public class DispatcherTest : AutoCleanForm
                 await RequestBurstCount(ActionFull, "Full");
                 break;
 
+            case ActionPriority:
+                await RequestBurstCount(ActionPriority, "priority test (Full dispatcher)");
+                break;
+
             case ActionBack:
                 await NavigateTo(new Menu());
                 break;
@@ -91,6 +97,9 @@ public class DispatcherTest : AutoCleanForm
 
         btn.AddButtonRow(new ButtonBase("Run burst test - Full dispatcher",
             new CallbackData(CallbackGroup, ActionFull).Serialize()));
+
+        btn.AddButtonRow(new ButtonBase("Run priority test - Full dispatcher",
+            new CallbackData(CallbackGroup, ActionPriority).Serialize()));
 
         btn.AddButtonRow(new ButtonBase("« Back to menu", new CallbackData(CallbackGroup, ActionBack).Serialize()));
 
@@ -126,9 +135,16 @@ public class DispatcherTest : AutoCleanForm
 
         message.Handled = true;
 
-        var (dispatcher, label) = CreateDispatcher(_pendingDispatcherAction);
+        var action = _pendingDispatcherAction;
+        var (dispatcher, label) = CreateDispatcher(action);
 
         _pendingDispatcherAction = null;
+
+        if (action == ActionPriority)
+        {
+            await RunPriorityTest(dispatcher, count);
+            return;
+        }
 
         await RunBurstTest(dispatcher, label, count);
     }
@@ -137,7 +153,7 @@ public class DispatcherTest : AutoCleanForm
     {
         return dispatcherAction switch
         {
-            ActionFull => (new FullRequestDispatcher(new RequestDispatcherSettings
+            ActionFull or ActionPriority => (new FullRequestDispatcher(new RequestDispatcherSettings
             {
                 MaxRequestsPerSecond = FullDispatcherMaxRequestsPerSecond,
                 MaxRequestsPerSecondPerChat = FullDispatcherMaxRequestsPerSecondPerChat,
@@ -195,5 +211,45 @@ public class DispatcherTest : AutoCleanForm
             $"Edit: {editStopwatch.Elapsed.TotalSeconds:F2}s ({count / editStopwatch.Elapsed.TotalSeconds:F1} msg/s)\n" +
             $"Delete: {deleteStopwatch.Elapsed.TotalSeconds:F2}s ({count / deleteStopwatch.Elapsed.TotalSeconds:F1} msg/s)\n" +
             $"Total: {totalStopwatch.Elapsed.TotalSeconds:F2}s");
+    }
+
+    /// <summary>
+    /// Queues <paramref name="count"/> background messages, then sends one UI message. With the per-chat limit of
+    /// 1 msg/s the background burst takes about <paramref name="count"/> seconds, but the UI message only has to
+    /// wait for the slot that is currently cooling down
+    /// </summary>
+    private async Task RunPriorityTest(IRequestDispatcher dispatcher, int count)
+    {
+        await Device.Send($"Running priority test: {count} Background messages, then 1 UI message...");
+
+        var backgroundStopwatch = Stopwatch.StartNew();
+
+        var backgroundTasks = Enumerable.Range(1, count)
+            .Select(i => dispatcher.Dispatch(Device,
+                a => a.SendMessage(Device.DeviceId, $"Background message #{i}"),
+                priority: RequestPriority.Background))
+            .ToArray();
+
+        var uiStopwatch = Stopwatch.StartNew();
+
+        var uiMessage = await dispatcher.Dispatch(Device,
+            a => a.SendMessage(Device.DeviceId, "UI message - sent last, delivered first"),
+            priority: RequestPriority.UI);
+
+        uiStopwatch.Stop();
+
+        var messages = await Task.WhenAll(backgroundTasks);
+
+        backgroundStopwatch.Stop();
+
+        await Task.WhenAll(messages.Append(uiMessage)
+            .Select(msg => dispatcher.Dispatch(Device,
+                a => a.DeleteMessage(Device.DeviceId, msg.MessageId),
+                priority: RequestPriority.Background)));
+
+        await Device.Send(
+            $"Priority test, {count} Background messages:\n" +
+            $"UI message delivered after: {uiStopwatch.Elapsed.TotalSeconds:F2}s\n" +
+            $"Background burst finished after: {backgroundStopwatch.Elapsed.TotalSeconds:F2}s");
     }
 }

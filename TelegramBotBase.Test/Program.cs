@@ -75,7 +75,7 @@ internal class Program
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.W:
-                    var me = await bot.Client.TelegramClient.GetMe();
+                    var me = await bot.RequestDispatcher.GetMe();
                     //Open Website in default browser
                     var url = $"https://t.me/{me.Username}";
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
