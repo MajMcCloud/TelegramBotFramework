@@ -28,11 +28,12 @@ public class DispatcherTest : AutoCleanForm
 
     // "Full" dispatcher rate-limit settings used for the burst comparison ---
     private const int FullDispatcherMaxRequestsPerSecond = 30;
-    private const int FullDispatcherMaxRequestsPerSecondPerChat = 1;
+    private const int FullDispatcherMaxRequestsPerSecondPerChat = 5;
+    private const int FullDispatcherMaxRequestsPerSecondPerGroup = 1;
     private const int FullDispatcherMaxRequestsPerMinutePerGroup = 20;
 
     // Upper bound for the per-chat limit the user may pick. Measured against the live API, private chats
-    // accept bursts of ~30 messages without a 429, so 1/s is far stricter than Telegram actually is there
+    // accept bursts of ~30 messages without a 429
     private const int MaxPerChat = 30;
 
     private const string CallbackGroup = "dt";
@@ -124,7 +125,7 @@ public class DispatcherTest : AutoCleanForm
             $"How many messages should the {label} dispatcher burst test use? " +
             $"Enter a number between {MinBurstCount} and {MaxBurstCount}. " +
             $"Optionally add the per-chat limit for the Full dispatcher, e.g. \"30 5\" " +
-            $"(default {FullDispatcherMaxRequestsPerSecondPerChat}/s, max {MaxPerChat}/s)");
+            $"(default {(Device.IsGroup ? FullDispatcherMaxRequestsPerSecondPerGroup : FullDispatcherMaxRequestsPerSecondPerChat)}/s, max {MaxPerChat}/s)");
         
         _renderMainButtons = false;
     }
@@ -139,7 +140,7 @@ public class DispatcherTest : AutoCleanForm
 
         var parts = (message.Message?.Text ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-        var perChat = FullDispatcherMaxRequestsPerSecondPerChat;
+        var perChat = Device.IsGroup ? FullDispatcherMaxRequestsPerSecondPerGroup : FullDispatcherMaxRequestsPerSecondPerChat;
 
         if (parts.Length is < 1 or > 2
             || !int.TryParse(parts[0], out var count) || count < MinBurstCount || count > MaxBurstCount
@@ -183,6 +184,7 @@ public class DispatcherTest : AutoCleanForm
             {
                 MaxRequestsPerSecond = FullDispatcherMaxRequestsPerSecond,
                 MaxRequestsPerSecondPerChat = perChat,
+                MaxRequestsPerSecondPerGroup = perChat,
                 MaxRequestsPerMinutePerGroup = FullDispatcherMaxRequestsPerMinutePerGroup
             }, Device.Client), $"Full ({perChat}/s per chat{(Device.IsGroup ? $", {FullDispatcherMaxRequestsPerMinutePerGroup}/min per group" : "")})"),
 

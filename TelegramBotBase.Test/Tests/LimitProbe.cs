@@ -77,7 +77,7 @@ public static class LimitProbe
             default:
                 Console.WriteLine(
                     "Scenarios: send-private | send-group | edit-private | edit-group  [count] [rate msg/s, 0 = all at once]\n" +
-                    "           dispatch-private | dispatch-group  [count] [MaxRequestsPerSecondPerChat]");
+                    "           dispatch-private | dispatch-group  [count] [per-chat or per-group limit/s]");
                 return 1;
         }
 
@@ -216,7 +216,7 @@ public static class LimitProbe
         var settings = new RequestDispatcherSettings
         {
             MaxRequestsPerSecondPerChat = perChat,
-            // Group limiter is only applied when the session knows it is a group; see the note printed below
+            MaxRequestsPerSecondPerGroup = perChat,
             MaxRequestsPerMinutePerGroup = 20
         };
 
@@ -268,7 +268,6 @@ public static class LimitProbe
         var sent = messages.Count(m => m != null);
 
         Console.WriteLine($"\n=== FullRequestDispatcher, {(isGroup ? "group" : "private")}, {count} msgs, perChat={perChat}/s ===");
-        Console.WriteLine($"session.IsGroup={session.IsGroup} (group limiter {(session.IsGroup ? "active" : "NOT applied")})");
         Console.WriteLine($"sent={sent} dropped(retries exhausted)={dropped} failed={failures.Count} internal429={hits429} " +
                           $"retry_after=[{string.Join(",", retryAfters)}]");
         Console.WriteLine($"elapsed={sw.Elapsed.TotalSeconds:F2}s, effective {sent / sw.Elapsed.TotalSeconds:F2} msg/s");
