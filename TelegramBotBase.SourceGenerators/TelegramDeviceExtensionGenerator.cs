@@ -115,6 +115,10 @@ namespace TelegramBotBase
                 {
                     targets.Add(Target.DeviceChat);
                 }
+                else if (userId != null && !NotDeviceUser.Contains(method.Name))
+                {
+                    targets.Add(Target.DeviceUser);
+                }
 
                 foreach (var target in targets)
                 {
