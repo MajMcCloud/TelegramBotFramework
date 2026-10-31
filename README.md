@@ -1318,8 +1318,9 @@ public class RequestDispatcherSettings
 {
     // --- Concurrency and retry: used by every dispatcher (Default and Full) ---
 
-    // Max Bot API requests allowed in flight at once (protects your app, not Telegram's servers)
-    public int MaxConcurrentRequests { get; set; } = 10;
+    // Max Bot API requests allowed in flight at once. Telegram may hold a throttled group request open for up to
+    // a minute, so a small pool lets a few busy groups stall every other chat
+    public int MaxConcurrentRequests { get; set; } = 30;
 
     // How many times a request is retried after a HTTP 429 before giving up
     public int MaxRetryAttempts { get; set; } = 3;
@@ -1328,10 +1329,11 @@ public class RequestDispatcherSettings
     public bool RespectRetryAfterHeader { get; set; } = true;
 
     // Wait time used before a retry when no retry_after value is available
-    public TimeSpan FallbackRetryAfter { get; set; } = TimeSpan.FromSeconds(3);
+    public TimeSpan FallbackRetryAfter { get; set; } = TimeSpan.FromSeconds(5);
 
-    // If true, a HTTP 429 pauses ALL outgoing requests bot-wide for retry_after seconds, not just the offending chat
-    public bool GlobalPauseOn429 { get; set; } = true;
+    // If true, a HTTP 429 pauses ALL outgoing requests bot-wide for retry_after seconds, not just the offending chat.
+    // Telegram's 429s are scoped to a single chat, so by default only the offending request waits
+    public bool GlobalPauseOn429 { get; set; } = false;
 
     // How long a queued request waits before it is promoted by one priority level, so low priorities cannot starve.
     // Promotion never goes above UI. Zero or negative disables aging
@@ -1342,13 +1344,17 @@ public class RequestDispatcherSettings
     // Max requests per second across all chats combined (Telegram's global limit, ~30/sec)
     public int MaxRequestsPerSecond { get; set; } = 30;
 
-    // Max requests per second to a single chat (Telegram's per-chat limit, ~1/sec)
-    public int MaxRequestsPerSecondPerChat { get; set; } = 1;
+    // Max requests per second to a single private chat. Telegram accepts bursts of ~30 messages to one user
+    // without a 429, so 5/sec keeps a wide margin while staying responsive
+    public int MaxRequestsPerSecondPerChat { get; set; } = 5;
+
+    // Max requests per second to a single group, supergroup or channel (Telegram paces groups at ~1/sec)
+    public int MaxRequestsPerSecondPerGroup { get; set; } = 1;
 
     // How long an idle chat's rate limiter stays cached before being evicted to free memory
     public TimeSpan ChatLimiterCacheTimeout { get; set; } = TimeSpan.FromMinutes(5);
 
-    // Max requests per minute to a single group/supergroup (Telegram's per-group limit, ~20/min)
+    // Max requests per minute to a single group, supergroup or channel (Telegram's per-group limit, ~20/min)
     public int MaxRequestsPerMinutePerGroup { get; set; } = 20;
 
     // Same as ChatLimiterCacheTimeout, but for per-group rate limiters
@@ -1361,15 +1367,21 @@ public class RequestDispatcherSettings
 > allows bots up to about 20 messages per minute in a group, and caps bulk broadcasts at roughly 
 > 30 messages per second unless paid broadcasts are enabled (see the [Bots FAQ]((https://core.telegram.org/bots/faq#broadcasting-to-users)) for details). 
 > If your bot has been granted higher limits, adjust the settings accordingly.
+>
+> In practice Telegram is more lenient in private chats than the 1/sec guidance suggests: measured against the live
+> API, bursts of ~30 messages to one user went through without a `HTTP 429`, and Telegram slowed its responses
+> instead of rejecting requests after that. In groups it paces messages at ~1/sec and 20/min by holding requests
+> open, and answers `HTTP 429` (with `retry_after` of a few seconds) only once ~30 requests are queued for that group.
+> The defaults reflect this: 5/sec for private chats, 1/sec and 20/min for groups and channels.
 
 ---
 
 ### DefaultRequestDispatcher
 
 Wraps every outgoing call in a concurrency limiter sized to `MaxConcurrentRequests`, and retries automatically when
-Telegram responds with `HTTP 429`, honoring the `retry_after` value it returns. When `GlobalPauseOn429` is enabled
-(the default), a `HTTP 429` pauses *all* outgoing traffic for `retry_after` seconds rather than only the offending chat,
-matching Telegram's actual behavior.
+Telegram responds with `HTTP 429`, honoring the `retry_after` value it returns. By default only the request that got
+the `HTTP 429` waits, since Telegram scopes these responses to a single chat. Enable `GlobalPauseOn429` to pause
+*all* outgoing traffic for `retry_after` seconds instead.
 
 ```csharp
 var bot = BotBaseBuilder
@@ -1403,7 +1415,8 @@ With custom settings:
 Extends `DefaultRequestDispatcher` with global, per-chat, and per-group throttling, keeping the bot within
 Telegram's documented and community-observed limits. Per-chat and per-group limiter instances are cached and
 evicted after `ChatLimiterCacheTimeout`/`GroupLimiterCacheTimeout` of inactivity, so memory usage stays bounded even
-as the bot talks to more and more chats over time.
+as the bot talks to more and more chats over time. Groups, supergroups and channels are recognized by their negative
+chat id, so group limits apply even to sessions that have not received a message yet (e.g. broadcasts).
 
 ```csharp
 var bot = BotBaseBuilder
@@ -1426,7 +1439,8 @@ With custom settings:
 .UseFullRequestDispatcher(new RequestDispatcherSettings
 {
     MaxRequestsPerSecond = 30,
-    MaxRequestsPerSecondPerChat = 1,
+    MaxRequestsPerSecondPerChat = 5,
+    MaxRequestsPerSecondPerGroup = 1,
     MaxRequestsPerMinutePerGroup = 20
 })
 ```
