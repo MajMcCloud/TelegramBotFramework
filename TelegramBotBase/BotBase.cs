@@ -264,14 +264,14 @@ public sealed class BotBase
 
         foreach (var scope in new BotCommandScope[] { BotCommandScope.Default(), BotCommandScope.AllPrivateChats(), BotCommandScope.AllChatAdministrators(), BotCommandScope.AllGroupChats() })
         {
-            var result = await RequestDispatcher.Dispatch(c => c.GetMyCommands(scope));
+            var result = await RequestDispatcher.GetMyCommands(scope);
             scopes.Add(new BotCommandScopeGroup(scope, result, null));
         }
 
 
         foreach (var session in Sessions.SessionList)
         {
-            var result = await RequestDispatcher.Dispatch(c => c.GetMyCommands(BotCommandScope.Chat(session.Key)));
+            var result = await RequestDispatcher.GetMyCommands(BotCommandScope.Chat(session.Key));
             scopes.Add(new BotCommandScopeGroup(BotCommandScope.Chat(session.Key), result, null));
         }
 
