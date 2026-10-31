@@ -43,7 +43,9 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
             return SlotAttempt.BlockedGlobally;
         }
 
-        var chat = GetChatSemaphore(ds.DeviceId);
+        var isGroup = IsGroupChat(ds);
+
+        var chat = GetChatSemaphore(ds.DeviceId, isGroup);
         if (!chat.TryWait())
         {
             GlobalSemaphore.ReleaseImmediately();
@@ -51,7 +53,7 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
             return SlotAttempt.BlockedForSession;
         }
 
-        if (ds.IsGroup && !GetGroupSemaphore(ds.DeviceId).TryWait())
+        if (isGroup && !GetGroupSemaphore(ds.DeviceId).TryWait())
         {
             chat.ReleaseImmediately();
             GlobalSemaphore.ReleaseImmediately();
@@ -64,10 +66,12 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
 
     protected override void ReleaseSpot(IDeviceSession ds)
     {
-        GlobalSemaphore.Release();
-        GetChatSemaphore(ds.DeviceId).Release();
+        var isGroup = IsGroupChat(ds);
 
-        if (ds.IsGroup)
+        GlobalSemaphore.Release();
+        GetChatSemaphore(ds.DeviceId, isGroup).Release();
+
+        if (isGroup)
         {
             GetGroupSemaphore(ds.DeviceId).Release();
         }
@@ -75,12 +79,23 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
         base.ReleaseSpot(ds);
     }
     
-    protected CooldownSemaphore GetChatSemaphore(long chatId)
+    /// <summary>
+    /// Whether <paramref name="ds"/> is subject to the group limits. Telegram gives groups, supergroups and channels
+    /// negative chat ids, so the id decides even for sessions that have not received a message yet
+    /// (where <see cref="IDeviceSession.IsGroup"/> is still false)
+    /// </summary>
+    protected virtual bool IsGroupChat(IDeviceSession ds)
+    {
+        return ds.DeviceId < 0 || ds.IsGroup || ds.IsChannel;
+    }
+
+    protected CooldownSemaphore GetChatSemaphore(long chatId, bool isGroup)
     {
         return ChatSemaphoreCache.GetOrCreate(chatId, entry =>
             {
                 entry.SlidingExpiration = Settings.ChatLimiterCacheTimeout;
-                var semaphore = new CooldownSemaphore(Settings.MaxRequestsPerSecondPerChat, TimeSpan.FromSeconds(1));
+                var perSecond = isGroup ? Settings.MaxRequestsPerSecondPerGroup : Settings.MaxRequestsPerSecondPerChat;
+                var semaphore = new CooldownSemaphore(perSecond, TimeSpan.FromSeconds(1));
                 semaphore.SlotAvailable += SignalSlotAvailable;
                 return semaphore;
             }
