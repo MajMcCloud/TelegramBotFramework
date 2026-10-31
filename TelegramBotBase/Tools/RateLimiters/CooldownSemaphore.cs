@@ -33,6 +33,26 @@ public class CooldownSemaphore
         return Semaphore.WaitAsync(ct);
     }
 
+    /// <summary>Raised after a slot has become available again once its cooldown elapsed</summary>
+    public event Action SlotAvailable;
+
+    /// <summary>
+    /// Consumes a slot only if one is available right now, without waiting
+    /// </summary>
+    /// <returns><c>true</c> if a slot was consumed</returns>
+    public virtual bool TryWait()
+    {
+        return Semaphore.Wait(0);
+    }
+
+    /// <summary>
+    /// Gives back a slot that was consumed but never used, skipping the cooldown
+    /// </summary>
+    public virtual void ReleaseImmediately()
+    {
+        Semaphore.Release();
+    }
+
     /// <summary>
     /// Releases a slot after the cooldown period instead of immediately
     /// </summary>
@@ -50,6 +70,7 @@ public class CooldownSemaphore
         finally
         {
             Semaphore?.Release();
+            SlotAvailable?.Invoke();
         }
     }
 }
