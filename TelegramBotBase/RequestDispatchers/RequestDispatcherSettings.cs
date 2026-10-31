@@ -45,4 +45,11 @@ public class RequestDispatcherSettings
     
     /// <summary>Max number of concurrent HTTP requests to the Bot API</summary>
     public int MaxConcurrentRequests { get; set; } = 10;
+
+    /// <summary>
+    /// Time a queued request waits before it is promoted by one priority level, so low-priority
+    /// requests cannot starve behind a steady stream of higher-priority ones. Promotion never lifts a
+    /// request above <see cref="RequestPriority.UI"/>. Zero or negative disables aging
+    /// </summary>
+    public TimeSpan PriorityAgingInterval { get; set; } = TimeSpan.FromSeconds(2);
 }

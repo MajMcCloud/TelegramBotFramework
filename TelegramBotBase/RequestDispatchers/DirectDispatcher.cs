@@ -36,8 +36,10 @@ public class DirectDispatcher : IRequestDispatcher
     /// <param name="ds">This field will not be used</param>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
+    /// <param name="priority">This field will not be used</param>
     public virtual async Task Dispatch(IDeviceSession ds, Func<ITelegramBotClient, Task> request,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
     {
         await request(Client.TelegramClient);
     }
@@ -50,10 +52,12 @@ public class DirectDispatcher : IRequestDispatcher
     /// <param name="ds">This field will not be used</param>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
+    /// <param name="priority">This field will not be used</param>
     /// <returns>The result of <paramref name="request"/></returns>
     /// <exception cref="ApiRequestException">Thrown on error code not equal to <see cref="Http.TooManyRequests"/></exception>
     public virtual async Task<T> Dispatch<T>(IDeviceSession ds, Func<ITelegramBotClient, Task<T>> request,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
     {
         return await request(Client.TelegramClient);
     }
@@ -63,10 +67,12 @@ public class DirectDispatcher : IRequestDispatcher
     /// </summary>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
+    /// <param name="priority">This field will not be used</param>
     /// <returns></returns>
-    public virtual async Task Dispatch(Func<ITelegramBotClient, Task> request, CancellationToken ct = default)
+    public virtual async Task Dispatch(Func<ITelegramBotClient, Task> request, CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
     {
-        await Dispatch(GlobalSession, request, ct);
+        await Dispatch(GlobalSession, request, ct, priority);
     }
 
     /// <summary>
@@ -75,9 +81,11 @@ public class DirectDispatcher : IRequestDispatcher
     /// <typeparam name="T">Return type of the Telegram API call</typeparam>
     /// <param name="request">The Telegram API call to execute</param>
     /// <param name="ct">Cancellation token</param>
+    /// <param name="priority">This field will not be used</param>
     /// <returns>The result of <paramref name="request"/></returns>
-    public virtual async Task<T> Dispatch<T>(Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default)
+    public virtual async Task<T> Dispatch<T>(Func<ITelegramBotClient, Task<T>> request, CancellationToken ct = default,
+        RequestPriority priority = RequestPriority.Normal)
     {
-        return await Dispatch(GlobalSession, request, ct);
+        return await Dispatch(GlobalSession, request, ct, priority);
     }
 }

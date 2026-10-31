@@ -24,21 +24,42 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
     public FullRequestDispatcher(RequestDispatcherSettings settings, MessageClient client) : base(settings, client)
     {
         GlobalSemaphore = new CooldownSemaphore(settings.MaxRequestsPerSecond, TimeSpan.FromSeconds(1));
+        GlobalSemaphore.SlotAvailable += SignalSlotAvailable;
         ChatSemaphoreCache = new MemoryCache(new MemoryCacheOptions());
         GroupSemaphoreCache = new MemoryCache(new MemoryCacheOptions());
     }
 
-    protected override async Task OccupySpot(IDeviceSession ds, CancellationToken ct = default)
+    protected override SlotAttempt TryOccupySpot(IDeviceSession ds)
     {
-        await base.OccupySpot(ds, ct);
-        
-        await GlobalSemaphore.Wait(ct);
-        await GetChatSemaphore(ds.DeviceId).Wait(ct);
-
-        if (ds.IsGroup)
+        var baseAttempt = base.TryOccupySpot(ds);
+        if (baseAttempt != SlotAttempt.Acquired)
         {
-            await GetGroupSemaphore(ds.DeviceId).Wait(ct);
+            return baseAttempt;
         }
+
+        if (!GlobalSemaphore.TryWait())
+        {
+            ConcurrencyLimiter.Release();
+            return SlotAttempt.BlockedGlobally;
+        }
+
+        var chat = GetChatSemaphore(ds.DeviceId);
+        if (!chat.TryWait())
+        {
+            GlobalSemaphore.ReleaseImmediately();
+            ConcurrencyLimiter.Release();
+            return SlotAttempt.BlockedForSession;
+        }
+
+        if (ds.IsGroup && !GetGroupSemaphore(ds.DeviceId).TryWait())
+        {
+            chat.ReleaseImmediately();
+            GlobalSemaphore.ReleaseImmediately();
+            ConcurrencyLimiter.Release();
+            return SlotAttempt.BlockedForSession;
+        }
+
+        return SlotAttempt.Acquired;
     }
 
     protected override void ReleaseSpot(IDeviceSession ds)
@@ -59,7 +80,9 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
         return ChatSemaphoreCache.GetOrCreate(chatId, entry =>
             {
                 entry.SlidingExpiration = Settings.ChatLimiterCacheTimeout;
-                return new CooldownSemaphore(Settings.MaxRequestsPerSecondPerChat, TimeSpan.FromSeconds(1));
+                var semaphore = new CooldownSemaphore(Settings.MaxRequestsPerSecondPerChat, TimeSpan.FromSeconds(1));
+                semaphore.SlotAvailable += SignalSlotAvailable;
+                return semaphore;
             }
         );
     }
@@ -69,7 +92,9 @@ public class FullRequestDispatcher : DefaultRequestDispatcher
         return GroupSemaphoreCache.GetOrCreate(chatId, entry =>
             {
                 entry.SlidingExpiration = Settings.GroupLimiterCacheTimeout;
-                return new CooldownSemaphore(Settings.MaxRequestsPerMinutePerGroup, TimeSpan.FromMinutes(1));
+                var semaphore = new CooldownSemaphore(Settings.MaxRequestsPerMinutePerGroup, TimeSpan.FromMinutes(1));
+                semaphore.SlotAvailable += SignalSlotAvailable;
+                return semaphore;
             }
         );
     }
