@@ -19,6 +19,12 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
+        if (args.Length > 0 && args[0] == "probe-limits")
+        {
+            Environment.ExitCode = await LimitProbe.RunAsync(args);
+            return;
+        }
+
         bot = BotBaseBuilder
                  .Create()
                  .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
