@@ -18,9 +18,11 @@ var bot = BotBaseBuilder
             .DefaultMessageLoop()
             .WithStartForm<Start>()
             .NoProxy()
+            .UseDefaultRequestDispatcher()
             .OnlyStart()
-            .UseSQLDatabase("localhost", "telegram_bot")
+            .UseSqlDatabase("localhost", "telegram_bot")
             .UseEnglish()
+            .UseSingleThread()
             .Build();
 
 bot.Start();
@@ -38,8 +40,9 @@ var bot = BotBaseBuilder
             .DefaultMessageLoop()
             .WithStartForm<Start>()
             .NoProxy()
+            .UseDefaultRequestDispatcher()
             .OnlyStart()
-            .UseSQLDatabase("localhost", "telegram_bot")
+            .UseSqlDatabase("localhost", "telegram_bot")
             .UseEnglish()
             .UseSingleThread()
             .WithSessionLimits(l => l.IdleTimeout = TimeSpan.FromMinutes(30))

@@ -9,7 +9,7 @@
 ## How to use
 
 ```csharp
-using TelegramBotBase.Extensions.Serializer.Database.PostgreSQL;
+using TelegramBotBase.Extensions.Serializer.Database.PostgreSql;
 
 
 var bot = BotBaseBuilder
@@ -18,9 +18,11 @@ var bot = BotBaseBuilder
             .DefaultMessageLoop()
             .WithStartForm<Start>()
             .NoProxy()
+            .UseDefaultRequestDispatcher()
             .OnlyStart()
-            .UsePostgreSqlDatabase("localhost",  "8181", "telegram_bot")
+            .UsePostgreSqlDatabase("localhost", 8181, "telegram_bot")
             .UseEnglish()
+            .UseSingleThread()
             .Build();
 
 bot.Start();
@@ -38,8 +40,9 @@ var bot = BotBaseBuilder
             .DefaultMessageLoop()
             .WithStartForm<Start>()
             .NoProxy()
+            .UseDefaultRequestDispatcher()
             .OnlyStart()
-            .UsePostgreSqlDatabase("localhost", "8181", "telegram_bot")
+            .UsePostgreSqlDatabase("localhost", 8181, "telegram_bot")
             .UseEnglish()
             .UseSingleThread()
             .WithSessionLimits(l => l.IdleTimeout = TimeSpan.FromMinutes(30))

@@ -22,9 +22,11 @@ var bot = BotBaseBuilder
             .DefaultMessageLoop()
             .WithStartForm<Start>()
             .NoProxy()
+            .UseDefaultRequestDispatcher()
             .OnlyStart()
             .UseNewtonsoftJson()
             .UseEnglish()
+            .UseSingleThread()
             .Build();
 
 bot.Start();
