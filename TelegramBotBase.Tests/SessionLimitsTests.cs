@@ -1,3 +1,4 @@
+using TelegramBotBase.Builder;
 using TelegramBotBase.Sessions;
 using TelegramBotBase.Tests.Infrastructure;
 
@@ -15,6 +16,87 @@ public class SessionLimitsTests
         var limits = new SessionLimits();
         Assert.False(limits.IsEnabled);
         Assert.Equal(TimeSpan.FromMinutes(1), limits.SweepInterval);
+    }
+
+    private const string Token = "1234567890:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
+    [Fact]
+    public void NoSessionLimits_Stage_BuildsWithoutLimits()
+    {
+        var bot = BotBaseBuilder.Create()
+                                .WithAPIKey(Token)
+                                .MinimalMessageLoop()
+                                .WithStartForm<TrackingForm>()
+                                .NoProxy()
+                                .UseDirectDispatcher()
+                                .NoCommands()
+                                .NoSerialization()
+                                .DefaultLanguage()
+                                .UseSingleThread()
+                                .NoSessionLimits()
+                                .Build();
+
+        Assert.Null(bot.SessionLimits);
+    }
+
+    [Fact]
+    public void WithDefaultSessionLimits_Stage_UsesRecommendedDefaults()
+    {
+        var bot = BotBaseBuilder.Create()
+                                .WithAPIKey(Token)
+                                .MinimalMessageLoop()
+                                .WithStartForm<TrackingForm>()
+                                .NoProxy()
+                                .UseDirectDispatcher()
+                                .NoCommands()
+                                .NoSerialization()
+                                .DefaultLanguage()
+                                .UseSingleThread()
+                                .WithDefaultSessionLimits()
+                                .Build();
+
+        Assert.Equal(TimeSpan.FromMinutes(30), bot.SessionLimits.IdleTimeout);
+        Assert.Equal(10_000, bot.SessionLimits.MaxSessions);
+        Assert.Equal(TimeSpan.FromMinutes(1), bot.SessionLimits.SweepInterval);
+    }
+
+    [Fact]
+    public void CreateDefault_ReturnsIndependentInstances()
+    {
+        var first = SessionLimits.CreateDefault();
+        first.MaxSessions = 1;
+
+        Assert.Equal(SessionLimits.DefaultMaxSessions, SessionLimits.CreateDefault().MaxSessions);
+    }
+
+    [Fact]
+    public void QuickStart_UsesNoSessionLimits()
+    {
+        var bot = BotBaseBuilder.Create()
+                                .QuickStart<TrackingForm>(Token)
+                                .Build();
+
+        Assert.Null(bot.SessionLimits);
+    }
+
+    [Fact]
+    public void WithSessionLimits_Stage_AfterThreadPool()
+    {
+        var bot = BotBaseBuilder.Create()
+                                .WithAPIKey(Token)
+                                .MinimalMessageLoop()
+                                .WithStartForm<TrackingForm>()
+                                .NoProxy()
+                                .UseDirectDispatcher()
+                                .NoCommands()
+                                .NoSerialization()
+                                .DefaultLanguage()
+                                .UseThreadPool()
+                                .WithSessionLimits(new SessionLimits { MaxSessions = 5 })
+                                .Build();
+
+        Assert.Equal(5, bot.SessionLimits.MaxSessions);
+        Assert.Null(bot.SessionLimits.IdleTimeout);
     }
 
     [Fact]

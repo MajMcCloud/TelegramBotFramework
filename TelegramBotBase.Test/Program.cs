@@ -52,6 +52,7 @@ internal class Program
                  .NoSerialization()
                  .UseEnglish()
                  .UseThreadPool()
+                 .NoSessionLimits()
                  .Build();
 
 

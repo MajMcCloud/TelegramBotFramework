@@ -131,6 +131,7 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 
 // Upload bot commands to BotFather
@@ -284,6 +285,7 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 
 bot.BotCommand += async (s, en) =>
@@ -737,6 +739,7 @@ var bot = BotBaseBuilder
         .NoSerialization()
         .UseEnglish()
         .UseThreadPool()
+        .NoSessionLimits()
         .Build();
 
 await bot.Start();
@@ -1053,6 +1056,7 @@ var bot = BotBaseBuilder
     .UseSimpleJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 
 await bot.Start();
@@ -1078,6 +1082,7 @@ var bot = BotBaseBuilder
     .UseJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 
 await bot.Start();
@@ -1102,6 +1107,7 @@ var bot = BotBaseBuilder
     .UseXML(AppContext.BaseDirectory + "config\\states.xml")
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 
 await bot.Start();
@@ -1177,7 +1183,15 @@ dependency injection scope and its state). `BotBase.Sessions` (`SessionManager`)
 `SessionList`, a thread-safe `ConcurrentDictionary<long, IDeviceSession>`. `IDeviceSession.LastAction` holds the time
 (UTC) of the last update of the device.
 
-By default sessions are kept in memory forever. For bots with many users, configure session limits.
+Session limits are the last builder stage, after threading:
+
+| Stage method                   | Behavior                                                                                         |
+|--------------------------------|--------------------------------------------------------------------------------------------------|
+| `.NoSessionLimits()`           | Keeps all sessions in memory forever (the behavior of earlier versions). Used by `QuickStart`.   |
+| `.WithDefaultSessionLimits()`  | Recommended defaults: evicts sessions idle for 30 minutes and keeps at most 10.000 sessions.     |
+| `.WithSessionLimits(...)`      | Your own limits, see below.                                                                      |
+
+For bots with many users, configure session limits.
 
 ### Ending sessions
 
@@ -1199,6 +1213,9 @@ Calling it from within an update of the same session is safe: closing and dispos
 processed. Ending an unknown device does nothing and returns `false`.
 
 ### Session limits
+
+Choose `.WithSessionLimits(...)` (or `.WithDefaultSessionLimits()`) instead of `.NoSessionLimits()` in the last
+builder stage:
 
 ```csharp
 var bot = BotBaseBuilder
@@ -1406,6 +1423,7 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .UseEnglish()
     .UseThreadPool() // or .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 ```
 ### Performance Considerations
@@ -1537,6 +1555,7 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 ```
 
@@ -1572,6 +1591,7 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 ```
 
@@ -1610,6 +1630,7 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 ```
 
@@ -1782,6 +1803,7 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .UseEnglish()
     .UseSingleThread()
+    .NoSessionLimits()
     .Build();
 
 await bot.Start();

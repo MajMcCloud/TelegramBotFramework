@@ -60,12 +60,11 @@ internal sealed class TestBot
                            ? serialization.NoSerialization()
                            : serialization.UseSerialization(stateMachine);
 
-        var building = language.DefaultLanguage().UseSingleThread();
+        var limitsStage = language.DefaultLanguage().UseSingleThread();
 
-        if (limits != null)
-        {
-            building = building.WithSessionLimits(limits);
-        }
+        var building = limits != null
+                           ? limitsStage.WithSessionLimits(limits)
+                           : limitsStage.NoSessionLimits();
 
         testBot.Bot = building.Build();
         testBot.Bot.Sessions.UtcNow = () => testBot.Now;

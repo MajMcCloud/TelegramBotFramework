@@ -27,6 +27,7 @@ var bot = BotBaseBuilder
             .UseNewtonsoftJson()
             .UseEnglish()
             .UseSingleThread()
+            .NoSessionLimits()
             .Build();
 
 bot.Start();

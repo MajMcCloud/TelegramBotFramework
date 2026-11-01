@@ -23,6 +23,7 @@ var bot = BotBaseBuilder
             .UseSqlDatabase("localhost", "telegram_bot")
             .UseEnglish()
             .UseSingleThread()
+            .NoSessionLimits()
             .Build();
 
 bot.Start();

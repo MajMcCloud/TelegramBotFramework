@@ -17,6 +17,29 @@ namespace TelegramBotBase.Sessions;
 public sealed class SessionLimits
 {
     /// <summary>
+    ///     Idle timeout of <see cref="CreateDefault" />: 30 minutes.
+    /// </summary>
+    public static readonly TimeSpan DefaultIdleTimeout = TimeSpan.FromMinutes(30);
+
+    /// <summary>
+    ///     Maximum number of sessions of <see cref="CreateDefault" />: 10.000.
+    /// </summary>
+    public const int DefaultMaxSessions = 10_000;
+
+    /// <summary>
+    ///     Returns new limits with recommended defaults: sessions idle for <see cref="DefaultIdleTimeout" /> get evicted,
+    ///     at most <see cref="DefaultMaxSessions" /> sessions are kept, the sweeper runs every minute.
+    /// </summary>
+    public static SessionLimits CreateDefault()
+    {
+        return new SessionLimits
+        {
+            IdleTimeout = DefaultIdleTimeout,
+            MaxSessions = DefaultMaxSessions
+        };
+    }
+
+    /// <summary>
     ///     Sessions without any update for longer than this get evicted. <c>null</c> disables idle eviction.
     /// </summary>
     public TimeSpan? IdleTimeout { get; set; }

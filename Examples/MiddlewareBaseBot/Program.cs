@@ -58,6 +58,7 @@ public class Program
                     .NoSerialization()
                     .UsePersian()
                     .UseSingleThread()
+                    .NoSessionLimits()
                     .Build();
 
         return bot;
@@ -95,6 +96,7 @@ public class Program
                     .NoSerialization()
                     .UsePersian()
                     .UseSingleThread()
+                    .NoSessionLimits()
                     .Build();
 
         return bot;
@@ -130,6 +132,7 @@ public class Program
                             .NoSerialization()
                             .UsePersian()
                             .UseSingleThread()
+                            .NoSessionLimits()
                             .Build();
 
         return bot;
@@ -155,6 +158,7 @@ public class Program
                             .NoSerialization()
                             .UsePersian()
                             .UseSingleThread()
+                            .NoSessionLimits()
                             .Build();
 
         return bot;
@@ -179,6 +183,7 @@ public class Program
                             .NoSerialization()
                             .UsePersian()
                             .UseSingleThread()
+                            .NoSessionLimits()
                             .Build();
 
         return bot;
@@ -200,6 +205,7 @@ public class Program
                     .NoSerialization()
                     .UsePersian()
                     .UseSingleThread()
+                    .NoSessionLimits()
                     .Build();
 
         return bot;

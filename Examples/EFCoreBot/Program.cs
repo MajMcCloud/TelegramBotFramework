@@ -20,6 +20,7 @@ var bot = BotBaseBuilder.Create()
                         .NoSerialization()
                         .DefaultLanguage()
                         .UseSingleThread()
+                        .NoSessionLimits()
                         .Build();
 
 await bot.Start();
