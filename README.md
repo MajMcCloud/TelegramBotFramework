@@ -1851,7 +1851,8 @@ Project: [open source](TelegramBotBase.Extensions.Images/)
 
 ### TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
-A session serializer for Microsoft SQL Server.
+A session serializer for Microsoft SQL Server. Supports per device states (`IDeviceStateMachine`), so with
+[session limits](#session-limits-and-state-machines) states are loaded on demand and evicted sessions are saved one by one.
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.MSSQL.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.MSSQL)
@@ -1864,7 +1865,8 @@ Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serial
 
 ### TelegramBotBase.Extensions.Serializer.Database.PostgreSql
 
-A session serializer for PostgreSql Server.
+A session serializer for PostgreSql Server. Supports per device states (`IDeviceStateMachine`), so with
+[session limits](#session-limits-and-state-machines) states are loaded on demand and evicted sessions are saved one by one.
 
 [![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql/)
 [![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Database.PostgreSql.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Database.PostgreSql)
