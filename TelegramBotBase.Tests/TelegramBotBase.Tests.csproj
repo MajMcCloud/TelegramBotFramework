@@ -13,6 +13,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
         <PackageReference Include="xunit" Version="2.9.2" />
+        <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -21,6 +22,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
+        <ProjectReference Include="..\TelegramBotBase.Extensions.Serializer.Database.MSSQL\TelegramBotBase.Extensions.Serializer.Database.MSSQL.csproj" />
+        <ProjectReference Include="..\TelegramBotBase.Extensions.Serializer.Database.PostgreSql\TelegramBotBase.Extensions.Serializer.Database.PostgreSql.csproj" />
     </ItemGroup>
 
 </Project>
