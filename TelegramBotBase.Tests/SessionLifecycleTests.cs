@@ -192,7 +192,7 @@ public class SessionLifecycleTests
     }
 
     [Fact]
-    public async Task InvokeMessageLoop_WithoutSession_DoesNotStartOne()
+    public async Task InvokeMessageLoop_WithoutSession_DoesNothing()
     {
         var bot = TestBot.Create();
 
@@ -200,5 +200,7 @@ public class SessionLifecycleTests
 
         Assert.Null(bot.Sessions.GetSession(5));
         Assert.Empty(bot.Forms.Created);
+        Assert.Equal(0, bot.Loop.Invocations);
+        Assert.Empty(bot.Errors);
     }
 }

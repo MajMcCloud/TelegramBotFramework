@@ -239,7 +239,7 @@ public sealed class BotBase
 
     /// <summary>
     ///     This will invoke the full message loop for the device even when no "userevent" like message or action has been
-    ///     raised.
+    ///     raised. An evicted session gets restored from its saved state first. Does nothing if the device has no session.
     /// </summary>
     /// <param name="deviceId">Contains the device/chat id of the device to update.</param>
     /// <param name="e"></param>
@@ -249,6 +249,11 @@ public sealed class BotBase
         try
         {
             ds = (await Sessions.AcquireSession(deviceId, false))?.Session;
+            if (ds == null)
+            {
+                return;
+            }
+
             e.Device = ds;
 
             await MessageLoopFactory.MessageLoop(this, ds, new UpdateResult(e.UpdateData, ds), e);
