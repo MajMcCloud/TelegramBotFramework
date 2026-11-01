@@ -25,6 +25,12 @@ internal class Program
             return;
         }
 
+        if (args.Length > 0 && args[0] == "probe-sessions")
+        {
+            Environment.ExitCode = await SessionProbe.RunAsync(args);
+            return;
+        }
+
         bot = BotBaseBuilder
                  .Create()
                  .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
