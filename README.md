@@ -79,6 +79,12 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
   * [Attributes](#attributes)
     * [SaveState](#savestate)
     * [IgnoreState](#ignorestate)
+- [Session Lifetime and Limits](#session-lifetime-and-limits)
+  * [Ending sessions](#ending-sessions)
+  * [Session limits](#session-limits)
+  * [Opting out of eviction](#opting-out-of-eviction)
+  * [Session limits and state machines](#session-limits-and-state-machines)
+  * [Forms holding other forms](#forms-holding-other-forms)
 - [Navigation and NavigationController (v4.0.0)](#navigation-and-navigationcontroller)
   * [As of Now](#as-of-now)
   * [Usage](#usage)
@@ -1163,6 +1169,142 @@ public class Registration : STForm
 {
 }
 ```
+
+## Session Lifetime and Limits
+
+Every user or group writing to the bot gets a device session holding its active form (with all controls, its
+dependency injection scope and its state). `BotBase.Sessions` (`SessionManager`) keeps them in
+`SessionList`, a thread-safe `ConcurrentDictionary<long, IDeviceSession>`. `IDeviceSession.LastAction` holds the time
+(UTC) of the last update of the device.
+
+By default sessions are kept in memory forever. For bots with many users, configure session limits.
+
+### Ending sessions
+
+`EndSessionAsync` ends a session: it removes it, raises `BotBase.SessionEnds`, closes the active form (`OnClosed`)
+and disposes all forms of the session including their dependency injection scopes. A saved state of the device gets
+discarded, so the next update starts a fresh session with the start form.
+
+```csharp
+bot.SessionEnds += (s, e) =>
+{
+    Console.WriteLine($"Session {e.DeviceId} ended: {e.Reason}"); // Manual, Idle or Capacity
+};
+
+// e.g. within a "logout" button handler
+await bot.Sessions.EndSessionAsync(Device.DeviceId);
+```
+
+Calling it from within an update of the same session is safe: closing and disposal happen once the update has been
+processed. Ending an unknown device does nothing and returns `false`.
+
+### Session limits
+
+```csharp
+var bot = BotBaseBuilder
+    .Create()
+    .WithAPIKey("{YOUR API KEY}")
+    .DefaultMessageLoop()
+    .WithStartForm<StartForm>()
+    .NoProxy()
+    .UseDefaultRequestDispatcher()
+    .DefaultCommands()
+    .UseJSON(AppContext.BaseDirectory + "config\\states.json")
+    .UseEnglish()
+    .UseThreadPool()
+    .WithSessionLimits(l =>
+    {
+        l.IdleTimeout = TimeSpan.FromMinutes(30);     // evict sessions without updates for 30 minutes
+        l.MaxSessions = 10_000;                       // keep at most 10.000 sessions in memory
+        l.SweepInterval = TimeSpan.FromMinutes(1);    // how often idle sessions are looked for (default)
+    })
+    .Build();
+```
+
+| Setting         | Description                                                                                                           |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------|
+| `IdleTimeout`   | Sessions without any update for longer than this get evicted by a background sweeper. `null` disables it.             |
+| `MaxSessions`   | When a new session exceeds this number, the least recently active sessions get evicted right away. `null` disables it. |
+| `SweepInterval` | Interval of the background sweeper, which runs between `bot.Start()` and `bot.Stop()`. Defaults to one minute.         |
+
+Evictions are silent: forms get disposed (including their dependency injection scopes), but `OnClosed` is not
+called and no message gets sent, edited or deleted. `SessionEnds` is raised with `ESessionEndReason.Idle` or
+`ESessionEndReason.Capacity`. `bot.Sessions.EvictSessions()` runs an eviction pass manually.
+
+A session currently processing an update is never evicted. Without a state machine, the next update of an evicted
+device starts a fresh session with the start form.
+
+### Opting out of eviction
+
+Sessions showing a form marked with `[KeepAlive]`, or whose form returns `false` for `CanEvict`, are never evicted
+(but can still be ended manually). `MaxSessions` can be exceeded temporarily in this case.
+
+```csharp
+[KeepAlive]
+public class PaymentForm : FormBase
+{
+}
+
+public class UploadForm : FormBase
+{
+    public bool UploadRunning { get; set; }
+
+    public override bool CanEvict => !UploadRunning;
+}
+```
+
+### Session limits and state machines
+
+With session limits and a state machine configured, the state of an evicted session gets saved and the session gets
+restored on the next update of the device, instead of starting over. Restored sessions don't raise `SessionBegins`.
+
+- Plain state machines (`IStateMachine`, like the JSON and XML ones) are read once at startup. Their states (and the
+  ones of evicted sessions) are kept as lightweight entries in memory until the device writes again, and are included
+  when the sessions get saved.
+- State machines implementing `IDeviceStateMachine` load nothing at startup. States get loaded per device on the first
+  update, evicted sessions are saved one by one, and saving all sessions only updates the states of active sessions
+  instead of replacing all stored states.
+
+```csharp
+public interface IDeviceStateMachine : IStateMachine
+{
+    void SaveFormState(StateEntry state);
+
+    StateEntry LoadFormState(long deviceId);   // null if there is none
+
+    void RemoveFormState(long deviceId);
+}
+```
+
+Without session limits, states are loaded at startup and saved in bulk, as before.
+
+### Forms holding other forms
+
+All forms reachable from a session are disposed together with it: the active and previous form, the stack of a
+`NavigationController` and the parent of a `ModalDialog`. If your own form keeps references to other forms, override
+`GetLinkedForms`:
+
+```csharp
+public class WizardForm : FormBase
+{
+    private readonly List<FormBase> _steps = new();
+
+    protected override IEnumerable<FormBase> GetLinkedForms()
+    {
+        foreach (var form in base.GetLinkedForms())
+        {
+            yield return form;
+        }
+
+        foreach (var step in _steps)
+        {
+            yield return step;
+        }
+    }
+}
+```
+
+---
 
 ## Navigation and NavigationController
 
