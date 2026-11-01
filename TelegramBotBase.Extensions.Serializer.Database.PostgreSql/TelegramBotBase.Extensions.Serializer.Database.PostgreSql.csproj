@@ -21,8 +21,15 @@
 		    <PrivateAssets>all</PrivateAssets>
 		    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	    </PackageReference>
-	    <PackageReference Include="TelegramBotBase" Version="7.0.0" />
 	    <PackageReference Include="Npgsql" Version="9.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="TelegramBotBase.Tests" />
     </ItemGroup>
 
 </Project>

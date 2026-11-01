@@ -1,6 +1,8 @@
 ﻿using Npgsql;
 using System;
-using System.Data;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text.Json;
 using NpgsqlTypes;
 using TelegramBotBase.Args;
 using TelegramBotBase.Base;
@@ -11,13 +13,19 @@ namespace TelegramBotBase.Extensions.Serializer.Database.PostgreSql
 {
     /// <summary>
     /// Represents a PostgreSQL implementation of the <see cref="IStateMachine"/> for saving and loading form states.
+    /// Supports per device access (<see cref="IDeviceStateMachine"/>), which is used together with session limits.
     /// </summary>
-    public class PostgreSqlSerializer : IStateMachine
+    public class PostgreSqlSerializer : IDeviceStateMachine
     {
         private readonly string insertIntoSessionSql;
         private readonly string insertIntoSessionsDataSql;
         private readonly string selectAllDevicesSessionsSql;
-        private readonly string selectAllDevicesSessionsDataSql;
+        private readonly string selectDeviceSessionSql;
+        private readonly string selectDeviceSessionsDataSql;
+        private readonly string deleteAllSessionsSql;
+        private readonly string deleteAllSessionsDataSql;
+        private readonly string deleteDeviceSessionSql;
+        private readonly string deleteDeviceSessionsDataSql;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostgreSqlSerializer"/> class.
@@ -40,12 +48,21 @@ namespace TelegramBotBase.Extensions.Serializer.Database.PostgreSql
                 throw new ArgumentException($"{nameof(FallbackStateForm)} is not a subclass of {nameof(FormBase)}");
             }
 
-            insertIntoSessionSql = "INSERT INTO " + TablePrefix +
-                                   "devices_sessions (deviceId, deviceTitle, \"FormUri\", \"QualifiedName\") VALUES (@deviceId, @deviceTitle, @FormUri, @QualifiedName)";
-            insertIntoSessionsDataSql = "INSERT INTO " + TablePrefix + "devices_sessions_data (deviceId, key, value, type) VALUES (@deviceId, @key, @value, @type)";
+            var sessions = TablePrefix + "devices_sessions";
+            var data = TablePrefix + "devices_sessions_data";
 
-            selectAllDevicesSessionsSql = "SELECT * FROM " + TablePrefix + "devices_sessions";
-            selectAllDevicesSessionsDataSql = "SELECT * FROM " + TablePrefix + "devices_sessions_data WHERE deviceId = @deviceId";
+            insertIntoSessionSql = "INSERT INTO " + sessions +
+                                   " (deviceId, deviceTitle, \"FormUri\", \"QualifiedName\") VALUES (@deviceId, @deviceTitle, @FormUri, @QualifiedName)";
+            insertIntoSessionsDataSql = "INSERT INTO " + data + " (deviceId, key, value, type) VALUES (@deviceId, @key, @value, @type)";
+
+            selectAllDevicesSessionsSql = "SELECT deviceId, deviceTitle, \"FormUri\", \"QualifiedName\" FROM " + sessions;
+            selectDeviceSessionSql = selectAllDevicesSessionsSql + " WHERE deviceId = @deviceId";
+            selectDeviceSessionsDataSql = "SELECT key, value, type FROM " + data + " WHERE deviceId = @deviceId";
+
+            deleteAllSessionsSql = "DELETE FROM " + sessions;
+            deleteAllSessionsDataSql = "DELETE FROM " + data;
+            deleteDeviceSessionSql = deleteAllSessionsSql + " WHERE deviceId = @deviceId";
+            deleteDeviceSessionsDataSql = deleteAllSessionsDataSql + " WHERE deviceId = @deviceId";
         }
 
         /// <summary>
@@ -56,6 +73,7 @@ namespace TelegramBotBase.Extensions.Serializer.Database.PostgreSql
         /// <summary>
         /// Gets or sets the table name prefix for database tables.
         /// </summary>
+        /// <remarks>Changing it after construction has no effect, the statements are built in the constructor.</remarks>
         public string TablePrefix { get; set; }
 
         /// <summary>
@@ -65,44 +83,28 @@ namespace TelegramBotBase.Extensions.Serializer.Database.PostgreSql
 
         /// <inheritdoc/>
         /// <summary>
-        /// Saves form states to the PostgreSQL database.
+        /// Saves form states to the PostgreSQL database, replacing all stored states.
         /// </summary>
         /// <param name="e">The <see cref="SaveStatesEventArgs"/> containing the states to be saved.</param>
         public void SaveFormStates(SaveStatesEventArgs e)
         {
-            var container = e.States;
-
-            //Cleanup old Session data
-            Cleanup();
-
             using (var connection = new NpgsqlConnection(ConnectionString))
             {
                 connection.Open();
 
-                //Store session data in database
-                foreach (var state in container.States)
+                using (var transaction = connection.BeginTransaction())
                 {
-                    using (var sessionCommand = connection.CreateCommand())
+                    //Cleanup old Session data
+                    Execute(connection, transaction, deleteAllSessionsDataSql, null);
+                    Execute(connection, transaction, deleteAllSessionsSql, null);
+
+                    //Store session data in database
+                    foreach (var state in e.States.States)
                     {
-                        sessionCommand.CommandText = insertIntoSessionSql;
-
-                        sessionCommand.Parameters.Add(new NpgsqlParameter("@deviceId", NpgsqlDbType.Bigint){Value = state.DeviceId });
-                        sessionCommand.Parameters.Add(new NpgsqlParameter("@deviceTitle", DbType.StringFixedLength){Value = state.ChatTitle ?? string.Empty});
-                        sessionCommand.Parameters.Add(new NpgsqlParameter("@FormUri", DbType.StringFixedLength) {Value = state.FormUri});
-                        sessionCommand.Parameters.Add(new NpgsqlParameter("@QualifiedName", DbType.StringFixedLength){Value = state.QualifiedName });
-
-                        sessionCommand.ExecuteNonQuery();
+                        InsertState(connection, transaction, state);
                     }
-                }
-            }
 
-            using (var connection = new NpgsqlConnection(ConnectionString))
-            {
-                connection.Open();
-
-                foreach (var state in container.States)
-                {
-                    SaveSessionsData(state, connection);
+                    transaction.Commit();
                 }
             }
         }
@@ -120,132 +122,221 @@ namespace TelegramBotBase.Extensions.Serializer.Database.PostgreSql
             {
                 connection.Open();
 
-                using (var sessionCommand = connection.CreateCommand())
+                foreach (var stateEntry in ReadEntries(connection, selectAllDevicesSessionsSql, null))
                 {
-                    sessionCommand.CommandText = selectAllDevicesSessionsSql;
+                    LoadValues(connection, stateEntry);
 
-                    var sessionTable = new DataTable();
-                    using (var dataAdapter = new NpgsqlDataAdapter(sessionCommand))
-                    {
-                        dataAdapter.Fill(sessionTable);
-
-                        foreach (DataRow row in sessionTable.Rows)
-                        {
-                            var stateEntry = new StateEntry
-                            {
-                                DeviceId = (long)row["deviceId"],
-                                ChatTitle = row["deviceTitle"].ToString(),
-                                FormUri = row["FormUri"].ToString(),
-                                QualifiedName = row["QualifiedName"].ToString()
-                            };
-
-                            stateContainer.States.Add(stateEntry);
-
-                            if (stateEntry.DeviceId > 0)
-                            {
-                                stateContainer.ChatIds.Add(stateEntry.DeviceId);
-                            }
-                            else
-                            {
-                                stateContainer.GroupIds.Add(stateEntry.DeviceId);
-                            }
-
-                            LoadDataTable(connection, row, stateEntry);
-                        }
-                    }
+                    stateContainer.States.Add(stateEntry);
                 }
             }
 
             return stateContainer;
         }
 
-        /// <summary>
-        /// Cleans up old session data in the PostgreSQL database.
-        /// </summary>
-        private void Cleanup()
+        /// <inheritdoc/>
+        public void SaveFormState(StateEntry state)
+        {
+            if (state == null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            using (var connection = new NpgsqlConnection(ConnectionString))
+            {
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction())
+                {
+                    DeleteState(connection, transaction, state.DeviceId);
+
+                    InsertState(connection, transaction, state);
+
+                    transaction.Commit();
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public StateEntry LoadFormState(long deviceId)
         {
             using (var connection = new NpgsqlConnection(ConnectionString))
             {
                 connection.Open();
 
-                using (var clearCommand = connection.CreateCommand())
+                var entries = ReadEntries(connection, selectDeviceSessionSql, deviceId);
+                if (entries.Count == 0)
                 {
-                    clearCommand.CommandText = $"DELETE FROM {TablePrefix}devices_sessions_data";
-                    clearCommand.ExecuteNonQuery();
+                    return null;
                 }
 
-                using (var clearCommand = connection.CreateCommand())
+                LoadValues(connection, entries[0]);
+
+                return entries[0];
+            }
+        }
+
+        /// <inheritdoc/>
+        public void RemoveFormState(long deviceId)
+        {
+            using (var connection = new NpgsqlConnection(ConnectionString))
+            {
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction())
                 {
-                    clearCommand.CommandText = $"DELETE FROM {TablePrefix}devices_sessions";
-                    clearCommand.ExecuteNonQuery();
+                    DeleteState(connection, transaction, deviceId);
+
+                    transaction.Commit();
                 }
             }
         }
 
-        /// <summary>
-        /// Saves session data to the PostgreSQL database.
-        /// </summary>
-        /// <param name="state">The state entry containing session data to be saved.</param>
-        /// <param name="connection">The NpgsqlConnection used for the database interaction.</param>
-        private void SaveSessionsData(StateEntry state, NpgsqlConnection connection)
+        private static void Execute(NpgsqlConnection connection, NpgsqlTransaction transaction, string sql, long? deviceId)
         {
+            using (var command = new NpgsqlCommand(sql, connection, transaction))
+            {
+                if (deviceId != null)
+                {
+                    command.Parameters.Add(new NpgsqlParameter("@deviceId", NpgsqlDbType.Bigint) { Value = deviceId.Value });
+                }
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private void DeleteState(NpgsqlConnection connection, NpgsqlTransaction transaction, long deviceId)
+        {
+            Execute(connection, transaction, deleteDeviceSessionsDataSql, deviceId);
+            Execute(connection, transaction, deleteDeviceSessionSql, deviceId);
+        }
+
+        /// <summary>
+        /// Inserts the session row and its data rows.
+        /// </summary>
+        private void InsertState(NpgsqlConnection connection, NpgsqlTransaction transaction, StateEntry state)
+        {
+            using (var sessionCommand = new NpgsqlCommand(insertIntoSessionSql, connection, transaction))
+            {
+                sessionCommand.Parameters.Add(new NpgsqlParameter("@deviceId", NpgsqlDbType.Bigint) { Value = state.DeviceId });
+                sessionCommand.Parameters.Add(new NpgsqlParameter("@deviceTitle", NpgsqlDbType.Varchar) { Value = state.ChatTitle ?? string.Empty });
+                sessionCommand.Parameters.Add(new NpgsqlParameter("@FormUri", NpgsqlDbType.Varchar) { Value = state.FormUri ?? string.Empty });
+                sessionCommand.Parameters.Add(new NpgsqlParameter("@QualifiedName", NpgsqlDbType.Varchar) { Value = state.QualifiedName ?? string.Empty });
+
+                sessionCommand.ExecuteNonQuery();
+            }
+
+            if (state.Values == null)
+            {
+                return;
+            }
+
             foreach (var data in state.Values)
             {
-                using (var dataCommand = connection.CreateCommand())
+                //Nothing to restore for missing values
+                if (data.Value == null)
                 {
-                    dataCommand.CommandText = insertIntoSessionsDataSql;
+                    continue;
+                }
 
+                using (var dataCommand = new NpgsqlCommand(insertIntoSessionsDataSql, connection, transaction))
+                {
                     dataCommand.Parameters.Add(new NpgsqlParameter("@deviceId", NpgsqlDbType.Bigint) { Value = state.DeviceId });
-                    dataCommand.Parameters.Add(new NpgsqlParameter("@key", DbType.StringFixedLength) { Value = data.Key });
-
-                    var type = data.Value.GetType();
-
-                    if (type.IsPrimitive || type == typeof(string))
-                    {
-                        dataCommand.Parameters.Add(new NpgsqlParameter("@value", NpgsqlDbType.Text) { Value = data.Value });
-                    }
-                    else
-                    {
-                        var json = System.Text.Json.JsonSerializer.Serialize(data.Value);
-                        dataCommand.Parameters.Add(new NpgsqlParameter("@value", NpgsqlDbType.Text) { Value = json });
-                    }
-
-                    dataCommand.Parameters.Add(new NpgsqlParameter("@type", DbType.StringFixedLength) { Value = type.AssemblyQualifiedName });
+                    dataCommand.Parameters.Add(new NpgsqlParameter("@key", NpgsqlDbType.Varchar) { Value = data.Key });
+                    dataCommand.Parameters.Add(new NpgsqlParameter("@value", NpgsqlDbType.Text) { Value = SerializeValue(data.Value) });
+                    dataCommand.Parameters.Add(new NpgsqlParameter("@type", NpgsqlDbType.Varchar) { Value = data.Value.GetType().AssemblyQualifiedName });
 
                     dataCommand.ExecuteNonQuery();
                 }
             }
         }
 
-        /// <summary>
-        /// Loads session data from the PostgreSQL database.
-        /// </summary>
-        /// <param name="connection">The NpgsqlConnection used for the database interaction.</param>
-        /// <param name="row">The DataRow representing a session entry in the main sessions table.</param>
-        /// <param name="stateEntry">The StateEntry object to which session data will be loaded.</param>
-        private void LoadDataTable(NpgsqlConnection connection, DataRow row, StateEntry stateEntry)
+        private static List<StateEntry> ReadEntries(NpgsqlConnection connection, string sql, long? deviceId)
         {
-            using (var sessionCommand = connection.CreateCommand())
+            var entries = new List<StateEntry>();
+
+            using (var command = new NpgsqlCommand(sql, connection))
             {
-                sessionCommand.CommandText = selectAllDevicesSessionsDataSql;
-                sessionCommand.Parameters.Add(new NpgsqlParameter("@deviceId", row["deviceId"]));
-
-                var dataCommandTable = new DataTable();
-                using (var npgSqlDataAdapter = new NpgsqlDataAdapter(sessionCommand))
+                if (deviceId != null)
                 {
-                    npgSqlDataAdapter.Fill(dataCommandTable);
-
-                    foreach (DataRow dataRow in dataCommandTable.Rows)
-                    {
-                        var key = dataRow["key"].ToString();
-                        var type = Type.GetType(dataRow["type"].ToString());
-
-                        var value = System.Text.Json.JsonSerializer.Deserialize(dataRow["value"].ToString(), type);
-
-                        stateEntry.Values.Add(key, value);
-                    }
+                    command.Parameters.Add(new NpgsqlParameter("@deviceId", NpgsqlDbType.Bigint) { Value = deviceId.Value });
                 }
 
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        entries.Add(new StateEntry
+                        {
+                            DeviceId = reader.GetInt64(0),
+                            ChatTitle = reader.GetString(1),
+                            FormUri = reader.GetString(2),
+                            QualifiedName = reader.GetString(3)
+                        });
+                    }
+                }
+            }
+
+            return entries;
+        }
+
+        /// <summary>
+        /// Loads the data rows of a session into its state entry.
+        /// </summary>
+        private void LoadValues(NpgsqlConnection connection, StateEntry stateEntry)
+        {
+            using (var command = new NpgsqlCommand(selectDeviceSessionsDataSql, connection))
+            {
+                command.Parameters.Add(new NpgsqlParameter("@deviceId", NpgsqlDbType.Bigint) { Value = stateEntry.DeviceId });
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var type = Type.GetType(reader.GetString(2));
+
+                        //Skip values of types which don't exist (anymore)
+                        if (type == null)
+                        {
+                            continue;
+                        }
+
+                        stateEntry.Values[reader.GetString(0)] = DeserializeValue(reader.GetString(1), type);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Serializes a state value as JSON.
+        /// </summary>
+        internal static string SerializeValue(object value)
+        {
+            return JsonSerializer.Serialize(value, value.GetType());
+        }
+
+        /// <summary>
+        /// Deserializes a state value. Also reads values written by earlier versions, which stored strings as plain
+        /// text instead of JSON.
+        /// </summary>
+        internal static object DeserializeValue(string value, Type type)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize(value, type);
+            }
+            catch (JsonException)
+            {
+                if (type == typeof(string))
+                {
+                    return value;
+                }
+
+                if (type.IsPrimitive)
+                {
+                    return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
+                }
+
+                throw;
             }
         }
     }
