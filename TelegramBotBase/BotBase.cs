@@ -116,7 +116,7 @@ public sealed class BotBase
     }
 
 
-    private async Task Client_MessageLoop(object sender, UpdateResult e)
+    internal async Task Client_MessageLoop(object sender, UpdateResult e)
     {
         IDeviceSession ds = null;
         try

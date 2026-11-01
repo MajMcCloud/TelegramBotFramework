@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Extensions.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModalDialogNavigation", "Examples\ModalDialogNavigation\ModalDialogNavigation.csproj", "{3008791F-4B41-43C5-BF09-E0DE637CE81B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotBase.Tests", "TelegramBotBase.Tests\TelegramBotBase.Tests.csproj", "{0D49FC68-3A75-4D37-83D0-42E09A0C3E17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +134,10 @@ Global
 		{3008791F-4B41-43C5-BF09-E0DE637CE81B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3008791F-4B41-43C5-BF09-E0DE637CE81B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3008791F-4B41-43C5-BF09-E0DE637CE81B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D49FC68-3A75-4D37-83D0-42E09A0C3E17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D49FC68-3A75-4D37-83D0-42E09A0C3E17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D49FC68-3A75-4D37-83D0-42E09A0C3E17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D49FC68-3A75-4D37-83D0-42E09A0C3E17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
