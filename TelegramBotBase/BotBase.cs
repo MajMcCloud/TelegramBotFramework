@@ -76,6 +76,12 @@ public sealed class BotBase
     public IMessageLoopFactory MessageLoopFactory { get; internal set; }
 
     public IRequestDispatcher RequestDispatcher { get; internal set; }
+
+    /// <summary>
+    ///     Limits for the sessions kept in memory (idle timeout, maximum count). <c>null</c> (default) keeps all sessions
+    ///     forever. Configure it with <c>BotBaseBuilder.WithSessionLimits</c>.
+    /// </summary>
+    public SessionLimits SessionLimits { get; internal set; }
     
     /// <summary>
     ///     All internal used settings.
@@ -106,6 +112,8 @@ public sealed class BotBase
             // should be waited until finish
             Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
         }
+
+        Sessions.StartSweeper();
 
         Client.StartReceiving();
     }
@@ -188,6 +196,8 @@ public sealed class BotBase
 
         Client.MessageLoop -= Client_MessageLoop;
         Client.StopReceiving();
+
+        await Sessions.StopSweeper();
 
         await Sessions.SaveSessionStates();
     }
@@ -441,7 +451,7 @@ public sealed class BotBase
 
     /// <summary>
     ///     Will be called if a session/context gets ended, either manually (<see cref="SessionManager.EndSessionAsync" />)
-    ///     or by eviction (idle timeout / capacity).
+    ///     or by eviction (idle timeout / capacity, see <see cref="SessionLimits" />).
     ///     The session is already removed from the session list, but its forms are not disposed yet.
     /// </summary>
     public event EventHandler<SessionEndEventArgs> SessionEnds

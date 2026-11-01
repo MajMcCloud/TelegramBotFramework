@@ -88,6 +88,13 @@ public class FormBase : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    ///     Returns if the session showing this form may be evicted by the configured session limits.
+    ///     Override this to keep a session alive while e.g. a long-running interaction is in progress.
+    ///     For a permanent opt-out, use the <see cref="Attributes.KeepAlive" /> attribute.
+    /// </summary>
+    public virtual bool CanEvict => true;
+
 
     public async Task OnInit(InitEventArgs e)
     {

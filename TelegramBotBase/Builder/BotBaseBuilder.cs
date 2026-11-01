@@ -14,6 +14,7 @@ using TelegramBotBase.Interfaces.ExternalActions;
 using TelegramBotBase.Localizations;
 using TelegramBotBase.MessageLoops;
 using TelegramBotBase.RequestDispatchers;
+using TelegramBotBase.Sessions;
 using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder;
@@ -33,6 +34,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     private IStateMachine _stateMachine;
 
     private IRequestDispatcher _requestDispatcher;
+
+    private SessionLimits _sessionLimits;
 
     private BotBaseBuilder()
     {
@@ -58,10 +61,37 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             BotCommandScopes = BotCommandScopes,
             StateMachine = _stateMachine,
             MessageLoopFactory = _messageLoopFactory,
-            RequestDispatcher = _requestDispatcher
+            RequestDispatcher = _requestDispatcher,
+            SessionLimits = _sessionLimits
         };
 
         return bot;
+    }
+
+    public IBuildingStage WithSessionLimits(Action<SessionLimits> configure)
+    {
+        if (configure == null)
+        {
+            throw new ArgumentNullException(nameof(configure));
+        }
+
+        var limits = new SessionLimits();
+        configure(limits);
+
+        return WithSessionLimits(limits);
+    }
+
+    public IBuildingStage WithSessionLimits(SessionLimits limits)
+    {
+        if (limits == null)
+        {
+            throw new ArgumentNullException(nameof(limits));
+        }
+
+        limits.Validate();
+
+        _sessionLimits = limits.Clone();
+        return this;
     }
 
     private void CompleteSkippedStagesWithDefaultValues()
