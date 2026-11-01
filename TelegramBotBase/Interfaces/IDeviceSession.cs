@@ -42,7 +42,7 @@ public interface IDeviceSession : IDeviceSessionMethods
 
 
     /// <summary>
-    ///     When did any last action happend (message received or button clicked)
+    ///     When did any last action happen (message received or button clicked), in UTC.
     /// </summary>
     DateTime LastAction { get; set; }
 

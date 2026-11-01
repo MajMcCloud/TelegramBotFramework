@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,10 +19,16 @@ namespace TelegramBotBase;
 /// </summary>
 public class SessionManager
 {
+    /// <summary>
+    ///     Sessions which are currently being created, used to make sure only one session gets created per device
+    ///     when several updates of the same device are processed concurrently.
+    /// </summary>
+    private readonly ConcurrentDictionary<long, Lazy<Task<IDeviceSession>>> _pendingSessions = new();
+
     public SessionManager(BotBase botBase)
     {
         BotBase = botBase;
-        SessionList = new Dictionary<long, IDeviceSession>();
+        SessionList = new ConcurrentDictionary<long, IDeviceSession>();
     }
 
     /// <summary>
@@ -30,9 +37,9 @@ public class SessionManager
     public MessageClient Client => BotBase.Client;
 
     /// <summary>
-    ///     A list of all active sessions.
+    ///     A thread-safe list of all active sessions.
     /// </summary>
-    public Dictionary<long, IDeviceSession> SessionList { get; set; }
+    public ConcurrentDictionary<long, IDeviceSession> SessionList { get; }
 
 
     /// <summary>
@@ -41,50 +48,109 @@ public class SessionManager
     public BotBase BotBase { get; }
 
     /// <summary>
+    ///     Clock used for idle tracking (UTC). Can be replaced in tests.
+    /// </summary>
+    internal Func<DateTime> UtcNow { get; set; } = () => DateTime.UtcNow;
+
+    /// <summary>
     ///     Get device session from Device/ChatId
     /// </summary>
     /// <param name="deviceId"></param>
-    /// <returns></returns>
+    /// <returns>The session or <c>null</c> if there is no active session for this device.</returns>
     public IDeviceSession GetSession(long deviceId)
     {
-        var ds = SessionList.FirstOrDefault(a => a.Key == deviceId).Value ?? null;
-        return ds;
+        return SessionList.TryGetValue(deviceId, out var ds) ? ds : null;
     }
 
     /// <summary>
     ///     Start a new session
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="deviceId"></param>
     /// <returns></returns>
     public async Task<IDeviceSession> StartSession(long deviceId)
     {
-        var start = BotBase.FormFactory.CreateStartForm();
-
-        start.Client = Client;
-
-        var ds = new DeviceSession(deviceId, BotBase.RequestDispatcher, start);
-
-        start.Device = ds;
-        await start.OnInit(new InitEventArgs());
-
-        await start.OnOpened(EventArgs.Empty);
+        var ds = await CreateStartSession(deviceId);
 
         SessionList[deviceId] = ds;
         return ds;
     }
 
     /// <summary>
-    ///     End session
+    ///     Returns the existing session of the device or starts a new one. Concurrent calls for the same device
+    ///     share one start, so only one session (and one start form) gets created.
+    /// </summary>
+    /// <param name="deviceId"></param>
+    /// <returns>The session and if it has been created by this call.</returns>
+    internal async Task<(IDeviceSession Session, bool Created)> GetOrStartSession(long deviceId)
+    {
+        if (SessionList.TryGetValue(deviceId, out var existing))
+        {
+            return (existing, false);
+        }
+
+        var created = false;
+        var pending = _pendingSessions.GetOrAdd(deviceId, id => new Lazy<Task<IDeviceSession>>(async () =>
+        {
+            // Another start could have completed between the lookup above and registering this one.
+            if (SessionList.TryGetValue(id, out var current))
+            {
+                return current;
+            }
+
+            created = true;
+
+            var ds = await CreateStartSession(id);
+
+            SessionList[id] = ds;
+            return ds;
+        }));
+
+        try
+        {
+            var session = await pending.Value;
+            return (session, created);
+        }
+        finally
+        {
+            // Only remove our own entry, a newer pending start could already be registered.
+            TryRemoveExact(_pendingSessions, deviceId, pending);
+        }
+    }
+
+    /// <summary>
+    ///     Removes the entry only if it still holds the given value.
+    /// </summary>
+    private static bool TryRemoveExact<TValue>(ConcurrentDictionary<long, TValue> dictionary, long key, TValue value)
+    {
+        return ((ICollection<KeyValuePair<long, TValue>>)dictionary).Remove(new KeyValuePair<long, TValue>(key, value));
+    }
+
+    private async Task<IDeviceSession> CreateStartSession(long deviceId)
+    {
+        var start = BotBase.FormFactory.CreateStartForm();
+
+        start.Client = Client;
+
+        var ds = new DeviceSession(deviceId, BotBase.RequestDispatcher, start)
+        {
+            LastAction = UtcNow()
+        };
+
+        start.Device = ds;
+        await start.OnInit(new InitEventArgs());
+
+        await start.OnOpened(EventArgs.Empty);
+
+        return ds;
+    }
+
+    /// <summary>
+    ///     End session. Does nothing if there is no session for this device.
     /// </summary>
     /// <param name="deviceId"></param>
     public void EndSession(long deviceId)
     {
-        var d = SessionList[deviceId];
-        if (d != null)
-        {
-            SessionList.Remove(deviceId);
-        }
+        SessionList.TryRemove(deviceId, out _);
     }
 
     /// <summary>
@@ -200,10 +266,14 @@ public class SessionManager
             form.Client = Client;
             var device = new DeviceSession(s.DeviceId, BotBase.RequestDispatcher, form)
             {
-                ChatTitle = s.ChatTitle
+                ChatTitle = s.ChatTitle,
+                LastAction = UtcNow()
             };
 
-            SessionList.Add(s.DeviceId, device);
+            if (!SessionList.TryAdd(s.DeviceId, device))
+            {
+                continue;
+            }
 
             //Is Subclass of IStateForm
             if (form is IStateForm iform)
@@ -224,7 +294,7 @@ public class SessionManager
             catch
             {
                 //Skip on exception
-                SessionList.Remove(s.DeviceId);
+                TryRemoveExact(SessionList, s.DeviceId, (IDeviceSession)device);
             }
         }
     }

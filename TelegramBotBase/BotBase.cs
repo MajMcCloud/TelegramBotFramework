@@ -115,14 +115,15 @@ public sealed class BotBase
     {
         try
         {
-            var ds = Sessions.GetSession(e.DeviceId);
-            if (ds == null)
+            var (ds, created) = await Sessions.GetOrStartSession(e.DeviceId);
+            if (created)
             {
-                ds = await Sessions.StartSession(e.DeviceId);
                 ds.LastMessage = e.Message;
 
                 OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
             }
+
+            ds.LastAction = Sessions.UtcNow();
 
             e.Device = ds;
 
@@ -195,9 +196,9 @@ public sealed class BotBase
             return;
         }
 
-        foreach (var s in Sessions.SessionList)
+        foreach (var deviceId in Sessions.SessionList.Keys)
         {
-            await Client.TelegramClient.SendMessage(s.Key, message);
+            await Client.TelegramClient.SendMessage(deviceId, message);
         }
     }
 
