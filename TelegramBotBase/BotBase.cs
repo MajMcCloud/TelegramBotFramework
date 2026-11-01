@@ -101,10 +101,7 @@ public sealed class BotBase
 
         Client.MessageLoop += Client_MessageLoop;
 
-        if (StateMachine != null)
-        {
-            await Sessions.LoadSessionStates(StateMachine);
-        }
+        await Sessions.LoadSessionStatesOnStart();
 
         // Enable auto session saving
         if (GetSetting(ESettings.SaveSessionsOnConsoleExit, false))
@@ -124,14 +121,18 @@ public sealed class BotBase
         IDeviceSession ds = null;
         try
         {
-            var (session, created) = (await Sessions.AcquireSession(e.DeviceId, true)).Value;
-            ds = session;
+            var acquired = (await Sessions.AcquireSession(e.DeviceId, true)).Value;
+            ds = acquired.Session;
 
-            if (created)
+            if (acquired.Created)
             {
                 ds.LastMessage = e.Message;
 
-                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+                // A restored (previously evicted) session continues, it doesn't begin.
+                if (!acquired.Restored)
+                {
+                    OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+                }
             }
 
             ds.LastAction = Sessions.UtcNow();

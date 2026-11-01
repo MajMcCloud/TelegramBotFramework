@@ -2,25 +2,21 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
-using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
-using TelegramBotBase.Tools;
 
 namespace TelegramBotBase;
 
 /// <summary>
 ///     Base class for managing all active sessions
 /// </summary>
-public class SessionManager
+public partial class SessionManager
 {
     /// <summary>
     ///     Sessions which are currently being created, used to make sure only one session gets created per device
@@ -29,20 +25,15 @@ public class SessionManager
     private readonly ConcurrentDictionary<long, Lazy<Task<IDeviceSession>>> _pendingSessions = new();
 
     /// <summary>
+    ///     Sessions which have been ended and are still saving or discarding their state. A new session of the same
+    ///     device waits for it, so it never restores an outdated state.
+    /// </summary>
+    private readonly ConcurrentDictionary<long, Task> _pendingEnds = new();
+
+    /// <summary>
     ///     Usage tracking per session. Attached to the session instance, so it goes away together with it.
     /// </summary>
     private readonly ConditionalWeakTable<IDeviceSession, SessionLease> _leases = new();
-
-    /// <summary>
-    ///     Makes sure only one eviction pass runs at a time.
-    /// </summary>
-    private readonly SemaphoreSlim _evictionLock = new(1, 1);
-
-    private readonly object _sweeperSync = new();
-
-    private CancellationTokenSource _sweeperCancellation;
-
-    private Task _sweeper;
 
     public SessionManager(BotBase botBase)
     {
@@ -82,7 +73,7 @@ public class SessionManager
     }
 
     /// <summary>
-    ///     Start a new session
+    ///     Start a new session with the start form. An existing session of this device gets replaced (not disposed).
     /// </summary>
     /// <param name="deviceId"></param>
     /// <returns></returns>
@@ -96,12 +87,14 @@ public class SessionManager
 
     /// <summary>
     ///     Returns the session of the device and acquires it for the caller, so it can't be evicted or disposed
-    ///     while in use. Each successful call has to be paired with <see cref="ReleaseSession" />.
+    ///     while in use. Each returned session has to be released with <see cref="ReleaseSession" />.
+    ///     A missing session gets restored from its saved state (when session limits and a state machine are
+    ///     configured) or, if <paramref name="startIfMissing" /> is set, started with the start form.
     /// </summary>
     /// <param name="deviceId"></param>
-    /// <param name="startIfMissing">Starts a new session if the device has none, otherwise returns <c>null</c>.</param>
-    /// <returns>The acquired session and if it has been created by this call, or <c>null</c>.</returns>
-    internal async Task<(IDeviceSession Session, bool Created)?> AcquireSession(long deviceId, bool startIfMissing)
+    /// <param name="startIfMissing">Starts a new session if the device has none and no state to restore.</param>
+    /// <returns>The acquired session, or <c>null</c> if there is none.</returns>
+    internal async Task<AcquiredSession?> AcquireSession(long deviceId, bool startIfMissing)
     {
         while (true)
         {
@@ -109,31 +102,37 @@ public class SessionManager
             {
                 if (TryAcquire(existing))
                 {
-                    return (existing, false);
+                    return new AcquiredSession(existing, false, false);
                 }
 
-                // The session has just been ended and removed from the list, look again.
+                // The session has just been ended, which removes it from the list in the same step. Look again.
                 continue;
             }
 
-            if (!startIfMissing)
+            var (session, created, restored) = await GetOrCreateSession(deviceId, startIfMissing);
+
+            if (session == null)
             {
-                return null;
+                if (!startIfMissing)
+                {
+                    return null;
+                }
+
+                // A concurrent call which wasn't allowed to start a session created nothing, try again.
+                continue;
             }
 
-            var (session, created) = await GetOrStartSession(deviceId);
-
-            // The creator already holds the lease, see GetOrStartSession.
+            // The creator already holds the lease, see GetOrCreateSession.
             if (created)
             {
                 await EnforceCapacityOnStart();
 
-                return (session, true);
+                return new AcquiredSession(session, true, restored);
             }
 
             if (TryAcquire(session))
             {
-                return (session, false);
+                return new AcquiredSession(session, false, false);
             }
         }
     }
@@ -160,29 +159,48 @@ public class SessionManager
 
         if (dispose)
         {
-            await DisposeSession(session, lease.Reason);
+            await DisposeForms(session, lease.Reason == ESessionEndReason.Manual);
         }
     }
 
     /// <summary>
-    ///     Returns the existing session of the device or starts a new one. Concurrent calls for the same device
-    ///     share one start, so only one session (and one start form) gets created. When the session has been created
-    ///     by this call, it is returned already acquired (see <see cref="AcquireSession" />).
+    ///     Returns the existing session of the device or creates one (restored from its saved state or started with
+    ///     the start form). Concurrent calls for the same device share one creation, so only one session gets created.
+    ///     When the session has been created by this call, it is returned already acquired
+    ///     (see <see cref="AcquireSession" />).
     /// </summary>
-    /// <param name="deviceId"></param>
-    /// <returns>The session and if it has been created by this call.</returns>
-    private async Task<(IDeviceSession Session, bool Created)> GetOrStartSession(long deviceId)
+    private async Task<(IDeviceSession Session, bool Created, bool Restored)> GetOrCreateSession(long deviceId,
+        bool startIfMissing)
     {
         var created = false;
+        var restored = false;
+
         var pending = _pendingSessions.GetOrAdd(deviceId, id => new Lazy<Task<IDeviceSession>>(async () =>
         {
-            // Another start could have completed between the caller's lookup and registering this one.
+            // A session of this device which has just been evicted could still be saving its state.
+            if (_pendingEnds.TryGetValue(id, out var ending))
+            {
+                await ending;
+            }
+
+            // Another creation could have completed between the caller's lookup and registering this one.
             if (SessionList.TryGetValue(id, out var current))
             {
                 return current;
             }
 
-            var ds = await CreateStartSession(id);
+            var ds = await TryRestoreSession(id);
+            var isRestored = ds != null;
+
+            if (ds == null)
+            {
+                if (!startIfMissing)
+                {
+                    return null;
+                }
+
+                ds = await CreateStartSession(id);
+            }
 
             // Hold the session for the creator before it becomes visible, so it can't be evicted right away.
             var lease = GetLease(ds);
@@ -191,20 +209,35 @@ public class SessionManager
                 lease.Active++;
             }
 
-            created = true;
+            if (!SessionList.TryAdd(id, ds))
+            {
+                // Someone added a session in the meantime (e.g. via StartSession), drop ours.
+                lock (lease)
+                {
+                    lease.Active--;
+                    lease.Ended = true;
+                    lease.Disposed = true;
+                }
 
-            SessionList[id] = ds;
+                await DisposeForms(ds, false);
+
+                return SessionList.TryGetValue(id, out current) ? current : null;
+            }
+
+            created = true;
+            restored = isRestored;
+
             return ds;
         }));
 
         try
         {
             var session = await pending.Value;
-            return (session, created);
+            return (session, created, restored);
         }
         finally
         {
-            // Only remove our own entry, a newer pending start could already be registered.
+            // Only remove our own entry, a newer pending creation could already be registered.
             TryRemoveExact(_pendingSessions, deviceId, pending);
         }
     }
@@ -271,18 +304,24 @@ public class SessionManager
     ///     closes the active form (<c>OnClosed</c>) and disposes all forms of the session including their dependency
     ///     injection scopes. If the session is in use right now (e.g. called from within a form of this session),
     ///     closing and disposal happen once the current update has been processed.
-    ///     A saved state of this device gets discarded. The next update of the device starts a fresh session.
+    ///     A saved state of this device gets discarded, so the next update of the device starts a fresh session.
     /// </summary>
     /// <param name="deviceId"></param>
-    /// <returns><c>true</c> if a session has been ended, <c>false</c> if there was none.</returns>
+    /// <returns><c>true</c> if an active session has been ended, otherwise <c>false</c>.</returns>
     public async Task<bool> EndSessionAsync(long deviceId)
     {
-        if (!SessionList.TryGetValue(deviceId, out var session))
+        while (SessionList.TryGetValue(deviceId, out var session))
         {
-            return false;
+            if (await TryEndSession(deviceId, session, ESessionEndReason.Manual))
+            {
+                return true;
+            }
         }
 
-        return await TryEndSession(deviceId, session, ESessionEndReason.Manual);
+        // No active session, but an evicted one could still be saved.
+        DiscardState(deviceId);
+
+        return false;
     }
 
     /// <summary>
@@ -293,6 +332,8 @@ public class SessionManager
                                            Func<IDeviceSession, bool> canEnd = null)
     {
         var lease = GetLease(session);
+        var ending = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Task pendingEnd;
         bool disposeNow;
 
         lock (lease)
@@ -310,6 +351,10 @@ public class SessionManager
             lease.Ended = true;
             lease.Reason = reason;
 
+            // Registered before the session leaves the list, so a new session of this device waits for the state.
+            pendingEnd = _pendingEnds.AddOrUpdate(deviceId, ending.Task,
+                                                  (_, existing) => Task.WhenAll(existing, ending.Task));
+
             TryRemoveExact(SessionList, deviceId, session);
 
             disposeNow = lease.Active == 0;
@@ -317,6 +362,25 @@ public class SessionManager
             {
                 lease.Disposed = true;
             }
+        }
+
+        try
+        {
+            if (reason == ESessionEndReason.Manual)
+            {
+                DiscardState(deviceId);
+            }
+            else
+            {
+                await PersistState(deviceId, session);
+            }
+        }
+        finally
+        {
+            ending.SetResult(true);
+
+            _ = pendingEnd.ContinueWith(_ => TryRemoveExact(_pendingEnds, deviceId, pendingEnd),
+                                        TaskScheduler.Default);
         }
 
         try
@@ -330,21 +394,22 @@ public class SessionManager
 
         if (disposeNow)
         {
-            await DisposeSession(session, reason);
+            await DisposeForms(session, reason == ESessionEndReason.Manual);
         }
 
         return true;
     }
 
     /// <summary>
-    ///     Closes (only when ended manually) and disposes all forms of the session.
+    ///     Disposes all forms of the session. With <paramref name="closeActiveForm" /> the active form gets closed
+    ///     first (<c>OnClosed</c>, which may send requests to Telegram); evictions skip that.
     /// </summary>
-    private async Task DisposeSession(IDeviceSession session, ESessionEndReason reason)
+    private async Task DisposeForms(IDeviceSession session, bool closeActiveForm)
     {
         // Collect first: closing the active form clears its device and may switch the active form.
         var forms = CollectForms(session);
 
-        if (reason == ESessionEndReason.Manual && session.ActiveForm is { IsDisposed: false } activeForm)
+        if (closeActiveForm && session.ActiveForm is { IsDisposed: false } activeForm)
         {
             try
             {
@@ -407,238 +472,6 @@ public class SessionManager
     }
 
     /// <summary>
-    ///     Evicts all sessions exceeding the configured <see cref="BotBase.SessionLimits" /> now: first idle
-    ///     sessions, then the least recently active ones while there are more than allowed.
-    ///     This runs periodically in the background while the bot is started, but can be invoked manually too.
-    /// </summary>
-    /// <returns>The number of evicted sessions.</returns>
-    public async Task<int> EvictSessions()
-    {
-        var limits = BotBase.SessionLimits;
-        if (limits?.IsEnabled != true)
-        {
-            return 0;
-        }
-
-        await _evictionLock.WaitAsync();
-        try
-        {
-            var evicted = 0;
-
-            if (limits.IdleTimeout is { } idleTimeout)
-            {
-                evicted += await EvictIdleSessions(idleTimeout);
-            }
-
-            if (limits.MaxSessions is { } maxSessions)
-            {
-                evicted += await EvictExceedingSessions(maxSessions);
-            }
-
-            return evicted;
-        }
-        finally
-        {
-            _evictionLock.Release();
-        }
-    }
-
-    private async Task<int> EvictIdleSessions(TimeSpan idleTimeout)
-    {
-        var now = UtcNow();
-        var evicted = 0;
-
-        bool IsIdle(IDeviceSession session)
-        {
-            return now - session.LastAction > idleTimeout;
-        }
-
-        foreach (var entry in SessionList.ToArray())
-        {
-            if (!IsIdle(entry.Value))
-            {
-                continue;
-            }
-
-            if (await TryEndSession(entry.Key, entry.Value, ESessionEndReason.Idle,
-                                    s => IsIdle(s) && CanEvict(s)))
-            {
-                evicted++;
-            }
-        }
-
-        return evicted;
-    }
-
-    private async Task<int> EvictExceedingSessions(int maxSessions)
-    {
-        if (SessionList.Count <= maxSessions)
-        {
-            return 0;
-        }
-
-        var evicted = 0;
-
-        var candidates = SessionList.ToArray()
-                                    .Where(a => CanEvict(a.Value))
-                                    .OrderBy(a => a.Value.LastAction)
-                                    .ToList();
-
-        foreach (var entry in candidates)
-        {
-            if (SessionList.Count <= maxSessions)
-            {
-                break;
-            }
-
-            if (await TryEndSession(entry.Key, entry.Value, ESessionEndReason.Capacity, CanEvict))
-            {
-                evicted++;
-            }
-        }
-
-        return evicted;
-    }
-
-    /// <summary>
-    ///     Keeps the session count within the limit right when a new session got started, instead of waiting for the
-    ///     next sweep. Skipped if an eviction pass is already running.
-    /// </summary>
-    private async Task EnforceCapacityOnStart()
-    {
-        if (BotBase.SessionLimits?.MaxSessions is not { } maxSessions || SessionList.Count <= maxSessions)
-        {
-            return;
-        }
-
-        if (!await _evictionLock.WaitAsync(0))
-        {
-            return;
-        }
-
-        try
-        {
-            await EvictExceedingSessions(maxSessions);
-        }
-        catch (Exception ex)
-        {
-            BotBase.OnException(new SystemExceptionEventArgs(null, 0, null, ex));
-        }
-        finally
-        {
-            _evictionLock.Release();
-        }
-    }
-
-    /// <summary>
-    ///     Returns if the session may be evicted: none of its forms is marked with <see cref="KeepAlive" /> or
-    ///     returns <c>false</c> for <see cref="FormBase.CanEvict" />.
-    /// </summary>
-    private static bool CanEvict(IDeviceSession session)
-    {
-        try
-        {
-            foreach (var form in CollectForms(session))
-            {
-                if (form.IsDisposed)
-                {
-                    continue;
-                }
-
-                if (form.GetType().GetCustomAttributes(typeof(KeepAlive), true).Length != 0 || !form.CanEvict)
-                {
-                    return false;
-                }
-            }
-        }
-        catch
-        {
-            // A failing opt-out check keeps the session, losing it would be worse.
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    ///     Starts the background sweeper if session limits are configured.
-    /// </summary>
-    internal void StartSweeper()
-    {
-        var limits = BotBase.SessionLimits;
-        if (limits?.IsEnabled != true)
-        {
-            return;
-        }
-
-        lock (_sweeperSync)
-        {
-            if (_sweeper != null)
-            {
-                return;
-            }
-
-            _sweeperCancellation = new CancellationTokenSource();
-            var token = _sweeperCancellation.Token;
-
-            _sweeper = Task.Run(() => RunSweeper(limits.SweepInterval, token));
-        }
-    }
-
-    /// <summary>
-    ///     Stops the background sweeper and waits until a running eviction pass has finished.
-    /// </summary>
-    internal async Task StopSweeper()
-    {
-        Task sweeper;
-        CancellationTokenSource cancellation;
-
-        lock (_sweeperSync)
-        {
-            sweeper = _sweeper;
-            cancellation = _sweeperCancellation;
-
-            _sweeper = null;
-            _sweeperCancellation = null;
-        }
-
-        if (sweeper == null)
-        {
-            return;
-        }
-
-        cancellation.Cancel();
-
-        await sweeper;
-
-        cancellation.Dispose();
-    }
-
-    private async Task RunSweeper(TimeSpan interval, CancellationToken token)
-    {
-        while (true)
-        {
-            try
-            {
-                await Task.Delay(interval, token);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-
-            try
-            {
-                await EvictSessions();
-            }
-            catch (Exception ex)
-            {
-                BotBase.OnException(new SystemExceptionEventArgs(null, 0, null, ex));
-            }
-        }
-    }
-
-    /// <summary>
     ///     Returns all active User Sessions.
     /// </summary>
     /// <returns></returns>
@@ -654,232 +487,5 @@ public class SessionManager
     public List<IDeviceSession> GetGroupSessions()
     {
         return SessionList.Where(a => a.Key < 0).Select(a => a.Value).ToList();
-    }
-
-    /// <summary>
-    ///     Loads the previously saved states from the machine.
-    /// </summary>
-    public async Task LoadSessionStates()
-    {
-        if (BotBase.StateMachine == null)
-        {
-            return;
-        }
-
-        await LoadSessionStates(BotBase.StateMachine);
-    }
-
-
-    /// <summary>
-    ///     Loads the previously saved states from the machine.
-    /// </summary>
-    public async Task LoadSessionStates(IStateMachine statemachine)
-    {
-        if (statemachine == null)
-        {
-            throw new ArgumentNullException(nameof(statemachine),
-                                            "No StateMachine defined. Please set one to property BotBase.StateMachine");
-        }
-
-        var container = statemachine.LoadFormStates();
-
-        foreach (var s in container.States)
-        {
-            var t = Type.GetType(s.QualifiedName);
-            if (t == null || !t.IsSubclassOf(typeof(FormBase)))
-            {
-                continue;
-            }
-
-            //Key already existing
-            if (SessionList.ContainsKey(s.DeviceId))
-            {
-                continue;
-            }
-
-            var form = BotBase.FormFactory.CreateForm(t);
-
-            if (form == null && statemachine.FallbackStateForm != null)
-            {
-                form = BotBase.FormFactory.CreateForm(statemachine.FallbackStateForm);
-            }
-
-            if (form == null)
-            {
-                continue;
-            }
-
-            if (t == form.GetType() && s.Values != null && s.Values.Count > 0)
-            {
-                var properties = s.Values.Where(a => a.Key.StartsWith("$"));
-                var fields = form.GetType()
-                                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                 .Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
-
-                foreach (var p in properties)
-                {
-                    var f = fields.FirstOrDefault(a => a.Name == p.Key.Substring(1));
-                    if (f == null)
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        if (f.PropertyType.IsEnum)
-                        {
-                            var ent = Enum.Parse(f.PropertyType, p.Value.ToString());
-
-                            f.SetValue(form, ent);
-
-                            continue;
-                        }
-
-
-                        f.SetValue(form, p.Value);
-                    }
-                    catch (ArgumentException)
-                    {
-                        Conversion.CustomConversionChecks(form, p, f);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-
-            form.Client = Client;
-            var device = new DeviceSession(s.DeviceId, BotBase.RequestDispatcher, form)
-            {
-                ChatTitle = s.ChatTitle,
-                LastAction = UtcNow()
-            };
-
-            if (!SessionList.TryAdd(s.DeviceId, device))
-            {
-                continue;
-            }
-
-            //Is Subclass of IStateForm
-            if (form is IStateForm iform)
-            {
-                var ls = new LoadStateEventArgs
-                {
-                    Values = s.Values
-                };
-                await iform.LoadState(ls);
-            }
-
-            try
-            {
-                await form.OnInit(new InitEventArgs());
-
-                await form.OnOpened(EventArgs.Empty);
-            }
-            catch
-            {
-                //Skip on exception
-                TryRemoveExact(SessionList, s.DeviceId, (IDeviceSession)device);
-            }
-        }
-    }
-
-
-    /// <summary>
-    ///     Saves all open states into the machine.
-    /// </summary>
-    public async Task SaveSessionStates(IStateMachine statemachine)
-    {
-        if (statemachine == null)
-        {
-            throw new ArgumentNullException(nameof(statemachine),
-                                            "No StateMachine defined. Please set one to property BotBase.StateMachine");
-        }
-
-        var states = new List<StateEntry>();
-
-        foreach (var s in SessionList)
-        {
-            if (s.Value == null)
-            {
-                continue;
-            }
-
-            var form = s.Value.ActiveForm;
-
-            try
-            {
-                var se = new StateEntry
-                {
-                    DeviceId = s.Key,
-                    ChatTitle = s.Value.GetChatTitle(),
-                    FormUri = form.GetType().FullName,
-                    QualifiedName = form.GetType().AssemblyQualifiedName
-                };
-
-                //Skip classes where IgnoreState attribute is existing
-                if (form.GetType().GetCustomAttributes(typeof(IgnoreState), true).Length != 0)
-                {
-                    //Skip this form, when there is no fallback state form
-                    if (statemachine.FallbackStateForm == null)
-                    {
-                        continue;
-                    }
-
-                    //Replace form by default State one.
-                    se.FormUri = statemachine.FallbackStateForm.FullName;
-                    se.QualifiedName = statemachine.FallbackStateForm.AssemblyQualifiedName;
-                }
-
-                //Is Subclass of IStateForm
-                if (form is IStateForm iform)
-                {
-                    //Loading Session states
-                    var ssea = new SaveStateEventArgs();
-                    await iform.SaveState(ssea);
-
-                    se.Values = ssea.Values;
-                }
-
-                //Search for public properties with SaveState attribute
-                var fields = form.GetType()
-                                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                 .Where(a => a.GetCustomAttributes(typeof(SaveState), true).Length != 0).ToList();
-
-                foreach (var f in fields)
-                {
-                    var val = f.GetValue(form);
-
-                    se.Values.Add("$" + f.Name, val);
-                }
-
-                states.Add(se);
-            }
-            catch
-            {
-                //Continue on error (skip this form)
-            }
-        }
-
-        var sc = new StateContainer
-        {
-            States = states
-        };
-
-        statemachine.SaveFormStates(new SaveStatesEventArgs(sc));
-    }
-
-    /// <summary>
-    ///     Saves all open states into the machine.
-    /// </summary>
-    public async Task SaveSessionStates()
-    {
-        if (BotBase.StateMachine == null)
-        {
-            return;
-        }
-
-
-        await SaveSessionStates(BotBase.StateMachine);
     }
 }
