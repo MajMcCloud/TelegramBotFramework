@@ -51,6 +51,7 @@ var bot = BotBaseBuilder
                  .NoSerialization()
                  .UseEnglish()
                  .UseThreadPool()
+                 .NoSessionLimits()
                  .Build();
 
 

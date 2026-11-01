@@ -95,7 +95,7 @@ public class DeviceSession : IDeviceSession
     public string ChatTitle { get; set; }
 
     /// <summary>
-    ///     When did any last action happen (message received or button clicked)
+    ///     When did any last action happen (message received or button clicked), in UTC.
     /// </summary>
     public DateTime LastAction { get; set; }
 

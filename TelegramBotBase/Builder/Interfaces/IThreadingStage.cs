@@ -12,8 +12,8 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <remarks>This method is typically used to optimize performance in scenarios where
         /// multithreading is unnecessary or could introduce complexity, such as when working with non-thread-safe
         /// resources or ensuring sequential execution.</remarks>
-        /// <returns>An <see cref="IBuildingStage"/> instance configured to operate on a single thread.</returns>
-        public IBuildingStage UseSingleThread();
+        /// <returns>An <see cref="ISessionLimitsStage"/> instance configured to operate on a single thread.</returns>
+        public ISessionLimitsStage UseSingleThread();
 
 
         /// <summary>
@@ -22,8 +22,8 @@ namespace TelegramBotBase.Builder.Interfaces
         /// <remarks>This method enables the use of the thread pool for task execution, which can improve
         /// performance in scenarios where multiple tasks need to be executed concurrently. Ensure that the thread pool
         /// is appropriate for your workload and does not introduce contention or resource exhaustion.</remarks>
-        /// <returns>An <see cref="IBuildingStage"/> instance configured to use the thread pool.</returns>
-        public IBuildingStage UseThreadPool();
+        /// <returns>An <see cref="ISessionLimitsStage"/> instance configured to use the thread pool.</returns>
+        public ISessionLimitsStage UseThreadPool();
 
         /// <summary>
         /// Configures the application to use a thread pool with the specified number of worker and I/O threads.
@@ -32,8 +32,8 @@ namespace TelegramBotBase.Builder.Interfaces
         /// specific concurrency or I/O requirements.</remarks>
         /// <param name="workerThreads">The number of worker threads to allocate in the thread pool. Must be a positive integer.</param>
         /// <param name="ioThreads">The number of I/O threads to allocate in the thread pool. Must be a positive integer.</param>
-        /// <returns>An <see cref="IBuildingStage"/> instance that allows further configuration of the application.</returns>
-        public IBuildingStage UseThreadPool(int workerThreads, int ioThreads);
+        /// <returns>An <see cref="ISessionLimitsStage"/> instance that allows further configuration of the application.</returns>
+        public ISessionLimitsStage UseThreadPool(int workerThreads, int ioThreads);
 
     }
 }
