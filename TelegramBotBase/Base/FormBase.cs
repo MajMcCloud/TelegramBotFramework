@@ -75,6 +75,19 @@ public class FormBase : IAsyncDisposable
         IsDisposed = true;
     }
 
+    /// <summary>
+    ///     Returns other forms this form keeps alive (e.g. a navigation stack or the parent of a modal dialog).
+    ///     They get disposed together with the session when it ends or gets evicted.
+    ///     Override this when your form holds references to other forms.
+    /// </summary>
+    protected internal virtual IEnumerable<FormBase> GetLinkedForms()
+    {
+        if (NavigationController != null)
+        {
+            yield return NavigationController;
+        }
+    }
+
 
     public async Task OnInit(InitEventArgs e)
     {

@@ -3,10 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TelegramBotBase.Args;
 using TelegramBotBase.Attributes;
 using TelegramBotBase.Base;
+using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 using TelegramBotBase.Interfaces;
 using TelegramBotBase.Sessions;
@@ -24,6 +26,11 @@ public class SessionManager
     ///     when several updates of the same device are processed concurrently.
     /// </summary>
     private readonly ConcurrentDictionary<long, Lazy<Task<IDeviceSession>>> _pendingSessions = new();
+
+    /// <summary>
+    ///     Usage tracking per session. Attached to the session instance, so it goes away together with it.
+    /// </summary>
+    private readonly ConditionalWeakTable<IDeviceSession, SessionLease> _leases = new();
 
     public SessionManager(BotBase botBase)
     {
@@ -76,30 +83,96 @@ public class SessionManager
     }
 
     /// <summary>
+    ///     Returns the session of the device and acquires it for the caller, so it can't be evicted or disposed
+    ///     while in use. Each successful call has to be paired with <see cref="ReleaseSession" />.
+    /// </summary>
+    /// <param name="deviceId"></param>
+    /// <param name="startIfMissing">Starts a new session if the device has none, otherwise returns <c>null</c>.</param>
+    /// <returns>The acquired session and if it has been created by this call, or <c>null</c>.</returns>
+    internal async Task<(IDeviceSession Session, bool Created)?> AcquireSession(long deviceId, bool startIfMissing)
+    {
+        while (true)
+        {
+            if (SessionList.TryGetValue(deviceId, out var existing))
+            {
+                if (TryAcquire(existing))
+                {
+                    return (existing, false);
+                }
+
+                // The session has just been ended and removed from the list, look again.
+                continue;
+            }
+
+            if (!startIfMissing)
+            {
+                return null;
+            }
+
+            var (session, created) = await GetOrStartSession(deviceId);
+
+            // The creator already holds the lease, see GetOrStartSession.
+            if (created || TryAcquire(session))
+            {
+                return (session, created);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Releases a session previously acquired with <see cref="AcquireSession" />. If the session has been ended
+    ///     while in use, it gets disposed now.
+    /// </summary>
+    internal async Task ReleaseSession(IDeviceSession session)
+    {
+        var lease = GetLease(session);
+        bool dispose;
+
+        lock (lease)
+        {
+            lease.Active--;
+
+            dispose = lease.Ended && lease.Active == 0 && !lease.Disposed;
+            if (dispose)
+            {
+                lease.Disposed = true;
+            }
+        }
+
+        if (dispose)
+        {
+            await DisposeSession(session, lease.Reason);
+        }
+    }
+
+    /// <summary>
     ///     Returns the existing session of the device or starts a new one. Concurrent calls for the same device
-    ///     share one start, so only one session (and one start form) gets created.
+    ///     share one start, so only one session (and one start form) gets created. When the session has been created
+    ///     by this call, it is returned already acquired (see <see cref="AcquireSession" />).
     /// </summary>
     /// <param name="deviceId"></param>
     /// <returns>The session and if it has been created by this call.</returns>
-    internal async Task<(IDeviceSession Session, bool Created)> GetOrStartSession(long deviceId)
+    private async Task<(IDeviceSession Session, bool Created)> GetOrStartSession(long deviceId)
     {
-        if (SessionList.TryGetValue(deviceId, out var existing))
-        {
-            return (existing, false);
-        }
-
         var created = false;
         var pending = _pendingSessions.GetOrAdd(deviceId, id => new Lazy<Task<IDeviceSession>>(async () =>
         {
-            // Another start could have completed between the lookup above and registering this one.
+            // Another start could have completed between the caller's lookup and registering this one.
             if (SessionList.TryGetValue(id, out var current))
             {
                 return current;
             }
 
-            created = true;
-
             var ds = await CreateStartSession(id);
+
+            // Hold the session for the creator before it becomes visible, so it can't be evicted right away.
+            var lease = GetLease(ds);
+            lock (lease)
+            {
+                lease.Active++;
+            }
+
+            created = true;
 
             SessionList[id] = ds;
             return ds;
@@ -114,6 +187,26 @@ public class SessionManager
         {
             // Only remove our own entry, a newer pending start could already be registered.
             TryRemoveExact(_pendingSessions, deviceId, pending);
+        }
+    }
+
+    private SessionLease GetLease(IDeviceSession session)
+    {
+        return _leases.GetValue(session, _ => new SessionLease());
+    }
+
+    private bool TryAcquire(IDeviceSession session)
+    {
+        var lease = GetLease(session);
+        lock (lease)
+        {
+            if (lease.Ended)
+            {
+                return false;
+            }
+
+            lease.Active++;
+            return true;
         }
     }
 
@@ -148,9 +241,150 @@ public class SessionManager
     ///     End session. Does nothing if there is no session for this device.
     /// </summary>
     /// <param name="deviceId"></param>
+    [Obsolete("Use EndSessionAsync instead.")]
     public void EndSession(long deviceId)
     {
-        SessionList.TryRemove(deviceId, out _);
+        EndSessionAsync(deviceId).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    ///     Ends the session of the device: removes it from the session list, raises <see cref="BotBase.SessionEnds" />,
+    ///     closes the active form (<c>OnClosed</c>) and disposes all forms of the session including their dependency
+    ///     injection scopes. If the session is in use right now (e.g. called from within a form of this session),
+    ///     closing and disposal happen once the current update has been processed.
+    ///     A saved state of this device gets discarded. The next update of the device starts a fresh session.
+    /// </summary>
+    /// <param name="deviceId"></param>
+    /// <returns><c>true</c> if a session has been ended, <c>false</c> if there was none.</returns>
+    public async Task<bool> EndSessionAsync(long deviceId)
+    {
+        if (!SessionList.TryGetValue(deviceId, out var session))
+        {
+            return false;
+        }
+
+        return await TryEndSession(deviceId, session, ESessionEndReason.Manual);
+    }
+
+    /// <summary>
+    ///     Ends the given session. Evictions (any reason but <see cref="ESessionEndReason.Manual" />) skip sessions
+    ///     which are currently in use or for which <paramref name="canEnd" /> returns <c>false</c>.
+    /// </summary>
+    private async Task<bool> TryEndSession(long deviceId, IDeviceSession session, ESessionEndReason reason,
+                                           Func<IDeviceSession, bool> canEnd = null)
+    {
+        var lease = GetLease(session);
+        bool disposeNow;
+
+        lock (lease)
+        {
+            if (lease.Ended)
+            {
+                return false;
+            }
+
+            if (reason != ESessionEndReason.Manual && (lease.Active > 0 || (canEnd != null && !canEnd(session))))
+            {
+                return false;
+            }
+
+            lease.Ended = true;
+            lease.Reason = reason;
+
+            TryRemoveExact(SessionList, deviceId, session);
+
+            disposeNow = lease.Active == 0;
+            if (disposeNow)
+            {
+                lease.Disposed = true;
+            }
+        }
+
+        try
+        {
+            BotBase.OnSessionEnds(new SessionEndEventArgs(deviceId, session, reason));
+        }
+        catch (Exception ex)
+        {
+            BotBase.OnException(new SystemExceptionEventArgs(null, deviceId, session, ex));
+        }
+
+        if (disposeNow)
+        {
+            await DisposeSession(session, reason);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Closes (only when ended manually) and disposes all forms of the session.
+    /// </summary>
+    private async Task DisposeSession(IDeviceSession session, ESessionEndReason reason)
+    {
+        // Collect first: closing the active form clears its device and may switch the active form.
+        var forms = CollectForms(session);
+
+        if (reason == ESessionEndReason.Manual && session.ActiveForm is { IsDisposed: false } activeForm)
+        {
+            try
+            {
+                await activeForm.OnClosed(EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                BotBase.OnException(new SystemExceptionEventArgs(null, session.DeviceId, session, ex));
+            }
+        }
+
+        foreach (var form in forms)
+        {
+            if (form.IsDisposed)
+            {
+                continue;
+            }
+
+            try
+            {
+                await form.DisposeAsync();
+            }
+            catch (Exception ex)
+            {
+                BotBase.OnException(new SystemExceptionEventArgs(null, session.DeviceId, session, ex));
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Returns all forms kept alive by the session: the active and previous form and every form linked to them
+    ///     (see <see cref="FormBase.GetLinkedForms" />).
+    /// </summary>
+    internal static List<FormBase> CollectForms(IDeviceSession session)
+    {
+        var forms = new List<FormBase>();
+        var seen = new HashSet<FormBase>();
+        var queue = new Queue<FormBase>();
+
+        queue.Enqueue(session.ActiveForm);
+        queue.Enqueue(session.PreviousForm);
+
+        while (queue.Count > 0)
+        {
+            var form = queue.Dequeue();
+            if (form == null || !seen.Add(form))
+            {
+                continue;
+            }
+
+            forms.Add(form);
+
+            foreach (var linked in form.GetLinkedForms())
+            {
+                queue.Enqueue(linked);
+            }
+        }
+
+        return forms;
     }
 
     /// <summary>

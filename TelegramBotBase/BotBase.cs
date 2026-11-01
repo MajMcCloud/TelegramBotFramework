@@ -113,9 +113,12 @@ public sealed class BotBase
 
     private async Task Client_MessageLoop(object sender, UpdateResult e)
     {
+        IDeviceSession ds = null;
         try
         {
-            var (ds, created) = await Sessions.GetOrStartSession(e.DeviceId);
+            var (session, created) = (await Sessions.AcquireSession(e.DeviceId, true)).Value;
+            ds = session;
+
             if (created)
             {
                 ds.LastMessage = e.Message;
@@ -155,15 +158,20 @@ public sealed class BotBase
         }
         catch (InvalidServiceProviderConfiguration ex)
         {
-            var ds = Sessions.GetSession(e.DeviceId);
-            OnException(new SystemExceptionEventArgs(e.Message.Text, e.DeviceId, ds, ex));
+            OnException(new SystemExceptionEventArgs(e.Message?.Text, e.DeviceId, ds ?? Sessions.GetSession(e.DeviceId), ex));
 
             throw;
         }
         catch (Exception ex)
         {
-            var ds = Sessions.GetSession(e.DeviceId);
-            OnException(new SystemExceptionEventArgs(e.Message.Text, e.DeviceId, ds, ex));
+            OnException(new SystemExceptionEventArgs(e.Message?.Text, e.DeviceId, ds ?? Sessions.GetSession(e.DeviceId), ex));
+        }
+        finally
+        {
+            if (ds != null)
+            {
+                await Sessions.ReleaseSession(ds);
+            }
         }
     }
 
@@ -226,17 +234,24 @@ public sealed class BotBase
     /// <param name="e"></param>
     public async Task InvokeMessageLoop(long deviceId, MessageResult e)
     {
+        IDeviceSession ds = null;
         try
         {
-            var ds = Sessions.GetSession(deviceId);
+            ds = (await Sessions.AcquireSession(deviceId, false))?.Session;
             e.Device = ds;
 
             await MessageLoopFactory.MessageLoop(this, ds, new UpdateResult(e.UpdateData, ds), e);
         }
         catch (Exception ex)
         {
-            var ds = Sessions.GetSession(deviceId);
-            OnException(new SystemExceptionEventArgs(e.Message.Text, deviceId, ds, ex));
+            OnException(new SystemExceptionEventArgs(e.Message?.Text, deviceId, ds ?? Sessions.GetSession(deviceId), ex));
+        }
+        finally
+        {
+            if (ds != null)
+            {
+                await Sessions.ReleaseSession(ds);
+            }
         }
     }
 
@@ -397,6 +412,8 @@ public sealed class BotBase
 
     private static readonly object EvSessionBegins = new();
 
+    private static readonly object EvSessionEnds = new();
+
     private static readonly object EvMessage = new();
 
     public delegate Task BotCommandEventHandler(object sender, BotCommandEventArgs e);
@@ -420,6 +437,22 @@ public sealed class BotBase
     public void OnSessionBegins(SessionBeginEventArgs e)
     {
         (_events[EvSessionBegins] as EventHandler<SessionBeginEventArgs>)?.Invoke(this, e);
+    }
+
+    /// <summary>
+    ///     Will be called if a session/context gets ended, either manually (<see cref="SessionManager.EndSessionAsync" />)
+    ///     or by eviction (idle timeout / capacity).
+    ///     The session is already removed from the session list, but its forms are not disposed yet.
+    /// </summary>
+    public event EventHandler<SessionEndEventArgs> SessionEnds
+    {
+        add => _events.AddHandler(EvSessionEnds, value);
+        remove => _events.RemoveHandler(EvSessionEnds, value);
+    }
+
+    public void OnSessionEnds(SessionEndEventArgs e)
+    {
+        (_events[EvSessionEnds] as EventHandler<SessionEndEventArgs>)?.Invoke(this, e);
     }
 
     /// <summary>
