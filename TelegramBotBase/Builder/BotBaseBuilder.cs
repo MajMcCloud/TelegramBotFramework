@@ -14,13 +14,15 @@ using TelegramBotBase.Interfaces.ExternalActions;
 using TelegramBotBase.Localizations;
 using TelegramBotBase.MessageLoops;
 using TelegramBotBase.RequestDispatchers;
+using TelegramBotBase.Sessions;
 using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder;
 
 public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBotCommandsStage,
                               IBuildingStage, INetworkingSelectionStage, ISessionSerializationStage,
-                              ILanguageSelectionStage, IThreadingStage, IRequestDispatcherSelectionStage
+                              ILanguageSelectionStage, IThreadingStage, IRequestDispatcherSelectionStage,
+                              ISessionLimitsStage
 {
     private string _apiKey;
 
@@ -33,6 +35,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     private IStateMachine _stateMachine;
 
     private IRequestDispatcher _requestDispatcher;
+
+    private SessionLimits _sessionLimits;
 
     private BotBaseBuilder()
     {
@@ -58,7 +62,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
             BotCommandScopes = BotCommandScopes,
             StateMachine = _stateMachine,
             MessageLoopFactory = _messageLoopFactory,
-            RequestDispatcher = _requestDispatcher
+            RequestDispatcher = _requestDispatcher,
+            SessionLimits = _sessionLimits
         };
 
         return bot;
@@ -105,6 +110,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         UseSingleThread();
 
+        NoSessionLimits();
+
         return this;
     }
 
@@ -129,6 +136,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         UseSingleThread();
 
+        NoSessionLimits();
+
         return this;
     }
 
@@ -150,6 +159,8 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         DefaultLanguage();
 
         UseSingleThread();
+
+        NoSessionLimits();
 
         return this;
     }
@@ -542,14 +553,14 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
     #region "Step 9 (Threading)"
 
-    public IBuildingStage UseSingleThread()
+    public ISessionLimitsStage UseSingleThread()
     {
         _client.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
 
         return this;
     }
 
-    public IBuildingStage UseThreadPool()
+    public ISessionLimitsStage UseThreadPool()
     {
         var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
 
@@ -562,7 +573,7 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
     }
 
 
-    public IBuildingStage UseThreadPool(int workerThreads, int ioThreads)
+    public ISessionLimitsStage UseThreadPool(int workerThreads, int ioThreads)
     {
         var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
 
@@ -574,6 +585,47 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
 
         _client = c;
 
+        return this;
+    }
+
+    #endregion
+
+    #region "Step 10 (Session limits)"
+
+    public IBuildingStage NoSessionLimits()
+    {
+        _sessionLimits = null;
+        return this;
+    }
+
+    public IBuildingStage WithDefaultSessionLimits()
+    {
+        return WithSessionLimits(SessionLimits.CreateDefault());
+    }
+
+    public IBuildingStage WithSessionLimits(Action<SessionLimits> configure)
+    {
+        if (configure == null)
+        {
+            throw new ArgumentNullException(nameof(configure));
+        }
+
+        var limits = new SessionLimits();
+        configure(limits);
+
+        return WithSessionLimits(limits);
+    }
+
+    public IBuildingStage WithSessionLimits(SessionLimits limits)
+    {
+        if (limits == null)
+        {
+            throw new ArgumentNullException(nameof(limits));
+        }
+
+        limits.Validate();
+
+        _sessionLimits = limits.Clone();
         return this;
     }
 

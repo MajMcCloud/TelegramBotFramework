@@ -52,6 +52,19 @@ public class NavigationController : FormBase, IStateForm
     [SaveState]
     public bool ForceCleanupOnLastPop { get; set; }
 
+    protected internal override IEnumerable<FormBase> GetLinkedForms()
+    {
+        foreach (var form in base.GetLinkedForms())
+        {
+            yield return form;
+        }
+
+        foreach (var form in History)
+        {
+            yield return form;
+        }
+    }
+
     /// <summary>
     ///     Returns the current form from the stack.
     /// </summary>

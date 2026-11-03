@@ -23,3 +23,6 @@ CREATE TABLE tgb_devices_sessions_data (
 -- Add default constraint for Id column in tgb_devices_sessions_data
 ALTER TABLE tgb_devices_sessions_data
     ALTER COLUMN Id SET DEFAULT uuid_generate_v4();
+
+-- Speeds up loading and removing the state of a single device (used with session limits)
+CREATE INDEX IX_tgb_devices_sessions_data_deviceId ON tgb_devices_sessions_data (deviceId);

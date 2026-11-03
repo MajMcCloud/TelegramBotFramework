@@ -27,6 +27,7 @@ namespace DependencyInjection
                                     .NoSerialization()
                                     .DefaultLanguage()
                                     .UseSingleThread()
+                                    .NoSessionLimits()
                                     .Build();
 
             await bot.Start();

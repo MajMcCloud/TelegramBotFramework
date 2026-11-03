@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TelegramBotBase.Form;
@@ -28,6 +29,19 @@ public class ModalDialog : FormBase
 
         if (IsDisplayedAsModal)
             await ParentForm.ReturnFromModal(this);
+    }
+
+    protected internal override IEnumerable<FormBase> GetLinkedForms()
+    {
+        foreach (var form in base.GetLinkedForms())
+        {
+            yield return form;
+        }
+
+        if (ParentForm != null)
+        {
+            yield return ParentForm;
+        }
     }
 
     public override Task NavigateTo(FormBase newForm, params object[] args)

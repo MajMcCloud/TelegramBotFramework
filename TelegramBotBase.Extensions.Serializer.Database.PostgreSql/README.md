@@ -9,7 +9,7 @@
 ## How to use
 
 ```csharp
-using TelegramBotBase.Extensions.Serializer.Database.PostgreSQL;
+using TelegramBotBase.Extensions.Serializer.Database.PostgreSql;
 
 
 var bot = BotBaseBuilder
@@ -18,10 +18,41 @@ var bot = BotBaseBuilder
             .DefaultMessageLoop()
             .WithStartForm<Start>()
             .NoProxy()
+            .UseDefaultRequestDispatcher()
             .OnlyStart()
-            .UsePostgreSqlDatabase("localhost",  "8181", "telegram_bot")
+            .UsePostgreSqlDatabase("localhost", 8181, "telegram_bot")
             .UseEnglish()
+            .UseSingleThread()
+            .NoSessionLimits()
             .Build();
 
 bot.Start();
+```
+
+## Session limits
+
+The serializer implements `IDeviceStateMachine`. Together with session limits, states are not loaded at startup
+but per device on its first update, and evicted sessions are saved one by one:
+
+```csharp
+var bot = BotBaseBuilder
+            .Create()
+            .WithAPIKey(APIKey)
+            .DefaultMessageLoop()
+            .WithStartForm<Start>()
+            .NoProxy()
+            .UseDefaultRequestDispatcher()
+            .OnlyStart()
+            .UsePostgreSqlDatabase("localhost", 8181, "telegram_bot")
+            .UseEnglish()
+            .UseSingleThread()
+            .WithSessionLimits(l => l.IdleTimeout = TimeSpan.FromMinutes(30))
+            .Build();
+```
+
+Since single devices get loaded while updates are processed, add an index on `deviceId` to existing databases
+(already part of `create_tables.sql`):
+
+```sql
+CREATE INDEX IX_tgb_devices_sessions_data_deviceId ON tgb_devices_sessions_data (deviceId);
 ```

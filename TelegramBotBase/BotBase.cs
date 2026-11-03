@@ -76,6 +76,12 @@ public sealed class BotBase
     public IMessageLoopFactory MessageLoopFactory { get; internal set; }
 
     public IRequestDispatcher RequestDispatcher { get; internal set; }
+
+    /// <summary>
+    ///     Limits for the sessions kept in memory (idle timeout, maximum count). <c>null</c> (default) keeps all sessions
+    ///     forever. Configure it with <c>BotBaseBuilder.WithSessionLimits</c>.
+    /// </summary>
+    public SessionLimits SessionLimits { get; internal set; }
     
     /// <summary>
     ///     All internal used settings.
@@ -95,10 +101,7 @@ public sealed class BotBase
 
         Client.MessageLoop += Client_MessageLoop;
 
-        if (StateMachine != null)
-        {
-            await Sessions.LoadSessionStates(StateMachine);
-        }
+        await Sessions.LoadSessionStatesOnStart();
 
         // Enable auto session saving
         if (GetSetting(ESettings.SaveSessionsOnConsoleExit, false))
@@ -107,22 +110,32 @@ public sealed class BotBase
             Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
         }
 
+        Sessions.StartSweeper();
+
         Client.StartReceiving();
     }
 
 
-    private async Task Client_MessageLoop(object sender, UpdateResult e)
+    internal async Task Client_MessageLoop(object sender, UpdateResult e)
     {
+        IDeviceSession ds = null;
         try
         {
-            var ds = Sessions.GetSession(e.DeviceId);
-            if (ds == null)
+            var acquired = (await Sessions.AcquireSession(e.DeviceId, true)).Value;
+            ds = acquired.Session;
+
+            if (acquired.Created)
             {
-                ds = await Sessions.StartSession(e.DeviceId);
                 ds.LastMessage = e.Message;
 
-                OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+                // A restored (previously evicted) session continues, it doesn't begin.
+                if (!acquired.Restored)
+                {
+                    OnSessionBegins(new SessionBeginEventArgs(e.DeviceId, ds));
+                }
             }
+
+            ds.LastAction = Sessions.UtcNow();
 
             e.Device = ds;
 
@@ -154,15 +167,20 @@ public sealed class BotBase
         }
         catch (InvalidServiceProviderConfiguration ex)
         {
-            var ds = Sessions.GetSession(e.DeviceId);
-            OnException(new SystemExceptionEventArgs(e.Message.Text, e.DeviceId, ds, ex));
+            OnException(new SystemExceptionEventArgs(e.Message?.Text, e.DeviceId, ds ?? Sessions.GetSession(e.DeviceId), ex));
 
             throw;
         }
         catch (Exception ex)
         {
-            var ds = Sessions.GetSession(e.DeviceId);
-            OnException(new SystemExceptionEventArgs(e.Message.Text, e.DeviceId, ds, ex));
+            OnException(new SystemExceptionEventArgs(e.Message?.Text, e.DeviceId, ds ?? Sessions.GetSession(e.DeviceId), ex));
+        }
+        finally
+        {
+            if (ds != null)
+            {
+                await Sessions.ReleaseSession(ds);
+            }
         }
     }
 
@@ -180,6 +198,8 @@ public sealed class BotBase
         Client.MessageLoop -= Client_MessageLoop;
         Client.StopReceiving();
 
+        await Sessions.StopSweeper();
+
         await Sessions.SaveSessionStates();
     }
 
@@ -195,9 +215,9 @@ public sealed class BotBase
             return;
         }
 
-        foreach (var s in Sessions.SessionList)
+        foreach (var deviceId in Sessions.SessionList.Keys)
         {
-            await Client.TelegramClient.SendMessage(s.Key, message);
+            await Client.TelegramClient.SendMessage(deviceId, message);
         }
     }
 
@@ -219,23 +239,35 @@ public sealed class BotBase
 
     /// <summary>
     ///     This will invoke the full message loop for the device even when no "userevent" like message or action has been
-    ///     raised.
+    ///     raised. An evicted session gets restored from its saved state first. Does nothing if the device has no session.
     /// </summary>
     /// <param name="deviceId">Contains the device/chat id of the device to update.</param>
     /// <param name="e"></param>
     public async Task InvokeMessageLoop(long deviceId, MessageResult e)
     {
+        IDeviceSession ds = null;
         try
         {
-            var ds = Sessions.GetSession(deviceId);
+            ds = (await Sessions.AcquireSession(deviceId, false))?.Session;
+            if (ds == null)
+            {
+                return;
+            }
+
             e.Device = ds;
 
             await MessageLoopFactory.MessageLoop(this, ds, new UpdateResult(e.UpdateData, ds), e);
         }
         catch (Exception ex)
         {
-            var ds = Sessions.GetSession(deviceId);
-            OnException(new SystemExceptionEventArgs(e.Message.Text, deviceId, ds, ex));
+            OnException(new SystemExceptionEventArgs(e.Message?.Text, deviceId, ds ?? Sessions.GetSession(deviceId), ex));
+        }
+        finally
+        {
+            if (ds != null)
+            {
+                await Sessions.ReleaseSession(ds);
+            }
         }
     }
 
@@ -396,6 +428,8 @@ public sealed class BotBase
 
     private static readonly object EvSessionBegins = new();
 
+    private static readonly object EvSessionEnds = new();
+
     private static readonly object EvMessage = new();
 
     public delegate Task BotCommandEventHandler(object sender, BotCommandEventArgs e);
@@ -419,6 +453,22 @@ public sealed class BotBase
     public void OnSessionBegins(SessionBeginEventArgs e)
     {
         (_events[EvSessionBegins] as EventHandler<SessionBeginEventArgs>)?.Invoke(this, e);
+    }
+
+    /// <summary>
+    ///     Will be called if a session/context gets ended, either manually (<see cref="SessionManager.EndSessionAsync" />)
+    ///     or by eviction (idle timeout / capacity, see <see cref="SessionLimits" />).
+    ///     The session is already removed from the session list, but its forms are not disposed yet.
+    /// </summary>
+    public event EventHandler<SessionEndEventArgs> SessionEnds
+    {
+        add => _events.AddHandler(EvSessionEnds, value);
+        remove => _events.RemoveHandler(EvSessionEnds, value);
+    }
+
+    public void OnSessionEnds(SessionEndEventArgs e)
+    {
+        (_events[EvSessionEnds] as EventHandler<SessionEndEventArgs>)?.Invoke(this, e);
     }
 
     /// <summary>
