@@ -16,18 +16,10 @@
 using TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson;
 
 
-var bot = BotBaseBuilder
-            .Create()
-            .WithAPIKey(APIKey)
-            .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create(APIKey)
             .WithStartForm<Start>()
-            .NoProxy()
-            .UseDefaultRequestDispatcher()
-            .OnlyStart()
             .UseNewtonsoftJson()
             .UseEnglish()
-            .UseSingleThread()
-            .NoSessionLimits()
             .Build();
 
 bot.Start();

@@ -12,9 +12,9 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
-        __bot = BotBaseBuilder.Create()
-                              .QuickStart<Start>(Environment.GetEnvironmentVariable("API_KEY") ??
+        __bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ??
                                                  throw new Exception("API_KEY is not set"))
+                              .WithStartForm<Start>()
                               .Build();
 
         await __bot.Start();

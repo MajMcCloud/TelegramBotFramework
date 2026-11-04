@@ -87,20 +87,15 @@ namespace FileWatcher
             //start file watcher even without api key for testing
             if (!string.IsNullOrEmpty(Config.APIKey))
             {
-                Bot = BotBaseBuilder.Create()
-                    .WithAPIKey(Config.APIKey)
-                    .DefaultMessageLoop()
+                Bot = BotBaseBuilder.Create(Config.APIKey)
                     .WithStartForm<Forms.Start>()
-                    .NoProxy()
                     .CustomCommands(a =>
                     {
                         a.Start("Starts the bot");
                         a.Add("myid", "Whats my id?");
 
                     })
-                    .NoSerialization()
                     .UseGerman()
-                    .UseSingleThread()
                     .Build();
 
                 Bot.BotCommand += Bot_BotCommand;
@@ -185,7 +180,7 @@ namespace FileWatcher
             {
                 try
                 {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, message);
+                    await Bot.Client.TelegramClient.SendMessage(device, message);
                 }
                 catch
                 {

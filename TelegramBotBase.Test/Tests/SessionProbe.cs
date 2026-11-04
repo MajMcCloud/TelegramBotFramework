@@ -53,20 +53,18 @@ public static class SessionProbe
     private static BotBase CreateBot(string apiKey, string statesFile, Action<Sessions.SessionLimits> limits,
                                      List<SessionEndEventArgs> ended, List<Exception> errors)
     {
-        var serialization = BotBaseBuilder.Create()
-                                          .WithAPIKey(apiKey)
-                                          .DefaultMessageLoop()
-                                          .WithStartForm<SessionProbeForm>()
-                                          .NoProxy()
-                                          .UseDefaultRequestDispatcher()
-                                          .NoCommands();
+        var builder = BotBaseBuilder.Create(apiKey)
+                                    .WithStartForm<SessionProbeForm>()
+                                    .NoCommands()
+                                    .UseEnglish()
+                                    .WithSessionLimits(limits);
 
-        var language = statesFile != null ? serialization.UseJSON(statesFile) : serialization.NoSerialization();
+        if (statesFile != null)
+        {
+            builder.UseJSON(statesFile);
+        }
 
-        var bot = language.UseEnglish()
-                          .UseSingleThread()
-                          .WithSessionLimits(limits)
-                          .Build();
+        var bot = builder.Build();
 
         bot.SessionEnds += (_, e) =>
         {
