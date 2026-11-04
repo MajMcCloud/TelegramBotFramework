@@ -314,6 +314,11 @@ selected a default are not needed anymore:
 | `.WithHttpClient(client, ...)`                            | `.ConfigureNetworking(n => n.UseHttpClient(client))`               |
 | `.WithBotClient(client, ...)`                             | `.ConfigureNetworking(n => n.UseBotClient(client))`                |
 | `.UseDefaultRequestDispatcher()`                          | remove                                                              |
+| `.UseDefaultRequestDispatcher(settings)`                  | unchanged, `settings` must not be `null`                            |
+| `.UseFullRequestDispatcher(settings)`                     | unchanged                                                           |
+| `.UseDirectDispatcher()`                                  | unchanged                                                           |
+| `.UseCustomRequestDispatcher(client => ...)`              | unchanged, `client` is the final client of the bot                  |
+| `.UseCustomRequestDispatcher(dispatcher)`                 | unchanged                                                           |
 | `.OnlyStart()`                                            | remove                                                              |
 | `.NoCommands()`                                           | `.NoCommands()` (needed, the default registers `/start`)            |
 | `.CustomCommands(a => ...)`                               | unchanged, the list passed to the delegate is empty                 |
@@ -322,6 +327,8 @@ selected a default are not needed anymore:
 | `.Custom(localization)`                                   | `.UseLanguage(localization)`                                        |
 | `.UseSingleThread()`                                      | remove                                                              |
 | `.NoSessionLimits()`                                      | remove                                                              |
+| `.WithDefaultSessionLimits()`                             | unchanged                                                           |
+| `.WithSessionLimits(limits)`, `.WithSessionLimits(l => ...)` | unchanged, invalid limits are reported by `Build()` in a `BotBaseBuilderException` instead of an `ArgumentOutOfRangeException` from the call |
 | `CustomMessageLoop<T>()` with `T` not an `IMessageLoopFactory` | compile error, `T` has to implement `IMessageLoopFactory`      |
 
 The request dispatcher now always uses the same `MessageClient` as the bot, also with `UseThreadPool()`.
