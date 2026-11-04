@@ -185,7 +185,7 @@ namespace FileWatcher
             {
                 try
                 {
-                    await Bot.Client.TelegramClient.SendTextMessageAsync(device, message);
+                    await Bot.Client.TelegramClient.SendMessage(device, message);
                 }
                 catch
                 {
