@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 using TelegramBotBase.Base;
-using TelegramBotBase.Builder.Interfaces;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
@@ -19,591 +15,529 @@ using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder;
 
-public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBotCommandsStage,
-                              IBuildingStage, INetworkingSelectionStage, ISessionSerializationStage,
-                              ILanguageSelectionStage, IThreadingStage, IRequestDispatcherSelectionStage,
-                              ISessionLimitsStage
+/// <summary>
+///     Configures and creates a <see cref="BotBase" />.
+///     Only the API key (<see cref="Create" />) and a start form or form factory are required,
+///     every other setting is optional and has a default:
+///     <list type="bullet">
+///         <item>message loop: <see cref="FormBaseMessageLoop" /></item>
+///         <item>networking: direct connection, 60 seconds timeout, pending updates are kept</item>
+///         <item>request dispatcher: <see cref="DefaultRequestDispatcher" /> with default settings</item>
+///         <item>bot commands: only <c>/start</c></item>
+///         <item>serialization: none</item>
+///         <item>language: the current <see cref="Default.Language" />, which is English by default</item>
+///         <item>threading: single thread</item>
+///         <item>session limits: none</item>
+///     </list>
+///     The order of the calls does not matter, if a setting is configured twice the last call wins.
+///     All objects are created in <see cref="Build" />.
+/// </summary>
+public sealed class BotBaseBuilder
 {
-    private string _apiKey;
+    private const string StartCommandDescription = "Starts the bot";
 
-    private MessageClient _client;
+    private readonly string _apiKey;
 
-    private IFormFactory _factory;
+    private readonly NetworkingOptions _networking = new();
 
-    private IMessageLoopFactory _messageLoopFactory;
+    private List<BotCommandScopeGroup> _botCommandScopes = CreateStartCommandOnly();
+
+    private Func<IMessageLoopFactory> _messageLoop;
+
+    private Func<IFormFactory> _formFactory;
+
+    private Func<MessageClient, IRequestDispatcher> _requestDispatcher;
 
     private IStateMachine _stateMachine;
 
-    private IRequestDispatcher _requestDispatcher;
+    private Localization _language;
+
+    private bool _useThreadPool;
+
+    private int? _workerThreads;
+
+    private int? _ioThreads;
 
     private SessionLimits _sessionLimits;
 
-    private BotBaseBuilder()
-    {
+    private bool _built;
 
+    private BotBaseBuilder(string apiKey)
+    {
+        _apiKey = apiKey;
     }
 
     /// <summary>
-    ///     Contains different Botcommands for different areas.
+    ///     Creates a new builder for a bot with the given API key.
     /// </summary>
-    private List<BotCommandScopeGroup> BotCommandScopes { get; } = new();
-
-    /// <summary>
-    /// Creates a full BotBase instance with all parameters previously set.
-    /// </summary>
-    /// <returns></returns>
-    public BotBase Build()
+    /// <exception cref="ArgumentException">The API key is null or empty.</exception>
+    public static BotBaseBuilder Create(string apiKey)
     {
-        CompleteSkippedStagesWithDefaultValues();
-
-        var bot = new BotBase(_apiKey, _client)
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
-            FormFactory = _factory,
-            BotCommandScopes = BotCommandScopes,
-            StateMachine = _stateMachine,
-            MessageLoopFactory = _messageLoopFactory,
-            RequestDispatcher = _requestDispatcher,
-            SessionLimits = _sessionLimits
-        };
-
-        return bot;
-    }
-
-    private void CompleteSkippedStagesWithDefaultValues()
-    {
-        if (_requestDispatcher is null)
-        {
-            UseDefaultRequestDispatcher();
+            throw new ArgumentException("The API key must not be empty.", nameof(apiKey));
         }
+
+        return new BotBaseBuilder(apiKey);
     }
 
-    public static IAPIKeySelectionStage Create()
-    {
-        return new BotBaseBuilder();
-    }
+    #region "Message loop"
 
-    #region "Step 1 (Basic Stuff)"
-
-    public IMessageLoopSelectionStage WithAPIKey(string apiKey)
+    /// <summary>
+    ///     Uses the <see cref="FormBaseMessageLoop" /> with the given external action manager.
+    ///     Without a message loop call the <see cref="FormBaseMessageLoop" /> is used without an external action manager.
+    /// </summary>
+    public BotBaseBuilder DefaultMessageLoop(IExternalActionManager managerInstance)
     {
-        _apiKey = apiKey;
+        _messageLoop = () => new FormBaseMessageLoop { ExternalActionManager = managerInstance };
         return this;
     }
 
-
-    public IBuildingStage QuickStart(string apiKey, Type startForm, bool throwPendingUpdates = false)
+    /// <summary>
+    ///     Uses a <see cref="MiddlewareBaseMessageLoop" /> configured by the given delegate.
+    /// </summary>
+    public BotBaseBuilder MiddlewareMessageLoop(
+        Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
     {
-        _apiKey = apiKey;
-        _factory = new DefaultFormFactory(startForm);
+        if (messageLoopConfiguration == null)
+        {
+            throw new ArgumentNullException(nameof(messageLoopConfiguration));
+        }
 
-        DefaultMessageLoop();
-
-        UseDefaultRequestDispatcher();
-
-        NoProxy(throwPendingUpdates);
-
-        OnlyStart();
-
-        NoSerialization();
-
-        DefaultLanguage();
-
-        UseSingleThread();
-
-        NoSessionLimits();
-
+        _messageLoop = () => messageLoopConfiguration(new MiddlewareBaseMessageLoop());
         return this;
     }
 
-
-    public IBuildingStage QuickStart<T>(string apiKey, bool throwPendingUpdates = false)
-        where T : FormBase
+    /// <summary>
+    ///     Uses the <see cref="MinimalMessageLoop" />, which only handles the load event of forms.
+    /// </summary>
+    public BotBaseBuilder MinimalMessageLoop()
     {
-        _apiKey = apiKey;
-        _factory = new DefaultFormFactory(typeof(T));
-
-        DefaultMessageLoop();
-
-        UseDefaultRequestDispatcher();
-
-        NoProxy(throwPendingUpdates);
-
-        OnlyStart();
-
-        NoSerialization();
-
-        DefaultLanguage();
-
-        UseSingleThread();
-
-        NoSessionLimits();
-
+        _messageLoop = () => new MinimalMessageLoop();
         return this;
     }
 
-    public IBuildingStage QuickStart(string apiKey, IFormFactory formFactory, bool throwPendingUpdates = false)
+    /// <summary>
+    ///     Uses the <see cref="FullMessageLoop" />, which handles all update types.
+    /// </summary>
+    public BotBaseBuilder FullMessageLoop(IExternalActionManager managerInstance = null)
     {
-        _apiKey = apiKey;
-        _factory = formFactory;
+        _messageLoop = () => new FullMessageLoop { ExternalActionManager = managerInstance };
+        return this;
+    }
 
-        DefaultMessageLoop();
+    /// <summary>
+    ///     Uses the given message loop instance.
+    /// </summary>
+    public BotBaseBuilder CustomMessageLoop(IMessageLoopFactory messageLoop)
+    {
+        if (messageLoop == null)
+        {
+            throw new ArgumentNullException(nameof(messageLoop));
+        }
 
-        UseDefaultRequestDispatcher();
+        _messageLoop = () => messageLoop;
+        return this;
+    }
 
-        NoProxy(throwPendingUpdates);
-
-        OnlyStart();
-
-        NoSerialization();
-
-        DefaultLanguage();
-
-        UseSingleThread();
-
-        NoSessionLimits();
-
+    /// <summary>
+    ///     Uses a new instance of the given message loop type.
+    /// </summary>
+    public BotBaseBuilder CustomMessageLoop<T>()
+        where T : class, IMessageLoopFactory, new()
+    {
+        _messageLoop = () => new T();
         return this;
     }
 
     #endregion
 
+    #region "Start form / form factory (required)"
 
-    #region "Step 2 (Message Loop)"
-
-    public IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null)
+    /// <summary>
+    ///     Uses the given form as start form. It needs a parameterless constructor.
+    /// </summary>
+    public BotBaseBuilder WithStartForm(Type startFormClass)
     {
-        var loop = new FormBaseMessageLoop();
+        if (startFormClass == null)
+        {
+            throw new ArgumentNullException(nameof(startFormClass));
+        }
 
-        loop.ExternalActionManager = managerInstance;
-
-        _messageLoopFactory = loop;
-
+        _formFactory = () => new DefaultFormFactory(startFormClass);
         return this;
     }
 
-    public IStartFormSelectionStage MiddlewareMessageLoop(Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
-    {
-        _messageLoopFactory = messageLoopConfiguration(new MiddlewareBaseMessageLoop());
-
-        return this;
-    }
-
-    public IStartFormSelectionStage MinimalMessageLoop()
-    {
-        _messageLoopFactory = new MinimalMessageLoop();
-
-        return this;
-    }
-
-
-    public IStartFormSelectionStage FullMessageLoop(IExternalActionManager managerInstance = null)
-    {
-        var loop = new FullMessageLoop();
-
-        loop.ExternalActionManager = managerInstance;
-
-        _messageLoopFactory = loop;
-
-        return this;
-    }
-
-
-    public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
-    {
-        _messageLoopFactory = messageLoopClass;
-
-        return this;
-    }
-
-    public IStartFormSelectionStage CustomMessageLoop<T>()
-        where T : class, new()
-    {
-        _messageLoopFactory =
-            typeof(T).GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
-
-        return this;
-    }
-
-    #endregion
-
-
-    #region "Step 3 (Start Form/Factory)"
-
-    public INetworkingSelectionStage WithStartForm(Type startFormClass)
-    {
-        _factory = new DefaultFormFactory(startFormClass);
-        return this;
-    }
-
-    public INetworkingSelectionStage WithStartForm<T>()
+    /// <summary>
+    ///     Uses the given form as start form.
+    /// </summary>
+    public BotBaseBuilder WithStartForm<T>()
         where T : FormBase, new()
     {
-        _factory = new DefaultFormFactory(typeof(T));
+        _formFactory = () => new DefaultFormFactory(typeof(T));
         return this;
     }
 
-    public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+    /// <summary>
+    ///     Uses the given form as start form and creates all forms via the service provider.
+    /// </summary>
+    public BotBaseBuilder WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
     {
-        _factory = new ServiceProviderFormFactory(startFormClass, serviceProvider);
+        if (startFormClass == null)
+        {
+            throw new ArgumentNullException(nameof(startFormClass));
+        }
+
+        if (serviceProvider == null)
+        {
+            throw new ArgumentNullException(nameof(serviceProvider));
+        }
+
+        _formFactory = () => new ServiceProviderFormFactory(startFormClass, serviceProvider);
         return this;
     }
 
-    public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
+    /// <summary>
+    ///     Uses the given form as start form and creates all forms via the service provider.
+    /// </summary>
+    public BotBaseBuilder WithServiceProvider<T>(IServiceProvider serviceProvider)
         where T : FormBase
     {
-        _factory = new ServiceProviderFormFactory<T>(serviceProvider);
+        if (serviceProvider == null)
+        {
+            throw new ArgumentNullException(nameof(serviceProvider));
+        }
+
+        _formFactory = () => new ServiceProviderFormFactory<T>(serviceProvider);
         return this;
     }
 
-    public INetworkingSelectionStage WithFormFactory(IFormFactory factory)
+    /// <summary>
+    ///     Uses the given form factory to create the start form and all other forms.
+    /// </summary>
+    public BotBaseBuilder WithFormFactory(IFormFactory factory)
     {
-        _factory = factory;
+        if (factory == null)
+        {
+            throw new ArgumentNullException(nameof(factory));
+        }
+
+        _formFactory = () => factory;
         return this;
     }
 
     #endregion
 
+    #region "Networking"
 
-    #region "Step 4 (Network Settings)"
-
-    public IRequestDispatcherSelectionStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    /// <summary>
+    ///     Configures proxy, timeout and pending updates. See <see cref="NetworkingOptions" /> for the defaults.
+    /// </summary>
+    /// <example>
+    ///     <code>
+    /// builder.ConfigureNetworking(n =>
+    /// {
+    ///     n.UseProxy("http://127.0.0.1:8080");
+    ///     n.Timeout = TimeSpan.FromSeconds(30);
+    ///     n.DropPendingUpdates = true;
+    /// });
+    /// </code>
+    /// </example>
+    public BotBaseBuilder ConfigureNetworking(Action<NetworkingOptions> configure)
     {
-        var url = new Uri(proxyAddress);
-        _client = new MessageClient(_apiKey, url)
+        if (configure == null)
         {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)
-            },
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
+            throw new ArgumentNullException(nameof(configure));
+        }
 
-
-    public IRequestDispatcherSelectionStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
-
-
-    public IRequestDispatcherSelectionStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey, tgclient)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
-
-
-    public IRequestDispatcherSelectionStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey, proxyHost, proxyPort)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
-
-    public IRequestDispatcherSelectionStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey, tgclient)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
+        configure(_networking);
         return this;
     }
 
     #endregion
 
-    #region "Step 5 (Request Dispatcher)"
+    #region "Request dispatcher"
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null)
+    /// <summary>
+    ///     Uses the <see cref="DefaultRequestDispatcher" /> with the given settings.
+    ///     Without this call the default dispatcher with default settings is used.
+    /// </summary>
+    public BotBaseBuilder UseDefaultRequestDispatcher(RequestDispatcherSettings settings)
+    {
+        if (settings == null)
+        {
+            throw new ArgumentNullException(nameof(settings));
+        }
+
+        _requestDispatcher = client => new DefaultRequestDispatcher(settings, client);
+        return this;
+    }
+
+    /// <summary>
+    ///     Uses the <see cref="FullRequestDispatcher" />.
+    /// </summary>
+    public BotBaseBuilder UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
     {
         settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new DefaultRequestDispatcher(settings, _client);
+        _requestDispatcher = client => new FullRequestDispatcher(settings, client);
         return this;
     }
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
+    /// <summary>
+    ///     Uses the <see cref="DirectDispatcher" />, which sends every request immediately.
+    /// </summary>
+    public BotBaseBuilder UseDirectDispatcher()
     {
-        settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new FullRequestDispatcher(settings, _client);
+        _requestDispatcher = client => new DirectDispatcher(client);
         return this;
     }
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
+    /// <summary>
+    ///     Uses a custom dispatcher. The factory receives the final <see cref="MessageClient" /> of the bot.
+    /// </summary>
+    public BotBaseBuilder UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
     {
-        _requestDispatcher = factory(_client);
+        _requestDispatcher = factory ?? throw new ArgumentNullException(nameof(factory));
         return this;
     }
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
+    /// <summary>
+    ///     Uses the given dispatcher instance.
+    /// </summary>
+    public BotBaseBuilder UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
     {
-        _requestDispatcher = dispatcher;
-        return this;
-    }
+        if (dispatcher == null)
+        {
+            throw new ArgumentNullException(nameof(dispatcher));
+        }
 
-    public IBotCommandsStage UseDirectDispatcher()
-    {
-        _requestDispatcher = new DirectDispatcher(_client);
+        _requestDispatcher = _ => dispatcher;
         return this;
     }
 
     #endregion
 
-    #region "Step 6 (Bot Commands)"
+    #region "Bot commands"
 
-    public ISessionSerializationStage NoCommands()
+    /// <summary>
+    ///     Registers no bot commands. By default only <c>/start</c> is registered.
+    /// </summary>
+    public BotBaseBuilder NoCommands()
     {
+        _botCommandScopes = new List<BotCommandScopeGroup>();
         return this;
     }
 
-    public ISessionSerializationStage OnlyStart()
+    /// <summary>
+    ///     Registers <c>/start</c>, <c>/help</c> and <c>/settings</c>.
+    /// </summary>
+    public BotBaseBuilder DefaultCommands()
     {
-        BotCommandScopes.Start("Starts the bot");
-
+        _botCommandScopes = CreateStartCommandOnly();
+        _botCommandScopes.Help("Should show you some help");
+        _botCommandScopes.Settings("Should show you some settings");
         return this;
     }
 
-    public ISessionSerializationStage DefaultCommands()
+    /// <summary>
+    ///     Replaces the bot commands with the ones added by the delegate. The list passed to it is empty,
+    ///     so add <c>/start</c> again if you need it.
+    /// </summary>
+    public BotBaseBuilder CustomCommands(Action<List<BotCommandScopeGroup>> action)
     {
-        BotCommandScopes.Start("Starts the bot");
-        BotCommandScopes.Help("Should show you some help");
-        BotCommandScopes.Settings("Should show you some settings");
+        if (action == null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        _botCommandScopes = new List<BotCommandScopeGroup>();
+        action(_botCommandScopes);
         return this;
     }
 
-    public ISessionSerializationStage CustomCommands(Action<List<BotCommandScopeGroup>> action)
+    private static List<BotCommandScopeGroup> CreateStartCommandOnly()
     {
-        action?.Invoke(BotCommandScopes);
+        var scopes = new List<BotCommandScopeGroup>();
+        scopes.Start(StartCommandDescription);
+        return scopes;
+    }
+
+    #endregion
+
+    #region "Serialization"
+
+    /// <summary>
+    ///     Saves and restores the sessions with the given state machine. By default nothing is serialized.
+    /// </summary>
+    public BotBaseBuilder UseSerialization(IStateMachine machine)
+    {
+        _stateMachine = machine ?? throw new ArgumentNullException(nameof(machine));
+        return this;
+    }
+
+    /// <summary>
+    ///     Uses the application runtime path to load and write a states.json file.
+    /// </summary>
+    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">
+    ///     For the legacy version use the UseNewtonsoftJson method of
+    ///     TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson
+    /// </seealso>
+    public BotBaseBuilder UseJSON(Type fallbackForm = null)
+    {
+        return UseJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
+    }
+
+    /// <summary>
+    ///     Uses the given path to load and write a states.json file.
+    /// </summary>
+    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">
+    ///     For the legacy version use the UseNewtonsoftJson method of
+    ///     TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson
+    /// </seealso>
+    public BotBaseBuilder UseJSON(string path, Type fallbackForm = null)
+    {
+        return UseSerialization(new JsonStateMachine(path, fallbackForm));
+    }
+
+    /// <summary>
+    ///     Uses the application runtime path to load and write a states.json file.
+    /// </summary>
+    [Obsolete("Use UseJSON instead.")]
+    public BotBaseBuilder UseSimpleJSON(Type fallbackForm = null)
+    {
+        return UseSimpleJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
+    }
+
+    /// <summary>
+    ///     Uses the given path to load and write a states.json file.
+    /// </summary>
+    [Obsolete("Use UseJSON instead.")]
+    public BotBaseBuilder UseSimpleJSON(string path, Type fallbackForm = null)
+    {
+        return UseSerialization(new SimpleJsonStateMachine(path, fallbackForm));
+    }
+
+    /// <summary>
+    ///     Uses the application runtime path to load and write a states.xml file.
+    /// </summary>
+    public BotBaseBuilder UseXML(Type fallbackForm = null)
+    {
+        return UseXML(Path.Combine(Directory.GetCurrentDirectory(), "states.xml"), fallbackForm);
+    }
+
+    /// <summary>
+    ///     Uses the given path to load and write a states.xml file.
+    /// </summary>
+    public BotBaseBuilder UseXML(string path, Type fallbackForm = null)
+    {
+        return UseSerialization(new XmlStateMachine(path, fallbackForm));
+    }
+
+    #endregion
+
+    #region "Language"
+
+    /// <summary>
+    ///     Sets <see cref="Default.Language" /> to English when the bot is built.
+    /// </summary>
+    public BotBaseBuilder UseEnglish()
+    {
+        return UseLanguage(new English());
+    }
+
+    /// <summary>
+    ///     Sets <see cref="Default.Language" /> to German when the bot is built.
+    /// </summary>
+    public BotBaseBuilder UseGerman()
+    {
+        return UseLanguage(new German());
+    }
+
+    /// <summary>
+    ///     Sets <see cref="Default.Language" /> to Persian when the bot is built.
+    /// </summary>
+    public BotBaseBuilder UsePersian()
+    {
+        return UseLanguage(new Persian());
+    }
+
+    /// <summary>
+    ///     Sets <see cref="Default.Language" /> to Russian when the bot is built.
+    /// </summary>
+    public BotBaseBuilder UseRussian()
+    {
+        return UseLanguage(new Russian());
+    }
+
+    /// <summary>
+    ///     Sets <see cref="Default.Language" /> to Ukrainian when the bot is built.
+    /// </summary>
+    public BotBaseBuilder UseUkrainian()
+    {
+        return UseLanguage(new Ukrainian());
+    }
+
+    /// <summary>
+    ///     Sets <see cref="Default.Language" /> to Belarusian when the bot is built.
+    /// </summary>
+    public BotBaseBuilder UseBelarusian()
+    {
+        return UseLanguage(new Belarusian());
+    }
+
+    /// <summary>
+    ///     Sets <see cref="Default.Language" /> to the given localization when the bot is built.
+    ///     Without a language call the bot uses the current <see cref="Default.Language" />.
+    /// </summary>
+    public BotBaseBuilder UseLanguage(Localization language)
+    {
+        _language = language ?? throw new ArgumentNullException(nameof(language));
         return this;
     }
 
     #endregion
 
+    #region "Threading"
 
-    #region "Step 7 (Serialization)"
-
-    public ILanguageSelectionStage NoSerialization()
+    /// <summary>
+    ///     Handles every update on the thread pool instead of a single thread.
+    /// </summary>
+    public BotBaseBuilder UseThreadPool()
     {
-        return this;
-    }
-
-    public ILanguageSelectionStage UseSerialization(IStateMachine machine)
-    {
-        _stateMachine = machine;
+        _useThreadPool = true;
+        _workerThreads = null;
+        _ioThreads = null;
         return this;
     }
 
     /// <summary>
-    /// Uses the application runtime path to load and write a states.json file.
+    ///     Handles every update on the thread pool and sets its maximum number of threads on start.
     /// </summary>
-    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseJSON(Type fallbackForm = null)
+    public BotBaseBuilder UseThreadPool(int workerThreads, int ioThreads)
     {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
-        _stateMachine = new JsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the given path to load and write a states.json file.
-    /// </summary>
-    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseJSON(string path, Type fallbackForm = null)
-    {
-        _stateMachine = new JsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the application runtime path to load and write a states.json file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseSimpleJSON(Type fallbackForm = null)
-    {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
-        _stateMachine = new SimpleJsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the given path to load and write a states.json file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseSimpleJSON(string path, Type fallbackForm = null)
-    {
-        _stateMachine = new SimpleJsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the application runtime path to load and write a states.xml file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseXML(Type fallbackForm = null)
-    {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.xml");
-        _stateMachine = new XmlStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the given path to load and write a states.xml file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseXML(string path, Type fallbackForm = null)
-    {
-        _stateMachine = new XmlStateMachine(path, fallbackForm);
+        _useThreadPool = true;
+        _workerThreads = workerThreads;
+        _ioThreads = ioThreads;
         return this;
     }
 
     #endregion
 
+    #region "Session limits"
 
-    #region "Step 8 (Language)"
-
-    /// <inheritdoc cref="ILanguageSelectionStage.DefaultLanguage"/>
-    public IThreadingStage DefaultLanguage()
-    {
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseEnglish"/>
-    public IThreadingStage UseEnglish()
-    {
-        Default.Language = new English();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseGerman"/>
-    public IThreadingStage UseGerman()
-    {
-        Default.Language = new German();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UsePersian"/>
-    public IThreadingStage UsePersian()
-    {
-        Default.Language = new Persian();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseRussian"/>
-    public IThreadingStage UseRussian()
-    {
-        Default.Language = new Russian();
-        return this;
-
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseUkrainian"/>
-    public IThreadingStage UseUkrainian()
-    {
-        Default.Language = new Ukrainian();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseBelarusian"/>
-    public IThreadingStage UseBelarusian()
-    {
-        Default.Language = new Belarusian();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.Custom"/>
-    public IThreadingStage Custom(Localization language)
-    {
-        Default.Language = language;
-        return this;
-    }
-
-
-    #endregion
-
-
-    #region "Step 9 (Threading)"
-
-    public ISessionLimitsStage UseSingleThread()
-    {
-        _client.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
-
-        return this;
-    }
-
-    public ISessionLimitsStage UseThreadPool()
-    {
-        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
-
-        c.DropPendingUpdates = _client.DropPendingUpdates;
-        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
-
-        _client = c;
-
-        return this;
-    }
-
-
-    public ISessionLimitsStage UseThreadPool(int workerThreads, int ioThreads)
-    {
-        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
-
-        c.ThreadPool_WorkerThreads = workerThreads;
-        c.ThreadPool_IOThreads = ioThreads;
-
-        c.DropPendingUpdates = _client.DropPendingUpdates;
-        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
-
-        _client = c;
-
-        return this;
-    }
-
-    #endregion
-
-    #region "Step 10 (Session limits)"
-
-    public IBuildingStage NoSessionLimits()
-    {
-        _sessionLimits = null;
-        return this;
-    }
-
-    public IBuildingStage WithDefaultSessionLimits()
+    /// <summary>
+    ///     Uses the recommended session limits, see <see cref="SessionLimits.CreateDefault" />.
+    ///     By default there are no limits.
+    /// </summary>
+    public BotBaseBuilder WithDefaultSessionLimits()
     {
         return WithSessionLimits(SessionLimits.CreateDefault());
     }
 
-    public IBuildingStage WithSessionLimits(Action<SessionLimits> configure)
+    /// <summary>
+    ///     Uses session limits configured by the delegate.
+    /// </summary>
+    public BotBaseBuilder WithSessionLimits(Action<SessionLimits> configure)
     {
         if (configure == null)
         {
@@ -616,18 +550,133 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return WithSessionLimits(limits);
     }
 
-    public IBuildingStage WithSessionLimits(SessionLimits limits)
+    /// <summary>
+    ///     Uses a copy of the given session limits.
+    /// </summary>
+    public BotBaseBuilder WithSessionLimits(SessionLimits limits)
     {
         if (limits == null)
         {
             throw new ArgumentNullException(nameof(limits));
         }
 
-        limits.Validate();
-
         _sessionLimits = limits.Clone();
         return this;
     }
 
     #endregion
+
+    /// <summary>
+    ///     Validates the configuration and creates the bot. A builder can only build one bot.
+    /// </summary>
+    /// <exception cref="BotBaseBuilderException">The configuration is invalid.</exception>
+    /// <exception cref="InvalidOperationException">The builder has already built a bot.</exception>
+    public BotBase Build()
+    {
+        if (_built)
+        {
+            throw new InvalidOperationException("This builder has already built a bot. Create a new builder for another bot.");
+        }
+
+        var errors = new List<string>();
+
+        var formFactory = Create(_formFactory, errors, "Start form",
+                                 "No start form is configured. Call WithStartForm, WithServiceProvider or WithFormFactory.");
+
+        var messageLoop = Create(_messageLoop ?? (() => new FormBaseMessageLoop()), errors, "Message loop",
+                                 "The message loop configuration returned null.");
+
+        _networking.Validate(errors);
+
+        if (_useThreadPool && _workerThreads != null && (_workerThreads < 1 || _ioThreads < 1))
+        {
+            errors.Add($"Threading: the thread pool needs at least 1 worker and 1 IO thread, but got {_workerThreads} and {_ioThreads}.");
+        }
+
+        try
+        {
+            _sessionLimits?.Validate();
+        }
+        catch (ArgumentException ex)
+        {
+            errors.Add("Session limits: " + ex.Message);
+        }
+
+        MessageClient client = null;
+        if (errors.Count == 0)
+        {
+            client = Create(() => _networking.CreateClient(_apiKey, _useThreadPool), errors, "API key",
+                            "The message client could not be created.");
+        }
+
+        IRequestDispatcher requestDispatcher = null;
+        if (client != null)
+        {
+            if (client is ThreadPoolMessageClient threadPoolClient)
+            {
+                threadPoolClient.ThreadPool_WorkerThreads = _workerThreads;
+                threadPoolClient.ThreadPool_IOThreads = _ioThreads;
+            }
+
+            client.AllowedUpdates = messageLoop.ConfigureUpdateTypes();
+
+            // Created from the final client, so the dispatcher and the bot always share the same one.
+            var dispatcherFactory = _requestDispatcher ??
+                                    (c => new DefaultRequestDispatcher(new RequestDispatcherSettings(), c));
+
+            requestDispatcher = Create(() => dispatcherFactory(client), errors, "Request dispatcher",
+                                       "The custom request dispatcher factory returned null.");
+        }
+
+        if (errors.Count > 0)
+        {
+            throw new BotBaseBuilderException(errors);
+        }
+
+        if (_language != null)
+        {
+            Default.Language = _language;
+        }
+
+        _built = true;
+
+        return new BotBase(_apiKey, client)
+        {
+            FormFactory = formFactory,
+            BotCommandScopes = _botCommandScopes,
+            StateMachine = _stateMachine,
+            MessageLoopFactory = messageLoop,
+            RequestDispatcher = requestDispatcher,
+            SessionLimits = _sessionLimits
+        };
+    }
+
+    /// <summary>
+    ///     Runs the factory and records a missing result or an argument error instead of throwing.
+    /// </summary>
+    private static T Create<T>(Func<T> factory, ICollection<string> errors, string area, string missingMessage)
+        where T : class
+    {
+        if (factory == null)
+        {
+            errors.Add($"{area}: {missingMessage}");
+            return null;
+        }
+
+        try
+        {
+            var result = factory();
+            if (result == null)
+            {
+                errors.Add($"{area}: {missingMessage}");
+            }
+
+            return result;
+        }
+        catch (ArgumentException ex)
+        {
+            errors.Add($"{area}: {ex.Message}");
+            return null;
+        }
+    }
 }
