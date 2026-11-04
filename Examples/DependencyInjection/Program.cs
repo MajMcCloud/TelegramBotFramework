@@ -16,18 +16,10 @@ namespace DependencyInjection
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            var bot = BotBaseBuilder.Create()
-                                    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
+            var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ??
                                                 throw new Exception("API_KEY is not set"))
-                                    .DefaultMessageLoop()
                                     .WithServiceProvider<StartForm>(serviceProvider)
-                                    .NoProxy()
-                                    .UseDefaultRequestDispatcher()
                                     .NoCommands()
-                                    .NoSerialization()
-                                    .DefaultLanguage()
-                                    .UseSingleThread()
-                                    .NoSessionLimits()
                                     .Build();
 
             await bot.Start();

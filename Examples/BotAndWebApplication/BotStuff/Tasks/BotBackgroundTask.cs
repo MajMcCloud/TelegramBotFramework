@@ -7,14 +7,10 @@ namespace BotAndWebApplication.BotStuff.Tasks
     {
         BotBackgroundTask()
         {
-            BotBaseInstance = BotBaseBuilder.Create()
-                                .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
+            BotBaseInstance = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ??
                                     throw new Exception("API_KEY is not set"))
-                                .DefaultMessageLoop()
                                 .WithStartForm<StartForm>()
-                                .NoProxy()
                                 .DefaultCommands()
-                                .NoSerialization()
                                 .UseEnglish()
                                 .UseThreadPool()
                                 .Build();
