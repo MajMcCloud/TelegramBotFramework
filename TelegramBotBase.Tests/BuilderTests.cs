@@ -144,6 +144,25 @@ public class BuilderTests
     }
 
     [Fact]
+    public void Dispatcher_GetsFinalThreadPoolClient()
+    {
+        MessageClient dispatcherClient = null;
+
+        var bot = BotBaseBuilder.Create(Token)
+                                .WithStartForm<TrackingForm>()
+                                .UseCustomRequestDispatcher(c =>
+                                {
+                                    dispatcherClient = c;
+                                    return new DirectDispatcher(c);
+                                })
+                                .UseThreadPool()
+                                .Build();
+
+        Assert.IsType<ThreadPoolMessageClient>(bot.Client);
+        Assert.Same(bot.Client, dispatcherClient);
+    }
+
+    [Fact]
     public void CallOrder_DoesNotMatter()
     {
         var bot = BotBaseBuilder.Create(Token)
