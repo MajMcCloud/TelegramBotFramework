@@ -48,25 +48,23 @@ internal sealed class TestBot
             Loop = new TestMessageLoop()
         };
 
-        var serialization = BotBaseBuilder.Create()
-                                          .WithAPIKey(Token)
-                                          .CustomMessageLoop(testBot.Loop)
-                                          .WithFormFactory(formFactory ?? testBot.Forms)
-                                          .NoProxy()
-                                          .UseDirectDispatcher()
-                                          .NoCommands();
+        var builder = BotBaseBuilder.Create(Token)
+                                    .CustomMessageLoop(testBot.Loop)
+                                    .WithFormFactory(formFactory ?? testBot.Forms)
+                                    .UseDirectDispatcher()
+                                    .NoCommands();
 
-        var language = stateMachine == null
-                           ? serialization.NoSerialization()
-                           : serialization.UseSerialization(stateMachine);
+        if (stateMachine != null)
+        {
+            builder.UseSerialization(stateMachine);
+        }
 
-        var limitsStage = language.DefaultLanguage().UseSingleThread();
+        if (limits != null)
+        {
+            builder.WithSessionLimits(limits);
+        }
 
-        var building = limits != null
-                           ? limitsStage.WithSessionLimits(limits)
-                           : limitsStage.NoSessionLimits();
-
-        testBot.Bot = building.Build();
+        testBot.Bot = builder.Build();
         testBot.Bot.Sessions.UtcNow = () => testBot.Now;
 
         testBot.Bot.SessionBegins += (_, e) =>

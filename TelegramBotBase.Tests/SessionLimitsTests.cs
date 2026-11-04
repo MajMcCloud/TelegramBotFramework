@@ -21,37 +21,24 @@ public class SessionLimitsTests
     private const string Token = "1234567890:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
     [Fact]
-    public void NoSessionLimits_Stage_BuildsWithoutLimits()
+    public void WithoutSessionLimits_BuildsWithoutLimits()
     {
-        var bot = BotBaseBuilder.Create()
-                                .WithAPIKey(Token)
+        var bot = BotBaseBuilder.Create(Token)
                                 .MinimalMessageLoop()
                                 .WithStartForm<TrackingForm>()
-                                .NoProxy()
                                 .UseDirectDispatcher()
-                                .NoCommands()
-                                .NoSerialization()
-                                .DefaultLanguage()
-                                .UseSingleThread()
-                                .NoSessionLimits()
                                 .Build();
 
         Assert.Null(bot.SessionLimits);
     }
 
     [Fact]
-    public void WithDefaultSessionLimits_Stage_UsesRecommendedDefaults()
+    public void WithDefaultSessionLimits_UsesRecommendedDefaults()
     {
-        var bot = BotBaseBuilder.Create()
-                                .WithAPIKey(Token)
+        var bot = BotBaseBuilder.Create(Token)
                                 .MinimalMessageLoop()
                                 .WithStartForm<TrackingForm>()
-                                .NoProxy()
                                 .UseDirectDispatcher()
-                                .NoCommands()
-                                .NoSerialization()
-                                .DefaultLanguage()
-                                .UseSingleThread()
                                 .WithDefaultSessionLimits()
                                 .Build();
 
@@ -70,27 +57,22 @@ public class SessionLimitsTests
     }
 
     [Fact]
-    public void QuickStart_UsesNoSessionLimits()
+    public void MinimalConfiguration_UsesNoSessionLimits()
     {
-        var bot = BotBaseBuilder.Create()
-                                .QuickStart<TrackingForm>(Token)
+        var bot = BotBaseBuilder.Create(Token)
+                                .WithStartForm<TrackingForm>()
                                 .Build();
 
         Assert.Null(bot.SessionLimits);
     }
 
     [Fact]
-    public void WithSessionLimits_Stage_AfterThreadPool()
+    public void WithSessionLimits_WithThreadPool()
     {
-        var bot = BotBaseBuilder.Create()
-                                .WithAPIKey(Token)
+        var bot = BotBaseBuilder.Create(Token)
                                 .MinimalMessageLoop()
                                 .WithStartForm<TrackingForm>()
-                                .NoProxy()
                                 .UseDirectDispatcher()
-                                .NoCommands()
-                                .NoSerialization()
-                                .DefaultLanguage()
                                 .UseThreadPool()
                                 .WithSessionLimits(new SessionLimits { MaxSessions = 5 })
                                 .Build();
@@ -124,21 +106,25 @@ public class SessionLimitsTests
     [InlineData(1_000, null, -1)]
     public void Builder_RejectsInvalidLimits(int? idleMilliseconds, int? maxSessions, int sweepMilliseconds)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => TestBot.Create(limits: l =>
+        var ex = Assert.Throws<BotBaseBuilderException>(() => TestBot.Create(limits: l =>
         {
             l.IdleTimeout = idleMilliseconds is { } idle ? TimeSpan.FromMilliseconds(idle) : null;
             l.MaxSessions = maxSessions;
             l.SweepInterval = TimeSpan.FromMilliseconds(sweepMilliseconds);
         }));
+
+        Assert.StartsWith("Session limits:", Assert.Single(ex.Errors));
     }
 
     [Fact]
     public void Builder_RejectsTooLongSweepInterval()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => TestBot.Create(limits: l =>
+        var ex = Assert.Throws<BotBaseBuilderException>(() => TestBot.Create(limits: l =>
         {
             l.IdleTimeout = TimeSpan.FromMinutes(1);
             l.SweepInterval = TimeSpan.FromDays(30);
         }));
+
+        Assert.StartsWith("Session limits:", Assert.Single(ex.Errors));
     }
 }
