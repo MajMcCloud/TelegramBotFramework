@@ -39,7 +39,10 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
 ## Index
 
 - [Quick start](#quick-start)
-- [Simplified builder](#simplified-builder)
+- [Builder](#builder)
+  * [Defaults](#defaults)
+  * [Validation](#validation)
+  * [Migrating from the stage builder](#migrating-from-the-stage-builder)
 - [Features](#features)
   * [System calls & bot commands](#system-calls--bot-commands)
   * [Text messages handling](#text-messages)
@@ -117,24 +120,11 @@ First of all, create a new empty dotnet console project and paste some code:
 ```csharp
 // public async Task Main(string[] args)
 
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}") // do not store your API key as plain text in project sources
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}") // do not store your API key as plain text in project sources
     .WithStartForm<StartForm>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher()
-    .CustomCommands(a =>
-    {
-        a.Start("Starts the bot");
-    })
-    .NoSerialization()
-    .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 
-// Upload bot commands to BotFather
+// Upload bot commands (by default only /start) to BotFather
 await bot.UploadBotCommands();
 
 // Start your Bot
@@ -235,19 +225,106 @@ var form = new TestForm();
 await this.NavigateTo(form);
 ```
 
-## Simplified builder
+## Builder
 
-When migrating from a previous version or starting completely new, all these options can be a bit overwhelming.
-There's a function called `QuickStart` that simplifies building a bit.
+`BotBaseBuilder.Create(apiKey)` returns a builder. Only the API key and a start form (or form factory) are required,
+every other setting is optional. All methods return the builder, so they can be chained in any order. If a setting
+is configured twice, the last call wins. `Build()` validates the configuration and creates the bot.
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .QuickStart<StartForm>("{YOUR API KEY}")
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
+    .WithStartForm<StartForm>()
+    .ConfigureNetworking(n =>
+    {
+        n.UseProxy("http://127.0.0.1:8080");
+        n.Timeout = TimeSpan.FromSeconds(30);
+        n.DropPendingUpdates = true;
+    })
+    .DefaultCommands()
+    .UseJSON(AppContext.BaseDirectory + "config\\states.json")
+    .UseGerman()
+    .UseThreadPool()
+    .WithDefaultSessionLimits()
     .Build();
-
-await bot.Start();
 ```
+
+The builder can also be used step by step, like the ASP.NET Core builders:
+
+```csharp
+var builder = BotBaseBuilder.Create("{YOUR API KEY}");
+builder.WithStartForm<StartForm>();
+
+if (useThreadPool)
+{
+    builder.UseThreadPool();
+}
+
+var bot = builder.Build();
+```
+
+A builder creates exactly one bot, a second `Build()` call throws an `InvalidOperationException`.
+
+### Defaults
+
+| Setting            | Default                                                | Methods                                                                                                                                                 |
+|--------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Start form         | required                                               | `WithStartForm<T>()`, `WithStartForm(type)`, `WithServiceProvider<T>(serviceProvider)`, `WithServiceProvider(type, serviceProvider)`, `WithFormFactory(factory)` |
+| Message loop       | `FormBaseMessageLoop`                                  | `DefaultMessageLoop(externalActionManager)`, `MinimalMessageLoop()`, `FullMessageLoop()`, `MiddlewareMessageLoop(...)`, `CustomMessageLoop(...)`         |
+| Networking         | direct connection, 60 seconds timeout, pending updates are kept | `ConfigureNetworking(n => ...)` with `UseProxy(address)`, `UseProxy(host, port)`, `UseHttpClient(...)`, `UseBotClient(...)`, `Timeout`, `DropPendingUpdates` |
+| Request dispatcher | `DefaultRequestDispatcher` with default settings       | `UseDefaultRequestDispatcher(settings)`, `UseFullRequestDispatcher()`, `UseDirectDispatcher()`, `UseCustomRequestDispatcher(...)`                        |
+| Bot commands       | only `/start` ("Starts the bot")                       | `DefaultCommands()` (`/start`, `/help`, `/settings`), `CustomCommands(...)` (starts from an empty list), `NoCommands()`                                  |
+| Serialization      | none, sessions are not saved                           | `UseJSON()`, `UseXML()`, `UseSerialization(stateMachine)`, extension packages (i.e. `UseSqlDatabase(...)`)                                               |
+| Language           | the current `Default.Language`, which is English by default | `UseEnglish()`, `UseGerman()`, `UsePersian()`, `UseRussian()`, `UseUkrainian()`, `UseBelarusian()`, `UseLanguage(localization)`                     |
+| Threading          | single thread                                          | `UseThreadPool()`, `UseThreadPool(workerThreads, ioThreads)`                                                                                             |
+| Session limits     | none, sessions are kept in memory until they end       | `WithDefaultSessionLimits()`, `WithSessionLimits(...)`                                                                                                  |
+
+The language is applied to `Default.Language` when `Build()` is called.
+
+### Validation
+
+`Build()` checks the whole configuration and throws a `BotBaseBuilderException` (an `InvalidOperationException`)
+that lists every problem in its message and in `Errors`, for example:
+
+```
+The bot configuration is invalid:
+ - Start form: No start form is configured. Call WithStartForm, WithServiceProvider or WithFormFactory.
+ - Networking: the proxy address 'localhost' is not a valid absolute URI.
+ - Session limits: The maximum number of sessions has to be at least 1.
+```
+
+`Create` throws an `ArgumentException` for an empty API key, and methods throw an `ArgumentNullException` for
+`null` arguments.
+
+### Migrating from the stage builder
+
+The stage interfaces (`IAPIKeySelectionStage`, ..., `IBuildingStage`) and `QuickStart` were removed. Calls that
+selected a default are not needed anymore:
+
+| Before                                                    | Now                                                                 |
+|-----------------------------------------------------------|---------------------------------------------------------------------|
+| `BotBaseBuilder.Create().WithAPIKey(key)`                 | `BotBaseBuilder.Create(key)`                                        |
+| `.QuickStart<T>(key)`, `.QuickStart(key, type)`            | `BotBaseBuilder.Create(key).WithStartForm<T>()`                    |
+| `.QuickStart(key, formFactory)`                           | `BotBaseBuilder.Create(key).WithFormFactory(formFactory)`           |
+| `.QuickStart<T>(key, true)`                               | `... .ConfigureNetworking(n => n.DropPendingUpdates = true)`        |
+| `.DefaultMessageLoop()`                                   | remove                                                              |
+| `.NoProxy()`                                              | remove                                                              |
+| `.NoProxy(true, 30)`                                      | `.ConfigureNetworking(n => { n.DropPendingUpdates = true; n.Timeout = TimeSpan.FromSeconds(30); })` |
+| `.WithProxy(address, ...)`                                | `.ConfigureNetworking(n => n.UseProxy(address))`                   |
+| `.WithHostAndPort(host, port, ...)`                       | `.ConfigureNetworking(n => n.UseProxy(host, port))`                |
+| `.WithHttpClient(client, ...)`                            | `.ConfigureNetworking(n => n.UseHttpClient(client))`               |
+| `.WithBotClient(client, ...)`                             | `.ConfigureNetworking(n => n.UseBotClient(client))`                |
+| `.UseDefaultRequestDispatcher()`                          | remove                                                              |
+| `.OnlyStart()`                                            | remove                                                              |
+| `.NoCommands()`                                           | `.NoCommands()` (needed, the default registers `/start`)            |
+| `.CustomCommands(a => ...)`                               | unchanged, the list passed to the delegate is empty                 |
+| `.NoSerialization()`                                      | remove                                                              |
+| `.DefaultLanguage()`                                      | remove                                                              |
+| `.Custom(localization)`                                   | `.UseLanguage(localization)`                                        |
+| `.UseSingleThread()`                                      | remove                                                              |
+| `.NoSessionLimits()`                                      | remove                                                              |
+| `CustomMessageLoop<T>()` with `T` not an `IMessageLoopFactory` | compile error, `T` has to implement `IMessageLoopFactory`      |
+
+The request dispatcher now always uses the same `MessageClient` as the bot, also with `UseThreadPool()`.
 
 ## Features
 
@@ -268,13 +345,8 @@ Below we have 4 commands.
 `/params` - demonstrates the use of parameters per command (i.e. /params 1 2 3 test ...)
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<Start>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher()
     .CustomCommands(a =>
     {
         a.Start("Starts the bot");
@@ -282,10 +354,7 @@ var bot = BotBaseBuilder
         a.Add("form2", "Opens test form 2");
         a.Add("params", "Returns all send parameters as a message.");
     })
-    .NoSerialization()
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 
 bot.BotCommand += async (s, en) =>
@@ -728,18 +797,12 @@ public class CustomMessageLoop : IMessageLoopFactory
 
 **Usage:**
 ```csharp
-var bot = BotBaseBuilder
-        .Create()
-        .WithAPIKey("{YOUR API KEY}")
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
         .CustomMessageLoop(new CustomMessageLoop())
         .WithStartForm<StartForm>()
-        .NoProxy()
-        .UseDefaultRequestDispatcher()
         .DefaultCommands()
-        .NoSerialization()
         .UseEnglish()
         .UseThreadPool()
-        .NoSessionLimits()
         .Build();
 
 await bot.Start();
@@ -1042,21 +1105,10 @@ Is easy to use and useful for simple structures like basic datatypes. Won't work
 > require type information), use [`JSONStateMachine`](#jsonstatemachine) or [`XMLStateMachine`](#xmlstatemachine) instead.
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher()
-    .CustomCommands(a =>
-    {
-        a.Start("Starts the bot");
-    })
     .UseSimpleJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 
 await bot.Start();
@@ -1068,21 +1120,10 @@ It is easy to use too, but it works for complex datatypes, because it saves thei
 into the JSON file.
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher()
-    .CustomCommands(a =>
-    {
-        a.Start("Starts the bot");
-    })
     .UseJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 
 await bot.Start();
@@ -1093,21 +1134,10 @@ await bot.Start();
 The last one should work like the others.
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher()
-    .CustomCommands(a =>
-    {
-        a.Start("Starts the bot");
-    })
     .UseXML(AppContext.BaseDirectory + "config\\states.xml")
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 
 await bot.Start();
@@ -1183,11 +1213,11 @@ dependency injection scope and its state). `BotBase.Sessions` (`SessionManager`)
 `SessionList`, a thread-safe `ConcurrentDictionary<long, IDeviceSession>`. `IDeviceSession.LastAction` holds the time
 (UTC) of the last update of the device.
 
-Session limits are the last builder stage, after threading:
+Session limits are configured with the builder:
 
-| Stage method                   | Behavior                                                                                         |
+| Builder method                 | Behavior                                                                                         |
 |--------------------------------|--------------------------------------------------------------------------------------------------|
-| `.NoSessionLimits()`           | Keeps all sessions in memory forever (the behavior of earlier versions). Used by `QuickStart`.   |
+| (none)                         | Keeps all sessions in memory until they end. This is the default.                                |
 | `.WithDefaultSessionLimits()`  | Recommended defaults: evicts sessions idle for 30 minutes and keeps at most 10.000 sessions.     |
 | `.WithSessionLimits(...)`      | Your own limits, see below.                                                                      |
 
@@ -1214,17 +1244,11 @@ processed. Ending an unknown device does nothing and returns `false`.
 
 ### Session limits
 
-Choose `.WithSessionLimits(...)` (or `.WithDefaultSessionLimits()`) instead of `.NoSessionLimits()` in the last
-builder stage:
+Add `.WithSessionLimits(...)` (or `.WithDefaultSessionLimits()`) to the builder:
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher()
     .DefaultCommands()
     .UseJSON(AppContext.BaseDirectory + "config\\states.json")
     .UseEnglish()
@@ -1402,7 +1426,7 @@ Efficient threading and task management are essential for building responsive an
 
 You can configure the threading model during bot setup using the builder methods:
 
-- `.UseSingleThread()`: Processes all updates sequentially on a single thread. This is the default and is recommended for simple bots, bots with non-thread-safe resources, or when strict message order is required.
+- Without a threading call all updates are processed sequentially on a single thread. This is the default and is recommended for simple bots, bots with non-thread-safe resources, or when strict message order is required.
 - `.UseThreadPool()`: Enables concurrent processing of updates using the .NET thread pool. This improves throughput and responsiveness for high-traffic bots or when handling long-running operations.
 - `.UseThreadPool(workerThreads, ioThreads)`: Fine-tune the number of worker and I/O threads for advanced scenarios with specific concurrency requirements.
 
@@ -1412,18 +1436,11 @@ You can configure the threading model during bot setup using the builder methods
 
 **Example:**
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher()
     .DefaultCommands()
-    .NoSerialization()
     .UseEnglish()
-    .UseThreadPool() // or .UseSingleThread()
-    .NoSessionLimits()
+    .UseThreadPool() // or leave it out for a single thread
     .Build();
 ```
 ### Performance Considerations
@@ -1439,7 +1456,7 @@ var bot = BotBaseBuilder
 - Prefer `async` methods throughout your forms and message handlers.
 - Minimize shared state or protect it with proper synchronization (e.g., locks) if using thread pool mode.
 - Test your bot under expected load to choose the optimal threading model.
-- For most bots, start with `UseSingleThread()` and switch to `UseThreadPool()` if you observe performance issues.
+- For most bots, start with the single thread default and switch to `UseThreadPool()` if you observe performance issues.
 
 
 
@@ -1544,18 +1561,10 @@ the `HTTP 429` waits, since Telegram scopes these responses to a single chat. En
 *all* outgoing traffic for `retry_after` seconds instead.
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
-    .WithStartForm<StartForm>()
-    .NoProxy()
-    .UseDefaultRequestDispatcher() // uses default settings
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
+    .WithStartForm<StartForm>() // the DefaultRequestDispatcher with default settings is used without a dispatcher call
     .DefaultCommands()
-    .NoSerialization()
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 ```
 
@@ -1580,18 +1589,11 @@ as the bot talks to more and more chats over time. Groups, supergroups and chann
 chat id, so group limits apply even to sessions that have not received a message yet (e.g. broadcasts).
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
     .UseFullRequestDispatcher() // uses default settings
     .DefaultCommands()
-    .NoSerialization()
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 ```
 
@@ -1619,18 +1621,11 @@ With custom settings:
 Does not perform any rate limiting or retry logic. Use this only if you want to handle concurrency and retries yourself.
 
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
     .UseDirectDispatcher()
     .DefaultCommands()
-    .NoSerialization()
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 ```
 
@@ -1791,19 +1786,12 @@ requests are re-checked.
 
 **Usage:**
 ```csharp
-var bot = BotBaseBuilder
-    .Create()
-    .WithAPIKey("{YOUR API KEY}")
-    .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create("{YOUR API KEY}")
     .WithStartForm<StartForm>()
-    .NoProxy()
     .UseCustomRequestDispatcher(client => new LoggingRequestDispatcher(
         new FullRequestDispatcher(new RequestDispatcherSettings(), client)))
     .DefaultCommands()
-    .NoSerialization()
     .UseEnglish()
-    .UseSingleThread()
-    .NoSessionLimits()
     .Build();
 
 await bot.Start();
