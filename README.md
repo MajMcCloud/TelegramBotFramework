@@ -105,7 +105,7 @@ BitTorrent: `TYVZSykaVT1nKZnz9hjDgBRNB9VavU1bpW`
   * [TelegramBotBase.Extensions.Images](#telegrambotbaseextensionsimages)
   * [TelegramBotBase.Extensions.Images.IronSoftware](#telegrambotbaseextensionsimagesironsoftware)
   * [TelegramBotBase.Extensions.Serializer.Database.MSSQL](#telegrambotbaseextensionsserializerdatabasemssql)
-  * [TelegramBotBase.Extensions.Serializer.Database.PostgreSql](#telegrambotbaseextensionsserializerdatabasemysql)
+  * [TelegramBotBase.Extensions.Serializer.Database.PostgreSql](#telegrambotbaseextensionsserializerdatabasepostgresql)
   * [TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson](#telegrambotbaseextensionsserializerlegacynewtonsoftjson)
   * [TelegramBotBase.Extensions.ActionManager](#telegrambotbaseextensionsactionmanager)
 - [Test Project](#test-project)
@@ -142,7 +142,7 @@ await bot.Start();
 
 The `BotBase` class will manage a lot of things for you, like bot commands, action events and so on.
 `StartForm` is your first form which every user will get internally redirected to, *just like a start page*.
-It needs to be a subclass of `FormBase` you will find in namespace `TelegramBotBase.Base`
+It needs to be a subclass of `FormBase` you will find in namespace `TelegramBotBase.Form`
 
 Every `Form` has some events which will get raised at specific times.
 In every form, you are able to get notes about
@@ -297,41 +297,59 @@ The bot configuration is invalid:
 
 ### Migrating from the stage builder
 
-The stage interfaces (`IAPIKeySelectionStage`, ..., `IBuildingStage`) and `QuickStart` were removed. Calls that
-selected a default are not needed anymore:
+The stage interfaces (`IAPIKeySelectionStage`, ..., `IBuildingStage`) and `QuickStart` were removed. Every method
+returns `BotBaseBuilder`, so the calls can be in any order. Calls that only selected a default are not needed:
 
-| Before                                                    | Now                                                                 |
-|-----------------------------------------------------------|---------------------------------------------------------------------|
-| `BotBaseBuilder.Create().WithAPIKey(key)`                 | `BotBaseBuilder.Create(key)`                                        |
-| `.QuickStart<T>(key)`, `.QuickStart(key, type)`            | `BotBaseBuilder.Create(key).WithStartForm<T>()`                    |
-| `.QuickStart(key, formFactory)`                           | `BotBaseBuilder.Create(key).WithFormFactory(formFactory)`           |
-| `.QuickStart<T>(key, true)`                               | `... .ConfigureNetworking(n => n.DropPendingUpdates = true)`        |
-| `.DefaultMessageLoop()`                                   | remove                                                              |
-| `.NoProxy()`                                              | remove                                                              |
-| `.NoProxy(true, 30)`                                      | `.ConfigureNetworking(n => { n.DropPendingUpdates = true; n.Timeout = TimeSpan.FromSeconds(30); })` |
-| `.WithProxy(address, ...)`                                | `.ConfigureNetworking(n => n.UseProxy(address))`                   |
-| `.WithHostAndPort(host, port, ...)`                       | `.ConfigureNetworking(n => n.UseProxy(host, port))`                |
-| `.WithHttpClient(client, ...)`                            | `.ConfigureNetworking(n => n.UseHttpClient(client))`               |
-| `.WithBotClient(client, ...)`                             | `.ConfigureNetworking(n => n.UseBotClient(client))`                |
-| `.UseDefaultRequestDispatcher()`                          | remove                                                              |
-| `.UseDefaultRequestDispatcher(settings)`                  | unchanged, `settings` must not be `null`                            |
-| `.UseFullRequestDispatcher(settings)`                     | unchanged                                                           |
-| `.UseDirectDispatcher()`                                  | unchanged                                                           |
-| `.UseCustomRequestDispatcher(client => ...)`              | unchanged, `client` is the final client of the bot                  |
-| `.UseCustomRequestDispatcher(dispatcher)`                 | unchanged                                                           |
-| `.OnlyStart()`                                            | remove                                                              |
-| `.NoCommands()`                                           | `.NoCommands()` (needed, the default registers `/start`)            |
-| `.CustomCommands(a => ...)`                               | unchanged, the list passed to the delegate is empty                 |
-| `.NoSerialization()`                                      | remove                                                              |
-| `.DefaultLanguage()`                                      | remove                                                              |
-| `.Custom(localization)`                                   | `.UseLanguage(localization)`                                        |
-| `.UseSingleThread()`                                      | remove                                                              |
-| `.NoSessionLimits()`                                      | remove                                                              |
-| `.WithDefaultSessionLimits()`                             | unchanged                                                           |
-| `.WithSessionLimits(limits)`, `.WithSessionLimits(l => ...)` | unchanged, invalid limits are reported by `Build()` in a `BotBaseBuilderException` instead of an `ArgumentOutOfRangeException` from the call |
-| `CustomMessageLoop<T>()` with `T` not an `IMessageLoopFactory` | compile error, `T` has to implement `IMessageLoopFactory`      |
+| Before                                                                  | Now                                                                                    |
+|-------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| `BotBaseBuilder.Create().WithAPIKey(key)`                               | `BotBaseBuilder.Create(key)`                                                           |
+| `.QuickStart<T>(key)`                                                   | `BotBaseBuilder.Create(key).WithStartForm<T>()`                                        |
+| `.QuickStart(key, type)`                                                | `BotBaseBuilder.Create(key).WithStartForm(type)`                                       |
+| `.QuickStart(key, formFactory)`                                         | `BotBaseBuilder.Create(key).WithFormFactory(formFactory)`                              |
+| `.QuickStart...(key, ..., true)`                                        | add `.ConfigureNetworking(n => n.DropPendingUpdates = true)`                           |
+| `.DefaultMessageLoop()`                                                 | remove                                                                                 |
+| `.DefaultMessageLoop(manager)`, `.FullMessageLoop(...)`, `.MinimalMessageLoop()`, `.MiddlewareMessageLoop(...)`, `.CustomMessageLoop(instance)` | unchanged                         |
+| `.CustomMessageLoop<T>()`                                               | unchanged, `T` has to implement `IMessageLoopFactory` (checked by the compiler)       |
+| `.WithStartForm(...)`, `.WithServiceProvider(...)`, `.WithFormFactory(...)` | unchanged, still required                                                          |
+| `.NoProxy()`                                                            | remove                                                                                 |
+| `.NoProxy(throwPendingUpdates, timeoutInSeconds)`                       | `.ConfigureNetworking(n => { n.DropPendingUpdates = throwPendingUpdates; n.Timeout = TimeSpan.FromSeconds(timeoutInSeconds); })` |
+| `.WithProxy(address, throwPendingUpdates, timeoutInSeconds)`            | `.ConfigureNetworking(n => n.UseProxy(address))`, optionally with a `NetworkCredential`, plus `DropPendingUpdates` and `Timeout` as above |
+| `.WithHostAndPort(host, port, throwPendingUpdates, timeoutInSeconds)`   | `.ConfigureNetworking(n => n.UseProxy(host, port))`, plus `DropPendingUpdates` and `Timeout` as above |
+| `.WithHttpClient(client, throwPendingUpdates, timeoutInSeconds)`        | `.ConfigureNetworking(n => n.UseHttpClient(client))`, plus `DropPendingUpdates` and `Timeout` as above |
+| `.WithBotClient(client, throwPendingUpdates, timeoutInSeconds)`         | `.ConfigureNetworking(n => n.UseBotClient(client))`, plus `DropPendingUpdates` and `Timeout` as above |
+| `.UseDefaultRequestDispatcher()`                                        | remove                                                                                 |
+| `.UseDefaultRequestDispatcher(settings)`                                | unchanged, `settings` must not be `null`                                               |
+| `.UseFullRequestDispatcher(settings)`                                   | unchanged                                                                              |
+| `.UseDirectDispatcher()`                                                | unchanged                                                                              |
+| `.UseCustomRequestDispatcher(client => ...)`                            | unchanged, `client` is the final client of the bot                                     |
+| `.UseCustomRequestDispatcher(dispatcher)`                               | unchanged                                                                              |
+| `.OnlyStart()`                                                          | remove                                                                                 |
+| `.NoCommands()`                                                         | `.NoCommands()` (needed, the default registers `/start`)                               |
+| `.DefaultCommands()`                                                    | unchanged                                                                              |
+| `.CustomCommands(a => ...)`                                             | unchanged, the list passed to the delegate is empty                                    |
+| `.NoSerialization()`                                                    | remove                                                                                 |
+| `.UseSerialization(...)`, `.UseJSON(...)`, `.UseSimpleJSON(...)`, `.UseXML(...)` | unchanged                                                                     |
+| `.UseSqlDatabase(...)`, `.UsePostgreSqlDatabase(...)`, `.UseNewtonsoftJson(...)` | unchanged, they extend and return `BotBaseBuilder`                            |
+| `.DefaultLanguage()`                                                    | remove                                                                                 |
+| `.UseEnglish()`, `.UseGerman()`, `.UsePersian()`, `.UseRussian()`, `.UseUkrainian()`, `.UseBelarusian()` | unchanged, the language is set in `Build()`           |
+| `.Custom(localization)`                                                 | `.UseLanguage(localization)`                                                           |
+| `.UseSingleThread()`                                                    | remove                                                                                 |
+| `.UseThreadPool()`, `.UseThreadPool(workerThreads, ioThreads)`          | unchanged                                                                              |
+| `.NoSessionLimits()`                                                    | remove                                                                                 |
+| `.WithDefaultSessionLimits()`                                           | unchanged                                                                              |
+| `.WithSessionLimits(limits)`, `.WithSessionLimits(l => ...)`            | unchanged, invalid limits are reported by `Build()`                                    |
 
-The request dispatcher now always uses the same `MessageClient` as the bot, also with `UseThreadPool()`.
+Other changes to check:
+
+- Code that uses the stage interfaces as types (variables, return types, own extension methods like
+  `this ISessionSerializationStage builder`) has to use `BotBaseBuilder` instead.
+- `Default.Language` is set when `Build()` is called, not when `UseGerman()` and the other language methods are called.
+- `null` arguments throw an `ArgumentNullException` right away, for example `CustomCommands(null)`,
+  `UseSerialization(null)` and `WithStartForm((Type)null)`.
+- Configuration errors are reported by `Build()` in a `BotBaseBuilderException` instead of being thrown by the call
+  that caused them: an invalid proxy address, an invalid API key, invalid session limits.
+- A builder creates one bot, a second `Build()` call throws an `InvalidOperationException`.
+- The request dispatcher always uses the same `MessageClient` as the bot, also with `UseThreadPool()`.
 
 ## Features
 
@@ -718,6 +736,9 @@ imagination of the possibilities.
 
 Message loops define how incoming updates and messages are processed by the bot. Depending on your requirements, you can choose from several implementations, each offering different levels of complexity and flexibility.
 
+Select one with `DefaultMessageLoop(...)`, `MinimalMessageLoop()`, `MiddlewareMessageLoop(...)`, `FullMessageLoop(...)`
+or `CustomMessageLoop(...)` on the builder. Without a message loop call the `FormBaseMessageLoop` is used.
+
 ### Overview of available Message Loops
 
 | Name                        | Description                                                                 | UpdateTypes         | Use Case / Special Features                   |
@@ -989,7 +1010,10 @@ The current available languages for controls are:
 
 You can add other languages easily by creating a subclass of the [TelegramBotBase/Localizations/Localization.cs](TelegramBotBase/Localizations/Localization.cs) class.
 
-To set the default language set the *Language* property on the static [TelegramBotBase/Localizations/Default.cs](TelegramBotBase/Localizations/Default.cs) instance.
+To set the language, call `UseEnglish()`, `UseGerman()`, `UsePersian()`, `UseRussian()`, `UseUkrainian()`,
+`UseBelarusian()` or `UseLanguage(localization)` on the builder. The builder sets the *Language* property of the static
+[TelegramBotBase/Localizations/Default.cs](TelegramBotBase/Localizations/Default.cs) class when `Build()` is called.
+Without a language call the current `Default.Language` is used, which is English unless you change it.
 
 ## Groups
 
@@ -1324,7 +1348,7 @@ public interface IDeviceStateMachine : IStateMachine
 }
 ```
 
-Without session limits, states are loaded at startup and saved in bulk, as before.
+Without session limits, states are loaded at startup and saved in bulk.
 
 ### Forms holding other forms
 
@@ -1567,9 +1591,11 @@ Telegram responds with `HTTP 429`, honoring the `retry_after` value it returns. 
 the `HTTP 429` waits, since Telegram scopes these responses to a single chat. Enable `GlobalPauseOn429` to pause
 *all* outgoing traffic for `retry_after` seconds instead.
 
+Without a dispatcher call the `DefaultRequestDispatcher` with default settings is used:
+
 ```csharp
 var bot = BotBaseBuilder.Create("{YOUR API KEY}")
-    .WithStartForm<StartForm>() // the DefaultRequestDispatcher with default settings is used without a dispatcher call
+    .WithStartForm<StartForm>()
     .DefaultCommands()
     .UseEnglish()
     .Build();
@@ -1894,6 +1920,20 @@ Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serial
 
 Credits: [@Kataane](https://github.com/Kataane)
 
+---
+
+### TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson
+
+A session serializer that stores the states in a JSON file using Newtonsoft.Json, for bots that depend on
+Newtonsoft.Json for their session data. Select it with `UseNewtonsoftJson()` or `UseNewtonsoftJson(path)` on the builder.
+
+[![NuGet version (TelegramBotBase)](https://img.shields.io/nuget/v/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson.svg?style=flat-square)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/)
+[![Downloads](https://img.shields.io/nuget/dt/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson.svg?style=flat-square&label=Package%20Downloads)](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson)
+
+Source code: [TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/](/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/)
+
+Nuget package: [https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/](https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/)
+
 
 ### TelegramBotBase.Extensions.ActionManager
 
@@ -1954,3 +1994,15 @@ Want to use Inline- and ReplyMarkup at the same time ? Here is an example how yo
 Alpha: Full Dependency Injection example within this framework.
 
 - [Examples/DependencyInjection](Examples/DependencyInjection)
+
+Several bots built with the `MiddlewareBaseMessageLoop`, each with its own middleware chain.
+
+- [Examples/MiddlewareBaseBot](Examples/MiddlewareBaseBot)
+
+Navigating between forms with modal dialogs.
+
+- [Examples/ModalDialogNavigation](Examples/ModalDialogNavigation)
+
+Watches a directory and sends a message to the configured devices when a file changes.
+
+- [Examples/FileWatcher](Examples/FileWatcher)
