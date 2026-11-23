@@ -67,14 +67,14 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Message loop"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.DefaultMessageLoop(IExternalActionManager)" />
     public IBotBaseBuilder DefaultMessageLoop(IExternalActionManager managerInstance)
     {
         _messageLoop = () => new FormBaseMessageLoop { ExternalActionManager = managerInstance };
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.MiddlewareMessageLoop(Func{MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop})" />
     public IBotBaseBuilder MiddlewareMessageLoop(
         Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
     {
@@ -87,21 +87,21 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.MinimalMessageLoop()" />
     public IBotBaseBuilder MinimalMessageLoop()
     {
         _messageLoop = () => new MinimalMessageLoop();
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.FullMessageLoop(IExternalActionManager)" />
     public IBotBaseBuilder FullMessageLoop(IExternalActionManager managerInstance = null)
     {
         _messageLoop = () => new FullMessageLoop { ExternalActionManager = managerInstance };
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.CustomMessageLoop(IMessageLoopFactory)" />
     public IBotBaseBuilder CustomMessageLoop(IMessageLoopFactory messageLoop)
     {
         if (messageLoop == null)
@@ -113,7 +113,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.CustomMessageLoop{T}()" />
     public IBotBaseBuilder CustomMessageLoop<T>()
         where T : class, IMessageLoopFactory, new()
     {
@@ -125,7 +125,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Start form / form factory (required)"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithStartForm(Type)" />
     public IBotBaseBuilder WithStartForm(Type startFormClass)
     {
         if (startFormClass == null)
@@ -137,7 +137,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithStartForm{T}()" />
     public IBotBaseBuilder WithStartForm<T>()
         where T : FormBase, new()
     {
@@ -145,7 +145,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithServiceProvider(Type, IServiceProvider)" />
     public IBotBaseBuilder WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
     {
         if (startFormClass == null)
@@ -162,7 +162,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithServiceProvider{T}(IServiceProvider)" />
     public IBotBaseBuilder WithServiceProvider<T>(IServiceProvider serviceProvider)
         where T : FormBase
     {
@@ -175,7 +175,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithFormFactory(IFormFactory)" />
     public IBotBaseBuilder WithFormFactory(IFormFactory factory)
     {
         if (factory == null)
@@ -191,7 +191,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Networking"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.ConfigureNetworking(Action{NetworkingOptions})" />
     public IBotBaseBuilder ConfigureNetworking(Action<NetworkingOptions> configure)
     {
         if (configure == null)
@@ -207,7 +207,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Request dispatcher"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseDefaultRequestDispatcher(RequestDispatcherSettings)" />
     public IBotBaseBuilder UseDefaultRequestDispatcher(RequestDispatcherSettings settings)
     {
         if (settings == null)
@@ -219,7 +219,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseFullRequestDispatcher(RequestDispatcherSettings)" />
     public IBotBaseBuilder UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
     {
         settings ??= new RequestDispatcherSettings();
@@ -227,21 +227,21 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseDirectDispatcher()" />
     public IBotBaseBuilder UseDirectDispatcher()
     {
         _requestDispatcher = client => new DirectDispatcher(client);
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseCustomRequestDispatcher(Func{MessageClient, IRequestDispatcher})" />
     public IBotBaseBuilder UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
     {
         _requestDispatcher = factory ?? throw new ArgumentNullException(nameof(factory));
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseCustomRequestDispatcher(IRequestDispatcher)" />
     public IBotBaseBuilder UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
     {
         if (dispatcher == null)
@@ -257,14 +257,14 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Bot commands"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.NoCommands()" />
     public IBotBaseBuilder NoCommands()
     {
         _botCommandScopes = new List<BotCommandScopeGroup>();
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.DefaultCommands()" />
     public IBotBaseBuilder DefaultCommands()
     {
         _botCommandScopes = CreateStartCommandOnly();
@@ -273,7 +273,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.CustomCommands(Action{List{BotCommandScopeGroup}})" />
     public IBotBaseBuilder CustomCommands(Action<List<BotCommandScopeGroup>> action)
     {
         if (action == null)
@@ -297,46 +297,46 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Serialization"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseSerialization(IStateMachine)" />
     public IBotBaseBuilder UseSerialization(IStateMachine machine)
     {
         _stateMachine = machine ?? throw new ArgumentNullException(nameof(machine));
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseJSON(Type)" />
     public IBotBaseBuilder UseJSON(Type fallbackForm = null)
     {
         return UseJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseJSON(string, Type)" />
     public IBotBaseBuilder UseJSON(string path, Type fallbackForm = null)
     {
         return UseSerialization(new JsonStateMachine(path, fallbackForm));
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseSimpleJSON(Type)" />
     [Obsolete("Use UseJSON instead.")]
     public IBotBaseBuilder UseSimpleJSON(Type fallbackForm = null)
     {
         return UseSimpleJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseSimpleJSON(string, Type)" />
     [Obsolete("Use UseJSON instead.")]
     public IBotBaseBuilder UseSimpleJSON(string path, Type fallbackForm = null)
     {
         return UseSerialization(new SimpleJsonStateMachine(path, fallbackForm));
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseXML(Type)" />
     public IBotBaseBuilder UseXML(Type fallbackForm = null)
     {
         return UseXML(Path.Combine(Directory.GetCurrentDirectory(), "states.xml"), fallbackForm);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseXML(string, Type)" />
     public IBotBaseBuilder UseXML(string path, Type fallbackForm = null)
     {
         return UseSerialization(new XmlStateMachine(path, fallbackForm));
@@ -346,43 +346,43 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Language"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseEnglish()" />
     public IBotBaseBuilder UseEnglish()
     {
         return UseLanguage(new English());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseGerman()" />
     public IBotBaseBuilder UseGerman()
     {
         return UseLanguage(new German());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UsePersian()" />
     public IBotBaseBuilder UsePersian()
     {
         return UseLanguage(new Persian());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseRussian()" />
     public IBotBaseBuilder UseRussian()
     {
         return UseLanguage(new Russian());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseUkrainian()" />
     public IBotBaseBuilder UseUkrainian()
     {
         return UseLanguage(new Ukrainian());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseBelarusian()" />
     public IBotBaseBuilder UseBelarusian()
     {
         return UseLanguage(new Belarusian());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseLanguage(Localization)" />
     public IBotBaseBuilder UseLanguage(Localization language)
     {
         _language = language ?? throw new ArgumentNullException(nameof(language));
@@ -393,7 +393,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Threading"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseThreadPool()" />
     public IBotBaseBuilder UseThreadPool()
     {
         _useThreadPool = true;
@@ -402,7 +402,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.UseThreadPool(int, int)" />
     public IBotBaseBuilder UseThreadPool(int workerThreads, int ioThreads)
     {
         _useThreadPool = true;
@@ -415,13 +415,13 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #region "Session limits"
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithDefaultSessionLimits()" />
     public IBotBaseBuilder WithDefaultSessionLimits()
     {
         return WithSessionLimits(SessionLimits.CreateDefault());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithSessionLimits(Action{SessionLimits})" />
     public IBotBaseBuilder WithSessionLimits(Action<SessionLimits> configure)
     {
         if (configure == null)
@@ -435,7 +435,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
         return WithSessionLimits(limits);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.WithSessionLimits(SessionLimits)" />
     public IBotBaseBuilder WithSessionLimits(SessionLimits limits)
     {
         if (limits == null)
@@ -449,7 +449,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #endregion
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBotBaseBuilder.Build()" />
     public BotBase Build()
     {
         if (_built)
