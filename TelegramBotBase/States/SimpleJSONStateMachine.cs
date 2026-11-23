@@ -12,6 +12,7 @@ namespace TelegramBotBase.States;
 ///     Is used for simple object structures like classes, lists or basic datatypes without generics and other compiler
 ///     based data types.
 /// </summary>
+[Obsolete("Use SimpleJsonStateMachine instead.")]
 public class SimpleJsonStateMachine : IStateMachine
 {
     /// <summary>
