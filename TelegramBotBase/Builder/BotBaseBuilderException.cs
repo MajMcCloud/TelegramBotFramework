@@ -5,7 +5,7 @@ using System.Linq;
 namespace TelegramBotBase.Builder;
 
 /// <summary>
-///     Thrown by <see cref="BotBaseBuilder.Build" /> when the configuration is invalid.
+///     Thrown by <see cref="IBotBaseBuilder.Build" /> when the configuration is invalid.
 ///     <see cref="Errors" /> contains every problem that was found, not only the first one.
 /// </summary>
 public sealed class BotBaseBuilderException : InvalidOperationException

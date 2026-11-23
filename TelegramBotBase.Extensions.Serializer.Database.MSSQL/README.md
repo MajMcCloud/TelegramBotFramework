@@ -8,7 +8,10 @@
 
 ## How to use
 
+`UseSqlDatabase` extends and returns `IBotBaseBuilder`.
+
 ```csharp
+using TelegramBotBase.Builder;
 using TelegramBotBase.Extensions.Serializer.Database.MSSQL;
 
 

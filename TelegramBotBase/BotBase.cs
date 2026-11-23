@@ -79,7 +79,7 @@ public sealed class BotBase
 
     /// <summary>
     ///     Limits for the sessions kept in memory (idle timeout, maximum count). <c>null</c> (default) keeps all sessions
-    ///     forever. Configure it with <c>BotBaseBuilder.WithSessionLimits</c>.
+    ///     forever. Configure it with <c>IBotBaseBuilder.WithSessionLimits</c>.
     /// </summary>
     public SessionLimits SessionLimits { get; internal set; }
     

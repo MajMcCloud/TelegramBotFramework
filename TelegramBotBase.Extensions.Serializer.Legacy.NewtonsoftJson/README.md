@@ -12,7 +12,10 @@
 
 ## How to use
 
+`UseNewtonsoftJson` extends and returns `IBotBaseBuilder`.
+
 ```csharp
+using TelegramBotBase.Builder;
 using TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson;
 
 

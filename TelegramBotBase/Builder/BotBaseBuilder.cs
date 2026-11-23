@@ -15,24 +15,8 @@ using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder;
 
-/// <summary>
-///     Configures and creates a <see cref="BotBase" />.
-///     Only the API key (<see cref="Create" />) and a start form or form factory are required,
-///     every other setting is optional and has a default:
-///     <list type="bullet">
-///         <item>message loop: <see cref="FormBaseMessageLoop" /></item>
-///         <item>networking: direct connection, 60 seconds timeout, pending updates are kept</item>
-///         <item>request dispatcher: <see cref="DefaultRequestDispatcher" /> with default settings</item>
-///         <item>bot commands: only <c>/start</c></item>
-///         <item>serialization: none</item>
-///         <item>language: the current <see cref="Default.Language" />, which is English by default</item>
-///         <item>threading: single thread</item>
-///         <item>session limits: none</item>
-///     </list>
-///     The order of the calls does not matter, if a setting is configured twice the last call wins.
-///     All objects are created in <see cref="Build" />.
-/// </summary>
-public sealed class BotBaseBuilder
+/// <inheritdoc cref="IBotBaseBuilder" />
+public sealed class BotBaseBuilder : IBotBaseBuilder
 {
     private const string StartCommandDescription = "Starts the bot";
 
@@ -71,7 +55,7 @@ public sealed class BotBaseBuilder
     ///     Creates a new builder for a bot with the given API key.
     /// </summary>
     /// <exception cref="ArgumentException">The API key is null or empty.</exception>
-    public static BotBaseBuilder Create(string apiKey)
+    public static IBotBaseBuilder Create(string apiKey)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -83,20 +67,15 @@ public sealed class BotBaseBuilder
 
     #region "Message loop"
 
-    /// <summary>
-    ///     Uses the <see cref="FormBaseMessageLoop" /> with the given external action manager.
-    ///     Without a message loop call the <see cref="FormBaseMessageLoop" /> is used without an external action manager.
-    /// </summary>
-    public BotBaseBuilder DefaultMessageLoop(IExternalActionManager managerInstance)
+    /// <inheritdoc />
+    public IBotBaseBuilder DefaultMessageLoop(IExternalActionManager managerInstance)
     {
         _messageLoop = () => new FormBaseMessageLoop { ExternalActionManager = managerInstance };
         return this;
     }
 
-    /// <summary>
-    ///     Uses a <see cref="MiddlewareBaseMessageLoop" /> configured by the given delegate.
-    /// </summary>
-    public BotBaseBuilder MiddlewareMessageLoop(
+    /// <inheritdoc />
+    public IBotBaseBuilder MiddlewareMessageLoop(
         Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
     {
         if (messageLoopConfiguration == null)
@@ -108,28 +87,22 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Uses the <see cref="MinimalMessageLoop" />, which only handles the load event of forms.
-    /// </summary>
-    public BotBaseBuilder MinimalMessageLoop()
+    /// <inheritdoc />
+    public IBotBaseBuilder MinimalMessageLoop()
     {
         _messageLoop = () => new MinimalMessageLoop();
         return this;
     }
 
-    /// <summary>
-    ///     Uses the <see cref="FullMessageLoop" />, which handles all update types.
-    /// </summary>
-    public BotBaseBuilder FullMessageLoop(IExternalActionManager managerInstance = null)
+    /// <inheritdoc />
+    public IBotBaseBuilder FullMessageLoop(IExternalActionManager managerInstance = null)
     {
         _messageLoop = () => new FullMessageLoop { ExternalActionManager = managerInstance };
         return this;
     }
 
-    /// <summary>
-    ///     Uses the given message loop instance.
-    /// </summary>
-    public BotBaseBuilder CustomMessageLoop(IMessageLoopFactory messageLoop)
+    /// <inheritdoc />
+    public IBotBaseBuilder CustomMessageLoop(IMessageLoopFactory messageLoop)
     {
         if (messageLoop == null)
         {
@@ -140,10 +113,8 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Uses a new instance of the given message loop type.
-    /// </summary>
-    public BotBaseBuilder CustomMessageLoop<T>()
+    /// <inheritdoc />
+    public IBotBaseBuilder CustomMessageLoop<T>()
         where T : class, IMessageLoopFactory, new()
     {
         _messageLoop = () => new T();
@@ -154,10 +125,8 @@ public sealed class BotBaseBuilder
 
     #region "Start form / form factory (required)"
 
-    /// <summary>
-    ///     Uses the given form as start form. It needs a parameterless constructor.
-    /// </summary>
-    public BotBaseBuilder WithStartForm(Type startFormClass)
+    /// <inheritdoc />
+    public IBotBaseBuilder WithStartForm(Type startFormClass)
     {
         if (startFormClass == null)
         {
@@ -168,20 +137,16 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Uses the given form as start form.
-    /// </summary>
-    public BotBaseBuilder WithStartForm<T>()
+    /// <inheritdoc />
+    public IBotBaseBuilder WithStartForm<T>()
         where T : FormBase, new()
     {
         _formFactory = () => new DefaultFormFactory(typeof(T));
         return this;
     }
 
-    /// <summary>
-    ///     Uses the given form as start form and creates all forms via the service provider.
-    /// </summary>
-    public BotBaseBuilder WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+    /// <inheritdoc />
+    public IBotBaseBuilder WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
     {
         if (startFormClass == null)
         {
@@ -197,10 +162,8 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Uses the given form as start form and creates all forms via the service provider.
-    /// </summary>
-    public BotBaseBuilder WithServiceProvider<T>(IServiceProvider serviceProvider)
+    /// <inheritdoc />
+    public IBotBaseBuilder WithServiceProvider<T>(IServiceProvider serviceProvider)
         where T : FormBase
     {
         if (serviceProvider == null)
@@ -212,10 +175,8 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Uses the given form factory to create the start form and all other forms.
-    /// </summary>
-    public BotBaseBuilder WithFormFactory(IFormFactory factory)
+    /// <inheritdoc />
+    public IBotBaseBuilder WithFormFactory(IFormFactory factory)
     {
         if (factory == null)
         {
@@ -230,20 +191,8 @@ public sealed class BotBaseBuilder
 
     #region "Networking"
 
-    /// <summary>
-    ///     Configures proxy, timeout and pending updates. See <see cref="NetworkingOptions" /> for the defaults.
-    /// </summary>
-    /// <example>
-    ///     <code>
-    /// builder.ConfigureNetworking(n =>
-    /// {
-    ///     n.UseProxy("http://127.0.0.1:8080");
-    ///     n.Timeout = TimeSpan.FromSeconds(30);
-    ///     n.DropPendingUpdates = true;
-    /// });
-    /// </code>
-    /// </example>
-    public BotBaseBuilder ConfigureNetworking(Action<NetworkingOptions> configure)
+    /// <inheritdoc />
+    public IBotBaseBuilder ConfigureNetworking(Action<NetworkingOptions> configure)
     {
         if (configure == null)
         {
@@ -258,11 +207,8 @@ public sealed class BotBaseBuilder
 
     #region "Request dispatcher"
 
-    /// <summary>
-    ///     Uses the <see cref="DefaultRequestDispatcher" /> with the given settings.
-    ///     Without this call the default dispatcher with default settings is used.
-    /// </summary>
-    public BotBaseBuilder UseDefaultRequestDispatcher(RequestDispatcherSettings settings)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseDefaultRequestDispatcher(RequestDispatcherSettings settings)
     {
         if (settings == null)
         {
@@ -273,38 +219,30 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Uses the <see cref="FullRequestDispatcher" />.
-    /// </summary>
-    public BotBaseBuilder UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
     {
         settings ??= new RequestDispatcherSettings();
         _requestDispatcher = client => new FullRequestDispatcher(settings, client);
         return this;
     }
 
-    /// <summary>
-    ///     Uses the <see cref="DirectDispatcher" />, which sends every request immediately.
-    /// </summary>
-    public BotBaseBuilder UseDirectDispatcher()
+    /// <inheritdoc />
+    public IBotBaseBuilder UseDirectDispatcher()
     {
         _requestDispatcher = client => new DirectDispatcher(client);
         return this;
     }
 
-    /// <summary>
-    ///     Uses a custom dispatcher. The factory receives the final <see cref="MessageClient" /> of the bot.
-    /// </summary>
-    public BotBaseBuilder UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
     {
         _requestDispatcher = factory ?? throw new ArgumentNullException(nameof(factory));
         return this;
     }
 
-    /// <summary>
-    ///     Uses the given dispatcher instance.
-    /// </summary>
-    public BotBaseBuilder UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
     {
         if (dispatcher == null)
         {
@@ -319,19 +257,15 @@ public sealed class BotBaseBuilder
 
     #region "Bot commands"
 
-    /// <summary>
-    ///     Registers no bot commands. By default only <c>/start</c> is registered.
-    /// </summary>
-    public BotBaseBuilder NoCommands()
+    /// <inheritdoc />
+    public IBotBaseBuilder NoCommands()
     {
         _botCommandScopes = new List<BotCommandScopeGroup>();
         return this;
     }
 
-    /// <summary>
-    ///     Registers <c>/start</c>, <c>/help</c> and <c>/settings</c>.
-    /// </summary>
-    public BotBaseBuilder DefaultCommands()
+    /// <inheritdoc />
+    public IBotBaseBuilder DefaultCommands()
     {
         _botCommandScopes = CreateStartCommandOnly();
         _botCommandScopes.Help("Should show you some help");
@@ -339,11 +273,8 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Replaces the bot commands with the ones added by the delegate. The list passed to it is empty,
-    ///     so add <c>/start</c> again if you need it.
-    /// </summary>
-    public BotBaseBuilder CustomCommands(Action<List<BotCommandScopeGroup>> action)
+    /// <inheritdoc />
+    public IBotBaseBuilder CustomCommands(Action<List<BotCommandScopeGroup>> action)
     {
         if (action == null)
         {
@@ -366,69 +297,47 @@ public sealed class BotBaseBuilder
 
     #region "Serialization"
 
-    /// <summary>
-    ///     Saves and restores the sessions with the given state machine. By default nothing is serialized.
-    /// </summary>
-    public BotBaseBuilder UseSerialization(IStateMachine machine)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseSerialization(IStateMachine machine)
     {
         _stateMachine = machine ?? throw new ArgumentNullException(nameof(machine));
         return this;
     }
 
-    /// <summary>
-    ///     Uses the application runtime path to load and write a states.json file.
-    /// </summary>
-    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">
-    ///     For the legacy version use the UseNewtonsoftJson method of
-    ///     TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson
-    /// </seealso>
-    public BotBaseBuilder UseJSON(Type fallbackForm = null)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseJSON(Type fallbackForm = null)
     {
         return UseJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
     }
 
-    /// <summary>
-    ///     Uses the given path to load and write a states.json file.
-    /// </summary>
-    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">
-    ///     For the legacy version use the UseNewtonsoftJson method of
-    ///     TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson
-    /// </seealso>
-    public BotBaseBuilder UseJSON(string path, Type fallbackForm = null)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseJSON(string path, Type fallbackForm = null)
     {
         return UseSerialization(new JsonStateMachine(path, fallbackForm));
     }
 
-    /// <summary>
-    ///     Uses the application runtime path to load and write a states.json file.
-    /// </summary>
+    /// <inheritdoc />
     [Obsolete("Use UseJSON instead.")]
-    public BotBaseBuilder UseSimpleJSON(Type fallbackForm = null)
+    public IBotBaseBuilder UseSimpleJSON(Type fallbackForm = null)
     {
         return UseSimpleJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
     }
 
-    /// <summary>
-    ///     Uses the given path to load and write a states.json file.
-    /// </summary>
+    /// <inheritdoc />
     [Obsolete("Use UseJSON instead.")]
-    public BotBaseBuilder UseSimpleJSON(string path, Type fallbackForm = null)
+    public IBotBaseBuilder UseSimpleJSON(string path, Type fallbackForm = null)
     {
         return UseSerialization(new SimpleJsonStateMachine(path, fallbackForm));
     }
 
-    /// <summary>
-    ///     Uses the application runtime path to load and write a states.xml file.
-    /// </summary>
-    public BotBaseBuilder UseXML(Type fallbackForm = null)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseXML(Type fallbackForm = null)
     {
         return UseXML(Path.Combine(Directory.GetCurrentDirectory(), "states.xml"), fallbackForm);
     }
 
-    /// <summary>
-    ///     Uses the given path to load and write a states.xml file.
-    /// </summary>
-    public BotBaseBuilder UseXML(string path, Type fallbackForm = null)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseXML(string path, Type fallbackForm = null)
     {
         return UseSerialization(new XmlStateMachine(path, fallbackForm));
     }
@@ -437,59 +346,44 @@ public sealed class BotBaseBuilder
 
     #region "Language"
 
-    /// <summary>
-    ///     Sets <see cref="Default.Language" /> to English when the bot is built.
-    /// </summary>
-    public BotBaseBuilder UseEnglish()
+    /// <inheritdoc />
+    public IBotBaseBuilder UseEnglish()
     {
         return UseLanguage(new English());
     }
 
-    /// <summary>
-    ///     Sets <see cref="Default.Language" /> to German when the bot is built.
-    /// </summary>
-    public BotBaseBuilder UseGerman()
+    /// <inheritdoc />
+    public IBotBaseBuilder UseGerman()
     {
         return UseLanguage(new German());
     }
 
-    /// <summary>
-    ///     Sets <see cref="Default.Language" /> to Persian when the bot is built.
-    /// </summary>
-    public BotBaseBuilder UsePersian()
+    /// <inheritdoc />
+    public IBotBaseBuilder UsePersian()
     {
         return UseLanguage(new Persian());
     }
 
-    /// <summary>
-    ///     Sets <see cref="Default.Language" /> to Russian when the bot is built.
-    /// </summary>
-    public BotBaseBuilder UseRussian()
+    /// <inheritdoc />
+    public IBotBaseBuilder UseRussian()
     {
         return UseLanguage(new Russian());
     }
 
-    /// <summary>
-    ///     Sets <see cref="Default.Language" /> to Ukrainian when the bot is built.
-    /// </summary>
-    public BotBaseBuilder UseUkrainian()
+    /// <inheritdoc />
+    public IBotBaseBuilder UseUkrainian()
     {
         return UseLanguage(new Ukrainian());
     }
 
-    /// <summary>
-    ///     Sets <see cref="Default.Language" /> to Belarusian when the bot is built.
-    /// </summary>
-    public BotBaseBuilder UseBelarusian()
+    /// <inheritdoc />
+    public IBotBaseBuilder UseBelarusian()
     {
         return UseLanguage(new Belarusian());
     }
 
-    /// <summary>
-    ///     Sets <see cref="Default.Language" /> to the given localization when the bot is built.
-    ///     Without a language call the bot uses the current <see cref="Default.Language" />.
-    /// </summary>
-    public BotBaseBuilder UseLanguage(Localization language)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseLanguage(Localization language)
     {
         _language = language ?? throw new ArgumentNullException(nameof(language));
         return this;
@@ -499,10 +393,8 @@ public sealed class BotBaseBuilder
 
     #region "Threading"
 
-    /// <summary>
-    ///     Handles every update on the thread pool instead of a single thread.
-    /// </summary>
-    public BotBaseBuilder UseThreadPool()
+    /// <inheritdoc />
+    public IBotBaseBuilder UseThreadPool()
     {
         _useThreadPool = true;
         _workerThreads = null;
@@ -510,10 +402,8 @@ public sealed class BotBaseBuilder
         return this;
     }
 
-    /// <summary>
-    ///     Handles every update on the thread pool and sets its maximum number of threads on start.
-    /// </summary>
-    public BotBaseBuilder UseThreadPool(int workerThreads, int ioThreads)
+    /// <inheritdoc />
+    public IBotBaseBuilder UseThreadPool(int workerThreads, int ioThreads)
     {
         _useThreadPool = true;
         _workerThreads = workerThreads;
@@ -525,19 +415,14 @@ public sealed class BotBaseBuilder
 
     #region "Session limits"
 
-    /// <summary>
-    ///     Uses the recommended session limits, see <see cref="SessionLimits.CreateDefault" />.
-    ///     By default there are no limits.
-    /// </summary>
-    public BotBaseBuilder WithDefaultSessionLimits()
+    /// <inheritdoc />
+    public IBotBaseBuilder WithDefaultSessionLimits()
     {
         return WithSessionLimits(SessionLimits.CreateDefault());
     }
 
-    /// <summary>
-    ///     Uses session limits configured by the delegate.
-    /// </summary>
-    public BotBaseBuilder WithSessionLimits(Action<SessionLimits> configure)
+    /// <inheritdoc />
+    public IBotBaseBuilder WithSessionLimits(Action<SessionLimits> configure)
     {
         if (configure == null)
         {
@@ -550,10 +435,8 @@ public sealed class BotBaseBuilder
         return WithSessionLimits(limits);
     }
 
-    /// <summary>
-    ///     Uses a copy of the given session limits.
-    /// </summary>
-    public BotBaseBuilder WithSessionLimits(SessionLimits limits)
+    /// <inheritdoc />
+    public IBotBaseBuilder WithSessionLimits(SessionLimits limits)
     {
         if (limits == null)
         {
@@ -566,11 +449,7 @@ public sealed class BotBaseBuilder
 
     #endregion
 
-    /// <summary>
-    ///     Validates the configuration and creates the bot. A builder can only build one bot.
-    /// </summary>
-    /// <exception cref="BotBaseBuilderException">The configuration is invalid.</exception>
-    /// <exception cref="InvalidOperationException">The builder has already built a bot.</exception>
+    /// <inheritdoc />
     public BotBase Build()
     {
         if (_built)

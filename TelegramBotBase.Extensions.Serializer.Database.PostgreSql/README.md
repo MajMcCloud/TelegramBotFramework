@@ -8,7 +8,10 @@
 
 ## How to use
 
+`UsePostgreSqlDatabase` extends and returns `IBotBaseBuilder`.
+
 ```csharp
+using TelegramBotBase.Builder;
 using TelegramBotBase.Extensions.Serializer.Database.PostgreSql;
 
 

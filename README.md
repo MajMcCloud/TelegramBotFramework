@@ -227,9 +227,10 @@ await this.NavigateTo(form);
 
 ## Builder
 
-`BotBaseBuilder.Create(apiKey)` returns a builder. Only the API key and a start form (or form factory) are required,
-every other setting is optional. All methods return the builder, so they can be chained in any order. If a setting
-is configured twice, the last call wins. `Build()` validates the configuration and creates the bot.
+`BotBaseBuilder.Create(apiKey)` returns an `IBotBaseBuilder` from the `TelegramBotBase.Builder` namespace.
+The API key and a start form or form factory are required. Every other setting is optional. Configuration methods
+return the same `IBotBaseBuilder`, so they can be chained in any order. If a setting is configured twice, the
+last call wins. `Build()` validates the configuration and returns a `BotBase`.
 
 ```csharp
 var bot = BotBaseBuilder.Create("{YOUR API KEY}")
@@ -251,7 +252,7 @@ var bot = BotBaseBuilder.Create("{YOUR API KEY}")
 The builder can also be used step by step, like the ASP.NET Core builders:
 
 ```csharp
-var builder = BotBaseBuilder.Create("{YOUR API KEY}");
+IBotBaseBuilder builder = BotBaseBuilder.Create("{YOUR API KEY}");
 builder.WithStartForm<StartForm>();
 
 if (useThreadPool)
@@ -297,8 +298,8 @@ The bot configuration is invalid:
 
 ### Migrating from the stage builder
 
-The stage interfaces (`IAPIKeySelectionStage`, ..., `IBuildingStage`) and `QuickStart` were removed. Every method
-returns `BotBaseBuilder`, so the calls can be in any order. Calls that only selected a default are not needed:
+The stage interfaces (`IAPIKeySelectionStage`, ..., `IBuildingStage`) and `QuickStart` were removed.
+Configuration methods return `IBotBaseBuilder` and can be called in any order. Use the table to update existing calls.
 
 | Before                                                                  | Now                                                                                    |
 |-------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
@@ -329,7 +330,7 @@ returns `BotBaseBuilder`, so the calls can be in any order. Calls that only sele
 | `.CustomCommands(a => ...)`                                             | unchanged, the list passed to the delegate is empty                                    |
 | `.NoSerialization()`                                                    | remove                                                                                 |
 | `.UseSerialization(...)`, `.UseJSON(...)`, `.UseSimpleJSON(...)`, `.UseXML(...)` | unchanged                                                                     |
-| `.UseSqlDatabase(...)`, `.UsePostgreSqlDatabase(...)`, `.UseNewtonsoftJson(...)` | unchanged, they extend and return `BotBaseBuilder`                            |
+| `.UseSqlDatabase(...)`, `.UsePostgreSqlDatabase(...)`, `.UseNewtonsoftJson(...)` | same calls, now extend and return `IBotBaseBuilder`                           |
 | `.DefaultLanguage()`                                                    | remove                                                                                 |
 | `.UseEnglish()`, `.UseGerman()`, `.UsePersian()`, `.UseRussian()`, `.UseUkrainian()`, `.UseBelarusian()` | unchanged, the language is set in `Build()`           |
 | `.Custom(localization)`                                                 | `.UseLanguage(localization)`                                                           |
@@ -341,8 +342,8 @@ returns `BotBaseBuilder`, so the calls can be in any order. Calls that only sele
 
 Other changes to check:
 
-- Code that uses the stage interfaces as types (variables, return types, own extension methods like
-  `this ISessionSerializationStage builder`) has to use `BotBaseBuilder` instead.
+- Use `IBotBaseBuilder` for variables and return types previously typed as a stage interface or `BotBaseBuilder`.
+  Declare custom fluent extensions with a `this IBotBaseBuilder builder` parameter and an `IBotBaseBuilder` return type.
 - `Default.Language` is set when `Build()` is called, not when `UseGerman()` and the other language methods are called.
 - `null` arguments throw an `ArgumentNullException` right away, for example `CustomCommands(null)`,
   `UseSerialization(null)` and `WithStartForm((Type)null)`.

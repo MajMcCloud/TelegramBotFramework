@@ -25,9 +25,10 @@ public class BuilderTests
     [Fact]
     public void Build_WithOnlyStartForm_UsesDefaults()
     {
-        var bot = BotBaseBuilder.Create(Token)
-                                .WithStartForm<TrackingForm>()
-                                .Build();
+        IBotBaseBuilder builder = BotBaseBuilder.Create(Token);
+        Assert.Same(builder, builder.WithStartForm<TrackingForm>());
+
+        var bot = builder.Build();
 
         Assert.Equal(Token, bot.ApiKey);
         Assert.IsType<MessageClient>(bot.Client);
@@ -310,13 +311,13 @@ public class BuilderTests
 
 internal static class BuilderTestExtensions
 {
-    public static BotBaseBuilder UseSqlServerForTest(this BotBaseBuilder builder)
+    public static IBotBaseBuilder UseSqlServerForTest(this IBotBaseBuilder builder)
     {
         return Extensions.Serializer.Database.MSSQL.BotBaseBuilderExtensions.UseSqlDatabase(
             builder, "Server=localhost;Database=tbb;User Id=sa;Password=x;");
     }
 
-    public static BotBaseBuilder UsePostgresForTest(this BotBaseBuilder builder)
+    public static IBotBaseBuilder UsePostgresForTest(this IBotBaseBuilder builder)
     {
         return Extensions.Serializer.Database.PostgreSql.BotBaseBuilderExtensions.UsePostgreSqlDatabase(
             builder, "Host=localhost;Database=tbb;Username=x;Password=x");

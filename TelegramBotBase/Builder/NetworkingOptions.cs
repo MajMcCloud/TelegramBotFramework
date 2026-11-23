@@ -8,7 +8,7 @@ using TelegramBotBase.Base;
 namespace TelegramBotBase.Builder;
 
 /// <summary>
-///     Network settings of the bot, configured via <see cref="BotBaseBuilder.ConfigureNetworking" />.
+///     Network settings of the bot, configured via <see cref="IBotBaseBuilder.ConfigureNetworking" />.
 ///     Without any configuration the bot connects directly (no proxy) with a timeout of 60 seconds
 ///     and keeps pending updates.
 /// </summary>
