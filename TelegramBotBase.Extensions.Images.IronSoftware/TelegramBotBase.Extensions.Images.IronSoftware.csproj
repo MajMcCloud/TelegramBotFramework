@@ -19,11 +19,14 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="TelegramBotBase" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Properties\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
     </ItemGroup>
 
 </Project>

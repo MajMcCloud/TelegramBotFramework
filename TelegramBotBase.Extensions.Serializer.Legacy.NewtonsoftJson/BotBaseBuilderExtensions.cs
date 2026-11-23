@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using TelegramBotBase.Builder;
-using TelegramBotBase.Builder.Interfaces;
 
 namespace TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson
 {
@@ -12,30 +11,27 @@ namespace TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson
         ///     Using the complex version of .Net JSON, which can serialize all objects.
         ///     Saves in application directory.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="builder">The bot builder.</param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseNewtonsoftJson(this ISessionSerializationStage builder)
+        public static IBotBaseBuilder UseNewtonsoftJson(this IBotBaseBuilder builder)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
             
-            builder.UseNewtonsoftJson(path);
-
-            return builder as BotBaseBuilder;
+            return builder.UseNewtonsoftJson(path);
         }
 
         /// <summary>
         ///     Using the complex version of .Net JSON, which can serialize all objects.
         ///     Saves in application directory.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="builder">The bot builder.</param>
+        /// <param name="path">The path to the session state file.</param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseNewtonsoftJson(this ISessionSerializationStage builder, String path)
+        public static IBotBaseBuilder UseNewtonsoftJson(this IBotBaseBuilder builder, String path)
         {
             var _stateMachine = new NewtonsoftJsonStateMachine(path);
 
-            builder.UseSerialization(_stateMachine);
-
-            return builder as BotBaseBuilder;
+            return builder.UseSerialization(_stateMachine);
         }
     }
 }

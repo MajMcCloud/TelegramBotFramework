@@ -37,21 +37,16 @@ After adding the actions, you need to call the `HandleUpdate` method, passing th
 
 //Add it into your bot startup routine
 
-var bot = BotBaseBuilder
-                 .Create()
-                 .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
+var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ??
                              throw new Exception("API_KEY is not set"))
                  .DefaultMessageLoop(eam)
                  .WithStartForm<Start>()
-                 .NoProxy()
                  .CustomCommands(a =>
                  {
                      a.Start("Starts the bot");
                  })
-                 .NoSerialization()
                  .UseEnglish()
                  .UseThreadPool()
-                 .NoSessionLimits()
                  .Build();
 
 

@@ -8,22 +8,17 @@
 
 ## How to use
 
+`UseSqlDatabase` extends and returns `IBotBaseBuilder`.
+
 ```csharp
+using TelegramBotBase.Builder;
 using TelegramBotBase.Extensions.Serializer.Database.MSSQL;
 
 
-var bot = BotBaseBuilder
-            .Create()
-            .WithAPIKey(APIKey)
-            .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create(APIKey)
             .WithStartForm<Start>()
-            .NoProxy()
-            .UseDefaultRequestDispatcher()
-            .OnlyStart()
             .UseSqlDatabase("localhost", "telegram_bot")
             .UseEnglish()
-            .UseSingleThread()
-            .NoSessionLimits()
             .Build();
 
 bot.Start();
@@ -35,17 +30,10 @@ The serializer implements `IDeviceStateMachine`. Together with session limits, s
 but per device on its first update, and evicted sessions are saved one by one:
 
 ```csharp
-var bot = BotBaseBuilder
-            .Create()
-            .WithAPIKey(APIKey)
-            .DefaultMessageLoop()
+var bot = BotBaseBuilder.Create(APIKey)
             .WithStartForm<Start>()
-            .NoProxy()
-            .UseDefaultRequestDispatcher()
-            .OnlyStart()
             .UseSqlDatabase("localhost", "telegram_bot")
             .UseEnglish()
-            .UseSingleThread()
             .WithSessionLimits(l => l.IdleTimeout = TimeSpan.FromMinutes(30))
             .Build();
 ```

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 using TelegramBotBase.Base;
-using TelegramBotBase.Builder.Interfaces;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Factories;
 using TelegramBotBase.Form;
@@ -19,591 +15,414 @@ using TelegramBotBase.States;
 
 namespace TelegramBotBase.Builder;
 
-public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage, IStartFormSelectionStage, IBotCommandsStage,
-                              IBuildingStage, INetworkingSelectionStage, ISessionSerializationStage,
-                              ILanguageSelectionStage, IThreadingStage, IRequestDispatcherSelectionStage,
-                              ISessionLimitsStage
+/// <inheritdoc cref="IBotBaseBuilder" />
+public sealed class BotBaseBuilder : IBotBaseBuilder
 {
-    private string _apiKey;
+    private const string StartCommandDescription = "Starts the bot";
 
-    private MessageClient _client;
+    private readonly string _apiKey;
 
-    private IFormFactory _factory;
+    private readonly NetworkingOptions _networking = new();
 
-    private IMessageLoopFactory _messageLoopFactory;
+    private List<BotCommandScopeGroup> _botCommandScopes = CreateStartCommandOnly();
+
+    private Func<IMessageLoopFactory> _messageLoop;
+
+    private Func<IFormFactory> _formFactory;
+
+    private Func<MessageClient, IRequestDispatcher> _requestDispatcher;
 
     private IStateMachine _stateMachine;
 
-    private IRequestDispatcher _requestDispatcher;
+    private Localization _language;
+
+    private bool _useThreadPool;
+
+    private int? _workerThreads;
+
+    private int? _ioThreads;
 
     private SessionLimits _sessionLimits;
 
-    private BotBaseBuilder()
-    {
+    private bool _built;
 
+    private BotBaseBuilder(string apiKey)
+    {
+        _apiKey = apiKey;
     }
 
     /// <summary>
-    ///     Contains different Botcommands for different areas.
+    ///     Creates a new builder for a bot with the given API key.
     /// </summary>
-    private List<BotCommandScopeGroup> BotCommandScopes { get; } = new();
-
-    /// <summary>
-    /// Creates a full BotBase instance with all parameters previously set.
-    /// </summary>
-    /// <returns></returns>
-    public BotBase Build()
+    /// <exception cref="ArgumentException">The API key is null or empty.</exception>
+    public static IBotBaseBuilder Create(string apiKey)
     {
-        CompleteSkippedStagesWithDefaultValues();
-
-        var bot = new BotBase(_apiKey, _client)
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
-            FormFactory = _factory,
-            BotCommandScopes = BotCommandScopes,
-            StateMachine = _stateMachine,
-            MessageLoopFactory = _messageLoopFactory,
-            RequestDispatcher = _requestDispatcher,
-            SessionLimits = _sessionLimits
-        };
-
-        return bot;
-    }
-
-    private void CompleteSkippedStagesWithDefaultValues()
-    {
-        if (_requestDispatcher is null)
-        {
-            UseDefaultRequestDispatcher();
+            throw new ArgumentException("The API key must not be empty.", nameof(apiKey));
         }
+
+        return new BotBaseBuilder(apiKey);
     }
 
-    public static IAPIKeySelectionStage Create()
-    {
-        return new BotBaseBuilder();
-    }
+    #region "Message loop"
 
-    #region "Step 1 (Basic Stuff)"
-
-    public IMessageLoopSelectionStage WithAPIKey(string apiKey)
+    /// <inheritdoc cref="IBotBaseBuilder.DefaultMessageLoop(IExternalActionManager)" />
+    public IBotBaseBuilder DefaultMessageLoop(IExternalActionManager managerInstance)
     {
-        _apiKey = apiKey;
+        _messageLoop = () => new FormBaseMessageLoop { ExternalActionManager = managerInstance };
         return this;
     }
 
-
-    public IBuildingStage QuickStart(string apiKey, Type startForm, bool throwPendingUpdates = false)
+    /// <inheritdoc cref="IBotBaseBuilder.MiddlewareMessageLoop(Func{MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop})" />
+    public IBotBaseBuilder MiddlewareMessageLoop(
+        Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
     {
-        _apiKey = apiKey;
-        _factory = new DefaultFormFactory(startForm);
+        if (messageLoopConfiguration == null)
+        {
+            throw new ArgumentNullException(nameof(messageLoopConfiguration));
+        }
 
-        DefaultMessageLoop();
-
-        UseDefaultRequestDispatcher();
-
-        NoProxy(throwPendingUpdates);
-
-        OnlyStart();
-
-        NoSerialization();
-
-        DefaultLanguage();
-
-        UseSingleThread();
-
-        NoSessionLimits();
-
+        _messageLoop = () => messageLoopConfiguration(new MiddlewareBaseMessageLoop());
         return this;
     }
 
-
-    public IBuildingStage QuickStart<T>(string apiKey, bool throwPendingUpdates = false)
-        where T : FormBase
+    /// <inheritdoc cref="IBotBaseBuilder.MinimalMessageLoop()" />
+    public IBotBaseBuilder MinimalMessageLoop()
     {
-        _apiKey = apiKey;
-        _factory = new DefaultFormFactory(typeof(T));
-
-        DefaultMessageLoop();
-
-        UseDefaultRequestDispatcher();
-
-        NoProxy(throwPendingUpdates);
-
-        OnlyStart();
-
-        NoSerialization();
-
-        DefaultLanguage();
-
-        UseSingleThread();
-
-        NoSessionLimits();
-
+        _messageLoop = () => new MinimalMessageLoop();
         return this;
     }
 
-    public IBuildingStage QuickStart(string apiKey, IFormFactory formFactory, bool throwPendingUpdates = false)
+    /// <inheritdoc cref="IBotBaseBuilder.FullMessageLoop(IExternalActionManager)" />
+    public IBotBaseBuilder FullMessageLoop(IExternalActionManager managerInstance = null)
     {
-        _apiKey = apiKey;
-        _factory = formFactory;
+        _messageLoop = () => new FullMessageLoop { ExternalActionManager = managerInstance };
+        return this;
+    }
 
-        DefaultMessageLoop();
+    /// <inheritdoc cref="IBotBaseBuilder.CustomMessageLoop(IMessageLoopFactory)" />
+    public IBotBaseBuilder CustomMessageLoop(IMessageLoopFactory messageLoop)
+    {
+        if (messageLoop == null)
+        {
+            throw new ArgumentNullException(nameof(messageLoop));
+        }
 
-        UseDefaultRequestDispatcher();
+        _messageLoop = () => messageLoop;
+        return this;
+    }
 
-        NoProxy(throwPendingUpdates);
-
-        OnlyStart();
-
-        NoSerialization();
-
-        DefaultLanguage();
-
-        UseSingleThread();
-
-        NoSessionLimits();
-
+    /// <inheritdoc cref="IBotBaseBuilder.CustomMessageLoop{T}()" />
+    public IBotBaseBuilder CustomMessageLoop<T>()
+        where T : class, IMessageLoopFactory, new()
+    {
+        _messageLoop = () => new T();
         return this;
     }
 
     #endregion
 
+    #region "Start form / form factory (required)"
 
-    #region "Step 2 (Message Loop)"
-
-    public IStartFormSelectionStage DefaultMessageLoop(IExternalActionManager managerInstance = null)
+    /// <inheritdoc cref="IBotBaseBuilder.WithStartForm(Type)" />
+    public IBotBaseBuilder WithStartForm(Type startFormClass)
     {
-        var loop = new FormBaseMessageLoop();
+        if (startFormClass == null)
+        {
+            throw new ArgumentNullException(nameof(startFormClass));
+        }
 
-        loop.ExternalActionManager = managerInstance;
-
-        _messageLoopFactory = loop;
-
+        _formFactory = () => new DefaultFormFactory(startFormClass);
         return this;
     }
 
-    public IStartFormSelectionStage MiddlewareMessageLoop(Func<MiddlewareBaseMessageLoop, MiddlewareBaseMessageLoop> messageLoopConfiguration)
-    {
-        _messageLoopFactory = messageLoopConfiguration(new MiddlewareBaseMessageLoop());
-
-        return this;
-    }
-
-    public IStartFormSelectionStage MinimalMessageLoop()
-    {
-        _messageLoopFactory = new MinimalMessageLoop();
-
-        return this;
-    }
-
-
-    public IStartFormSelectionStage FullMessageLoop(IExternalActionManager managerInstance = null)
-    {
-        var loop = new FullMessageLoop();
-
-        loop.ExternalActionManager = managerInstance;
-
-        _messageLoopFactory = loop;
-
-        return this;
-    }
-
-
-    public IStartFormSelectionStage CustomMessageLoop(IMessageLoopFactory messageLoopClass)
-    {
-        _messageLoopFactory = messageLoopClass;
-
-        return this;
-    }
-
-    public IStartFormSelectionStage CustomMessageLoop<T>()
-        where T : class, new()
-    {
-        _messageLoopFactory =
-            typeof(T).GetConstructor(new Type[] { })?.Invoke(new object[] { }) as IMessageLoopFactory;
-
-        return this;
-    }
-
-    #endregion
-
-
-    #region "Step 3 (Start Form/Factory)"
-
-    public INetworkingSelectionStage WithStartForm(Type startFormClass)
-    {
-        _factory = new DefaultFormFactory(startFormClass);
-        return this;
-    }
-
-    public INetworkingSelectionStage WithStartForm<T>()
+    /// <inheritdoc cref="IBotBaseBuilder.WithStartForm{T}()" />
+    public IBotBaseBuilder WithStartForm<T>()
         where T : FormBase, new()
     {
-        _factory = new DefaultFormFactory(typeof(T));
+        _formFactory = () => new DefaultFormFactory(typeof(T));
         return this;
     }
 
-    public INetworkingSelectionStage WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
+    /// <inheritdoc cref="IBotBaseBuilder.WithServiceProvider(Type, IServiceProvider)" />
+    public IBotBaseBuilder WithServiceProvider(Type startFormClass, IServiceProvider serviceProvider)
     {
-        _factory = new ServiceProviderFormFactory(startFormClass, serviceProvider);
+        if (startFormClass == null)
+        {
+            throw new ArgumentNullException(nameof(startFormClass));
+        }
+
+        if (serviceProvider == null)
+        {
+            throw new ArgumentNullException(nameof(serviceProvider));
+        }
+
+        _formFactory = () => new ServiceProviderFormFactory(startFormClass, serviceProvider);
         return this;
     }
 
-    public INetworkingSelectionStage WithServiceProvider<T>(IServiceProvider serviceProvider)
+    /// <inheritdoc cref="IBotBaseBuilder.WithServiceProvider{T}(IServiceProvider)" />
+    public IBotBaseBuilder WithServiceProvider<T>(IServiceProvider serviceProvider)
         where T : FormBase
     {
-        _factory = new ServiceProviderFormFactory<T>(serviceProvider);
+        if (serviceProvider == null)
+        {
+            throw new ArgumentNullException(nameof(serviceProvider));
+        }
+
+        _formFactory = () => new ServiceProviderFormFactory<T>(serviceProvider);
         return this;
     }
 
-    public INetworkingSelectionStage WithFormFactory(IFormFactory factory)
+    /// <inheritdoc cref="IBotBaseBuilder.WithFormFactory(IFormFactory)" />
+    public IBotBaseBuilder WithFormFactory(IFormFactory factory)
     {
-        _factory = factory;
+        if (factory == null)
+        {
+            throw new ArgumentNullException(nameof(factory));
+        }
+
+        _formFactory = () => factory;
         return this;
     }
 
     #endregion
 
+    #region "Networking"
 
-    #region "Step 4 (Network Settings)"
-
-    public IRequestDispatcherSelectionStage WithProxy(string proxyAddress, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
+    /// <inheritdoc cref="IBotBaseBuilder.ConfigureNetworking(Action{NetworkingOptions})" />
+    public IBotBaseBuilder ConfigureNetworking(Action<NetworkingOptions> configure)
     {
-        var url = new Uri(proxyAddress);
-        _client = new MessageClient(_apiKey, url)
+        if (configure == null)
         {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)
-            },
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
+            throw new ArgumentNullException(nameof(configure));
+        }
 
-
-    public IRequestDispatcherSelectionStage NoProxy(bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
-
-
-    public IRequestDispatcherSelectionStage WithBotClient(TelegramBotClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey, tgclient)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
-
-
-    public IRequestDispatcherSelectionStage WithHostAndPort(string proxyHost, int proxyPort, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey, proxyHost, proxyPort)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
-        return this;
-    }
-
-    public IRequestDispatcherSelectionStage WithHttpClient(HttpClient tgclient, bool throwPendingUpdates = false, int timeoutInSeconds = 60)
-    {
-        _client = new MessageClient(_apiKey, tgclient)
-        {
-            TelegramClient =
-            {
-                Timeout = TimeSpan.FromSeconds(timeoutInSeconds)// new TimeSpan(0, 1, 0)
-            }
-        };
-        _client.DropPendingUpdates = throwPendingUpdates;
+        configure(_networking);
         return this;
     }
 
     #endregion
 
-    #region "Step 5 (Request Dispatcher)"
+    #region "Request dispatcher"
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseDefaultRequestDispatcher(RequestDispatcherSettings settings = null)
+    /// <inheritdoc cref="IBotBaseBuilder.UseDefaultRequestDispatcher(RequestDispatcherSettings)" />
+    public IBotBaseBuilder UseDefaultRequestDispatcher(RequestDispatcherSettings settings)
+    {
+        if (settings == null)
+        {
+            throw new ArgumentNullException(nameof(settings));
+        }
+
+        _requestDispatcher = client => new DefaultRequestDispatcher(settings, client);
+        return this;
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseFullRequestDispatcher(RequestDispatcherSettings)" />
+    public IBotBaseBuilder UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
     {
         settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new DefaultRequestDispatcher(settings, _client);
+        _requestDispatcher = client => new FullRequestDispatcher(settings, client);
         return this;
     }
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseFullRequestDispatcher(RequestDispatcherSettings settings = null)
+    /// <inheritdoc cref="IBotBaseBuilder.UseDirectDispatcher()" />
+    public IBotBaseBuilder UseDirectDispatcher()
     {
-        settings ??= new RequestDispatcherSettings();
-        _requestDispatcher = new FullRequestDispatcher(settings, _client);
+        _requestDispatcher = client => new DirectDispatcher(client);
         return this;
     }
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
+    /// <inheritdoc cref="IBotBaseBuilder.UseCustomRequestDispatcher(Func{MessageClient, IRequestDispatcher})" />
+    public IBotBaseBuilder UseCustomRequestDispatcher(Func<MessageClient, IRequestDispatcher> factory)
     {
-        _requestDispatcher = factory(_client);
+        _requestDispatcher = factory ?? throw new ArgumentNullException(nameof(factory));
         return this;
     }
 
-    /// <inheritdoc />
-    public IBotCommandsStage UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
+    /// <inheritdoc cref="IBotBaseBuilder.UseCustomRequestDispatcher(IRequestDispatcher)" />
+    public IBotBaseBuilder UseCustomRequestDispatcher(IRequestDispatcher dispatcher)
     {
-        _requestDispatcher = dispatcher;
-        return this;
-    }
+        if (dispatcher == null)
+        {
+            throw new ArgumentNullException(nameof(dispatcher));
+        }
 
-    public IBotCommandsStage UseDirectDispatcher()
-    {
-        _requestDispatcher = new DirectDispatcher(_client);
+        _requestDispatcher = _ => dispatcher;
         return this;
     }
 
     #endregion
 
-    #region "Step 6 (Bot Commands)"
+    #region "Bot commands"
 
-    public ISessionSerializationStage NoCommands()
+    /// <inheritdoc cref="IBotBaseBuilder.NoCommands()" />
+    public IBotBaseBuilder NoCommands()
     {
+        _botCommandScopes = new List<BotCommandScopeGroup>();
         return this;
     }
 
-    public ISessionSerializationStage OnlyStart()
+    /// <inheritdoc cref="IBotBaseBuilder.DefaultCommands()" />
+    public IBotBaseBuilder DefaultCommands()
     {
-        BotCommandScopes.Start("Starts the bot");
-
+        _botCommandScopes = CreateStartCommandOnly();
+        _botCommandScopes.Help("Should show you some help");
+        _botCommandScopes.Settings("Should show you some settings");
         return this;
     }
 
-    public ISessionSerializationStage DefaultCommands()
+    /// <inheritdoc cref="IBotBaseBuilder.CustomCommands(Action{List{BotCommandScopeGroup}})" />
+    public IBotBaseBuilder CustomCommands(Action<List<BotCommandScopeGroup>> action)
     {
-        BotCommandScopes.Start("Starts the bot");
-        BotCommandScopes.Help("Should show you some help");
-        BotCommandScopes.Settings("Should show you some settings");
+        if (action == null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        _botCommandScopes = new List<BotCommandScopeGroup>();
+        action(_botCommandScopes);
         return this;
     }
 
-    public ISessionSerializationStage CustomCommands(Action<List<BotCommandScopeGroup>> action)
+    private static List<BotCommandScopeGroup> CreateStartCommandOnly()
     {
-        action?.Invoke(BotCommandScopes);
+        var scopes = new List<BotCommandScopeGroup>();
+        scopes.Start(StartCommandDescription);
+        return scopes;
+    }
+
+    #endregion
+
+    #region "Serialization"
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseSerialization(IStateMachine)" />
+    public IBotBaseBuilder UseSerialization(IStateMachine machine)
+    {
+        _stateMachine = machine ?? throw new ArgumentNullException(nameof(machine));
+        return this;
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseJSON(Type)" />
+    public IBotBaseBuilder UseJSON(Type fallbackForm = null)
+    {
+        return UseJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseJSON(string, Type)" />
+    public IBotBaseBuilder UseJSON(string path, Type fallbackForm = null)
+    {
+        return UseSerialization(new JsonStateMachine(path, fallbackForm));
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseSimpleJSON(Type)" />
+    [Obsolete("Use UseJSON instead.")]
+    public IBotBaseBuilder UseSimpleJSON(Type fallbackForm = null)
+    {
+        return UseSimpleJSON(Path.Combine(Directory.GetCurrentDirectory(), "states.json"), fallbackForm);
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseSimpleJSON(string, Type)" />
+    [Obsolete("Use UseJSON instead.")]
+    public IBotBaseBuilder UseSimpleJSON(string path, Type fallbackForm = null)
+    {
+        return UseSerialization(new SimpleJsonStateMachine(path, fallbackForm));
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseXML(Type)" />
+    public IBotBaseBuilder UseXML(Type fallbackForm = null)
+    {
+        return UseXML(Path.Combine(Directory.GetCurrentDirectory(), "states.xml"), fallbackForm);
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseXML(string, Type)" />
+    public IBotBaseBuilder UseXML(string path, Type fallbackForm = null)
+    {
+        return UseSerialization(new XmlStateMachine(path, fallbackForm));
+    }
+
+    #endregion
+
+    #region "Language"
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseEnglish()" />
+    public IBotBaseBuilder UseEnglish()
+    {
+        return UseLanguage(new English());
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseGerman()" />
+    public IBotBaseBuilder UseGerman()
+    {
+        return UseLanguage(new German());
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UsePersian()" />
+    public IBotBaseBuilder UsePersian()
+    {
+        return UseLanguage(new Persian());
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseRussian()" />
+    public IBotBaseBuilder UseRussian()
+    {
+        return UseLanguage(new Russian());
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseUkrainian()" />
+    public IBotBaseBuilder UseUkrainian()
+    {
+        return UseLanguage(new Ukrainian());
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseBelarusian()" />
+    public IBotBaseBuilder UseBelarusian()
+    {
+        return UseLanguage(new Belarusian());
+    }
+
+    /// <inheritdoc cref="IBotBaseBuilder.UseLanguage(Localization)" />
+    public IBotBaseBuilder UseLanguage(Localization language)
+    {
+        _language = language ?? throw new ArgumentNullException(nameof(language));
         return this;
     }
 
     #endregion
 
+    #region "Threading"
 
-    #region "Step 7 (Serialization)"
-
-    public ILanguageSelectionStage NoSerialization()
+    /// <inheritdoc cref="IBotBaseBuilder.UseThreadPool()" />
+    public IBotBaseBuilder UseThreadPool()
     {
+        _useThreadPool = true;
+        _workerThreads = null;
+        _ioThreads = null;
         return this;
     }
 
-    public ILanguageSelectionStage UseSerialization(IStateMachine machine)
+    /// <inheritdoc cref="IBotBaseBuilder.UseThreadPool(int, int)" />
+    public IBotBaseBuilder UseThreadPool(int workerThreads, int ioThreads)
     {
-        _stateMachine = machine;
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the application runtime path to load and write a states.json file.
-    /// </summary>
-    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseJSON(Type fallbackForm = null)
-    {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
-        _stateMachine = new JsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the given path to load and write a states.json file.
-    /// </summary>
-    /// <seealso href="https://www.nuget.org/packages/TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson/">For the legacy version use the UseNewtonsoftJson method of TelegramBotBase.Extensions.Serializer.Legacy.NewtonsoftJson</seealso>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseJSON(string path, Type fallbackForm = null)
-    {
-        _stateMachine = new JsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the application runtime path to load and write a states.json file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseSimpleJSON(Type fallbackForm = null)
-    {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.json");
-        _stateMachine = new SimpleJsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the given path to load and write a states.json file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseSimpleJSON(string path, Type fallbackForm = null)
-    {
-        _stateMachine = new SimpleJsonStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the application runtime path to load and write a states.xml file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseXML(Type fallbackForm = null)
-    {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "states.xml");
-        _stateMachine = new XmlStateMachine(path, fallbackForm);
-        return this;
-    }
-
-    /// <summary>
-    /// Uses the given path to load and write a states.xml file.
-    /// </summary>
-    /// <returns></returns>
-    public ILanguageSelectionStage UseXML(string path, Type fallbackForm = null)
-    {
-        _stateMachine = new XmlStateMachine(path, fallbackForm);
+        _useThreadPool = true;
+        _workerThreads = workerThreads;
+        _ioThreads = ioThreads;
         return this;
     }
 
     #endregion
 
+    #region "Session limits"
 
-    #region "Step 8 (Language)"
-
-    /// <inheritdoc cref="ILanguageSelectionStage.DefaultLanguage"/>
-    public IThreadingStage DefaultLanguage()
-    {
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseEnglish"/>
-    public IThreadingStage UseEnglish()
-    {
-        Default.Language = new English();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseGerman"/>
-    public IThreadingStage UseGerman()
-    {
-        Default.Language = new German();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UsePersian"/>
-    public IThreadingStage UsePersian()
-    {
-        Default.Language = new Persian();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseRussian"/>
-    public IThreadingStage UseRussian()
-    {
-        Default.Language = new Russian();
-        return this;
-
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseUkrainian"/>
-    public IThreadingStage UseUkrainian()
-    {
-        Default.Language = new Ukrainian();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.UseBelarusian"/>
-    public IThreadingStage UseBelarusian()
-    {
-        Default.Language = new Belarusian();
-        return this;
-    }
-
-    /// <inheritdoc cref="ILanguageSelectionStage.Custom"/>
-    public IThreadingStage Custom(Localization language)
-    {
-        Default.Language = language;
-        return this;
-    }
-
-
-    #endregion
-
-
-    #region "Step 9 (Threading)"
-
-    public ISessionLimitsStage UseSingleThread()
-    {
-        _client.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
-
-        return this;
-    }
-
-    public ISessionLimitsStage UseThreadPool()
-    {
-        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
-
-        c.DropPendingUpdates = _client.DropPendingUpdates;
-        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
-
-        _client = c;
-
-        return this;
-    }
-
-
-    public ISessionLimitsStage UseThreadPool(int workerThreads, int ioThreads)
-    {
-        var c = new ThreadPoolMessageClient(_apiKey, (TelegramBotClient)_client.TelegramClient);
-
-        c.ThreadPool_WorkerThreads = workerThreads;
-        c.ThreadPool_IOThreads = ioThreads;
-
-        c.DropPendingUpdates = _client.DropPendingUpdates;
-        c.AllowedUpdates = this._messageLoopFactory.ConfigureUpdateTypes();
-
-        _client = c;
-
-        return this;
-    }
-
-    #endregion
-
-    #region "Step 10 (Session limits)"
-
-    public IBuildingStage NoSessionLimits()
-    {
-        _sessionLimits = null;
-        return this;
-    }
-
-    public IBuildingStage WithDefaultSessionLimits()
+    /// <inheritdoc cref="IBotBaseBuilder.WithDefaultSessionLimits()" />
+    public IBotBaseBuilder WithDefaultSessionLimits()
     {
         return WithSessionLimits(SessionLimits.CreateDefault());
     }
 
-    public IBuildingStage WithSessionLimits(Action<SessionLimits> configure)
+    /// <inheritdoc cref="IBotBaseBuilder.WithSessionLimits(Action{SessionLimits})" />
+    public IBotBaseBuilder WithSessionLimits(Action<SessionLimits> configure)
     {
         if (configure == null)
         {
@@ -616,18 +435,127 @@ public class BotBaseBuilder : IAPIKeySelectionStage, IMessageLoopSelectionStage,
         return WithSessionLimits(limits);
     }
 
-    public IBuildingStage WithSessionLimits(SessionLimits limits)
+    /// <inheritdoc cref="IBotBaseBuilder.WithSessionLimits(SessionLimits)" />
+    public IBotBaseBuilder WithSessionLimits(SessionLimits limits)
     {
         if (limits == null)
         {
             throw new ArgumentNullException(nameof(limits));
         }
 
-        limits.Validate();
-
         _sessionLimits = limits.Clone();
         return this;
     }
 
     #endregion
+
+    /// <inheritdoc cref="IBotBaseBuilder.Build()" />
+    public BotBase Build()
+    {
+        if (_built)
+        {
+            throw new InvalidOperationException("This builder has already built a bot. Create a new builder for another bot.");
+        }
+
+        var errors = new List<string>();
+
+        var formFactory = Create(_formFactory, errors, "Start form",
+                                 "No start form is configured. Call WithStartForm, WithServiceProvider or WithFormFactory.");
+
+        var messageLoop = Create(_messageLoop ?? (() => new FormBaseMessageLoop()), errors, "Message loop",
+                                 "The message loop configuration returned null.");
+
+        _networking.Validate(errors);
+
+        if (_useThreadPool && _workerThreads != null && (_workerThreads < 1 || _ioThreads < 1))
+        {
+            errors.Add($"Threading: the thread pool needs at least 1 worker and 1 IO thread, but got {_workerThreads} and {_ioThreads}.");
+        }
+
+        try
+        {
+            _sessionLimits?.Validate();
+        }
+        catch (ArgumentException ex)
+        {
+            errors.Add("Session limits: " + ex.Message);
+        }
+
+        MessageClient client = null;
+        if (errors.Count == 0)
+        {
+            client = Create(() => _networking.CreateClient(_apiKey, _useThreadPool), errors, "API key",
+                            "The message client could not be created.");
+        }
+
+        IRequestDispatcher requestDispatcher = null;
+        if (client != null)
+        {
+            if (client is ThreadPoolMessageClient threadPoolClient)
+            {
+                threadPoolClient.ThreadPool_WorkerThreads = _workerThreads;
+                threadPoolClient.ThreadPool_IOThreads = _ioThreads;
+            }
+
+            client.AllowedUpdates = messageLoop.ConfigureUpdateTypes();
+
+            // Created from the final client, so the dispatcher and the bot always share the same one.
+            var dispatcherFactory = _requestDispatcher ??
+                                    (c => new DefaultRequestDispatcher(new RequestDispatcherSettings(), c));
+
+            requestDispatcher = Create(() => dispatcherFactory(client), errors, "Request dispatcher",
+                                       "The custom request dispatcher factory returned null.");
+        }
+
+        if (errors.Count > 0)
+        {
+            throw new BotBaseBuilderException(errors);
+        }
+
+        if (_language != null)
+        {
+            Default.Language = _language;
+        }
+
+        _built = true;
+
+        return new BotBase(_apiKey, client)
+        {
+            FormFactory = formFactory,
+            BotCommandScopes = _botCommandScopes,
+            StateMachine = _stateMachine,
+            MessageLoopFactory = messageLoop,
+            RequestDispatcher = requestDispatcher,
+            SessionLimits = _sessionLimits
+        };
+    }
+
+    /// <summary>
+    ///     Runs the factory and records a missing result or an argument error instead of throwing.
+    /// </summary>
+    private static T Create<T>(Func<T> factory, ICollection<string> errors, string area, string missingMessage)
+        where T : class
+    {
+        if (factory == null)
+        {
+            errors.Add($"{area}: {missingMessage}");
+            return null;
+        }
+
+        try
+        {
+            var result = factory();
+            if (result == null)
+            {
+                errors.Add($"{area}: {missingMessage}");
+            }
+
+            return result;
+        }
+        catch (ArgumentException ex)
+        {
+            errors.Add($"{area}: {ex.Message}");
+            return null;
+        }
+    }
 }

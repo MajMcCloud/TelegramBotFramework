@@ -8,7 +8,7 @@ public class GroupManageForm : GroupForm
 {
     public override async Task OnMemberChanges(MemberChangeEventArgs e)
     {
-        if (e.Type != MessageType.ChatMembersAdded && e.Type != MessageType.ChatMemberLeft)
+        if (e.Type != MessageType.NewChatMembers && e.Type != MessageType.LeftChatMember)
         {
             return;
         }

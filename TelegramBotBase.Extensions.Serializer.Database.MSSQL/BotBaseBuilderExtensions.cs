@@ -1,6 +1,5 @@
 ﻿using System;
 using TelegramBotBase.Builder;
-using TelegramBotBase.Builder.Interfaces;
 
 namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
 {
@@ -14,15 +13,13 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
         /// <param name="tablePrefix"></param>
         /// <param name="fallbackForm"></param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseSqlDatabase(this ISessionSerializationStage builder,
-                                                             string connectionString, Type fallbackForm = null,
-                                                             string tablePrefix = "tgb_")
+        public static IBotBaseBuilder UseSqlDatabase(
+            this IBotBaseBuilder builder, string connectionString,
+            Type fallbackForm = null, string tablePrefix = "tgb_")
         {
             var serializer = new MssqlSerializer(connectionString, tablePrefix, fallbackForm);
 
-            builder.UseSerialization(serializer);
-
-            return builder as BotBaseBuilder;
+            return builder.UseSerialization(serializer);
         }
 
 
@@ -37,18 +34,17 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
         /// <param name="tablePrefix"></param>
         /// <param name="fallbackForm"></param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseSqlDatabase(this ISessionSerializationStage builder, string hostOrIP,
-                                                             string databaseName, string userId, string password,
-                                                             Type fallbackForm = null, string tablePrefix = "tgb_")
+        public static IBotBaseBuilder UseSqlDatabase(
+            this IBotBaseBuilder builder, string hostOrIP,
+            string databaseName, string userId, string password,
+            Type fallbackForm = null, string tablePrefix = "tgb_")
         {
             var connectionString =
                 $"Server={hostOrIP}; Database={databaseName}; User Id={userId}; Password={password}; TrustServerCertificate=true;";
 
             var serializer = new MssqlSerializer(connectionString, tablePrefix, fallbackForm);
 
-            builder.UseSerialization(serializer);
-
-            return builder as BotBaseBuilder;
+            return builder.UseSerialization(serializer);
         }
 
         /// <summary>
@@ -60,9 +56,10 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
         /// <param name="tablePrefix"></param>
         /// <param name="fallbackForm"></param>
         /// <returns></returns>
-        public static ILanguageSelectionStage UseSqlDatabase(this ISessionSerializationStage builder, string hostOrIP,
-                                                             string databaseName, bool integratedSecurity = true,
-                                                             Type fallbackForm = null, string tablePrefix = "tgb_")
+        public static IBotBaseBuilder UseSqlDatabase(
+            this IBotBaseBuilder builder, string hostOrIP,
+            string databaseName, bool integratedSecurity = true,
+            Type fallbackForm = null, string tablePrefix = "tgb_")
         {
             if (!integratedSecurity)
             {
@@ -74,9 +71,7 @@ namespace TelegramBotBase.Extensions.Serializer.Database.MSSQL
 
             var serializer = new MssqlSerializer(connectionString, tablePrefix, fallbackForm);
 
-            builder.UseSerialization(serializer);
-
-            return builder as BotBaseBuilder;
+            return builder.UseSerialization(serializer);
         }
     }
 }

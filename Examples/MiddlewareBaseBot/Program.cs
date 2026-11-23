@@ -21,9 +21,7 @@ public class Program
     /// </summary>
     private static BotBase GetAdminBot()
     {
-        var bot = BotBaseBuilder
-                    .Create()
-                    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
+        var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                     .MiddlewareMessageLoop(
                         messageLoop =>
                             messageLoop
@@ -52,13 +50,8 @@ public class Program
                                 .UseBotCommands()
                                 .UseForms())
                     .WithStartForm<StartForm>()
-                    .NoProxy()
-                    .UseDefaultRequestDispatcher()
                     .DefaultCommands()
-                    .NoSerialization()
                     .UsePersian()
-                    .UseSingleThread()
-                    .NoSessionLimits()
                     .Build();
 
         return bot;
@@ -69,9 +62,7 @@ public class Program
     /// </summary>
     private static BotBase GetInlineQueryBot()
     {
-        var bot = BotBaseBuilder
-                    .Create()
-                    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
+        var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                     .MiddlewareMessageLoop(
                         messageLoop =>
                             messageLoop
@@ -90,13 +81,8 @@ public class Program
                                     return;
                                 }))
                     .WithStartForm<StartForm>()
-                    .NoProxy()
-                    .UseDefaultRequestDispatcher()
                     .DefaultCommands()
-                    .NoSerialization()
                     .UsePersian()
-                    .UseSingleThread()
-                    .NoSessionLimits()
                     .Build();
 
         return bot;
@@ -107,9 +93,7 @@ public class Program
     /// </summary>
     private static BotBase GetFormBaseBot()
     {
-        var bot = BotBaseBuilder
-                            .Create()
-                            .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
+        var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                             .MiddlewareMessageLoop(
                                 messageLoop =>
                                     messageLoop
@@ -126,13 +110,8 @@ public class Program
                             // .UseActions()
                             // .UseRender()
                             .WithStartForm<StartForm>()
-                            .NoProxy()
-                            .UseDefaultRequestDispatcher()
                             .DefaultCommands()
-                            .NoSerialization()
                             .UsePersian()
-                            .UseSingleThread()
-                            .NoSessionLimits()
                             .Build();
 
         return bot;
@@ -143,22 +122,15 @@ public class Program
     /// </summary>
     private static BotBase GetFullBot()
     {
-        var bot = BotBaseBuilder
-                            .Create()
-                            .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
+        var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                             .MiddlewareMessageLoop(
                                 messageLoop =>
                                     messageLoop
                                         .UseBotCommands()
                                         .UseForms())
                             .WithStartForm<StartForm>()
-                            .NoProxy()
-                            .UseDefaultRequestDispatcher()
                             .DefaultCommands()
-                            .NoSerialization()
                             .UsePersian()
-                            .UseSingleThread()
-                            .NoSessionLimits()
                             .Build();
 
         return bot;
@@ -169,21 +141,14 @@ public class Program
     /// </summary>
     private static BotBase GetMinimalBot()
     {
-        var bot = BotBaseBuilder
-                            .Create()
-                            .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
+        var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                             .MiddlewareMessageLoop(
                                 messageLoop =>
                                     messageLoop
                                         .UseLoad())
                             .WithStartForm<StartForm>()
-                            .NoProxy()
-                            .UseDefaultRequestDispatcher()
                             .DefaultCommands()
-                            .NoSerialization()
                             .UsePersian()
-                            .UseSingleThread()
-                            .NoSessionLimits()
                             .Build();
 
         return bot;
@@ -191,21 +156,14 @@ public class Program
 
     private static BotBase GetPhotoBot()
     {
-        var bot = BotBaseBuilder
-                    .Create()
-                    .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
+        var bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ?? throw new Exception("API_KEY is not set"))
                     .MiddlewareMessageLoop(
                         messageLoop =>
                             messageLoop
                                 .UseAttachments(MessageType.Photo))
                     .WithStartForm<StartForm>()
-                    .NoProxy()
-                    .UseDefaultRequestDispatcher()
                     .DefaultCommands()
-                    .NoSerialization()
                     .UsePersian()
-                    .UseSingleThread()
-                    .NoSessionLimits()
                     .Build();
 
         return bot;

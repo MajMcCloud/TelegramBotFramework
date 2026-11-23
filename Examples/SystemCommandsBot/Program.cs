@@ -20,8 +20,8 @@ internal class Program
             return;
         }
 
-        var bot = BotBaseBuilder.Create()
-                                .QuickStart<StartForm>(BotConfig.ApiKey)
+        var bot = BotBaseBuilder.Create(BotConfig.ApiKey)
+                                .WithStartForm<StartForm>()
                                 .Build();
 
         await bot.Start();

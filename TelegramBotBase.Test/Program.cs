@@ -31,14 +31,9 @@ internal class Program
             return;
         }
 
-        bot = BotBaseBuilder
-                 .Create()
-                 .WithAPIKey(Environment.GetEnvironmentVariable("API_KEY") ??
+        bot = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ??
                              throw new Exception("API_KEY is not set"))
-                 .DefaultMessageLoop()
                  .WithStartForm<Start>()
-                 .NoProxy()
-                 .UseDefaultRequestDispatcher()
                  .CustomCommands(a =>
                  {
                      a.Start("Starts the bot");
@@ -49,10 +44,8 @@ internal class Program
                      a.Add("form2", "Opens test form 2");
                      a.Add("params", "Returns all send parameters as a message.");
                  })
-                 .NoSerialization()
                  .UseEnglish()
                  .UseThreadPool()
-                 .NoSessionLimits()
                  .Build();
 
 
