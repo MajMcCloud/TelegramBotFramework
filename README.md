@@ -283,34 +283,41 @@ The language is applied to `Default.Language` when `Build()` is called.
 
 ### Receiving updates by webhook
 
-Call `.WithWebhook(url, secretToken)` to let `await bot.Start()` register a public HTTPS webhook with Telegram.
-`WithWebhook` and `UseThreadPool` select different receiving modes. The bot uses the message loop's allowed update
-types and `ConfigureNetworking(n => n.DropPendingUpdates = true)` if configured. You can set `maxConnections` or
-provide a `certificateFactory` that opens a fresh public certificate stream for each registration.
+#### Try the counter bot
 
-In your HTTP handler, require exactly one `X-Telegram-Bot-Api-Secret-Token` header value and verify it with
-`bot.IsValidWebhookSecret(value)` before reading the body. Deserialize the request as a `Telegram.Bot.Types.Update`
-using `Telegram.Bot.JsonBotAPI.Options`, then pass it to `await bot.HandleUpdateAsync(update)`. The bot processes
-webhook updates one at a time per device.
+1. Set up a public HTTPS address that forwards requests to the example app. The default launch profile listens on `https://localhost:7200`. Telegram must be able to reach `/bot/webhook` at the public address. If a proxy terminates TLS and forwards over HTTP, configure ASP.NET Core to trust the scheme forwarded by that proxy.
+2. From the repository root, run the following commands in a shell. Replace the bot token and public hostname with your own. The webhook secret is a separate value that Telegram will send with each request.
 
-The [BotAndWebApplication example](Examples/BotAndWebApplication) switches to webhook mode when the Telegram
-webhook settings are supplied. Set these environment variables and run the project.
+   ```sh
+   export API_KEY='<your bot token>'
+   export Telegram__WebhookUrl='https://your-public-host.example/bot/webhook'
+   export Telegram__WebhookSecret="$(openssl rand -hex 32)"
+   dotnet run --project Examples/BotAndWebApplication --launch-profile BotAndWebApplication
+   ```
 
-```sh
-export API_KEY='<your bot token>'
-export Telegram__WebhookUrl='https://your-public-host.example/bot/webhook'
-export Telegram__WebhookSecret="$(openssl rand -hex 32)"
-dotnet run --project Examples/BotAndWebApplication
+3. Open `https://localhost:7200/`. The home page should say **Receiving updates via webhook**. This confirms the running app selected webhook mode.
+4. Open the bot in Telegram and send `/start`. Tap **Increase!** and then **Decrease!**. Seeing the counter change in the chat confirms that Telegram can reach the public endpoint and that button clicks reach the form.
+
+#### Use webhooks in your own bot
+
+Configure the builder with the public URL of your HTTP handler and the secret it will check. Starting the bot restores its sessions and registers the webhook with Telegram.
+
+```csharp
+var bot = BotBaseBuilder.Create(apiKey)
+    .WithStartForm<StartForm>()
+    .WithWebhook(publicWebhookUrl, webhookSecret)
+    .Build();
+
+await bot.Start();
 ```
 
-Route the public HTTPS URL to the example's `/bot/webhook` endpoint. If a reverse proxy terminates TLS, configure
-ASP.NET Core to trust its forwarded scheme so HTTPS redirection recognizes the original request. The endpoint
-returns `200 OK` once its bounded in-memory queue accepts the update, and `503 Service Unavailable` when the queue
-is full or closing so Telegram can retry. Graceful shutdown drains the queue before saving sessions. A process
-crash can lose accepted updates still in memory.
+In the HTTP handler, require exactly one `X-Telegram-Bot-Api-Secret-Token` header and check its value with `bot.IsValidWebhookSecret(value)` before reading the body. Deserialize the JSON as a `Telegram.Bot.Types.Update` using `Telegram.Bot.JsonBotAPI.Options`. Pass the update to `await bot.HandleUpdateAsync(update)` to run the existing message loop. Updates for the same device run one at a time.
 
-The bot keeps the webhook registered on stop by default. To remove it on stop, pass `deleteOnStop: true` to
-`WithWebhook`. When switching an already registered bot back to polling, remove its webhook first.
+The example keeps the HTTP response fast by handing the update to a bounded in-memory queue. It returns `200 OK` once the queue accepts the update. A worker then calls `HandleUpdateAsync`. When the queue is full or closing, the endpoint returns `503 Service Unavailable` so Telegram can retry. Graceful shutdown drains accepted work before saving sessions. A crash can lose work already acknowledged to Telegram. [Endpoint and queue implementation](Examples/BotAndWebApplication/BotStuff/TelegramWebhook.cs)
+
+Webhook registration uses the message loop's allowed update types and the networking option `DropPendingUpdates`. Use the optional `maxConnections` argument to limit Telegram's simultaneous delivery connections, or `certificateFactory` to supply a fresh public certificate stream on each registration.
+
+By default, `await bot.Stop()` keeps the webhook registered for the next startup. If you plan to switch back to polling, configure `deleteOnStop: true` before starting the webhook bot and stop it gracefully. For a webhook already left registered, call Telegram's `DeleteWebhook` before starting polling. To run the example in polling mode, supply only `API_KEY` and unset both webhook settings.
 
 ### Validation
 
