@@ -1,62 +1,51 @@
-﻿using TelegramBotBase;
-using TelegramBotBase.Builder;
+using TelegramBotBase;
 
-namespace BotAndWebApplication.BotStuff.Tasks
+namespace BotAndWebApplication.BotStuff.Tasks;
+
+internal sealed class BotBackgroundTask : IHostedService
 {
-    public class BotBackgroundTask : IHostedService
+    private readonly BotBase _bot;
+    private readonly ILogger<BotBackgroundTask> _logger;
+    private readonly TelegramWebhook? _webhook;
+
+    public BotBackgroundTask(BotBase bot, ILogger<BotBackgroundTask> logger, TelegramWebhook? webhook = null)
     {
-        BotBackgroundTask()
+        _bot = bot;
+        _logger = logger;
+        _webhook = webhook;
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Bot is starting.");
+
+        await _bot.UploadBotCommands();
+        await _bot.Start(cancellationToken);
+        _webhook?.Start();
+
+        _logger.LogInformation("Bot has started.");
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Bot is stopping.");
+
+        try
         {
-            BotBaseInstance = BotBaseBuilder.Create(Environment.GetEnvironmentVariable("API_KEY") ??
-                                    throw new Exception("API_KEY is not set"))
-                                .WithStartForm<StartForm>()
-                                .DefaultCommands()
-                                .UseEnglish()
-                                .UseThreadPool()
-                                .Build();
+            if (_webhook != null)
+            {
+                await _webhook.StopAsync();
+            }
+            else
+            {
+                await _bot.SentToAll("Bot will shut down now.");
+            }
+        }
+        finally
+        {
+            await _bot.Stop();
         }
 
-        public BotBackgroundTask(ILogger<BotBackgroundTask> logger) : this()
-        {
-            Logger = logger;
-        }
-
-        public ILogger<BotBackgroundTask>? Logger { get; }
-
-        public BotBase BotBaseInstance { get; private set; }
-
-
-
-
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            if (BotBaseInstance == null)
-                return;
-
-            Logger?.LogInformation("Bot is starting.");
-
-            await BotBaseInstance.UploadBotCommands();
-
-            await BotBaseInstance.Start();
-
-
-            Logger?.LogInformation("Bot has been started.");
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            if (BotBaseInstance == null)
-                return;
-
-            Logger?.LogInformation("Bot will shut down.");
-
-            //Let all users know that the bot will shut down.
-
-            await BotBaseInstance.SentToAll("Bot will shut down now.");
-
-            await BotBaseInstance.Stop();
-
-            Logger?.LogInformation("Bot has shutted down.");
-        }
+        _logger.LogInformation("Bot has stopped.");
     }
 }

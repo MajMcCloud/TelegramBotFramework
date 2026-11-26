@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -24,10 +25,15 @@ namespace TelegramBotBase;
 /// <typeparam name="T"></typeparam>
 public sealed class BotBase
 {
-    internal BotBase(string apiKey, MessageClient client)
+    private readonly SemaphoreSlim _lifecycle = new(1, 1);
+    private readonly WebhookReceiver _webhook;
+    private bool _started;
+
+    internal BotBase(string apiKey, MessageClient client, WebhookReceiver webhook = null)
     {
         ApiKey = apiKey;
         Client = client;
+        _webhook = webhook;
 
         SystemSettings = new Dictionary<ESettings, uint>();
 
@@ -90,29 +96,97 @@ public sealed class BotBase
 
 
     /// <summary>
-    ///     Start your Bot
+    ///     Starts the bot and begins receiving updates.
     /// </summary>
-    public async Task Start()
+    public Task Start()
+    {
+        return Start(CancellationToken.None);
+    }
+
+    /// <summary>
+    ///     Starts the bot and waits for Telegram to register the webhook when webhook mode is configured.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the wait to start and the webhook registration request.</param>
+    public async Task Start(CancellationToken cancellationToken)
     {
         if (Client == null)
         {
             return;
         }
 
-        Client.MessageLoop += Client_MessageLoop;
-
-        await Sessions.LoadSessionStatesOnStart();
-
-        // Enable auto session saving
-        if (GetSetting(ESettings.SaveSessionsOnConsoleExit, false))
+        await _lifecycle.WaitAsync(cancellationToken);
+        try
         {
-            // should be waited until finish
-            Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
+            if (_started)
+            {
+                return;
+            }
+
+            Client.MessageLoop += Client_MessageLoop;
+            try
+            {
+                await Sessions.LoadSessionStatesOnStart();
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (GetSetting(ESettings.SaveSessionsOnConsoleExit, false))
+                {
+                    Console.SetHandler(() => { Sessions.SaveSessionStates().GetAwaiter().GetResult(); });
+                }
+
+                Sessions.StartSweeper();
+                if (_webhook == null)
+                {
+                    Client.StartReceiving();
+                }
+                else
+                {
+                    await _webhook.Start(Client, cancellationToken);
+                }
+
+                _started = true;
+            }
+            catch
+            {
+                Client.MessageLoop -= Client_MessageLoop;
+                await Sessions.StopSweeper();
+                throw;
+            }
+        }
+        finally
+        {
+            _lifecycle.Release();
+        }
+    }
+
+    /// <summary>
+    ///     Checks whether the supplied X-Telegram-Bot-Api-Secret-Token header value matches the configured secret.
+    ///     The HTTP host should reject requests with a missing header or multiple header values.
+    /// </summary>
+    public bool IsValidWebhookSecret(string secretToken)
+    {
+        return _webhook?.IsValidSecret(secretToken) == true;
+    }
+
+    /// <summary>
+    ///     Processes an authenticated webhook update through the bot's message loop. Updates for the same device
+    ///     run one at a time. The HTTP host must authenticate the request before calling this method.
+    /// </summary>
+    /// <param name="update">The deserialized update from Telegram.</param>
+    /// <param name="cancellationToken">Cancels a pending update before its handler starts.</param>
+    /// <exception cref="InvalidOperationException">The bot is not running in webhook mode.</exception>
+    public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken = default)
+    {
+        if (update == null)
+        {
+            throw new ArgumentNullException(nameof(update));
         }
 
-        Sessions.StartSweeper();
+        if (_webhook == null)
+        {
+            throw new InvalidOperationException("The bot is not configured to receive webhook updates.");
+        }
 
-        Client.StartReceiving();
+        await _webhook.HandleUpdateAsync(Client, update, cancellationToken);
     }
 
 
@@ -186,7 +260,7 @@ public sealed class BotBase
 
 
     /// <summary>
-    ///     Stop your Bot
+    ///     Stops receiving updates, drains admitted webhook updates and saves session state.
     /// </summary>
     public async Task Stop()
     {
@@ -195,12 +269,42 @@ public sealed class BotBase
             return;
         }
 
-        Client.MessageLoop -= Client_MessageLoop;
-        Client.StopReceiving();
+        await _lifecycle.WaitAsync();
+        try
+        {
+            if (_webhook != null)
+            {
+                if (!_started)
+                {
+                    return;
+                }
 
-        await Sessions.StopSweeper();
+                await _webhook.Drain();
+            }
 
-        await Sessions.SaveSessionStates();
+            _started = false;
+            Client.MessageLoop -= Client_MessageLoop;
+            try
+            {
+                if (_webhook == null)
+                {
+                    Client.StopReceiving();
+                }
+                else
+                {
+                    await _webhook.DeleteIfConfigured(Client);
+                }
+            }
+            finally
+            {
+                await Sessions.StopSweeper();
+                await Sessions.SaveSessionStates();
+            }
+        }
+        finally
+        {
+            _lifecycle.Release();
+        }
     }
 
     /// <summary>

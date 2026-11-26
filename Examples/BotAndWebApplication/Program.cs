@@ -1,4 +1,6 @@
+using BotAndWebApplication.BotStuff;
 using BotAndWebApplication.BotStuff.Tasks;
+using TelegramBotBase.Builder;
 
 internal class Program
 {
@@ -9,6 +11,27 @@ internal class Program
         // Add services to the container.
         builder.Services.AddRazorPages();
 
+        var botBuilder = BotBaseBuilder.Create(builder.Configuration["API_KEY"] ??
+                                               throw new InvalidOperationException("API_KEY is not set."))
+                                       .WithStartForm<StartForm>()
+                                       .DefaultCommands()
+                                       .UseEnglish();
+
+        var webhookUrl = builder.Configuration["Telegram:WebhookUrl"];
+        var webhookSecret = builder.Configuration["Telegram:WebhookSecret"];
+        var useWebhook = webhookUrl != null || webhookSecret != null;
+        if (useWebhook)
+        {
+            botBuilder.WithWebhook(webhookUrl ?? throw new InvalidOperationException("Telegram:WebhookUrl is not set."),
+                                   webhookSecret ?? throw new InvalidOperationException("Telegram:WebhookSecret is not set."));
+            builder.Services.AddSingleton<TelegramWebhook>();
+        }
+        else
+        {
+            botBuilder.UseThreadPool();
+        }
+
+        builder.Services.AddSingleton(botBuilder.Build());
         builder.Services.AddHostedService<BotBackgroundTask>();
 
         var app = builder.Build();
@@ -29,6 +52,10 @@ internal class Program
         app.UseAuthorization();
 
         app.MapRazorPages();
+        if (useWebhook)
+        {
+            app.MapPost(TelegramWebhook.Path, (HttpRequest request, TelegramWebhook webhook) => webhook.HandleAsync(request));
+        }
 
         app.Run();
     }

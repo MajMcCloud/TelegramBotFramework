@@ -1,10 +1,20 @@
-﻿@page
+@page
 @model IndexModel
+@using BotAndWebApplication.BotStuff
+@inject IServiceProvider Services
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Telegram bot example";
+    var usesWebhook = Services.GetService<TelegramWebhook>() != null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>Telegram counter bot</h1>
+<p>Receiving updates via <strong>@(usesWebhook ? "webhook" : "long polling")</strong>.</p>
+
+@if (usesWebhook)
+{
+    <p>Telegram sends messages and button clicks to <code>POST /bot/webhook</code>.
+       The endpoint checks the secret header and queues each update for the bot.</p>
+}
+
+<p>Open your bot in Telegram and send <code>/start</code>. Tap <strong>Increase!</strong>
+   or <strong>Decrease!</strong> to see the counter change in the chat.</p>

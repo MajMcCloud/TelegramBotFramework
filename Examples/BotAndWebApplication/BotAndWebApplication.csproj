@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\TelegramBotBase\TelegramBotBase.csproj" />
+    <InternalsVisibleTo Include="TelegramBotBase.Tests" />
   </ItemGroup>
 
   <ItemGroup>

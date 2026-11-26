@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
@@ -177,11 +178,11 @@ public class MessageClient
 
     public async Task OnMessageLoop(UpdateResult update)
     {
-        var eventHandlers = (Events[EvOnMessageLoop] as Async.AsyncEventHandler<UpdateResult>)?.Invoke(this, update);
-
-        if (eventHandlers != null)
+        if (Events[EvOnMessageLoop] is Async.AsyncEventHandler<UpdateResult> eventHandlers)
         {
-            await eventHandlers;
+            await Task.WhenAll(eventHandlers.GetInvocationList()
+                                            .Cast<Async.AsyncEventHandler<UpdateResult>>()
+                                            .Select(async handler => await (handler(this, update) ?? Task.CompletedTask)));
         }
     }
 

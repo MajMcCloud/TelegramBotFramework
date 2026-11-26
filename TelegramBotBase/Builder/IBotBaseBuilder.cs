@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Form;
@@ -230,12 +231,24 @@ public interface IBotBaseBuilder
     IBotBaseBuilder UseLanguage(Localization language);
 
     /// <summary>
-    ///     Handles every update on the thread pool instead of a single thread.
+    ///     Receives updates via a Telegram webhook. The HTTP host can verify the secret with
+    ///     <see cref="BotBase.IsValidWebhookSecret" /> and pass updates to <see cref="BotBase.HandleUpdateAsync" />.
+    /// </summary>
+    /// <param name="url">The public HTTPS URL that receives Telegram updates.</param>
+    /// <param name="secretToken">The value Telegram sends in the X-Telegram-Bot-Api-Secret-Token header.</param>
+    /// <param name="maxConnections">The optional maximum number of simultaneous delivery connections (1–100).</param>
+    /// <param name="deleteOnStop">Whether to remove the webhook from Telegram when the bot stops.</param>
+    /// <param name="certificateFactory">Optional factory for a fresh public certificate stream on each start.</param>
+    IBotBaseBuilder WithWebhook(string url, string secretToken, int? maxConnections = null,
+                                bool deleteOnStop = false, Func<InputFileStream> certificateFactory = null);
+
+    /// <summary>
+    ///     Handles each polled update on the thread pool instead of a single thread.
     /// </summary>
     IBotBaseBuilder UseThreadPool();
 
     /// <summary>
-    ///     Handles every update on the thread pool and sets its maximum number of threads on start.
+    ///     Handles each polled update on the thread pool and sets its maximum number of threads on start.
     /// </summary>
     IBotBaseBuilder UseThreadPool(int workerThreads, int ioThreads);
 

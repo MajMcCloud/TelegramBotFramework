@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Telegram.Bot.Types;
 using TelegramBotBase.Base;
 using TelegramBotBase.Commands;
 using TelegramBotBase.Factories;
@@ -35,6 +36,8 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
     private IStateMachine _stateMachine;
 
     private Localization _language;
+
+    private WebhookReceiver _webhook;
 
     private bool _useThreadPool;
 
@@ -391,7 +394,15 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
     #endregion
 
-    #region "Threading"
+    #region "Update receiving"
+
+    /// <inheritdoc cref="IBotBaseBuilder.WithWebhook" />
+    public IBotBaseBuilder WithWebhook(string url, string secretToken, int? maxConnections = null,
+                                       bool deleteOnStop = false, Func<InputFileStream> certificateFactory = null)
+    {
+        _webhook = new WebhookReceiver(url, secretToken, maxConnections, deleteOnStop, certificateFactory);
+        return this;
+    }
 
     /// <inheritdoc cref="IBotBaseBuilder.UseThreadPool()" />
     public IBotBaseBuilder UseThreadPool()
@@ -467,6 +478,12 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
         _networking.Validate(errors);
 
+        _webhook?.Validate(errors);
+        if (_webhook != null && _useThreadPool)
+        {
+            errors.Add("Update receiving: WithWebhook and UseThreadPool select different receiving modes.");
+        }
+
         if (_useThreadPool && _workerThreads != null && (_workerThreads < 1 || _ioThreads < 1))
         {
             errors.Add($"Threading: the thread pool needs at least 1 worker and 1 IO thread, but got {_workerThreads} and {_ioThreads}.");
@@ -519,7 +536,7 @@ public sealed class BotBaseBuilder : IBotBaseBuilder
 
         _built = true;
 
-        return new BotBase(_apiKey, client)
+        return new BotBase(_apiKey, client, _webhook)
         {
             FormFactory = formFactory,
             BotCommandScopes = _botCommandScopes,
