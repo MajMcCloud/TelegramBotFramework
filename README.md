@@ -276,10 +276,41 @@ A builder creates exactly one bot, a second `Build()` call throws an `InvalidOpe
 | Bot commands       | only `/start` ("Starts the bot")                       | `DefaultCommands()` (`/start`, `/help`, `/settings`), `CustomCommands(...)` (starts from an empty list), `NoCommands()`                                  |
 | Serialization      | none, sessions are not saved                           | `UseJSON()`, `UseXML()`, `UseSerialization(stateMachine)`, extension packages (i.e. `UseSqlDatabase(...)`)                                               |
 | Language           | the current `Default.Language`, which is English by default | `UseEnglish()`, `UseGerman()`, `UsePersian()`, `UseRussian()`, `UseUkrainian()`, `UseBelarusian()`, `UseLanguage(localization)`                     |
-| Threading          | single thread                                          | `UseThreadPool()`, `UseThreadPool(workerThreads, ioThreads)`                                                                                             |
+| Update receiving   | polling, one update at a time                          | `UseThreadPool()`, `UseThreadPool(workerThreads, ioThreads)`, `WithWebhook(url, secretToken, ...)`                                                       |
 | Session limits     | none, sessions are kept in memory until they end       | `WithDefaultSessionLimits()`, `WithSessionLimits(...)`                                                                                                  |
 
 The language is applied to `Default.Language` when `Build()` is called.
+
+### Receiving updates by webhook
+
+Call `.WithWebhook(url, secretToken)` to let `await bot.Start()` register a public HTTPS webhook with Telegram.
+`WithWebhook` and `UseThreadPool` select different receiving modes. The bot uses the message loop's allowed update
+types and `ConfigureNetworking(n => n.DropPendingUpdates = true)` if configured. You can set `maxConnections` or
+provide a `certificateFactory` that opens a fresh public certificate stream for each registration.
+
+In your HTTP handler, require exactly one `X-Telegram-Bot-Api-Secret-Token` header value and verify it with
+`bot.IsValidWebhookSecret(value)` before reading the body. Deserialize the request as a `Telegram.Bot.Types.Update`
+using `Telegram.Bot.JsonBotAPI.Options`, then pass it to `await bot.HandleUpdateAsync(update)`. The bot processes
+webhook updates one at a time per device.
+
+The [BotAndWebApplication example](Examples/BotAndWebApplication) switches to webhook mode when the Telegram
+webhook settings are supplied. Set these environment variables and run the project.
+
+```sh
+export API_KEY='<your bot token>'
+export Telegram__WebhookUrl='https://your-public-host.example/bot/webhook'
+export Telegram__WebhookSecret="$(openssl rand -hex 32)"
+dotnet run --project Examples/BotAndWebApplication
+```
+
+Route the public HTTPS URL to the example's `/bot/webhook` endpoint. If a reverse proxy terminates TLS, configure
+ASP.NET Core to trust its forwarded scheme so HTTPS redirection recognizes the original request. The endpoint
+returns `200 OK` once its bounded in-memory queue accepts the update, and `503 Service Unavailable` when the queue
+is full or closing so Telegram can retry. Graceful shutdown drains the queue before saving sessions. A process
+crash can lose accepted updates still in memory.
+
+The bot keeps the webhook registered on stop by default. To remove it on stop, pass `deleteOnStop: true` to
+`WithWebhook`. When switching an already registered bot back to polling, remove its webhook first.
 
 ### Validation
 

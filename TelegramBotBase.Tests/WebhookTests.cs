@@ -1,6 +1,13 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Text;
 using System.Text.Json;
+using BotAndWebApplication.BotStuff;
+using BotAndWebApplication.BotStuff.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -196,6 +203,110 @@ public class WebhookTests
         }
 
         await api.PollCanceled.Task.WaitAsync(TestTimeout);
+    }
+
+    [Fact]
+    public async Task WebExample_AuthenticatesAndBoundsDeliveryThenDrainsBeforeSaving()
+    {
+        using var api = new TestTelegramApi();
+        using var httpClient = new HttpClient(api);
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var unblock = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var received = new ConcurrentQueue<(int UpdateId, long DeviceId, string Text)>();
+        var loop = new TestMessageLoop
+        {
+            Handler = async (_, _, update) =>
+            {
+                received.Enqueue((update.RawData.Id, update.DeviceId, update.Message.Text));
+                started.TrySetResult();
+                await unblock.Task;
+            }
+        };
+        var state = new MemoryStateMachine();
+        var bot = CreateBuilder(httpClient, loop).WithWebhook(Url, Secret).UseSerialization(state).Build();
+        var builder = Host.CreateApplicationBuilder();
+        builder.Services.AddSingleton(bot);
+        builder.Services.AddSingleton<TelegramWebhook>();
+        builder.Services.AddHostedService<BotBackgroundTask>();
+        using var host = builder.Build();
+        var webhook = host.Services.GetRequiredService<TelegramWebhook>();
+        await host.StartAsync();
+
+        Task stop = null;
+        var accepted = new List<int>();
+        try
+        {
+            Assert.Equal(StatusCodes.Status401Unauthorized, await SendToExample(webhook, StringValues.Empty));
+            Assert.Equal(StatusCodes.Status401Unauthorized, await SendToExample(webhook, "wrong"));
+            Assert.Equal(StatusCodes.Status401Unauthorized, await SendToExample(webhook, new[] { Secret, Secret }));
+            Assert.Equal(StatusCodes.Status415UnsupportedMediaType,
+                         await SendToExample(webhook, Secret, contentType: "text/plain"));
+            Assert.Equal(StatusCodes.Status400BadRequest, await SendToExample(webhook, Secret, body: "{"));
+            Assert.Equal(StatusCodes.Status400BadRequest, await SendToExample(webhook, Secret, body: "{}"));
+
+            Assert.Equal(StatusCodes.Status200OK, await SendToExample(webhook, Secret, updateId: 1));
+            accepted.Add(1);
+            await started.Task.WaitAsync(TestTimeout);
+
+            const int capacityProbeLimit = 120;
+            for (var id = 2; id <= capacityProbeLimit; id++)
+            {
+                var status = await SendToExample(webhook, Secret, updateId: id);
+                if (status == StatusCodes.Status503ServiceUnavailable)
+                {
+                    break;
+                }
+
+                Assert.Equal(StatusCodes.Status200OK, status);
+                accepted.Add(id);
+            }
+
+            Assert.InRange(accepted.Count, 2, capacityProbeLimit - 1);
+            stop = host.StopAsync();
+            Assert.False(stop.IsCompleted);
+            Assert.Equal(0, state.BulkSaves);
+            Assert.Equal(StatusCodes.Status503ServiceUnavailable, await SendToExample(webhook, Secret, updateId: 121));
+        }
+        finally
+        {
+            unblock.TrySetResult();
+            await (stop ?? host.StopAsync()).WaitAsync(TestTimeout);
+        }
+
+        Assert.Equal(accepted, received.Select(update => update.UpdateId).Order());
+        Assert.All(received, update =>
+        {
+            Assert.Equal(42, update.DeviceId);
+            Assert.Equal("hello", update.Text);
+        });
+        Assert.Equal(1, state.BulkSaves);
+    }
+
+    private static async Task<int?> SendToExample(TelegramWebhook webhook, StringValues secret, int updateId = 1,
+                                                   string body = null, string contentType = "application/json")
+    {
+        var request = new DefaultHttpContext().Request;
+        request.ContentType = contentType;
+        if (secret.Count > 0)
+        {
+            request.Headers["X-Telegram-Bot-Api-Secret-Token"] = secret;
+        }
+
+        body ??= $$"""
+                 {
+                   "update_id": {{updateId}},
+                   "message": {
+                     "message_id": 1,
+                     "date": 1,
+                     "chat": {"id": 42, "type": "private"},
+                     "text": "hello"
+                   }
+                 }
+                 """;
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(body));
+        request.Body = stream;
+        var result = await webhook.HandleAsync(request);
+        return Assert.IsAssignableFrom<IStatusCodeHttpResult>(result).StatusCode;
     }
 
     private static IBotBaseBuilder CreateBuilder(HttpClient httpClient, TestMessageLoop loop)

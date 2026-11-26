@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Examples\BotAndWebApplication\BotAndWebApplication.csproj" />
         <ProjectReference Include="..\TelegramBotBase\TelegramBotBase.csproj" />
         <ProjectReference Include="..\TelegramBotBase.Extensions.Serializer.Database.MSSQL\TelegramBotBase.Extensions.Serializer.Database.MSSQL.csproj" />
         <ProjectReference Include="..\TelegramBotBase.Extensions.Serializer.Database.PostgreSql\TelegramBotBase.Extensions.Serializer.Database.PostgreSql.csproj" />
